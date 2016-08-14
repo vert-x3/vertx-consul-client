@@ -17,7 +17,7 @@ import io.vertx.ext.consul.impl.ConsulClientImpl;
 public interface ConsulClient {
 
     static ConsulClient create(Vertx vertx, JsonObject config) {
-        return new ConsulClientImpl();
+        return new ConsulClientImpl(vertx, config);
     }
 
     @Fluent

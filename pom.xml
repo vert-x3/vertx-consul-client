@@ -91,6 +91,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>com.pszymczyk.consul</groupId>
+      <artifactId>embedded-consul</artifactId>
+      <version>0.1.9</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
       <version>3.4.0-SNAPSHOT</version>
