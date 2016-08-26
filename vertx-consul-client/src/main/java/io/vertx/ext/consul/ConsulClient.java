@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.ConsulClientImpl;
 
@@ -21,7 +22,10 @@ public interface ConsulClient {
     }
 
     @Fluent
-    ConsulClient getValue(String key, Handler<AsyncResult<String>> resultHandler);
+    ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler);
+
+    @Fluent
+    ConsulClient getValues(String keyPrefix, Handler<AsyncResult<JsonArray>> resultHandler);
 
     @Fluent
     ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
