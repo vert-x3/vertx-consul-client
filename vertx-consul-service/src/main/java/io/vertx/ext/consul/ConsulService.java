@@ -5,11 +5,25 @@ import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.Vertx;
+import io.vertx.serviceproxy.ProxyHelper;
+
+import java.util.List;
 
 @ProxyGen
 @VertxGen
 public interface ConsulService extends ConsulClient {
+
+    /**
+     * Create a proxy to a service that is deployed somewhere on the event bus
+     *
+     * @param vertx  the Vert.x instance
+     * @param address  the address the service is listening on on the event bus
+     * @return the service
+     */
+    static ConsulService createEventBusProxy(Vertx vertx, String address) {
+        return ProxyHelper.createProxy(ConsulService.class, vertx, address);
+    }
 
     @Override
     @Fluent
@@ -17,7 +31,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService getValues(String keyPrefix, Handler<AsyncResult<JsonArray>> resultHandler);
+    ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler);
 
     @Override
     @Fluent

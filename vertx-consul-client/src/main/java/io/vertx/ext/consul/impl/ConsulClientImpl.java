@@ -12,7 +12,9 @@ import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.KeyValuePair;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -25,8 +27,8 @@ public class ConsulClientImpl implements ConsulClient {
         Objects.requireNonNull(vertx);
         Objects.requireNonNull(config);
         httpClient = vertx.createHttpClient(new HttpClientOptions()
-                .setDefaultHost(config.getString("host", "localhost"))
-                .setDefaultPort(config.getInteger("port", 8500))
+                .setDefaultHost(config.getString("consul_host", "localhost"))
+                .setDefaultPort(config.getInteger("consul_port", 8500))
         );
     }
 
@@ -46,13 +48,13 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<JsonArray>> resultHandler) {
+    public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
         httpClient.get("/v1/kv/" + keyPrefix + "?recurse", h -> {
             if (h.statusCode() == 200) {
                 h.bodyHandler(bh -> {
-                    JsonArray arr = bh.toJsonArray().stream()
+                    List<KeyValuePair> arr = bh.toJsonArray().stream()
                             .map(obj -> parseValue((JsonObject) obj))
-                            .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+                            .collect(Collectors.toList());
                     resultHandler.handle(Future.succeededFuture(arr));
                 });
             } else {

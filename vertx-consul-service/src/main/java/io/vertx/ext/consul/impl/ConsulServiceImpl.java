@@ -2,10 +2,11 @@ package io.vertx.ext.consul.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.KeyValuePair;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -25,7 +26,7 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService getValues(String keyPrefix, Handler<AsyncResult<JsonArray>> resultHandler) {
+    public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
         consulClient.getValues(keyPrefix, resultHandler);
         return this;
     }
