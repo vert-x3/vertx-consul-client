@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class ConsulClientImpl implements ConsulClient {
 
     private final HttpClient httpClient;
+    private final String aclToken;
 
     public ConsulClientImpl(Vertx vertx, JsonObject config) {
         Objects.requireNonNull(vertx);
@@ -30,6 +31,7 @@ public class ConsulClientImpl implements ConsulClient {
                 .setDefaultHost(config.getString("consul_host", "localhost"))
                 .setDefaultPort(config.getInteger("consul_port", 8500))
         );
+        aclToken = config.getString("acl_token");
     }
 
     @Override
@@ -73,6 +75,47 @@ public class ConsulClientImpl implements ConsulClient {
                 resultHandler.handle(Future.failedFuture("bad status code"));
             }
         }).end(value);
+        return this;
+    }
+
+    @Override
+    public ConsulClient createAclToken(Handler<AsyncResult<String>> idHandler) {
+        httpClient.put("/v1/acl/create?token=" + aclToken, h -> {
+            if (h.statusCode() == 200) {
+                h.bodyHandler(bh -> {
+                    JsonObject responce = new JsonObject(bh.toString());
+                    idHandler.handle(Future.succeededFuture(responce.getString("ID")));
+                });
+            } else {
+                idHandler.handle(Future.failedFuture("bad status code"));
+            }
+        }).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler) {
+        httpClient.get("/v1/acl/info/" + id, h -> {
+            if (h.statusCode() == 200) {
+                h.bodyHandler(bh -> {
+                    tokenHandler.handle(Future.succeededFuture(new JsonArray(bh.toString()).getJsonObject(0)));
+                });
+            } else {
+                tokenHandler.handle(Future.failedFuture("bad status code"));
+            }
+        }).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
+        httpClient.put("/v1/acl/destroy/" + id + "?token=" + aclToken, h -> {
+            if (h.statusCode() == 200) {
+                resultHandler.handle(Future.succeededFuture());
+            } else {
+                resultHandler.handle(Future.failedFuture("bad status code"));
+            }
+        }).end();
         return this;
     }
 

@@ -31,6 +31,15 @@ public interface ConsulClient {
     @Fluent
     ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
 
+    @Fluent
+    ConsulClient createAclToken(Handler<AsyncResult<String>> idHandler);
+
+    @Fluent
+    ConsulClient infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler);
+
+    @Fluent
+    ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
+
     /**
      * Close the client and release its resources
      */

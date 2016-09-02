@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
@@ -36,6 +37,18 @@ public interface ConsulService extends ConsulClient {
     @Override
     @Fluent
     ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService createAclToken(Handler<AsyncResult<String>> idHandler);
+
+    @Override
+    @Fluent
+    ConsulService infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler);
+
+    @Override
+    @Fluent
+    ConsulService destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Override
     void close();
