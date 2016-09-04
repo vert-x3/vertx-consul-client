@@ -1,22 +1,25 @@
 package io.vertx.ext.consul;
 
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.json.JsonObject;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class ConsulServiceTest extends ConsulClientTestBase {
+public class ConsulServiceTest extends ConsulTestBase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        JsonObject config = config();
-        DeploymentOptions options = new DeploymentOptions().setConfig(config);
-        CountDownLatch latch = new CountDownLatch(1);
-        vertx.deployVerticle("service:io.vertx.consul-service", options, onSuccess(id -> {
-            client = ConsulService.createEventBusProxy(vertx, "vertx.consul");
+        CountDownLatch latch = new CountDownLatch(2);
+        DeploymentOptions masterOptions = new DeploymentOptions().setConfig(config(TEST_TOKEN));
+        vertx.deployVerticle("service:io.vertx.consul-service", masterOptions, onSuccess(id -> {
+            masterClient = ConsulService.createEventBusProxy(vertx, "vertx.consul");
+            latch.countDown();
+        }));
+        DeploymentOptions testOptions = new DeploymentOptions().setConfig(config(TEST_TOKEN));
+        vertx.deployVerticle("service:io.vertx.consul-service", testOptions, onSuccess(id -> {
+            testClient = ConsulService.createEventBusProxy(vertx, "vertx.consul");
             latch.countDown();
         }));
         awaitLatch(latch);

@@ -6,6 +6,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
@@ -36,7 +37,7 @@ public class ConsulClientImpl implements ConsulClient {
 
     @Override
     public ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
-        httpClient.get("/v1/kv/" + key, h -> {
+        HttpClientRequest rq = httpClient.get("/v1/kv/" + key, h -> {
             if (h.statusCode() == 200) {
                 h.bodyHandler(bh -> {
                     JsonArray arr = bh.toJsonArray();
@@ -45,13 +46,17 @@ public class ConsulClientImpl implements ConsulClient {
             } else {
                 resultHandler.handle(Future.failedFuture("bad status code"));
             }
-        }).end();
+        });
+        if (aclToken != null) {
+            rq.putHeader("X-Consul-Token", aclToken);
+        }
+        rq.end();
         return this;
     }
 
     @Override
     public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
-        httpClient.get("/v1/kv/" + keyPrefix + "?recurse", h -> {
+        HttpClientRequest rq = httpClient.get("/v1/kv/" + keyPrefix + "?recurse", h -> {
             if (h.statusCode() == 200) {
                 h.bodyHandler(bh -> {
                     List<KeyValuePair> arr = bh.toJsonArray().stream()
@@ -62,19 +67,27 @@ public class ConsulClientImpl implements ConsulClient {
             } else {
                 resultHandler.handle(Future.failedFuture("bad status code"));
             }
-        }).end();
+        });
+        if (aclToken != null) {
+            rq.putHeader("X-Consul-Token", aclToken);
+        }
+        rq.end();
         return this;
     }
 
     @Override
     public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-        httpClient.put("/v1/kv/" + key, h -> {
+        HttpClientRequest rq = httpClient.put("/v1/kv/" + key, h -> {
             if (h.statusCode() == 200) {
                 resultHandler.handle(Future.succeededFuture());
             } else {
                 resultHandler.handle(Future.failedFuture("bad status code"));
             }
-        }).end(value);
+        });
+        if (aclToken != null) {
+            rq.putHeader("X-Consul-Token", aclToken);
+        }
+        rq.end(value);
         return this;
     }
 
