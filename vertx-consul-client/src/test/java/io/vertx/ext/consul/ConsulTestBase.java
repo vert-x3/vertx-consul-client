@@ -105,7 +105,7 @@ public class ConsulTestBase extends VertxTestBase {
 
     @Test
     public void test3() throws InterruptedException {
-        masterClient.createAclToken(h -> {
+        masterClient.createAclToken(null, null, h -> {
             String id = h.result();
             masterClient.infoAclToken(id, handleResult(info -> {
                 assertEquals(id, info.getString("ID"));
@@ -117,7 +117,7 @@ public class ConsulTestBase extends VertxTestBase {
 
     @Test
     public void test4() throws InterruptedException {
-        masterClient.createAclToken(h -> {
+        masterClient.createAclToken(null, null, h -> {
             String id = h.result();
             masterClient.destroyAclToken(id, handleResult(destroyed -> testComplete()));
         });

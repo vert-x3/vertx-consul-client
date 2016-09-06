@@ -92,7 +92,14 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient createAclToken(Handler<AsyncResult<String>> idHandler) {
+    public ConsulClient createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler) {
+        JsonObject body = new JsonObject();
+        if (name != null) {
+            body.put("Name", name);
+        }
+        if (rules != null) {
+            body.put("Rules", rules);
+        }
         httpClient.put("/v1/acl/create?token=" + aclToken, h -> {
             if (h.statusCode() == 200) {
                 h.bodyHandler(bh -> {
@@ -102,7 +109,7 @@ public class ConsulClientImpl implements ConsulClient {
             } else {
                 idHandler.handle(Future.failedFuture("bad status code"));
             }
-        }).end();
+        }).end(body.encode());
         return this;
     }
 

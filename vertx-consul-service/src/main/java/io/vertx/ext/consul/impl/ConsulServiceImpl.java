@@ -39,8 +39,8 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService createAclToken(Handler<AsyncResult<String>> idHandler) {
-        consulClient.createAclToken(idHandler);
+    public ConsulService createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler) {
+        consulClient.createAclToken(name, rules, idHandler);
         return this;
     }
 

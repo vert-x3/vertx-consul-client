@@ -32,7 +32,7 @@ public interface ConsulClient {
     ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient createAclToken(Handler<AsyncResult<String>> idHandler);
+    ConsulClient createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler);
 
     @Fluent
     ConsulClient infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler);

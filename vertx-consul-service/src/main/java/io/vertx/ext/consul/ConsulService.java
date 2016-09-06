@@ -40,7 +40,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService createAclToken(Handler<AsyncResult<String>> idHandler);
+    ConsulService createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler);
 
     @Override
     @Fluent
