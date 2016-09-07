@@ -32,7 +32,15 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
+    ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
+
+    @Override
+    @Fluent
     ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
     @Override
     @Fluent

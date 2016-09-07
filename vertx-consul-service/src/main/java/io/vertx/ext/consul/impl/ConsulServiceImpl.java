@@ -27,8 +27,20 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.deleteValue(key, resultHandler);
+        return this;
+    }
+
+    @Override
     public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
         consulClient.getValues(keyPrefix, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.deleteValues(keyPrefix, resultHandler);
         return this;
     }
 

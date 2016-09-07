@@ -4,10 +4,11 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.KeyValuePair;
@@ -15,6 +16,7 @@ import io.vertx.ext.consul.KeyValuePair;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -37,57 +39,35 @@ public class ConsulClientImpl implements ConsulClient {
 
     @Override
     public ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
-        HttpClientRequest rq = httpClient.get("/v1/kv/" + key, h -> {
-            if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> {
-                    JsonArray arr = bh.toJsonArray();
-                    resultHandler.handle(Future.succeededFuture(parseValue(arr.getJsonObject(0))));
-                });
-            } else {
-                resultHandler.handle(Future.failedFuture("bad status code"));
-            }
-        });
-        if (aclToken != null) {
-            rq.putHeader("X-Consul-Token", aclToken);
-        }
-        rq.end();
+        request(HttpMethod.GET, "/v1/kv/" + key, resultHandler, buffer ->
+                parseValue(buffer.toJsonArray().getJsonObject(0)));
+        return this;
+    }
+
+    @Override
+    public ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.DELETE, "/v1/kv/" + key, resultHandler);
         return this;
     }
 
     @Override
     public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
-        HttpClientRequest rq = httpClient.get("/v1/kv/" + keyPrefix + "?recurse", h -> {
-            if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> {
-                    List<KeyValuePair> arr = bh.toJsonArray().stream()
-                            .map(obj -> parseValue((JsonObject) obj))
-                            .collect(Collectors.toList());
-                    resultHandler.handle(Future.succeededFuture(arr));
-                });
-            } else {
-                resultHandler.handle(Future.failedFuture("bad status code"));
-            }
-        });
-        if (aclToken != null) {
-            rq.putHeader("X-Consul-Token", aclToken);
-        }
-        rq.end();
+        request(HttpMethod.GET, "/v1/kv/" + keyPrefix + "?recurse", resultHandler, buffer ->
+                buffer.toJsonArray().stream()
+                        .map(obj -> parseValue((JsonObject) obj))
+                        .collect(Collectors.toList()));
+        return this;
+    }
+
+    @Override
+    public ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.DELETE, "/v1/kv/" + keyPrefix + "?recurse", resultHandler);
         return this;
     }
 
     @Override
     public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-        HttpClientRequest rq = httpClient.put("/v1/kv/" + key, h -> {
-            if (h.statusCode() == 200) {
-                resultHandler.handle(Future.succeededFuture());
-            } else {
-                resultHandler.handle(Future.failedFuture("bad status code"));
-            }
-        });
-        if (aclToken != null) {
-            rq.putHeader("X-Consul-Token", aclToken);
-        }
-        rq.end(value);
+        request(HttpMethod.PUT, "/v1/kv/" + key, value, resultHandler, buffer -> null);
         return this;
     }
 
@@ -100,48 +80,55 @@ public class ConsulClientImpl implements ConsulClient {
         if (rules != null) {
             body.put("Rules", rules);
         }
-        httpClient.put("/v1/acl/create?token=" + aclToken, h -> {
-            if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> {
-                    JsonObject responce = new JsonObject(bh.toString());
-                    idHandler.handle(Future.succeededFuture(responce.getString("ID")));
-                });
-            } else {
-                idHandler.handle(Future.failedFuture("bad status code"));
-            }
-        }).end(body.encode());
+        request(HttpMethod.PUT, "/v1/acl/create", body.encode(), idHandler, buffer ->
+                buffer.toJsonObject().getString("ID"));
         return this;
     }
 
     @Override
     public ConsulClient infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler) {
-        httpClient.get("/v1/acl/info/" + id, h -> {
-            if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> {
-                    tokenHandler.handle(Future.succeededFuture(new JsonArray(bh.toString()).getJsonObject(0)));
-                });
-            } else {
-                tokenHandler.handle(Future.failedFuture("bad status code"));
-            }
-        }).end();
+        request(HttpMethod.GET, "/v1/acl/info/" + id, tokenHandler, buffer -> buffer.toJsonArray().getJsonObject(0));
         return this;
     }
 
     @Override
     public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
-        httpClient.put("/v1/acl/destroy/" + id + "?token=" + aclToken, h -> {
-            if (h.statusCode() == 200) {
-                resultHandler.handle(Future.succeededFuture());
-            } else {
-                resultHandler.handle(Future.failedFuture("bad status code"));
-            }
-        }).end();
+        request(HttpMethod.PUT, "/v1/acl/destroy/" + id, resultHandler);
         return this;
     }
 
     @Override
     public void close() {
         httpClient.close();
+    }
+
+    private <T> void request(HttpMethod method, String path,
+                             Handler<AsyncResult<T>> resultHandler, Function<Buffer, T> mapper) {
+        request(method, path, null, resultHandler, mapper);
+    }
+
+    private <T> void request(HttpMethod method, String path,
+                             Handler<AsyncResult<T>> resultHandler) {
+        request(method, path, null, resultHandler, buffer -> null);
+    }
+
+    private <T> void request(HttpMethod method, String path, String body,
+                             Handler<AsyncResult<T>> resultHandler, Function<Buffer, T> mapper) {
+        HttpClientRequest rq = httpClient.request(method, path, h -> {
+            if (h.statusCode() == 200) {
+                h.bodyHandler(bh -> resultHandler.handle(Future.succeededFuture(mapper.apply(bh))));
+            } else {
+                resultHandler.handle(Future.failedFuture(h.statusMessage()));
+            }
+        });
+        if (aclToken != null) {
+            rq.putHeader("X-Consul-Token", aclToken);
+        }
+        if (body == null) {
+            rq.end();
+        } else {
+            rq.end(body);
+        }
     }
 
     private static KeyValuePair parseValue(JsonObject object) {

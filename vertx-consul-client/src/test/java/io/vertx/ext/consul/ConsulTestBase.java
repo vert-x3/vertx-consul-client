@@ -75,7 +75,7 @@ public class ConsulTestBase extends VertxTestBase {
     }
 
     @Test
-    public void test1() throws InterruptedException {
+    public void testKV1() throws InterruptedException {
         testClient.putValue("foo/bar", "value", handleResult(h1 -> {
             testClient.getValue("foo/bar", handleResult(pair -> {
                 assertEquals("foo/bar", pair.getKey());
@@ -87,7 +87,7 @@ public class ConsulTestBase extends VertxTestBase {
     }
 
     @Test
-    public void test2() throws InterruptedException {
+    public void testKV2() throws InterruptedException {
         testClient.putValue("foo/bars1", "value1", handleResult(h1 -> {
             testClient.putValue("foo/bars2", "value2", handleResult(h2 -> {
                 testClient.getValues("foo/bars", handleResult(h3 -> {
@@ -98,6 +98,20 @@ public class ConsulTestBase extends VertxTestBase {
                     assertEquals(expected, h3);
                     testComplete();
                 }));
+            }));
+        }));
+        await(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testKV3() throws InterruptedException {
+        testClient.putValue("foo/toDel", "value", handleResult(h1 -> {
+            testClient.deleteValue("foo/toDel", handleResult(h2 -> {
+                testClient.getValue("foo/toDel", h3 -> {
+                    if (h3.failed()) {
+                        testComplete();
+                    }
+                });
             }));
         }));
         await(1, TimeUnit.SECONDS);

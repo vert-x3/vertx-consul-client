@@ -26,7 +26,13 @@ public interface ConsulClient {
     ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler);
 
     @Fluent
+    ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
     ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler);
+
+    @Fluent
+    ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
     ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
