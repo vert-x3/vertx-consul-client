@@ -48,11 +48,11 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler);
+    ConsulService createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
     @Override
     @Fluent
-    ConsulService infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler);
+    ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
     @Override
     @Fluent

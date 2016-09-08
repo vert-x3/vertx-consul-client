@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.KeyValuePair;
 
@@ -72,22 +73,18 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient createAclToken(String name, String rules, Handler<AsyncResult<String>> idHandler) {
-        JsonObject body = new JsonObject();
-        if (name != null) {
-            body.put("Name", name);
-        }
-        if (rules != null) {
-            body.put("Rules", rules);
-        }
-        request(HttpMethod.PUT, "/v1/acl/create", body.encode(), idHandler, buffer ->
+    public ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
+        request(HttpMethod.PUT, "/v1/acl/create", token.toJson().encode(), idHandler, buffer ->
                 buffer.toJsonObject().getString("ID"));
         return this;
     }
 
     @Override
-    public ConsulClient infoAclToken(String id, Handler<AsyncResult<JsonObject>> tokenHandler) {
-        request(HttpMethod.GET, "/v1/acl/info/" + id, tokenHandler, buffer -> buffer.toJsonArray().getJsonObject(0));
+    public ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
+        request(HttpMethod.GET, "/v1/acl/info/" + id, tokenHandler, buffer -> {
+            JsonObject jsonObject = buffer.toJsonArray().getJsonObject(0);
+            return new AclToken(jsonObject);
+        });
         return this;
     }
 

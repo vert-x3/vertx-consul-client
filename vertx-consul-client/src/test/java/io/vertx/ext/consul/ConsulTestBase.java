@@ -119,10 +119,10 @@ public class ConsulTestBase extends VertxTestBase {
 
     @Test
     public void test3() throws InterruptedException {
-        masterClient.createAclToken(null, null, h -> {
+        masterClient.createAclToken(AclToken.empty(), h -> {
             String id = h.result();
             masterClient.infoAclToken(id, handleResult(info -> {
-                assertEquals(id, info.getString("ID"));
+                assertEquals(id, info.id);
                 testComplete();
             }));
         });
@@ -131,7 +131,7 @@ public class ConsulTestBase extends VertxTestBase {
 
     @Test
     public void test4() throws InterruptedException {
-        masterClient.createAclToken(null, null, h -> {
+        masterClient.createAclToken(AclToken.empty(), h -> {
             String id = h.result();
             masterClient.destroyAclToken(id, handleResult(destroyed -> testComplete()));
         });
