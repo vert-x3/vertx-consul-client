@@ -1,0 +1,106 @@
+/*
+ * Copyright 2014 Red Hat, Inc.
+ *
+ * Red Hat licenses this file to you under the Apache License, version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.  You may obtain a copy of the License at:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+package io.vertx.groovy.ext.consul;
+import groovy.transform.CompileStatic
+import io.vertx.lang.groovy.InternalHelper
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.consul.KeyValuePair
+import java.util.List
+import io.vertx.ext.consul.AclToken
+import io.vertx.groovy.core.Vertx
+import io.vertx.core.json.JsonObject
+import io.vertx.core.AsyncResult
+import io.vertx.core.Handler
+/**
+ * A Vert.x service used to interact with Consul.
+*/
+@CompileStatic
+public class ConsulClient {
+  private final def io.vertx.ext.consul.ConsulClient delegate;
+  public ConsulClient(Object delegate) {
+    this.delegate = (io.vertx.ext.consul.ConsulClient) delegate;
+  }
+  public Object getDelegate() {
+    return delegate;
+  }
+  public static ConsulClient create(Vertx vertx, Map<String, Object> config) {
+    def ret = InternalHelper.safeCreate(io.vertx.ext.consul.ConsulClient.create(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, config != null ? new io.vertx.core.json.JsonObject(config) : null), io.vertx.groovy.ext.consul.ConsulClient.class);
+    return ret;
+  }
+  public ConsulClient getValue(String key, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.getValue(key, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValuePair>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.KeyValuePair> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.deleteValue(key, resultHandler);
+    return this;
+  }
+  public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.getValues(keyPrefix, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.KeyValuePair>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.KeyValuePair>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.deleteValues(keyPrefix, resultHandler);
+    return this;
+  }
+  public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.putValue(key, value, resultHandler);
+    return this;
+  }
+  public ConsulClient createAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {
+    delegate.createAclToken(token != null ? new io.vertx.ext.consul.AclToken(io.vertx.lang.groovy.InternalHelper.toJsonObject(token)) : null, idHandler);
+    return this;
+  }
+  public ConsulClient infoAclToken(String id, Handler<AsyncResult<Map<String, Object>>> tokenHandler) {
+    delegate.infoAclToken(id, tokenHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.AclToken>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.AclToken> ar) {
+        if (ar.succeeded()) {
+          tokenHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          tokenHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.destroyAclToken(id, resultHandler);
+    return this;
+  }
+  /**
+   * Close the client and release its resources
+   */
+  public void close() {
+    delegate.close();
+  }
+}

@@ -1,0 +1,30 @@
+= Cheatsheets
+
+[[AclToken]]
+== AclToken
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[KeyValuePair]]
+== KeyValuePair
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[key]]`key`|`String`|-
+|[[value]]`value`|`String`|-
+|===
+

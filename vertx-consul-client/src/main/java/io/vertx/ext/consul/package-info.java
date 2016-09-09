@@ -1,5 +1,13 @@
 /**
  * = Vert.x Consul Client
+ *
+ * == Creating a client
+ *
+ * [source,java]
+ * ----
+ * {@link examples.Examples#exampleCreateClient}
+ * ----
+ *
  */
 @Document(fileName = "index.adoc")
 @ModuleGen(name = "vertx-consul", groupPackage = "io.vertx")

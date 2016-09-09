@@ -1,0 +1,12 @@
+= Vert.x Consul Client
+
+== Creating a client
+
+[source,java]
+----
+require 'vertx-consul/consul_client'
+
+client = VertxConsul::ConsulClient.create(vertx, config)
+
+
+----
