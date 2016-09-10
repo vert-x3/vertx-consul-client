@@ -21,6 +21,7 @@ import rx.Observable;
 import io.vertx.ext.consul.KeyValuePair;
 import java.util.List;
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.Event;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -135,6 +136,28 @@ public class ConsulService extends ConsulClient {
   public Observable<Void> destroyAclTokenObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     destroyAclToken(id, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).fireEvent(event, resultHandler);
+    return this;
+  }
+
+  public Observable<Event> fireEventObservable(Event event) { 
+    io.vertx.rx.java.ObservableFuture<Event> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    fireEvent(event, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).listEvents(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Event>> listEventsObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Event>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    listEvents(resultHandler.toHandler());
     return resultHandler;
   }
 

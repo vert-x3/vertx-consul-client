@@ -118,11 +118,25 @@ public class ConsulTestBase extends VertxTestBase {
     }
 
     @Test
+    public void testEvents1() throws InterruptedException {
+        testClient.fireEvent(Event.empty().withName("custom-event"), handleResult(h1 -> {
+            assertEquals(h1.getName(), "custom-event");
+            String evId = h1.getId();
+            testClient.listEvents(handleResult(h2 -> {
+                long cnt = h2.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
+                assertEquals(cnt, 1);
+                testComplete();
+            }));
+        }));
+        await(1, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void test3() throws InterruptedException {
         masterClient.createAclToken(AclToken.empty(), h -> {
             String id = h.result();
             masterClient.infoAclToken(id, handleResult(info -> {
-                assertEquals(id, info.id);
+                assertEquals(id, info.getId());
                 testComplete();
             }));
         });

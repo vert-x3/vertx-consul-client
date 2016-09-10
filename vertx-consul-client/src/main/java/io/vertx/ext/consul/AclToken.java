@@ -28,15 +28,15 @@ public class AclToken {
         }
     }
 
-    public static final String ID_KEY = "ID";
-    public static final String NAME_KEY = "Name";
-    public static final String TYPE_KEY = "Type";
-    public static final String RULES_KEY = "Rules";
+    private static final String ID_KEY = "ID";
+    private static final String NAME_KEY = "Name";
+    private static final String TYPE_KEY = "Type";
+    private static final String RULES_KEY = "Rules";
 
-    public final String id;
-    public final String name;
-    public final Type type;
-    public final String rules;
+    private final String id;
+    private final String name;
+    private final Type type;
+    private final String rules;
 
     public static AclToken empty() {
         return new AclToken(null, null, null, null);
@@ -54,6 +54,38 @@ public class AclToken {
         this.name = json.getString(NAME_KEY);
         this.type = Type.of(json.getString(TYPE_KEY));
         this.rules = json.getString(RULES_KEY);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public AclToken withId(String id) {
+        return new AclToken(id, name, type, rules);
+    }
+
+    public AclToken withName(String name) {
+        return new AclToken(id, name, type, rules);
+    }
+
+    public AclToken withType(Type type) {
+        return new AclToken(id, name, type, rules);
+    }
+
+    public AclToken withRules(String rules) {
+        return new AclToken(id, name, type, rules);
     }
 
     public JsonObject toJson() {

@@ -104,6 +104,25 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling destroy_acl_token(id)"
     end
+    # @param [Hash] event 
+    # @yield 
+    # @return [self]
+    def fire_event(event=nil)
+      if event.class == Hash && block_given?
+        @j_del.java_method(:fireEvent, [Java::IoVertxExtConsul::Event.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Event.new(::Vertx::Util::Utils.to_json_object(event)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fire_event(event)"
+    end
+    # @yield 
+    # @return [self]
+    def list_events
+      if block_given?
+        @j_del.java_method(:listEvents, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_events()"
+    end
     #  Close the client and release its resources
     # @return [void]
     def close

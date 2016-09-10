@@ -9,9 +9,11 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.Event;
 import io.vertx.ext.consul.KeyValuePair;
 
 import java.util.Base64;
@@ -91,6 +93,24 @@ public class ConsulClientImpl implements ConsulClient {
     @Override
     public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
         request(HttpMethod.PUT, "/v1/acl/destroy/" + id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulClient fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/event/fire/" + event.getName(), event.getPayload(), resultHandler, buffer -> {
+            JsonObject jsonObject = buffer.toJsonObject();
+            return new Event(jsonObject);
+        });
+        return this;
+    }
+
+    @Override
+    public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/event/list", resultHandler, buffer -> {
+            JsonArray jsonArray = buffer.toJsonArray();
+            return jsonArray.stream().map(obj -> new Event((JsonObject) obj)).collect(Collectors.toList());
+        });
         return this;
     }
 

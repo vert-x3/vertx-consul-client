@@ -21,6 +21,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.consul.KeyValuePair
 import java.util.List
 import io.vertx.ext.consul.AclToken
+import io.vertx.ext.consul.Event
 import io.vertx.groovy.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
@@ -95,6 +96,30 @@ public class ConsulClient {
   }
   public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
     delegate.destroyAclToken(id, resultHandler);
+    return this;
+  }
+  public ConsulClient fireEvent(Map<String, Object> event = [:], Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.fireEvent(event != null ? new io.vertx.ext.consul.Event(io.vertx.lang.groovy.InternalHelper.toJsonObject(event)) : null, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Event>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.Event> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient listEvents(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.listEvents(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Event>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Event>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
     return this;
   }
   /**

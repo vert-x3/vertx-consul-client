@@ -11,6 +11,26 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
+|[[rules]]`rules`|`String`|-
+|[[type]]`type`|`link:enums.html#Type[Type]`|-
+|===
+
+[[Event]]
+== Event
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
+|[[payload]]`payload`|`String`|-
 |===
 
 [[KeyValuePair]]

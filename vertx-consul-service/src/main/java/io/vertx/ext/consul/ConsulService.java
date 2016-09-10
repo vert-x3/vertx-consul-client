@@ -58,6 +58,12 @@ public interface ConsulService extends ConsulClient {
     @Fluent
     ConsulService destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    @Fluent
+    ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler);
+
+    @Fluent
+    ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
+
     @Override
     void close();
 }

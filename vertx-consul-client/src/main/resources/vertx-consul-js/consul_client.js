@@ -23,6 +23,7 @@ var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulClient = io.vertx.ext.consul.ConsulClient;
 var KeyValuePair = io.vertx.ext.consul.KeyValuePair;
 var AclToken = io.vertx.ext.consul.AclToken;
+var Event = io.vertx.ext.consul.Event;
 
 /**
  A Vert.x service used to interact with Consul.
@@ -195,6 +196,47 @@ var ConsulClient = function(j_val) {
       j_consulClient["destroyAclToken(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param event {Object} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.fireEvent = function(event, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["fireEvent(io.vertx.ext.consul.Event,io.vertx.core.Handler)"](event != null ? new Event(new JsonObject(JSON.stringify(event))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.listEvents = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["listEvents(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

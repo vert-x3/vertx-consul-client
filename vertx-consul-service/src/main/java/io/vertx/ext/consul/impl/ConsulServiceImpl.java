@@ -3,10 +3,7 @@ package io.vertx.ext.consul.impl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.consul.AclToken;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.ConsulService;
-import io.vertx.ext.consul.KeyValuePair;
+import io.vertx.ext.consul.*;
 
 import java.util.List;
 
@@ -66,6 +63,18 @@ public class ConsulServiceImpl implements ConsulService {
     @Override
     public ConsulService destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
         consulClient.destroyAclToken(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) {
+        consulClient.fireEvent(event, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
+        consulClient.listEvents(resultHandler);
         return this;
     }
 

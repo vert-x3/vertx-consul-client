@@ -43,6 +43,7 @@ import io.vertx.ext.consul.KeyValuePair;
 import java.util.List;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -186,6 +187,34 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
         }
         case "destroyAclToken": {
           service.destroyAclToken((java.lang.String)json.getValue("id"), createHandler(msg));
+          break;
+        }
+        case "fireEvent": {
+          service.fireEvent(json.getJsonObject("event") == null ? null : new io.vertx.ext.consul.Event(json.getJsonObject("event")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "listEvents": {
+          service.listEvents(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Event::toJson).collect(Collectors.toList())));
+            }
+         });
           break;
         }
         case "close": {

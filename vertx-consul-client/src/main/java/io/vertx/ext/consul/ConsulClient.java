@@ -46,6 +46,12 @@ public interface ConsulClient {
     @Fluent
     ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    @Fluent
+    ConsulClient fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler);
+
+    @Fluent
+    ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
+
     /**
      * Close the client and release its resources
      */

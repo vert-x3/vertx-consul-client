@@ -7,3 +7,6 @@ key "foo/" {
 key "foo/private/" {
   policy = "deny"
 }
+event "" {
+  policy = "write"
+}
