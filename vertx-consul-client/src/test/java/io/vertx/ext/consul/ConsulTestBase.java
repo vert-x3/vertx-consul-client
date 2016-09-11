@@ -36,8 +36,9 @@ public class ConsulTestBase extends VertxTestBase {
     protected JsonObject config(String token) {
         return new JsonObject()
                 .put("acl_token", token)
-                .put("consul_host", "localhost")
-                .put("consul_port", consul.getHttpPort());
+                .put("dc", DC)
+                .put("host", "localhost")
+                .put("port", consul.getHttpPort());
     }
 
     @BeforeClass

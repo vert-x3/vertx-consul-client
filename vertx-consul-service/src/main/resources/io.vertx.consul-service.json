@@ -3,9 +3,7 @@
   "options": {
     "worker": false,
     "config": {
-      "address": "vertx.consul",
-      "consul_host": "localhost",
-      "consul_port": 8500
+      "address": "vertx.consul"
     }
   }
 }
