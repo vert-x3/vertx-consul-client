@@ -3,6 +3,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Base64;
+
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -19,6 +21,13 @@ public class Event {
 
     public static Event empty() {
         return new Event(null, null, null);
+    }
+
+    public static Event parseConsulResponse(JsonObject jsonObject) {
+        String key = jsonObject.getString(ID_KEY);
+        String name = jsonObject.getString(NAME_KEY);
+        String payload = new String(Base64.getDecoder().decode(jsonObject.getString(PAYLOAD_KEY)));
+        return new Event(key, name, payload);
     }
 
     public Event(String id, String name, String payload) {

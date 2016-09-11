@@ -45,7 +45,7 @@ public class ConsulClientImpl implements ConsulClient {
     @Override
     public ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + key, resultHandler, buffer ->
-                parseValue(buffer.toJsonArray().getJsonObject(0))).end();
+                KeyValuePair.parseConsulResponse(buffer.toJsonArray().getJsonObject(0))).end();
         return this;
     }
 
@@ -59,7 +59,7 @@ public class ConsulClientImpl implements ConsulClient {
     public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + keyPrefix, "recurse", resultHandler, buffer ->
                 buffer.toJsonArray().stream()
-                        .map(obj -> parseValue((JsonObject) obj))
+                        .map(obj -> KeyValuePair.parseConsulResponse((JsonObject) obj))
                         .collect(Collectors.toList())).end();
         return this;
     }
@@ -102,7 +102,7 @@ public class ConsulClientImpl implements ConsulClient {
     public ConsulClient fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) {
         request(HttpMethod.PUT, "/v1/event/fire/" + event.getName(), resultHandler, buffer -> {
             JsonObject jsonObject = buffer.toJsonObject();
-            return new Event(jsonObject);
+            return Event.parseConsulResponse(jsonObject);
         }).end(event.getPayload() == null ? "" : event.getPayload());
         return this;
     }
@@ -111,7 +111,7 @@ public class ConsulClientImpl implements ConsulClient {
     public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
         request(HttpMethod.GET, "/v1/event/list", resultHandler, buffer -> {
             JsonArray jsonArray = buffer.toJsonArray();
-            return jsonArray.stream().map(obj -> new Event((JsonObject) obj)).collect(Collectors.toList());
+            return jsonArray.stream().map(obj -> Event.parseConsulResponse((JsonObject) obj)).collect(Collectors.toList());
         }).end();
         return this;
     }
@@ -157,9 +157,4 @@ public class ConsulClientImpl implements ConsulClient {
         return rq;
     }
 
-    private static KeyValuePair parseValue(JsonObject object) {
-        String key = object.getString("Key");
-        String value = new String(Base64.getDecoder().decode(object.getString("Value")));
-        return new KeyValuePair(key, value);
-    }
 }

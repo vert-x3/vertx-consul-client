@@ -3,17 +3,25 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Base64;
+
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
 public class KeyValuePair {
 
-    public static final String KEY = "key";
-    public static final String VALUE = "value";
+    public static final String KEY = "Key";
+    public static final String VALUE = "Value";
 
     private final String key;
     private final String value;
+
+    public static KeyValuePair parseConsulResponse(JsonObject jsonObject) {
+        String key = jsonObject.getString(KEY);
+        String value = new String(Base64.getDecoder().decode(jsonObject.getString(VALUE)));
+        return new KeyValuePair(key, value);
+    }
 
     public KeyValuePair(String key, String value) {
         this.key = key;

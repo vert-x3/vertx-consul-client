@@ -120,8 +120,9 @@ public class ConsulTestBase extends VertxTestBase {
 
     @Test
     public void testEvents1() throws InterruptedException {
-        testClient.fireEvent(Event.empty().withName("custom-event"), handleResult(h1 -> {
+        testClient.fireEvent(Event.empty().withName("custom-event").withPayload("content"), handleResult(h1 -> {
             assertEquals(h1.getName(), "custom-event");
+            assertEquals(h1.getPayload(), "content");
             String evId = h1.getId();
             testClient.listEvents(handleResult(h2 -> {
                 long cnt = h2.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
