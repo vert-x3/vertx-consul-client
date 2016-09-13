@@ -11,8 +11,8 @@ import java.util.Base64;
 @DataObject
 public class KeyValuePair {
 
-    public static final String KEY = "Key";
-    public static final String VALUE = "Value";
+    private static final String KEY = "Key";
+    private static final String VALUE = "Value";
 
     private final String key;
     private final String value;

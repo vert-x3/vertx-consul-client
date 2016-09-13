@@ -25,6 +25,7 @@ import io.vertx.ext.consul.Event;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.Service;
 
 
 public class ConsulService extends ConsulClient {
@@ -158,6 +159,28 @@ public class ConsulService extends ConsulClient {
   public Observable<List<Event>> listEventsObservable() { 
     io.vertx.rx.java.ObservableFuture<List<Event>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     listEvents(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService registerService(Service service, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).registerService(service, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> registerServiceObservable(Service service) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    registerService(service, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).infoService(name, resultHandler);
+    return this;
+  }
+
+  public Observable<List<Service>> infoServiceObservable(String name) { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    infoService(name, resultHandler.toHandler());
     return resultHandler;
   }
 

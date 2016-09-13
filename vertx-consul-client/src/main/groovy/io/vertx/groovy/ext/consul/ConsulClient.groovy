@@ -26,6 +26,7 @@ import io.vertx.groovy.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
+import io.vertx.ext.consul.Service
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -113,6 +114,22 @@ public class ConsulClient {
   public ConsulClient listEvents(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.listEvents(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Event>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Event>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient registerService(Map<String, Object> service = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.registerService(service != null ? new io.vertx.ext.consul.Service(io.vertx.lang.groovy.InternalHelper.toJsonObject(service)) : null, resultHandler);
+    return this;
+  }
+  public ConsulClient infoService(String name, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.infoService(name, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
         } else {

@@ -125,6 +125,26 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling list_events()"
     end
+    # @param [Hash] service 
+    # @yield 
+    # @return [self]
+    def register_service(service=nil)
+      if service.class == Hash && block_given?
+        @j_del.java_method(:registerService, [Java::IoVertxExtConsul::Service.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Service.new(::Vertx::Util::Utils.to_json_object(service)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling register_service(service)"
+    end
+    # @param [String] name 
+    # @yield 
+    # @return [self]
+    def info_service(name=nil)
+      if name.class == String && block_given?
+        @j_del.java_method(:infoService, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(name,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling info_service(name)"
+    end
     # @return [void]
     def close
       if !block_given?

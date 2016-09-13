@@ -11,12 +11,8 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.consul.AclToken;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Event;
-import io.vertx.ext.consul.KeyValuePair;
+import io.vertx.ext.consul.*;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -113,6 +109,20 @@ public class ConsulClientImpl implements ConsulClient {
             JsonArray jsonArray = buffer.toJsonArray();
             return jsonArray.stream().map(obj -> Event.parseConsulResponse((JsonObject) obj)).collect(Collectors.toList());
         }).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient registerService(Service service, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(service.registerRequest().encode());
+        return this;
+    }
+
+    @Override
+    public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/service/" + name, resultHandler, buffer -> buffer.toJsonArray().stream()
+                .map(obj -> new Service((JsonObject) obj))
+                .collect(Collectors.toList())).end();
         return this;
     }
 

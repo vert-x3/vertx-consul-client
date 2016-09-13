@@ -26,6 +26,7 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.Service;
 
 /**
  * A Vert.x service used to interact with Consul.
@@ -158,6 +159,28 @@ public class ConsulClient {
   public Observable<List<Event>> listEventsObservable() { 
     io.vertx.rx.java.ObservableFuture<List<Event>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     listEvents(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient registerService(Service service, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.registerService(service, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> registerServiceObservable(Service service) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    registerService(service, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    delegate.infoService(name, resultHandler);
+    return this;
+  }
+
+  public Observable<List<Service>> infoServiceObservable(String name) { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    infoService(name, resultHandler.toHandler());
     return resultHandler;
   }
 

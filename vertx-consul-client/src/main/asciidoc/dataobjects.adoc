@@ -48,3 +48,23 @@
 |[[value]]`value`|`String`|-
 |===
 
+[[Service]]
+== Service
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|-
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
+|[[node]]`node`|`String`|-
+|[[nodeAddress]]`nodeAddress`|`String`|-
+|[[port]]`port`|`Number (int)`|-
+|[[tags]]`tags`|`Array of String`|-
+|===
+

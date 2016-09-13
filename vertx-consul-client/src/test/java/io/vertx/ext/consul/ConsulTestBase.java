@@ -134,6 +134,27 @@ public class ConsulTestBase extends VertxTestBase {
     }
 
     @Test
+    public void testService1() {
+        Service service = Service.build()
+                .withName("serviceName")
+                .withTags(Arrays.asList("tag1", "tag2"))
+                .withAddress("10.0.0.1")
+                .withPort(8080);
+        testClient.registerService(service, handleResult(h1 -> testComplete()));
+        await(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testService2() {
+        testClient.infoService("consul", handleResult(services -> {
+            long cnt = services.stream().filter(s -> s.getName().equals("consul")).count();
+            assertEquals(cnt, 1);
+            testComplete();
+        }));
+        await(1, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void test3() throws InterruptedException {
         masterClient.createAclToken(AclToken.empty(), h -> {
             String id = h.result();

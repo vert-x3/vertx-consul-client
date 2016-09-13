@@ -79,6 +79,18 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService registerService(Service service, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.registerService(service, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
+        consulClient.infoService(name, resultHandler);
+        return this;
+    }
+
+    @Override
     public void close() {
         consulClient.close();
     }
