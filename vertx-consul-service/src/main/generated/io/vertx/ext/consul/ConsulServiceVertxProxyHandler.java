@@ -236,6 +236,20 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
+        case "localServices": {
+          service.localServices(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
         case "close": {
           service.close();
           break;

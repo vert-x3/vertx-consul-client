@@ -140,7 +140,15 @@ public class ConsulTestBase extends VertxTestBase {
                 .withTags(Arrays.asList("tag1", "tag2"))
                 .withAddress("10.0.0.1")
                 .withPort(8080);
-        testClient.registerService(service, handleResult(h1 -> testComplete()));
+        testClient.registerService(service, handleResult(h1 -> {
+            testClient.localServices(handleResult(h2 -> {
+                Service s = h2.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
+                assertEquals(s.getTags().get(1), "tag2");
+                assertEquals(s.getAddress(), "10.0.0.1");
+                assertEquals(s.getPort(), 8080);
+                testComplete();
+            }));
+        }));
         await(1, TimeUnit.SECONDS);
     }
 

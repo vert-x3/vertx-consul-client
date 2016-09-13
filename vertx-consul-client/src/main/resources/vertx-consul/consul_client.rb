@@ -143,6 +143,15 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling info_service(name)"
     end
+    # @yield 
+    # @return [self]
+    def local_services
+      if block_given?
+        @j_del.java_method(:localServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling local_services()"
+    end
     #  Close the client and release its resources
     # @return [void]
     def close

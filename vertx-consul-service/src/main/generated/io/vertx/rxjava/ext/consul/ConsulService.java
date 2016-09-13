@@ -184,6 +184,17 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
+  public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).localServices(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Service>> localServicesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    localServices(resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public void close() { 
     ((io.vertx.ext.consul.ConsulService) delegate).close();
   }

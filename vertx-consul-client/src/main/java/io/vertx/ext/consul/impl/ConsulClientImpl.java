@@ -127,6 +127,14 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/services", resultHandler, buffer -> buffer.toJsonObject().stream()
+                .map(obj -> Service.parseAgentInfo((JsonObject) obj.getValue()))
+                .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
     public void close() {
         httpClient.close();
     }

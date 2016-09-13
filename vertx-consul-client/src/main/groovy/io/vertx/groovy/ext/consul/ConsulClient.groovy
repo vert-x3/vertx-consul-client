@@ -139,6 +139,18 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  public ConsulClient localServices(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.localServices(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   /**
    * Close the client and release its resources
    */

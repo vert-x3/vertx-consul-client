@@ -70,6 +70,9 @@ public interface ConsulService extends ConsulClient {
     @Fluent
     ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
 
+    @Fluent
+    ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+
     @Override
     void close();
 }

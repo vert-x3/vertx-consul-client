@@ -58,6 +58,9 @@ public interface ConsulClient {
     @Fluent
     ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
 
+    @Fluent
+    ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+
     /**
      * Close the client and release its resources
      */

@@ -184,6 +184,17 @@ public class ConsulClient {
     return resultHandler;
   }
 
+  public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
+    delegate.localServices(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Service>> localServicesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    localServices(resultHandler.toHandler());
+    return resultHandler;
+  }
+
   /**
    * Close the client and release its resources
    */

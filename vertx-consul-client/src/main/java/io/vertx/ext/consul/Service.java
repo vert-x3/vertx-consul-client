@@ -23,6 +23,7 @@ public class Service {
 
     private static final String AGENT_SERVICE_ID = "ID";
     private static final String AGENT_SERVICE_NAME = "Name";
+    private static final String AGENT_SERVICE_SERVICE = "Service";
     private static final String AGENT_SERVICE_TAGS = "Tags";
     private static final String AGENT_SERVICE_ADDRESS = "Address";
     private static final String AGENT_SERVICE_PORT = "Port";
@@ -37,6 +38,16 @@ public class Service {
 
     public static Service build() {
         return new Service(null, null, null, null, null, null, 0);
+    }
+
+    public static Service parseAgentInfo(JsonObject jsonObject) {
+        String id = jsonObject.getString(AGENT_SERVICE_ID);
+        String service = jsonObject.getString(AGENT_SERVICE_SERVICE);
+        JsonArray tagsArr = jsonObject.getJsonArray(AGENT_SERVICE_TAGS);
+        List<String> tags = tagsArr == null ? null : tagsArr.getList();
+        String address = jsonObject.getString(AGENT_SERVICE_ADDRESS);
+        int port = jsonObject.getInteger(AGENT_SERVICE_PORT);
+        return new Service(null, null, id, service, tags, address, port);
     }
 
     public Service withNode(String node) {

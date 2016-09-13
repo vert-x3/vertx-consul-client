@@ -91,6 +91,12 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+        consulClient.localServices(resultHandler);
+        return this;
+    }
+
+    @Override
     public void close() {
         consulClient.close();
     }
