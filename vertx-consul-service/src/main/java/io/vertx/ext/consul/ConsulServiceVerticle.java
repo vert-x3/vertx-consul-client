@@ -1,6 +1,8 @@
 package io.vertx.ext.consul;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.ConsulServiceImpl;
 import io.vertx.serviceproxy.ProxyHelper;
 
@@ -9,24 +11,24 @@ import io.vertx.serviceproxy.ProxyHelper;
  */
 public class ConsulServiceVerticle extends AbstractVerticle {
 
-    ConsulService service;
+    private ConsulService service;
+    private MessageConsumer<JsonObject> messageConsumer;
 
     @Override
     public void start() throws Exception {
-
-        // Create the client object
         service = new ConsulServiceImpl(ConsulClient.create(vertx, config()));
-
-        // And register it on the event bus against the configured address
         String address = config().getString("address");
         if (address == null) {
             throw new IllegalStateException("address field must be specified in config for client verticle");
         }
-        ProxyHelper.registerService(ConsulService.class, vertx, service, address);
+        messageConsumer = ProxyHelper.registerService(ConsulService.class, vertx, service, address);
     }
 
     @Override
     public void stop() throws Exception {
+        if (messageConsumer != null) {
+            ProxyHelper.unregisterService(messageConsumer);
+        }
         service.close();
     }
 }
