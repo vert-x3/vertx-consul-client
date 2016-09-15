@@ -39,16 +39,18 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import io.vertx.ext.consul.KeyValuePair;
-import java.util.List;
 import io.vertx.ext.consul.ConsulService;
-import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
+import io.vertx.ext.consul.ServiceInfo;
+import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.ext.consul.KeyValuePair;
+import java.util.List;
+import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Service;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -219,7 +221,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "registerService": {
-          service.registerService(json.getJsonObject("service") == null ? null : new io.vertx.ext.consul.Service(json.getJsonObject("service")), createHandler(msg));
+          service.registerService(json.getJsonObject("service") == null ? null : new io.vertx.ext.consul.ServiceOptions(json.getJsonObject("service")), createHandler(msg));
           break;
         }
         case "infoService": {
@@ -231,7 +233,21 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(ServiceInfo::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "localChecks": {
+          service.localChecks(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(CheckInfo::toJson).collect(Collectors.toList())));
             }
          });
           break;
@@ -245,7 +261,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(ServiceInfo::toJson).collect(Collectors.toList())));
             }
          });
           break;

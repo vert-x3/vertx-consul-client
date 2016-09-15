@@ -18,15 +18,17 @@ package io.vertx.rxjava.ext.consul;
 
 import java.util.Map;
 import rx.Observable;
+import io.vertx.ext.consul.Event;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.ext.consul.ServiceInfo;
+import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.ServiceOptions;
 import io.vertx.ext.consul.KeyValuePair;
 import java.util.List;
 import io.vertx.ext.consul.AclToken;
-import io.vertx.ext.consul.Event;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.ext.consul.Service;
 
 /**
  * A Vert.x service used to interact with Consul.
@@ -162,35 +164,46 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient registerService(Service service, Handler<AsyncResult<Void>> resultHandler) { 
+  public ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.registerService(service, resultHandler);
     return this;
   }
 
-  public Observable<Void> registerServiceObservable(Service service) { 
+  public Observable<Void> registerServiceObservable(ServiceOptions service) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     registerService(service, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) { 
+  public ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) { 
     delegate.infoService(name, resultHandler);
     return this;
   }
 
-  public Observable<List<Service>> infoServiceObservable(String name) { 
-    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<List<ServiceInfo>> infoServiceObservable(String name) { 
+    io.vertx.rx.java.ObservableFuture<List<ServiceInfo>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     infoService(name, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
+  public ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) { 
+    delegate.localChecks(resultHandler);
+    return this;
+  }
+
+  public Observable<List<CheckInfo>> localChecksObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<CheckInfo>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    localChecks(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) { 
     delegate.localServices(resultHandler);
     return this;
   }
 
-  public Observable<List<Service>> localServicesObservable() { 
-    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<List<ServiceInfo>> localServicesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<ServiceInfo>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     localServices(resultHandler.toHandler());
     return resultHandler;
   }

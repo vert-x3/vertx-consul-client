@@ -128,7 +128,7 @@ module VertxConsul
     # @return [self]
     def register_service(service=nil)
       if service.class == Hash && block_given?
-        @j_del.java_method(:registerService, [Java::IoVertxExtConsul::Service.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Service.new(::Vertx::Util::Utils.to_json_object(service)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        @j_del.java_method(:registerService, [Java::IoVertxExtConsul::ServiceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::ServiceOptions.new(::Vertx::Util::Utils.to_json_object(service)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling register_service(service)"
@@ -142,6 +142,15 @@ module VertxConsul
         return self
       end
       raise ArgumentError, "Invalid arguments when calling info_service(name)"
+    end
+    # @yield 
+    # @return [self]
+    def local_checks
+      if block_given?
+        @j_del.java_method(:localChecks, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling local_checks()"
     end
     # @yield 
     # @return [self]

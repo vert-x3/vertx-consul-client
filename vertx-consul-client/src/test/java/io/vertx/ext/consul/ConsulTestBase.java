@@ -134,19 +134,26 @@ public class ConsulTestBase extends VertxTestBase {
     }
 
     @Test
-    public void testService1() {
-        Service service = Service.build()
-                .withName("serviceName")
-                .withTags(Arrays.asList("tag1", "tag2"))
-                .withAddress("10.0.0.1")
-                .withPort(8080);
+    public void testService1() throws InterruptedException {
+        ServiceOptions service = new ServiceOptions()
+                .setName("serviceName")
+                .setTags(Arrays.asList("tag1", "tag2"))
+                .setCheckOptions(CheckOptions.ttl("10s"))
+                .setAddress("10.0.0.1")
+                .setPort(8080);
+        waitFor(2);
         testClient.registerService(service, handleResult(h1 -> {
             testClient.localServices(handleResult(h2 -> {
-                Service s = h2.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
+                ServiceInfo s = h2.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
                 assertEquals(s.getTags().get(1), "tag2");
                 assertEquals(s.getAddress(), "10.0.0.1");
                 assertEquals(s.getPort(), 8080);
-                testComplete();
+                complete();
+            }));
+            testClient.localChecks(handleResult(h2 -> {
+                CheckInfo c = h2.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
+                assertEquals(c.getId(), "service:serviceName");
+                complete();
             }));
         }));
         await(1, TimeUnit.SECONDS);

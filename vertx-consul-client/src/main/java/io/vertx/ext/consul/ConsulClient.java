@@ -53,13 +53,16 @@ public interface ConsulClient {
     ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
 
     @Fluent
-    ConsulClient registerService(Service service, Handler<AsyncResult<Void>> resultHandler);
+    ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     @Fluent
-    ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
+
+    @Fluent
+    ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     /**
      * Close the client and release its resources

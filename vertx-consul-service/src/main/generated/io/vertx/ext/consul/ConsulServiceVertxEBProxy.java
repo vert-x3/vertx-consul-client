@@ -32,16 +32,18 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import io.vertx.ext.consul.KeyValuePair;
-import java.util.List;
 import io.vertx.ext.consul.ConsulService;
-import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
+import io.vertx.ext.consul.ServiceInfo;
+import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.ext.consul.KeyValuePair;
+import java.util.List;
+import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Service;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -259,7 +261,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService registerService(Service service, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -278,7 +280,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -291,13 +293,31 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Service(new JsonObject((Map) o)) : new Service((JsonObject) o)).collect(Collectors.toList())));
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new ServiceInfo(new JsonObject((Map) o)) : new ServiceInfo((JsonObject) o)).collect(Collectors.toList())));
       }
     });
     return this;
   }
 
-  public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "localChecks");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new CheckInfo(new JsonObject((Map) o)) : new CheckInfo((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -309,7 +329,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Service(new JsonObject((Map) o)) : new Service((JsonObject) o)).collect(Collectors.toList())));
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new ServiceInfo(new JsonObject((Map) o)) : new ServiceInfo((JsonObject) o)).collect(Collectors.toList())));
       }
     });
     return this;

@@ -21,10 +21,12 @@ var Vertx = require('vertx-js/vertx');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulClient = io.vertx.ext.consul.ConsulClient;
+var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValuePair = io.vertx.ext.consul.KeyValuePair;
 var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
-var Service = io.vertx.ext.consul.Service;
+var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
+var CheckInfo = io.vertx.ext.consul.CheckInfo;
 
 /**
  A Vert.x service used to interact with Consul.
@@ -256,7 +258,7 @@ var ConsulClient = function(j_val) {
   this.registerService = function(service, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["registerService(io.vertx.ext.consul.Service,io.vertx.core.Handler)"](service != null ? new Service(new JsonObject(JSON.stringify(service))) : null, function(ar) {
+      j_consulClient["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](service != null ? new ServiceOptions(new JsonObject(JSON.stringify(service))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -278,6 +280,26 @@ var ConsulClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulClient["infoService(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.localChecks = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["localChecks(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

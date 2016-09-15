@@ -113,23 +113,31 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient registerService(Service service, Handler<AsyncResult<Void>> resultHandler) {
-        request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(service.registerRequest().encode());
+    public ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(service.toJson().encode());
         return this;
     }
 
     @Override
-    public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
+    public ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         request(HttpMethod.GET, "/v1/catalog/service/" + name, resultHandler, buffer -> buffer.toJsonArray().stream()
-                .map(obj -> new Service((JsonObject) obj))
+                .map(obj -> new ServiceInfo((JsonObject) obj))
                 .collect(Collectors.toList())).end();
         return this;
     }
 
     @Override
-    public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+    public ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/checks", resultHandler, buffer -> buffer.toJsonObject().stream()
+                .map(obj -> new CheckInfo((JsonObject) obj.getValue()))
+                .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         request(HttpMethod.GET, "/v1/agent/services", resultHandler, buffer -> buffer.toJsonObject().stream()
-                .map(obj -> Service.parseAgentInfo((JsonObject) obj.getValue()))
+                .map(obj -> ServiceInfo.parseAgentInfo((JsonObject) obj.getValue()))
                 .collect(Collectors.toList())).end();
         return this;
     }

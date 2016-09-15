@@ -17,6 +17,39 @@
 |[[type]]`type`|`link:enums.html#Type[Type]`|-
 |===
 
+[[CheckInfo]]
+== CheckInfo
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
+|[[notes]]`notes`|`String`|-
+|[[output]]`output`|`String`|-
+|[[serviceId]]`serviceId`|`String`|-
+|[[serviceName]]`serviceName`|`String`|-
+|[[status]]`status`|`String`|-
+|===
+
+[[CheckOptions]]
+== CheckOptions
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
 [[Event]]
 == Event
 
@@ -48,8 +81,8 @@
 |[[value]]`value`|`String`|-
 |===
 
-[[Service]]
-== Service
+[[ServiceInfo]]
+== ServiceInfo
 
 ++++
 ++++
@@ -64,6 +97,25 @@
 |[[name]]`name`|`String`|-
 |[[node]]`node`|`String`|-
 |[[nodeAddress]]`nodeAddress`|`String`|-
+|[[port]]`port`|`Number (int)`|-
+|[[tags]]`tags`|`Array of String`|-
+|===
+
+[[ServiceOptions]]
+== ServiceOptions
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|-
+|[[checkOptions]]`checkOptions`|`link:dataobjects.html#CheckOptions[CheckOptions]`|-
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
 |[[port]]`port`|`Number (int)`|-
 |[[tags]]`tags`|`Array of String`|-
 |===

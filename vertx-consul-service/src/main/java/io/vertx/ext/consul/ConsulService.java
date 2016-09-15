@@ -65,13 +65,16 @@ public interface ConsulService extends ConsulClient {
     ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
 
     @Fluent
-    ConsulService registerService(Service service, Handler<AsyncResult<Void>> resultHandler);
+    ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     @Fluent
-    ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
+
+    @Fluent
+    ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     @Override
     void close();

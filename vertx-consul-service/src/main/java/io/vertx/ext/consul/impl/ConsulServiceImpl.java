@@ -79,19 +79,25 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService registerService(Service service, Handler<AsyncResult<Void>> resultHandler) {
+    public ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) {
         consulClient.registerService(service, resultHandler);
         return this;
     }
 
     @Override
-    public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
+    public ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         consulClient.infoService(name, resultHandler);
         return this;
     }
 
     @Override
-    public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+    public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+        consulClient.localChecks(resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         consulClient.localServices(resultHandler);
         return this;
     }
