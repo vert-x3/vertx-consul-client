@@ -2,7 +2,6 @@ package io.vertx.ext.consul.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
 import java.util.List;
@@ -93,6 +92,42 @@ public class ConsulServiceImpl implements ConsulService {
     @Override
     public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
         consulClient.localChecks(resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.registerCheck(check, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.deregisterCheck(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService passCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.passCheck(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.warnCheck(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService failCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.failCheck(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.updateCheck(checkInfo, resultHandler);
         return this;
     }
 

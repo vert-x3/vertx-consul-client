@@ -6,7 +6,6 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
@@ -71,10 +70,28 @@ public interface ConsulService extends ConsulClient {
     ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     @Fluent
+    ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+
+    @Fluent
     ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
 
     @Fluent
-    ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+    ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulService passCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulService warnCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulService failCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
     @Override
     void close();

@@ -59,10 +59,28 @@ public interface ConsulClient {
     ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
     @Fluent
+    ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+
+    @Fluent
     ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
 
     @Fluent
-    ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+    ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
+    ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
     /**
      * Close the client and release its resources

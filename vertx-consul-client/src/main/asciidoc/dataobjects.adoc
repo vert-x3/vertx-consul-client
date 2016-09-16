@@ -48,6 +48,8 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[name]]`name`|`String`|-
 |===
 
 [[Event]]

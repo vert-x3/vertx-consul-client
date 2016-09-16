@@ -9,6 +9,8 @@ import io.vertx.core.json.JsonObject;
 @DataObject
 public class CheckOptions {
 
+    private static final String ID_KEY = "ID";
+    private static final String NAME_KEY = "Name";
     private static final String SCRIPT_KEY = "Script";
     private static final String HTTP_KEY = "HTTP";
     private static final String INTERVAL_KEY = "Interval";
@@ -41,6 +43,8 @@ public class CheckOptions {
         return checkOptions;
     }
 
+    private String id;
+    private String name;
     private String script;
     private String http;
     private String ttl;
@@ -51,6 +55,8 @@ public class CheckOptions {
     }
 
     public CheckOptions(JsonObject jsonObject) {
+        this.id = jsonObject.getString(ID_KEY);
+        this.name = jsonObject.getString(NAME_KEY);
         this.script = jsonObject.getString(SCRIPT_KEY);
         this.http = jsonObject.getString(HTTP_KEY);
         this.ttl = jsonObject.getString(TTL_KEY);
@@ -60,6 +66,12 @@ public class CheckOptions {
 
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
+        if (id != null) {
+            jsonObject.put(ID_KEY, id);
+        }
+        if (name != null) {
+            jsonObject.put(NAME_KEY, name);
+        }
         if (script != null) {
             jsonObject.put(SCRIPT_KEY, script);
         }
@@ -78,4 +90,21 @@ public class CheckOptions {
         return jsonObject;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public CheckOptions setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public CheckOptions setName(String name) {
+        this.name = name;
+        return this;
+    }
 }

@@ -143,6 +143,43 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/check/register", resultHandler).end(check.toJson().encode());
+        return this;
+    }
+
+    @Override
+    public ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/check/deregister/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/check/pass/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/check/warn/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/check/fail/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/agent/check/update/" + checkInfo.getId(), resultHandler)
+                .end(checkInfo.updateRequest().encode());
+        return this;
+    }
+
+    @Override
     public void close() {
         httpClient.close();
     }

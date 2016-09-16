@@ -145,6 +145,15 @@ module VertxConsul
     end
     # @yield 
     # @return [self]
+    def local_services
+      if block_given?
+        @j_del.java_method(:localServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling local_services()"
+    end
+    # @yield 
+    # @return [self]
     def local_checks
       if block_given?
         @j_del.java_method(:localChecks, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
@@ -152,14 +161,65 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling local_checks()"
     end
+    # @param [Hash] check 
     # @yield 
     # @return [self]
-    def local_services
-      if block_given?
-        @j_del.java_method(:localServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+    def register_check(check=nil)
+      if check.class == Hash && block_given?
+        @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling local_services()"
+      raise ArgumentError, "Invalid arguments when calling register_check(check)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def deregister_check(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling deregister_check(id)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def pass_check(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:passCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling pass_check(id)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def warn_check(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:warnCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling warn_check(id)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def fail_check(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:failCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fail_check(id)"
+    end
+    # @param [Hash] checkInfo 
+    # @yield 
+    # @return [self]
+    def update_check(checkInfo=nil)
+      if checkInfo.class == Hash && block_given?
+        @j_del.java_method(:updateCheck, [Java::IoVertxExtConsul::CheckInfo.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckInfo.new(::Vertx::Util::Utils.to_json_object(checkInfo)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling update_check(checkInfo)"
     end
     #  Close the client and release its resources
     # @return [void]

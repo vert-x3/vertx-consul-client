@@ -61,6 +61,17 @@ public class CheckInfo {
         return jsonObject;
     }
 
+    public JsonObject updateRequest() {
+        JsonObject jsonObject = new JsonObject();
+        if (status != null) {
+            jsonObject.put(STATUS_KEY, status);
+        }
+        if (output != null) {
+            jsonObject.put(OUTPUT_KEY, output);
+        }
+        return jsonObject;
+    }
+
     public String getId() {
         return id;
     }
@@ -87,5 +98,40 @@ public class CheckInfo {
 
     public String getServiceName() {
         return serviceName;
+    }
+
+    public CheckInfo setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public CheckInfo setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public CheckInfo setStatus(String status) {
+        this.status = status;
+        return this;
+    }
+
+    public CheckInfo setNotes(String notes) {
+        this.notes = notes;
+        return this;
+    }
+
+    public CheckInfo setOutput(String output) {
+        this.output = output;
+        return this;
+    }
+
+    public CheckInfo setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+        return this;
+    }
+
+    public CheckInfo setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+        return this;
     }
 }

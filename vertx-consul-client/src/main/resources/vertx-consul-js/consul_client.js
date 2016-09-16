@@ -27,6 +27,7 @@ var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
 var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var CheckOptions = io.vertx.ext.consul.CheckOptions;
 
 /**
  A Vert.x service used to interact with Consul.
@@ -296,6 +297,26 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulClient}
    */
+  this.localServices = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["localServices(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
   this.localChecks = function(resultHandler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
@@ -313,15 +334,121 @@ var ConsulClient = function(j_val) {
   /**
 
    @public
+   @param check {Object} 
    @param resultHandler {function} 
    @return {ConsulClient}
    */
-  this.localServices = function(resultHandler) {
+  this.registerCheck = function(check, resultHandler) {
     var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'function') {
-      j_consulClient["localServices(io.vertx.core.Handler)"](function(ar) {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.deregisterCheck = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["deregisterCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.passCheck = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["passCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.warnCheck = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["warnCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.failCheck = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["failCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param checkInfo {Object} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.updateCheck = function(checkInfo, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["updateCheck(io.vertx.ext.consul.CheckInfo,io.vertx.core.Handler)"](checkInfo != null ? new CheckInfo(new JsonObject(JSON.stringify(checkInfo))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
       } else {
         resultHandler(null, ar.cause());
       }
