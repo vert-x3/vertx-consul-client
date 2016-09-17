@@ -26,7 +26,7 @@ public class ConsulServiceTest extends ConsulTestSuite {
                 latch.countDown();
             }));
             try {
-                latch.await(10L, TimeUnit.SECONDS);
+                latch.await(1L, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

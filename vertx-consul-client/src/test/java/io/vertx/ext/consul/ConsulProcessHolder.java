@@ -3,6 +3,7 @@ package io.vertx.ext.consul;
 import com.pszymczyk.consul.ConsulProcess;
 import com.pszymczyk.consul.ConsulStarterBuilder;
 import com.pszymczyk.consul.LogLevel;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
@@ -18,10 +19,22 @@ class ConsulProcessHolder {
 
     private static final String MASTER_TOKEN = "topSecret";
     private static final String DC = "test-dc";
-    private static final ConsulProcessHolder INSTANCE = new ConsulProcessHolder();
 
-    public static ConsulProcess consul() {
-        return INSTANCE.consul;
+    private static ConsulProcessHolder instance;
+
+    private static ConsulProcessHolder instance() {
+        if (instance == null) {
+            synchronized (ConsulProcessHolder.class) {
+                if (instance == null) {
+                    instance = new ConsulProcessHolder();
+                }
+            }
+        }
+        return instance;
+    }
+
+    static ConsulProcess consul() {
+        return instance().consul;
     }
 
     static String dc() {
@@ -32,12 +45,17 @@ class ConsulProcessHolder {
         return MASTER_TOKEN;
     }
 
-    static String testToken() {
-        return INSTANCE.testToken;
+    static String writeToken() {
+        return instance().writeToken;
+    }
+
+    static String readToken() {
+        return instance().readToken;
     }
 
     private ConsulProcess consul;
-    private String testToken;
+    private String writeToken;
+    private String readToken;
 
     private ConsulProcessHolder() {
         try {
@@ -54,27 +72,53 @@ class ConsulProcessHolder {
                         .put("datacenter", DC)
                         .put("acl_default_policy", "deny")
                         .put("acl_master_token", MASTER_TOKEN)
-                        .put("acl_datacenter", DC).encode())
+                        .put("acl_datacenter", DC)
+                        .encode())
                 .build()
                 .start();
-        HttpClientOptions httpClientOptions = new HttpClientOptions().setDefaultPort(consul.getHttpPort());
-        HttpClient httpClient = Vertx.vertx().createHttpClient(httpClientOptions);
-        CountDownLatch latch = new CountDownLatch(1);
-        httpClient.put("/v1/acl/create?token=" + MASTER_TOKEN, h -> {
-            if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> {
-                    JsonObject responce = new JsonObject(bh.toString());
-                    testToken = responce.getString("ID");
-                    httpClient.close();
-                    latch.countDown();
-                });
-            }
-        }).end(new JsonObject().put("Rules", Utils.readResource("default_rules.hcl")).encode());
+
+        CountDownLatch latch = new CountDownLatch(2);
+        Vertx vertx = Vertx.vertx();
+        createToken(vertx, "write_rules.hcl", token -> {
+            writeToken = token;
+            latch.countDown();
+        });
+        createToken(vertx, "read_rules.hcl", token -> {
+            readToken = token;
+            latch.countDown();
+        });
         latch.await(1, TimeUnit.SECONDS);
-        if (testToken == null) {
-            throw new RuntimeException("Starting consul fails");
+        vertx.close();
+
+        if (writeToken == null || readToken == null) {
+            throw new RuntimeException("Starting consul fails " + writeToken + "/" + readToken);
         }
         return consul;
     }
 
+    private void createToken(Vertx vertx, String rules, Handler<String> tokenHandler) {
+        HttpClientOptions httpClientOptions = new HttpClientOptions().setDefaultPort(consul.getHttpPort());
+        HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
+        String rulesBody;
+        try {
+            rulesBody = Utils.readResource(rules);
+        } catch (Exception e) {
+            tokenHandler.handle(null);
+            return;
+        }
+        String request = new JsonObject()
+                .put("Rules", rulesBody)
+                .encode();
+        httpClient.put("/v1/acl/create?token=" + MASTER_TOKEN, h -> {
+            if (h.statusCode() == 200) {
+                h.bodyHandler(bh -> {
+                    JsonObject responce = new JsonObject(bh.toString());
+                    httpClient.close();
+                    tokenHandler.handle(responce.getString("ID"));
+                });
+            } else {
+                tokenHandler.handle(null);
+            }
+        }).end(request);
+    }
 }

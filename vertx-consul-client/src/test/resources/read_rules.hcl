@@ -2,10 +2,7 @@ key "" {
   policy = "read"
 }
 key "foo/" {
-  policy = "write"
-}
-key "foo/private/" {
-  policy = "deny"
+  policy = "read"
 }
 event "" {
   policy = "write"

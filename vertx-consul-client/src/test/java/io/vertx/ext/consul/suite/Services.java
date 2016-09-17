@@ -22,15 +22,15 @@ public class Services extends ConsulTestBase {
                 .setAddress("10.0.0.1")
                 .setPort(8080);
         waitFor(2);
-        testClient.registerService(service, handleResult(h1 -> {
-            testClient.localServices(handleResult(h2 -> {
+        writeClient.registerService(service, handleResult(h1 -> {
+            writeClient.localServices(handleResult(h2 -> {
                 ServiceInfo s = h2.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
                 assertEquals(s.getTags().get(1), "tag2");
                 assertEquals(s.getAddress(), "10.0.0.1");
                 assertEquals(s.getPort(), 8080);
                 complete();
             }));
-            testClient.localChecks(handleResult(h2 -> {
+            writeClient.localChecks(handleResult(h2 -> {
                 CheckInfo c = h2.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
                 assertEquals(c.getId(), "service:serviceName");
                 complete();
@@ -41,7 +41,7 @@ public class Services extends ConsulTestBase {
 
     @Test
     public void testService2() {
-        testClient.infoService("consul", handleResult(services -> {
+        writeClient.infoService("consul", handleResult(services -> {
             long cnt = services.stream().filter(s -> s.getName().equals("consul")).count();
             assertEquals(cnt, 1);
             testComplete();

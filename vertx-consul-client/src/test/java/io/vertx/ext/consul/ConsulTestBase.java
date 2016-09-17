@@ -16,19 +16,22 @@ public class ConsulTestBase extends VertxTestBase {
     static Consumer<ConsulClient> clientCloser;
 
     protected ConsulClient masterClient;
-    protected ConsulClient testClient;
+    protected ConsulClient writeClient;
+    protected ConsulClient readClient;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         masterClient = clientCreator.apply(vertx, config(ConsulProcessHolder.masterToken()));
-        testClient = clientCreator.apply(vertx, config(ConsulProcessHolder.testToken()));
+        writeClient = clientCreator.apply(vertx, config(ConsulProcessHolder.writeToken()));
+        readClient = clientCreator.apply(vertx, config(ConsulProcessHolder.readToken()));
     }
 
     @Override
     public void tearDown() throws Exception {
         clientCloser.accept(masterClient);
-        clientCloser.accept(testClient);
+        clientCloser.accept(writeClient);
+        clientCloser.accept(readClient);
         super.tearDown();
     }
 
