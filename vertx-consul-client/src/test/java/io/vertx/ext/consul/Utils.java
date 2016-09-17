@@ -1,5 +1,8 @@
 package io.vertx.ext.consul;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,5 +18,15 @@ public class Utils {
             throw new RuntimeException("resource not found");
         }
         return new String(Files.readAllBytes(Paths.get(resource.toURI())));
+    }
+
+    public static <T> Handler<AsyncResult<T>> handleResult(Handler<T> resultHandler) {
+        return h -> {
+            if (h.succeeded()) {
+                resultHandler.handle(h.result());
+            } else {
+                throw new RuntimeException(h.cause());
+            }
+        };
     }
 }

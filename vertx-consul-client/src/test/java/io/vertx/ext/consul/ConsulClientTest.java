@@ -1,23 +1,17 @@
 package io.vertx.ext.consul;
 
 import io.vertx.ext.consul.impl.ConsulClientImpl;
+import org.junit.BeforeClass;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class ConsulClientTest extends ConsulTestBase {
+public class ConsulClientTest extends ConsulTestSuite {
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        masterClient = new ConsulClientImpl(vertx, config(MASTER_TOKEN));
-        testClient = new ConsulClientImpl(vertx, config(TEST_TOKEN));
+    @BeforeClass
+    public static void initCreator() {
+        ConsulTestBase.clientCreator = ConsulClientImpl::new;
+        ConsulTestBase.clientCloser = ConsulClient::close;
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        masterClient.close();
-        testClient.close();
-        super.tearDown();
-    }
 }
