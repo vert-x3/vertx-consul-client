@@ -11,6 +11,7 @@ public class CheckOptions {
 
     private static final String ID_KEY = "ID";
     private static final String NAME_KEY = "Name";
+    private static final String NOTE_KEY = "Note";
     private static final String SCRIPT_KEY = "Script";
     private static final String HTTP_KEY = "HTTP";
     private static final String INTERVAL_KEY = "Interval";
@@ -50,8 +51,9 @@ public class CheckOptions {
     private String ttl;
     private String tcp;
     private String interval;
+    private String note;
 
-    private CheckOptions() {
+    public CheckOptions() {
     }
 
     public CheckOptions(JsonObject jsonObject) {
@@ -62,6 +64,7 @@ public class CheckOptions {
         this.ttl = jsonObject.getString(TTL_KEY);
         this.tcp = jsonObject.getString(TCP_KEY);
         this.interval = jsonObject.getString(INTERVAL_KEY);
+        this.note = jsonObject.getString(NOTE_KEY);
     }
 
     public JsonObject toJson() {
@@ -71,6 +74,9 @@ public class CheckOptions {
         }
         if (name != null) {
             jsonObject.put(NAME_KEY, name);
+        }
+        if (note != null) {
+            jsonObject.put(NOTE_KEY, note);
         }
         if (script != null) {
             jsonObject.put(SCRIPT_KEY, script);
@@ -98,6 +104,10 @@ public class CheckOptions {
         return name;
     }
 
+    public String getNote() {
+        return note;
+    }
+
     public CheckOptions setId(String id) {
         this.id = id;
         return this;
@@ -105,6 +115,11 @@ public class CheckOptions {
 
     public CheckOptions setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public CheckOptions setNote(String note) {
+        this.note = note;
         return this;
     }
 }

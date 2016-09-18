@@ -71,13 +71,13 @@ public interface ConsulClient {
     ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulClient passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulClient warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulClient failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
     ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);

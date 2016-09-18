@@ -155,20 +155,23 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        request(HttpMethod.GET, "/v1/agent/check/pass/" + id, resultHandler).end();
+    public ConsulClient passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        String query = check.getNote() == null ? null : "note=" + check.getNote();
+        request(HttpMethod.GET, "/v1/agent/check/pass/" + check.getId(), query, resultHandler).end();
         return this;
     }
 
     @Override
-    public ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        request(HttpMethod.GET, "/v1/agent/check/warn/" + id, resultHandler).end();
+    public ConsulClient warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        String query = check.getNote() == null ? null : "note=" + check.getNote();
+        request(HttpMethod.GET, "/v1/agent/check/warn/" + check.getId(), query, resultHandler).end();
         return this;
     }
 
     @Override
-    public ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        request(HttpMethod.GET, "/v1/agent/check/fail/" + id, resultHandler).end();
+    public ConsulClient failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        String query = check.getNote() == null ? null : "note=" + check.getNote();
+        request(HttpMethod.GET, "/v1/agent/check/fail/" + check.getId(), query, resultHandler).end();
         return this;
     }
 
@@ -201,6 +204,9 @@ public class ConsulClientImpl implements ConsulClient {
 
     private <T> HttpClientRequest request(HttpMethod method, String path, String query,
                              Handler<AsyncResult<T>> resultHandler, Function<Buffer, T> mapper) {
+        if (query == null) {
+            query = "";
+        }
         if (dc != null) {
             if (!query.isEmpty()) {
                 query += "&";

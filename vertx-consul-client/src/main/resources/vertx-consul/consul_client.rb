@@ -181,35 +181,35 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling deregister_check(id)"
     end
-    # @param [String] id 
+    # @param [Hash] check 
     # @yield 
     # @return [self]
-    def pass_check(id=nil)
-      if id.class == String && block_given?
-        @j_del.java_method(:passCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def pass_check(check=nil)
+      if check.class == Hash && block_given?
+        @j_del.java_method(:passCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling pass_check(id)"
+      raise ArgumentError, "Invalid arguments when calling pass_check(check)"
     end
-    # @param [String] id 
+    # @param [Hash] check 
     # @yield 
     # @return [self]
-    def warn_check(id=nil)
-      if id.class == String && block_given?
-        @j_del.java_method(:warnCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def warn_check(check=nil)
+      if check.class == Hash && block_given?
+        @j_del.java_method(:warnCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling warn_check(id)"
+      raise ArgumentError, "Invalid arguments when calling warn_check(check)"
     end
-    # @param [String] id 
+    # @param [Hash] check 
     # @yield 
     # @return [self]
-    def fail_check(id=nil)
-      if id.class == String && block_given?
-        @j_del.java_method(:failCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def fail_check(check=nil)
+      if check.class == Hash && block_given?
+        @j_del.java_method(:failCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fail_check(id)"
+      raise ArgumentError, "Invalid arguments when calling fail_check(check)"
     end
     # @param [Hash] checkInfo 
     # @yield 

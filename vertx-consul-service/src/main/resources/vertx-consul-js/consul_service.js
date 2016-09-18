@@ -376,14 +376,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param id {string} 
+   @param check {Object} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.passCheck = function(id, resultHandler) {
+  this.passCheck = function(check, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["passCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["passCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -397,14 +397,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param id {string} 
+   @param check {Object} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.warnCheck = function(id, resultHandler) {
+  this.warnCheck = function(check, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["warnCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["warnCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -418,14 +418,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param id {string} 
+   @param check {Object} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.failCheck = function(id, resultHandler) {
+  this.failCheck = function(check, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["failCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["failCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {

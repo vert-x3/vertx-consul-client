@@ -174,16 +174,16 @@ public class ConsulClient {
     delegate.deregisterCheck(id, resultHandler);
     return this;
   }
-  public ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    delegate.passCheck(id, resultHandler);
+  public ConsulClient passCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.passCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
     return this;
   }
-  public ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    delegate.warnCheck(id, resultHandler);
+  public ConsulClient warnCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.warnCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
     return this;
   }
-  public ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    delegate.failCheck(id, resultHandler);
+  public ConsulClient failCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.failCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
     return this;
   }
   public ConsulClient updateCheck(Map<String, Object> checkInfo = [:], Handler<AsyncResult<Void>> resultHandler) {

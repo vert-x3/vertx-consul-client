@@ -108,20 +108,20 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService passCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        consulClient.passCheck(id, resultHandler);
+    public ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.passCheck(check, resultHandler);
         return this;
     }
 
     @Override
-    public ConsulService warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        consulClient.warnCheck(id, resultHandler);
+    public ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.warnCheck(check, resultHandler);
         return this;
     }
 
     @Override
-    public ConsulService failCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-        consulClient.failCheck(id, resultHandler);
+    public ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.failCheck(check, resultHandler);
         return this;
     }
 

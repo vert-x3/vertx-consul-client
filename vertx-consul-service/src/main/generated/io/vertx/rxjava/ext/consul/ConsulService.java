@@ -231,36 +231,36 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService passCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).passCheck(id, resultHandler);
+  public ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).passCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> passCheckObservable(String id) { 
+  public Observable<Void> passCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    passCheck(id, resultHandler.toHandler());
+    passCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).warnCheck(id, resultHandler);
+  public ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).warnCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> warnCheckObservable(String id) { 
+  public Observable<Void> warnCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    warnCheck(id, resultHandler.toHandler());
+    warnCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService failCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).failCheck(id, resultHandler);
+  public ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).failCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> failCheckObservable(String id) { 
+  public Observable<Void> failCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    failCheck(id, resultHandler.toHandler());
+    failCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 

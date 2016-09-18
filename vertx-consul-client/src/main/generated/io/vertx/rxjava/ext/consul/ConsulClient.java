@@ -231,36 +231,36 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient passCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.passCheck(id, resultHandler);
+  public ConsulClient passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.passCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> passCheckObservable(String id) { 
+  public Observable<Void> passCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    passCheck(id, resultHandler.toHandler());
+    passCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient warnCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.warnCheck(id, resultHandler);
+  public ConsulClient warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.warnCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> warnCheckObservable(String id) { 
+  public Observable<Void> warnCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    warnCheck(id, resultHandler.toHandler());
+    warnCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient failCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.failCheck(id, resultHandler);
+  public ConsulClient failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.failCheck(check, resultHandler);
     return this;
   }
 
-  public Observable<Void> failCheckObservable(String id) { 
+  public Observable<Void> failCheckObservable(CheckOptions check) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    failCheck(id, resultHandler.toHandler());
+    failCheck(check, resultHandler.toHandler());
     return resultHandler;
   }
 

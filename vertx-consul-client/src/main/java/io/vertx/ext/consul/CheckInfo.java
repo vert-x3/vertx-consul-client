@@ -9,6 +9,10 @@ import io.vertx.core.json.JsonObject;
 @DataObject
 public class CheckInfo {
 
+    public enum Status {
+        any, unknown, passing, warning, critical
+    }
+
     private static final String SERVICE_ID_KEY = "ServiceID";
     private static final String SERVICE_NAME_KEY = "ServiceName";
     private static final String ID_KEY = "CheckID";
@@ -19,7 +23,7 @@ public class CheckInfo {
 
     private String id;
     private String name;
-    private String status;
+    private Status status;
     private String notes;
     private String output;
     private String serviceId;
@@ -28,7 +32,7 @@ public class CheckInfo {
     public CheckInfo(JsonObject jsonObject) {
         this.id = jsonObject.getString(ID_KEY);
         this.name = jsonObject.getString(NAME_KEY);
-        this.status = jsonObject.getString(STATUS_KEY);
+        this.status = Status.valueOf(jsonObject.getString(STATUS_KEY));
         this.notes = jsonObject.getString(NOTES_KEY);
         this.output = jsonObject.getString(OUTPUT_KEY);
         this.serviceId = jsonObject.getString(SERVICE_ID_KEY);
@@ -44,7 +48,7 @@ public class CheckInfo {
             jsonObject.put(NAME_KEY, name);
         }
         if (status != null) {
-            jsonObject.put(STATUS_KEY, status);
+            jsonObject.put(STATUS_KEY, status.name());
         }
         if (notes != null) {
             jsonObject.put(NOTES_KEY, notes);
@@ -64,7 +68,7 @@ public class CheckInfo {
     public JsonObject updateRequest() {
         JsonObject jsonObject = new JsonObject();
         if (status != null) {
-            jsonObject.put(STATUS_KEY, status);
+            jsonObject.put(STATUS_KEY, status.name());
         }
         if (output != null) {
             jsonObject.put(OUTPUT_KEY, output);
@@ -80,7 +84,7 @@ public class CheckInfo {
         return name;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -110,7 +114,7 @@ public class CheckInfo {
         return this;
     }
 
-    public CheckInfo setStatus(String status) {
+    public CheckInfo setStatus(Status status) {
         this.status = status;
         return this;
     }

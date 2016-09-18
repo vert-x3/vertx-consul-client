@@ -34,7 +34,7 @@
 |[[output]]`output`|`String`|-
 |[[serviceId]]`serviceId`|`String`|-
 |[[serviceName]]`serviceName`|`String`|-
-|[[status]]`status`|`String`|-
+|[[status]]`status`|`link:enums.html#Status[Status]`|-
 |===
 
 [[CheckOptions]]
@@ -50,6 +50,7 @@
 ^|Name | Type ^| Description
 |[[id]]`id`|`String`|-
 |[[name]]`name`|`String`|-
+|[[note]]`note`|`String`|-
 |===
 
 [[Event]]

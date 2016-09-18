@@ -276,15 +276,15 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "passCheck": {
-          service.passCheck((java.lang.String)json.getValue("id"), createHandler(msg));
+          service.passCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
           break;
         }
         case "warnCheck": {
-          service.warnCheck((java.lang.String)json.getValue("id"), createHandler(msg));
+          service.warnCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
           break;
         }
         case "failCheck": {
-          service.failCheck((java.lang.String)json.getValue("id"), createHandler(msg));
+          service.failCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
           break;
         }
         case "updateCheck": {

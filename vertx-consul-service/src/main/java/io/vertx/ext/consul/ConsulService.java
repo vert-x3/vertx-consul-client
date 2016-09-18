@@ -82,13 +82,13 @@ public interface ConsulService extends ConsulClient {
     ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulService passCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulService warnCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulService failCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+    ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
     ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
