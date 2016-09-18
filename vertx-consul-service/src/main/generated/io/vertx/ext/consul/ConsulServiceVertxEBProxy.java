@@ -187,6 +187,62 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
+  public ConsulService updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
+    if (closed) {
+      idHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("token", token == null ? null : token.toJson());
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "updateAclToken");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        idHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        idHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
+    if (closed) {
+      idHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("id", id);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "cloneAclToken");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        idHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        idHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "listAclTokens");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new AclToken(new JsonObject((Map) o)) : new AclToken((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
+  }
+
   public ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
     if (closed) {
       tokenHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));

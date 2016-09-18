@@ -80,6 +80,30 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
+        request(HttpMethod.PUT, "/v1/acl/update", idHandler, buffer ->
+                buffer.toJsonObject().getString("ID")).end(token.toJson().encode());
+        return this;
+    }
+
+    @Override
+    public ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
+        request(HttpMethod.PUT, "/v1/acl/clone/" + id, idHandler, buffer ->
+                buffer.toJsonObject().getString("ID")).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/acl/list", resultHandler, buffer ->
+                buffer.toJsonArray().stream()
+                        .map(obj -> new AclToken((JsonObject) obj))
+                        .collect(Collectors.toList()))
+                .end();
+        return this;
+    }
+
+    @Override
     public ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
         request(HttpMethod.GET, "/v1/acl/info/" + id, tokenHandler, buffer -> {
             JsonObject jsonObject = buffer.toJsonArray().getJsonObject(0);

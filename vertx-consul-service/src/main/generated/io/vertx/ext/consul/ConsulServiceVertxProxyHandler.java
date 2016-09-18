@@ -175,6 +175,28 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           service.createAclToken(json.getJsonObject("token") == null ? null : new io.vertx.ext.consul.AclToken(json.getJsonObject("token")), createHandler(msg));
           break;
         }
+        case "updateAclToken": {
+          service.updateAclToken(json.getJsonObject("token") == null ? null : new io.vertx.ext.consul.AclToken(json.getJsonObject("token")), createHandler(msg));
+          break;
+        }
+        case "cloneAclToken": {
+          service.cloneAclToken((java.lang.String)json.getValue("id"), createHandler(msg));
+          break;
+        }
+        case "listAclTokens": {
+          service.listAclTokens(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(AclToken::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
         case "infoAclToken": {
           service.infoAclToken((java.lang.String)json.getValue("id"), res -> {
             if (res.failed()) {

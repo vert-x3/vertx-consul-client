@@ -84,6 +84,35 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling create_acl_token(token)"
     end
+    # @param [Hash] token 
+    # @yield 
+    # @return [self]
+    def update_acl_token(token=nil)
+      if token.class == Hash && block_given?
+        @j_del.java_method(:updateAclToken, [Java::IoVertxExtConsul::AclToken.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::AclToken.new(::Vertx::Util::Utils.to_json_object(token)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling update_acl_token(token)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def clone_acl_token(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:cloneAclToken, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling clone_acl_token(id)"
+    end
+    # @yield 
+    # @return [self]
+    def list_acl_tokens
+      if block_given?
+        @j_del.java_method(:listAclTokens, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_acl_tokens()"
+    end
     # @param [String] id 
     # @yield 
     # @return [self]

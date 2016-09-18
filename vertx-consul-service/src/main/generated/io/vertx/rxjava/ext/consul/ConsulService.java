@@ -121,6 +121,39 @@ public class ConsulService extends ConsulClient {
     return idHandler;
   }
 
+  public ConsulService updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).updateAclToken(token, idHandler);
+    return this;
+  }
+
+  public Observable<String> updateAclTokenObservable(AclToken token) { 
+    io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    updateAclToken(token, idHandler.toHandler());
+    return idHandler;
+  }
+
+  public ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).cloneAclToken(id, idHandler);
+    return this;
+  }
+
+  public Observable<String> cloneAclTokenObservable(String id) { 
+    io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    cloneAclToken(id, idHandler.toHandler());
+    return idHandler;
+  }
+
+  public ConsulService listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).listAclTokens(resultHandler);
+    return this;
+  }
+
+  public Observable<List<AclToken>> listAclTokensObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<AclToken>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    listAclTokens(resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).infoAclToken(id, tokenHandler);
     return this;

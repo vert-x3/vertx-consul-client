@@ -54,6 +54,24 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
+        consulClient.updateAclToken(token, idHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
+        consulClient.cloneAclToken(id, idHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) {
+        consulClient.listAclTokens(resultHandler);
+        return this;
+    }
+
+    @Override
     public ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
         consulClient.infoAclToken(id, tokenHandler);
         return this;

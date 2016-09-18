@@ -41,6 +41,15 @@ public interface ConsulClient {
     ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
     @Fluent
+    ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
+
+    @Fluent
+    ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
+
+    @Fluent
+    ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
+
+    @Fluent
     ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
     @Fluent

@@ -169,6 +169,68 @@ var ConsulService = function(j_val) {
   /**
 
    @public
+   @param token {Object} 
+   @param idHandler {function} 
+   @return {ConsulService}
+   */
+  this.updateAclToken = function(token, idHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["updateAclToken(io.vertx.ext.consul.AclToken,io.vertx.core.Handler)"](token != null ? new AclToken(new JsonObject(JSON.stringify(token))) : null, function(ar) {
+      if (ar.succeeded()) {
+        idHandler(ar.result(), null);
+      } else {
+        idHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param idHandler {function} 
+   @return {ConsulService}
+   */
+  this.cloneAclToken = function(id, idHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["cloneAclToken(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        idHandler(ar.result(), null);
+      } else {
+        idHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.listAclTokens = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["listAclTokens(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
    @param id {string} 
    @param tokenHandler {function} 
    @return {ConsulService}

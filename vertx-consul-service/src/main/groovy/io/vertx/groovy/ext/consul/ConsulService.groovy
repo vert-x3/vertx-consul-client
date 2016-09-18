@@ -89,6 +89,26 @@ public class ConsulService extends ConsulClient {
     ((io.vertx.ext.consul.ConsulService) delegate).createAclToken(token != null ? new io.vertx.ext.consul.AclToken(io.vertx.lang.groovy.InternalHelper.toJsonObject(token)) : null, idHandler);
     return this;
   }
+  public ConsulService updateAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).updateAclToken(token != null ? new io.vertx.ext.consul.AclToken(io.vertx.lang.groovy.InternalHelper.toJsonObject(token)) : null, idHandler);
+    return this;
+  }
+  public ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).cloneAclToken(id, idHandler);
+    return this;
+  }
+  public ConsulService listAclTokens(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).listAclTokens(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.AclToken>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.AclToken>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   public ConsulService infoAclToken(String id, Handler<AsyncResult<Map<String, Object>>> tokenHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).infoAclToken(id, tokenHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.AclToken>>() {
       public void handle(AsyncResult<io.vertx.ext.consul.AclToken> ar) {

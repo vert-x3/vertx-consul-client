@@ -51,45 +51,69 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
+    ConsulService updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
+
+    @Override
+    @Fluent
+    ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
+
+    @Override
+    @Fluent
+    ConsulService listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
+
+    @Override
+    @Fluent
     ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
     @Override
     @Fluent
     ConsulService destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
 
+    @Override
     @Fluent
     ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
