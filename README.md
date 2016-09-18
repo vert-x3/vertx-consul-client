@@ -1,14 +1,14 @@
 # vertx-consul-client
 
-At current stage only Key/Value Store and ACLs (partly) implemented
+- Key/Value Store
+- Access Control Lists
+- Health Checks
 
 ## TODO
 - features
-  - Access Control Lists (further implementation)
   - Nodes and Services catalog
   - Network Coordinates
   - User Events
-  - Health Checks
   - Sessions
   - Consul System Status
 - documentation
