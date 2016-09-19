@@ -24,7 +24,7 @@ public class Utils {
         return new String(Files.readAllBytes(Paths.get(resource.toURI())));
     }
 
-    public static void runSync(Consumer<Handler<AsyncResult<Void>>> runner) throws Throwable {
+    public static void runAsync(Consumer<Handler<AsyncResult<Void>>> runner) {
         CountDownLatch latch = new CountDownLatch(1);
         Future<Void> future = Future.future();
         runner.accept(h -> {
@@ -41,11 +41,11 @@ public class Utils {
             e.printStackTrace();
         }
         if (future.failed()) {
-            throw future.cause();
+            throw new RuntimeException(future.cause());
         }
     }
 
-    public static <T> T getSync(Consumer<Handler<AsyncResult<T>>> runner) throws Throwable {
+    public static <T> T getAsync(Consumer<Handler<AsyncResult<T>>> runner) {
         CountDownLatch latch = new CountDownLatch(1);
         Future<T> future = Future.future();
         runner.accept(h -> {
@@ -64,17 +64,7 @@ public class Utils {
         if (future.succeeded()) {
             return future.result();
         } else {
-            throw future.cause();
+            throw new RuntimeException(future.cause());
         }
-    }
-
-    public static <T> Handler<AsyncResult<T>> handleResult(Handler<T> resultHandler) {
-        return h -> {
-            if (h.succeeded()) {
-                resultHandler.handle(h.result());
-            } else {
-                throw new RuntimeException(h.cause());
-            }
-        };
     }
 }

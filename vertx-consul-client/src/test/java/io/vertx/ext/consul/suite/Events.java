@@ -4,9 +4,9 @@ import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Event;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
-import static io.vertx.ext.consul.Utils.handleResult;
+import static io.vertx.ext.consul.Utils.getAsync;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -14,18 +14,15 @@ import static io.vertx.ext.consul.Utils.handleResult;
 public class Events extends ConsulTestBase {
 
     @Test
-    public void testEvents1() throws InterruptedException {
-        writeClient.fireEvent(Event.empty().withName("custom-event").withPayload("content"), handleResult(h1 -> {
-            assertEquals(h1.getName(), "custom-event");
-            assertEquals(h1.getPayload(), "content");
-            String evId = h1.getId();
-            writeClient.listEvents(handleResult(h2 -> {
-                long cnt = h2.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
-                assertEquals(cnt, 1);
-                testComplete();
-            }));
-        }));
-        await(1, TimeUnit.SECONDS);
+    public void testEvents1() {
+        Event init = Event.empty().withName("custom-event").withPayload("content");
+        Event event = getAsync(h -> writeClient.fireEvent(init, h));
+        assertEquals(init.getName(), event.getName());
+        assertEquals(init.getPayload(), event.getPayload());
+        String evId = event.getId();
+        List<Event> list = getAsync(h -> writeClient.listEvents(h));
+        long cnt = list.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
+        assertEquals(cnt, 1);
     }
 
 }
