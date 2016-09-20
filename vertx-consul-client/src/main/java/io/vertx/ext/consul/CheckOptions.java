@@ -38,9 +38,10 @@ public class CheckOptions {
         return checkOptions;
     }
 
-    public static CheckOptions tcp(String tcp) {
+    public static CheckOptions tcp(String tcp, String interval) {
         CheckOptions checkOptions = new CheckOptions();
         checkOptions.tcp = tcp;
+        checkOptions.interval = interval;
         return checkOptions;
     }
 
