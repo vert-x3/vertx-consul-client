@@ -67,4 +67,20 @@ public class Utils {
             throw new RuntimeException(future.cause());
         }
     }
+
+    public static String osResolve() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String binaryVersion = "linux";
+        if (os.contains("mac")) {
+            binaryVersion = "darwin";
+        } else if (os.contains("windows")) {
+            binaryVersion = "windows";
+        }
+        return binaryVersion;
+    }
+
+    public static boolean isWindows() {
+        return "windows".equals(osResolve());
+    }
+
 }

@@ -5,10 +5,16 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.consul.Utils;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +62,7 @@ public class Checks extends ConsulTestBase {
 
     @Test
     public void httpCheckLifecycle() {
-        HealthReporter reporter = new HealthReporter(vertx);
+        HttpHealthReporter reporter = new HttpHealthReporter(vertx);
 
         String checkId = "checkId";
         CheckOptions opts = CheckOptions.http("http://localhost:" + reporter.port(), "1s")
@@ -85,7 +91,7 @@ public class Checks extends ConsulTestBase {
 
     @Test
     public void tcpCheckLifecycle() {
-        HealthReporter reporter = new HealthReporter(vertx);
+        HttpHealthReporter reporter = new HttpHealthReporter(vertx);
 
         String checkId = "checkId";
         CheckOptions opts = CheckOptions.tcp("localhost:" + reporter.port(), "1s")
@@ -98,6 +104,33 @@ public class Checks extends ConsulTestBase {
         assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
 
         reporter.close();
+        sleep(1500);
+        checkInfo = getCheckInfo(checkId);
+        assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
+
+        runAsync(h -> writeClient.deregisterCheck(checkId, h));
+    }
+
+    @Test
+    public void scriptCheckLifecycle() {
+        ScriptHealthReporter reporter = new ScriptHealthReporter();
+
+        String checkId = "checkId";
+        CheckOptions opts = CheckOptions.script(reporter.scriptPath(), "1s")
+                .setId(checkId)
+                .setName("checkName");
+        runAsync(h -> writeClient.registerCheck(opts, h));
+
+        sleep(1500);
+        CheckInfo checkInfo = getCheckInfo(checkId);
+        assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
+
+        reporter.setStatus(CheckInfo.Status.warning);
+        sleep(1500);
+        checkInfo = getCheckInfo(checkId);
+        assertEquals(CheckInfo.Status.warning, checkInfo.getStatus());
+
+        reporter.setStatus(CheckInfo.Status.critical);
         sleep(1500);
         checkInfo = getCheckInfo(checkId);
         assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
@@ -121,14 +154,64 @@ public class Checks extends ConsulTestBase {
         }
     }
 
-    private static class HealthReporter {
+    private static class ScriptHealthReporter {
+
+        private File healthStatusFile;
+        private File scriptFile;
+
+        ScriptHealthReporter() {
+            try {
+                Path scriptDir = Files.createTempDirectory("vertx-consul-script-dir-");
+                healthStatusFile = new File(scriptDir.toFile(), "status");
+                String scriptName = "health_script." + (Utils.isWindows() ? "bat" : "sh");
+                String scriptContent = Utils.readResource(scriptName)
+                        .replace("%STATUS_FILE%", healthStatusFile.getAbsolutePath());
+                scriptFile = new File(scriptDir.toFile(), scriptName);
+                PrintStream out = new PrintStream(scriptFile);
+                out.print(scriptContent);
+                out.close();
+                scriptFile.setExecutable(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            setStatus(CheckInfo.Status.passing);
+        }
+
+        String scriptPath() {
+            return scriptFile.getAbsolutePath();
+        }
+
+        void setStatus(CheckInfo.Status status) {
+            int statusCode;
+            switch (status) {
+                case passing:
+                    statusCode = 0;
+                    break;
+                case warning:
+                    statusCode = 1;
+                    break;
+                default:
+                    statusCode = 42;
+                    break;
+            }
+            try {
+                PrintStream out = new PrintStream(healthStatusFile);
+                out.print(statusCode);
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class HttpHealthReporter {
 
         private final HttpServer server;
         private final int port;
 
         private CheckInfo.Status status = CheckInfo.Status.passing;
 
-        HealthReporter(Vertx vertx) {
+        HttpHealthReporter(Vertx vertx) {
             this.port = getFreePort();
             CountDownLatch latch = new CountDownLatch(1);
             this.server = vertx.createHttpServer().requestHandler(h -> h.response()
