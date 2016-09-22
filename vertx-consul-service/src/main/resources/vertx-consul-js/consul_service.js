@@ -26,6 +26,7 @@ var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValuePair = io.vertx.ext.consul.KeyValuePair;
 var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
+var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
@@ -322,6 +323,27 @@ var ConsulService = function(j_val) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_consulService["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](service != null ? new ServiceOptions(new JsonObject(JSON.stringify(service))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param maintenanceOptions {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.maintenanceService = function(maintenanceOptions, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["maintenanceService(io.vertx.ext.consul.MaintenanceOptions,io.vertx.core.Handler)"](maintenanceOptions != null ? new MaintenanceOptions(new JsonObject(JSON.stringify(maintenanceOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {

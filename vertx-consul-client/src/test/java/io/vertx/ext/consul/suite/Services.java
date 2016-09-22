@@ -39,10 +39,48 @@ public class Services extends ChecksBase {
     }
 
     @Test
-    public void testService2() {
+    public void findConsul() {
         List<ServiceInfo> services = getAsync(h -> writeClient.infoService("consul", h));
         long cnt = services.stream().filter(s -> s.getName().equals("consul")).count();
         assertEquals(cnt, 1);
+    }
+
+    @Test
+    public void maintenanceMode() {
+        String serviceId = "serviceId";
+        ServiceOptions service = new ServiceOptions()
+                .setName("serviceName")
+                .setId(serviceId)
+                .setAddress("10.0.0.1")
+                .setCheckOptions(CheckOptions.ttl("1h"))
+                .setPort(8080);
+        runAsync(h -> writeClient.registerService(service, h));
+        runAsync(h -> writeClient.passCheck(new CheckOptions().setId("service:" + serviceId), h));
+
+        List<CheckInfo> checks = getAsync(h -> writeClient.localChecks(h));
+        assertEquals(1, checks.size());
+
+        String reason = "reason!";
+        MaintenanceOptions opts = new MaintenanceOptions()
+                .setId(serviceId)
+                .setReason(reason)
+                .setEnable(true);
+        runAsync(h -> writeClient.maintenanceService(opts, h));
+
+        // TODO undocumented (?) behavior
+        checks = getAsync(h -> writeClient.localChecks(h));
+        assertEquals(2, checks.size());
+        long cnt = checks.stream().filter(info -> info.getStatus() == CheckInfo.Status.critical).count();
+        assertEquals(1, cnt);
+        assertEquals(reason, checks.get(0).getNotes());
+
+        opts.setEnable(false);
+        runAsync(h -> writeClient.maintenanceService(opts, h));
+
+        checks = getAsync(h -> writeClient.localChecks(h));
+        assertEquals(1, checks.size());
+
+        runAsync(h -> writeClient.deregisterService(serviceId, h));
     }
 
     @Override

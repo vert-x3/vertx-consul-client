@@ -20,6 +20,7 @@ import java.util.Map;
 import rx.Observable;
 import io.vertx.ext.consul.Event;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.ext.consul.MaintenanceOptions;
 import io.vertx.ext.consul.ServiceInfo;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.CheckOptions;
@@ -206,6 +207,17 @@ public class ConsulClient {
   public Observable<Void> registerServiceObservable(ServiceOptions service) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     registerService(service, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.maintenanceService(maintenanceOptions, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> maintenanceServiceObservable(MaintenanceOptions maintenanceOptions) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    maintenanceService(maintenanceOptions, resultHandler.toHandler());
     return resultHandler;
   }
 

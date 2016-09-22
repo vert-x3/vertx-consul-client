@@ -65,6 +65,9 @@ public interface ConsulClient {
     ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
+    ConsulClient maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler);
+
+    @Fluent
     ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent

@@ -164,6 +164,16 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling register_service(service)"
     end
+    # @param [Hash] maintenanceOptions 
+    # @yield 
+    # @return [self]
+    def maintenance_service(maintenanceOptions=nil)
+      if maintenanceOptions.class == Hash && block_given?
+        @j_del.java_method(:maintenanceService, [Java::IoVertxExtConsul::MaintenanceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::MaintenanceOptions.new(::Vertx::Util::Utils.to_json_object(maintenanceOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling maintenance_service(maintenanceOptions)"
+    end
     # @param [String] id 
     # @yield 
     # @return [self]

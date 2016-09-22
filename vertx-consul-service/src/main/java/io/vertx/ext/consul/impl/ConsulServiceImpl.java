@@ -102,6 +102,12 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.maintenanceService(maintenanceOptions, resultHandler);
+        return this;
+    }
+
+    @Override
     public ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
         consulClient.deregisterService(id, resultHandler);
         return this;

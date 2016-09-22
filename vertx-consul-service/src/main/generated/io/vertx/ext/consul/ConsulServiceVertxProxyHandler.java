@@ -42,6 +42,7 @@ import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
+import io.vertx.ext.consul.MaintenanceOptions;
 import io.vertx.ext.consul.ServiceInfo;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.ConsulClient;
@@ -245,6 +246,10 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
         }
         case "registerService": {
           service.registerService(json.getJsonObject("service") == null ? null : new io.vertx.ext.consul.ServiceOptions(json.getJsonObject("service")), createHandler(msg));
+          break;
+        }
+        case "maintenanceService": {
+          service.maintenanceService(json.getJsonObject("maintenanceOptions") == null ? null : new io.vertx.ext.consul.MaintenanceOptions(json.getJsonObject("maintenanceOptions")), createHandler(msg));
           break;
         }
         case "deregisterService": {

@@ -20,6 +20,7 @@ import io.vertx.lang.groovy.InternalHelper
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.consul.Event
 import io.vertx.groovy.core.Vertx
+import io.vertx.ext.consul.MaintenanceOptions
 import io.vertx.ext.consul.ServiceInfo
 import io.vertx.ext.consul.CheckInfo
 import io.vertx.ext.consul.CheckOptions
@@ -151,6 +152,10 @@ public class ConsulService extends ConsulClient {
   }
   public ConsulService registerService(Map<String, Object> service = [:], Handler<AsyncResult<Void>> resultHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).registerService(service != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(service)) : null, resultHandler);
+    return this;
+  }
+  public ConsulService maintenanceService(Map<String, Object> maintenanceOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).maintenanceService(maintenanceOptions != null ? new io.vertx.ext.consul.MaintenanceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(maintenanceOptions)) : null, resultHandler);
     return this;
   }
   public ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {

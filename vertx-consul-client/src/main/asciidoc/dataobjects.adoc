@@ -84,6 +84,22 @@
 |[[value]]`value`|`String`|-
 |===
 
+[[MaintenanceOptions]]
+== MaintenanceOptions
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[enable]]`enable`|`Boolean`|-
+|[[id]]`id`|`String`|-
+|[[reason]]`reason`|`String`|-
+|===
+
 [[ServiceInfo]]
 == ServiceInfo
 

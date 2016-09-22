@@ -83,6 +83,10 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
+    ConsulService maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler);
+
+    @Override
+    @Fluent
     ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Override

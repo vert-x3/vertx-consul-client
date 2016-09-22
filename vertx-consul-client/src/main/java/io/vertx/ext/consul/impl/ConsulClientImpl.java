@@ -143,6 +143,16 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient maintenanceService(MaintenanceOptions opts, Handler<AsyncResult<Void>> resultHandler) {
+        String query = "enable=" + opts.isEnable();
+        if (opts.getReason() != null) {
+            query += "&reason=" + opts.getReason();
+        }
+        request(HttpMethod.PUT, "/v1/agent/service/maintenance/" + opts.getId(), query, resultHandler).end();
+        return this;
+    }
+
+    @Override
     public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
         request(HttpMethod.GET, "/v1/agent/service/deregister/" + id, resultHandler).end();
         return this;
