@@ -247,6 +247,10 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           service.registerService(json.getJsonObject("service") == null ? null : new io.vertx.ext.consul.ServiceOptions(json.getJsonObject("service")), createHandler(msg));
           break;
         }
+        case "deregisterService": {
+          service.deregisterService((java.lang.String)json.getValue("id"), createHandler(msg));
+          break;
+        }
         case "infoService": {
           service.infoService((java.lang.String)json.getValue("name"), res -> {
             if (res.failed()) {

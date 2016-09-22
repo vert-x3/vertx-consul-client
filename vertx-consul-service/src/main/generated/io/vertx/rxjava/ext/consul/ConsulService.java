@@ -209,6 +209,17 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
+  public ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).deregisterService(id, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> deregisterServiceObservable(String id) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    deregisterService(id, resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).infoService(name, resultHandler);
     return this;

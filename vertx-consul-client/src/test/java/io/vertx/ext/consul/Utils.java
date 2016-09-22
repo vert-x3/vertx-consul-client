@@ -3,6 +3,7 @@ package io.vertx.ext.consul;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -65,6 +66,16 @@ public class Utils {
             return future.result();
         } else {
             throw new RuntimeException(future.cause());
+        }
+    }
+
+    public static void sleep(Vertx vertx, long millis) {
+        CountDownLatch latch = new CountDownLatch(1);
+        vertx.setTimer(millis, h -> latch.countDown());
+        try {
+            latch.await(2 * millis, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

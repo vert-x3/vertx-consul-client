@@ -12,10 +12,10 @@ import static io.vertx.ext.consul.Utils.runAsync;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class Services extends ConsulTestBase {
+public class Services extends ChecksBase {
 
     @Test
-    public void testService1() {
+    public void createLocalService() {
         ServiceOptions service = new ServiceOptions()
                 .setName("serviceName")
                 .setTags(Arrays.asList("tag1", "tag2"))
@@ -26,6 +26,7 @@ public class Services extends ConsulTestBase {
 
         List<ServiceInfo> services = getAsync(h -> writeClient.localServices(h));
         ServiceInfo s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
+        String serviceId = s.getId();
         assertEquals(s.getTags().get(1), "tag2");
         assertEquals(s.getAddress(), "10.0.0.1");
         assertEquals(s.getPort(), 8080);
@@ -33,6 +34,8 @@ public class Services extends ConsulTestBase {
         List<CheckInfo> checks = getAsync(h -> writeClient.localChecks(h));
         CheckInfo c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
         assertEquals(c.getId(), "service:serviceName");
+
+        runAsync(h -> writeClient.deregisterService(serviceId, h));
     }
 
     @Test
@@ -42,4 +45,17 @@ public class Services extends ConsulTestBase {
         assertEquals(cnt, 1);
     }
 
+    @Override
+    String createCheck(CheckOptions opts) {
+        String serviceId = "serviceId";
+        ServiceOptions service = new ServiceOptions()
+                .setName("serviceName")
+                .setId(serviceId)
+                .setTags(Arrays.asList("tag1", "tag2"))
+                .setCheckOptions(opts)
+                .setAddress("10.0.0.1")
+                .setPort(8080);
+        runAsync(h -> writeClient.registerService(service, h));
+        return "service:" + serviceId;
+    }
 }

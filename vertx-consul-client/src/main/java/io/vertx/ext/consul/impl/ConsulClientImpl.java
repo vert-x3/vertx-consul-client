@@ -143,6 +143,12 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.GET, "/v1/agent/service/deregister/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
     public ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         request(HttpMethod.GET, "/v1/catalog/service/" + name, resultHandler, buffer -> buffer.toJsonArray().stream()
                 .map(obj -> new ServiceInfo((JsonObject) obj))

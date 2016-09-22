@@ -335,6 +335,27 @@ var ConsulService = function(j_val) {
   /**
 
    @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.deregisterService = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["deregisterService(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
    @param name {string} 
    @param resultHandler {function} 
    @return {ConsulService}

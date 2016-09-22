@@ -150,6 +150,10 @@ public class ConsulClient {
     delegate.registerService(service != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(service)) : null, resultHandler);
     return this;
   }
+  public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.deregisterService(id, resultHandler);
+    return this;
+  }
   public ConsulClient infoService(String name, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.infoService(name, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.ServiceInfo>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.ServiceInfo>> ar) {

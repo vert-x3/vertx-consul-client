@@ -162,6 +162,16 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling register_service(service)"
     end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def deregister_service(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:deregisterService, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling deregister_service(id)"
+    end
     # @param [String] name 
     # @yield 
     # @return [self]
