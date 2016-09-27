@@ -3,6 +3,7 @@
 - Key/Value Store
 - Access Control Lists
 - Health Checks
+- Consul System Status
 
 ## TODO
 - features
@@ -10,7 +11,6 @@
   - Network Coordinates
   - User Events
   - Sessions
-  - Consul System Status
 - documentation
 - testing
 - examples

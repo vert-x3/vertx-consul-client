@@ -272,6 +272,24 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling update_check(checkInfo)"
     end
+    # @yield 
+    # @return [self]
+    def leader_status
+      if block_given?
+        @j_del.java_method(:leaderStatus, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling leader_status()"
+    end
+    # @yield 
+    # @return [self]
+    def peers_status
+      if block_given?
+        @j_del.java_method(:peersStatus, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling peers_status()"
+    end
     # @return [void]
     def close
       if !block_given?

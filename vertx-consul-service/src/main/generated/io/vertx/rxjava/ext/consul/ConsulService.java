@@ -331,6 +331,28 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
+  public ConsulService leaderStatus(Handler<AsyncResult<String>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).leaderStatus(resultHandler);
+    return this;
+  }
+
+  public Observable<String> leaderStatusObservable() { 
+    io.vertx.rx.java.ObservableFuture<String> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    leaderStatus(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).peersStatus(resultHandler);
+    return this;
+  }
+
+  public Observable<List<String>> peersStatusObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<String>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    peersStatus(resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public void close() { 
     ((io.vertx.ext.consul.ConsulService) delegate).close();
   }

@@ -126,5 +126,13 @@ public interface ConsulService extends ConsulClient {
     ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
     @Override
+    @Fluent
+    ConsulService leaderStatus(Handler<AsyncResult<String>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
+
+    @Override
     void close();
 }

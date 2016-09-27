@@ -162,6 +162,18 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService leaderStatus(Handler<AsyncResult<String>> resultHandler) {
+        consulClient.leaderStatus(resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
+        consulClient.peersStatus(resultHandler);
+        return this;
+    }
+
+    @Override
     public ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         consulClient.localServices(resultHandler);
         return this;

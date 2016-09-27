@@ -97,6 +97,12 @@ public interface ConsulClient {
     @Fluent
     ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
+    @Fluent
+    ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler);
+
+    @Fluent
+    ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
+
     /**
      * Close the client and release its resources
      */

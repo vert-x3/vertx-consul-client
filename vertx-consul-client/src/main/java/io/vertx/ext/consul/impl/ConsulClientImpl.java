@@ -223,6 +223,23 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
+        request(HttpMethod.GET, "/v1/status/leader", resultHandler, buffer -> {
+            String leader = buffer.toString();
+            return leader.substring(1, leader.length() - 2);
+        }).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/status/peers", resultHandler, buffer -> buffer.toJsonArray().stream()
+                .map(obj -> (String) obj)
+                .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
     public void close() {
         httpClient.close();
     }

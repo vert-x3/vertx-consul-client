@@ -219,6 +219,22 @@ public class ConsulClient {
     delegate.updateCheck(checkInfo != null ? new io.vertx.ext.consul.CheckInfo(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkInfo)) : null, resultHandler);
     return this;
   }
+  public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
+    delegate.leaderStatus(resultHandler);
+    return this;
+  }
+  public ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
+    delegate.peersStatus(resultHandler != null ? new Handler<AsyncResult<java.util.List<java.lang.String>>>() {
+      public void handle(AsyncResult<java.util.List<java.lang.String>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   /**
    * Close the client and release its resources
    */

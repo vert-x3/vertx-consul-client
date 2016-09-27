@@ -222,6 +222,22 @@ public class ConsulService extends ConsulClient {
     ((io.vertx.ext.consul.ConsulService) delegate).updateCheck(checkInfo != null ? new io.vertx.ext.consul.CheckInfo(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkInfo)) : null, resultHandler);
     return this;
   }
+  public ConsulService leaderStatus(Handler<AsyncResult<String>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).leaderStatus(resultHandler);
+    return this;
+  }
+  public ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).peersStatus(resultHandler != null ? new Handler<AsyncResult<java.util.List<java.lang.String>>>() {
+      public void handle(AsyncResult<java.util.List<java.lang.String>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   public void close() {
     ((io.vertx.ext.consul.ConsulService) delegate).close();
   }

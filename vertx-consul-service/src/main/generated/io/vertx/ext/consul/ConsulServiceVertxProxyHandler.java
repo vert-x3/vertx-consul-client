@@ -322,6 +322,14 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           service.updateCheck(json.getJsonObject("checkInfo") == null ? null : new io.vertx.ext.consul.CheckInfo(json.getJsonObject("checkInfo")), createHandler(msg));
           break;
         }
+        case "leaderStatus": {
+          service.leaderStatus(createHandler(msg));
+          break;
+        }
+        case "peersStatus": {
+          service.peersStatus(createListHandler(msg));
+          break;
+        }
         case "close": {
           service.close();
           break;
