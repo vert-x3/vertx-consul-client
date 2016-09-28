@@ -30,6 +30,7 @@ import java.util.List
 import io.vertx.ext.consul.AclToken
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
+import io.vertx.ext.consul.Session
 @CompileStatic
 public class ConsulService extends ConsulClient {
   private final def io.vertx.ext.consul.ConsulService delegate;
@@ -236,6 +237,26 @@ public class ConsulService extends ConsulClient {
         }
       }
     } : null);
+    return this;
+  }
+  public ConsulService createSession(Map<String, Object> session = [:], Handler<AsyncResult<String>> idHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).createSession(session != null ? new io.vertx.ext.consul.Session(io.vertx.lang.groovy.InternalHelper.toJsonObject(session)) : null, idHandler);
+    return this;
+  }
+  public ConsulService infoSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).infoSession(id, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Session>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).destroySession(id, resultHandler);
     return this;
   }
   public void close() {

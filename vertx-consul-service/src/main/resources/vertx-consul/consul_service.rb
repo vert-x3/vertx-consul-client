@@ -290,6 +290,36 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling peers_status()"
     end
+    # @param [Hash] session 
+    # @yield 
+    # @return [self]
+    def create_session(session=nil)
+      if session.class == Hash && block_given?
+        @j_del.java_method(:createSession, [Java::IoVertxExtConsul::Session.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Session.new(::Vertx::Util::Utils.to_json_object(session)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling create_session(session)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def info_session(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:infoSession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling info_session(id)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def destroy_session(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:destroySession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling destroy_session(id)"
+    end
     # @return [void]
     def close
       if !block_given?

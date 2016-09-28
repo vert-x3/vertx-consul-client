@@ -174,6 +174,24 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
+    public ConsulService createSession(Session session, Handler<AsyncResult<String>> idHandler) {
+        consulClient.createSession(session, idHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
+        consulClient.infoSession(id, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
+        consulClient.destroySession(id, resultHandler);
+        return this;
+    }
+
+    @Override
     public ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
         consulClient.localServices(resultHandler);
         return this;

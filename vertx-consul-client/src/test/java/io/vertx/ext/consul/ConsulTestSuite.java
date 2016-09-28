@@ -16,6 +16,7 @@ import org.junit.runners.Suite;
         Events.class,
         KVStore.class,
         Services.class,
+        Sessions.class,
         Status.class
 })
 public class ConsulTestSuite {

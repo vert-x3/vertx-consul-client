@@ -30,6 +30,7 @@ import java.util.List;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.Session;
 
 
 public class ConsulService extends ConsulClient {
@@ -350,6 +351,39 @@ public class ConsulService extends ConsulClient {
   public Observable<List<String>> peersStatusObservable() { 
     io.vertx.rx.java.ObservableFuture<List<String>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     peersStatus(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService createSession(Session session, Handler<AsyncResult<String>> idHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).createSession(session, idHandler);
+    return this;
+  }
+
+  public Observable<String> createSessionObservable(Session session) { 
+    io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    createSession(session, idHandler.toHandler());
+    return idHandler;
+  }
+
+  public ConsulService infoSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).infoSession(id, resultHandler);
+    return this;
+  }
+
+  public Observable<Session> infoSessionObservable(String id) { 
+    io.vertx.rx.java.ObservableFuture<Session> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    infoSession(id, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).destroySession(id, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> destroySessionObservable(String id) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    destroySession(id, resultHandler.toHandler());
     return resultHandler;
   }
 

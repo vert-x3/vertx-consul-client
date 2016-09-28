@@ -31,6 +31,7 @@ import io.vertx.ext.consul.AclToken
 import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
+import io.vertx.ext.consul.Session
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -233,6 +234,26 @@ public class ConsulClient {
         }
       }
     } : null);
+    return this;
+  }
+  public ConsulClient createSession(Map<String, Object> session = [:], Handler<AsyncResult<String>> idHandler) {
+    delegate.createSession(session != null ? new io.vertx.ext.consul.Session(io.vertx.lang.groovy.InternalHelper.toJsonObject(session)) : null, idHandler);
+    return this;
+  }
+  public ConsulClient infoSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.infoSession(id, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Session>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.destroySession(id, resultHandler);
     return this;
   }
   /**

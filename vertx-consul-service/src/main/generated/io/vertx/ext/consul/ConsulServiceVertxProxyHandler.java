@@ -53,6 +53,7 @@ import java.util.List;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.Session;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -328,6 +329,28 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
         }
         case "peersStatus": {
           service.peersStatus(createListHandler(msg));
+          break;
+        }
+        case "createSession": {
+          service.createSession(json.getJsonObject("session") == null ? null : new io.vertx.ext.consul.Session(json.getJsonObject("session")), createHandler(msg));
+          break;
+        }
+        case "infoSession": {
+          service.infoSession((java.lang.String)json.getValue("id"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "destroySession": {
+          service.destroySession((java.lang.String)json.getValue("id"), createHandler(msg));
           break;
         }
         case "close": {

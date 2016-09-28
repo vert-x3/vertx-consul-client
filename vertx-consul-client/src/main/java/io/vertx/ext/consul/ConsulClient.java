@@ -103,6 +103,15 @@ public interface ConsulClient {
     @Fluent
     ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 
+    @Fluent
+    ConsulClient createSession(Session session, Handler<AsyncResult<String>> idHandler);
+
+    @Fluent
+    ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Fluent
+    ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
+
     /**
      * Close the client and release its resources
      */

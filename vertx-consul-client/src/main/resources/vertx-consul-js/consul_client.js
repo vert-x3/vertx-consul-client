@@ -27,6 +27,7 @@ var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
+var Session = io.vertx.ext.consul.Session;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 
@@ -594,6 +595,69 @@ var ConsulClient = function(j_val) {
       j_consulClient["peersStatus(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         resultHandler(ar.result(), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param session {Object} 
+   @param idHandler {function} 
+   @return {ConsulClient}
+   */
+  this.createSession = function(session, idHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["createSession(io.vertx.ext.consul.Session,io.vertx.core.Handler)"](session != null ? new Session(new JsonObject(JSON.stringify(session))) : null, function(ar) {
+      if (ar.succeeded()) {
+        idHandler(ar.result(), null);
+      } else {
+        idHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.infoSession = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["infoSession(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.destroySession = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["destroySession(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
       } else {
         resultHandler(null, ar.cause());
       }

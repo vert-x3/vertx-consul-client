@@ -139,3 +139,22 @@
 |[[tags]]`tags`|`Array of String`|-
 |===
 
+[[Session]]
+== Session
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[behavior]]`behavior`|`String`|-
+|[[checks]]`checks`|`Array of String`|-
+|[[lockDelay]]`lockDelay`|`String`|-
+|[[name]]`name`|`String`|-
+|[[node]]`node`|`String`|-
+|[[ttl]]`ttl`|`String`|-
+|===
+

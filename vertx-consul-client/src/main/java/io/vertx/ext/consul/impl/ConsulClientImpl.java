@@ -240,6 +240,25 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
+    public ConsulClient createSession(Session session, Handler<AsyncResult<String>> idHandler) {
+        request(HttpMethod.PUT, "/v1/session/create", idHandler, buffer -> buffer.toJsonObject().getString("ID"))
+                .end(session.toJson().encode());
+        return this;
+    }
+
+    @Override
+    public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
+        request(HttpMethod.GET, "/v1/session/info/" + id, resultHandler, buffer -> new Session(buffer.toJsonArray().getJsonObject(0))).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/session/destroy/" + id, resultHandler).end();
+        return this;
+    }
+
+    @Override
     public void close() {
         httpClient.close();
     }

@@ -134,5 +134,17 @@ public interface ConsulService extends ConsulClient {
     ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 
     @Override
+    @Fluent
+    ConsulService createSession(Session session, Handler<AsyncResult<String>> idHandler);
+
+    @Override
+    @Fluent
+    ConsulService infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
+
+    @Override
     void close();
 }
