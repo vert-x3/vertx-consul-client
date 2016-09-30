@@ -32,6 +32,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.KeyValuePairOptions;
 
 /**
  * A Vert.x service used to interact with Consul.
@@ -101,14 +102,14 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.putValue(key, value, resultHandler);
+  public ConsulClient putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) { 
+    delegate.putValue(pair, resultHandler);
     return this;
   }
 
-  public Observable<Void> putValueObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    putValue(key, value, resultHandler.toHandler());
+  public Observable<Boolean> putValueObservable(KeyValuePairOptions pair) { 
+    io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    putValue(pair, resultHandler.toHandler());
     return resultHandler;
   }
 

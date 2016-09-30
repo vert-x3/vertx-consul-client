@@ -31,6 +31,7 @@ import io.vertx.ext.consul.AclToken
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.ext.consul.Session
+import io.vertx.ext.consul.KeyValuePairOptions
 @CompileStatic
 public class ConsulService extends ConsulClient {
   private final def io.vertx.ext.consul.ConsulService delegate;
@@ -83,8 +84,8 @@ public class ConsulService extends ConsulClient {
     ((io.vertx.ext.consul.ConsulService) delegate).deleteValues(keyPrefix, resultHandler);
     return this;
   }
-  public ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).putValue(key, value, resultHandler);
+  public ConsulService putValue(Map<String, Object> pair = [:], Handler<AsyncResult<Boolean>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).putValue(pair != null ? new io.vertx.ext.consul.KeyValuePairOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(pair)) : null, resultHandler);
     return this;
   }
   public ConsulService createAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {

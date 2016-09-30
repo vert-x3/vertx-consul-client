@@ -42,8 +42,8 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-        consulClient.putValue(key, value, resultHandler);
+    public ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) {
+        consulClient.putValue(pair, resultHandler);
         return this;
     }
 

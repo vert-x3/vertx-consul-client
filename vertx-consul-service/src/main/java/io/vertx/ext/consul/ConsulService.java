@@ -43,7 +43,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
+    ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler);
 
     @Override
     @Fluent

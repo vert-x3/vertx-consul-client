@@ -32,6 +32,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.ext.consul.Session
+import io.vertx.ext.consul.KeyValuePairOptions
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -80,8 +81,8 @@ public class ConsulClient {
     delegate.deleteValues(keyPrefix, resultHandler);
     return this;
   }
-  public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-    delegate.putValue(key, value, resultHandler);
+  public ConsulClient putValue(Map<String, Object> pair = [:], Handler<AsyncResult<Boolean>> resultHandler) {
+    delegate.putValue(pair != null ? new io.vertx.ext.consul.KeyValuePairOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(pair)) : null, resultHandler);
     return this;
   }
   public ConsulClient createAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {

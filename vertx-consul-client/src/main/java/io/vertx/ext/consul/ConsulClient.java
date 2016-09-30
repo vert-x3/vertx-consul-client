@@ -35,7 +35,7 @@ public interface ConsulClient {
     ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler);
+    ConsulClient putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler);
 
     @Fluent
     ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);

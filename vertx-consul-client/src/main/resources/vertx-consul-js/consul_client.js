@@ -29,6 +29,7 @@ var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
 var Session = io.vertx.ext.consul.Session;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var KeyValuePairOptions = io.vertx.ext.consul.KeyValuePairOptions;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 
 /**
@@ -128,17 +129,16 @@ var ConsulClient = function(j_val) {
   /**
 
    @public
-   @param key {string} 
-   @param value {string} 
+   @param pair {Object} 
    @param resultHandler {function} 
    @return {ConsulClient}
    */
-  this.putValue = function(key, value, resultHandler) {
+  this.putValue = function(pair, resultHandler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_consulClient["putValue(java.lang.String,java.lang.String,io.vertx.core.Handler)"](key, value, function(ar) {
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["putValue(io.vertx.ext.consul.KeyValuePairOptions,io.vertx.core.Handler)"](pair != null ? new KeyValuePairOptions(new JsonObject(JSON.stringify(pair))) : null, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(null, null);
+        resultHandler(ar.result(), null);
       } else {
         resultHandler(null, ar.cause());
       }

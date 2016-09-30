@@ -47,6 +47,7 @@ import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.KeyValuePairOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -150,17 +151,16 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("key", key);
-    _json.put("value", value);
+    _json.put("pair", pair == null ? null : pair.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "putValue");
-    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<Boolean>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {

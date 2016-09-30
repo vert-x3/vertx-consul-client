@@ -54,6 +54,7 @@ import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.KeyValuePairOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -170,7 +171,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "putValue": {
-          service.putValue((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
+          service.putValue(json.getJsonObject("pair") == null ? null : new io.vertx.ext.consul.KeyValuePairOptions(json.getJsonObject("pair")), createHandler(msg));
           break;
         }
         case "createAclToken": {

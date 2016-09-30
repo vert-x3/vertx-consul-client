@@ -41,7 +41,7 @@ public class ConsulClientImpl implements ConsulClient {
     @Override
     public ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + key, resultHandler, buffer ->
-                KeyValuePair.parseConsulResponse(buffer.toJsonArray().getJsonObject(0))).end();
+                KeyValuePair.parse(buffer.toJsonArray().getJsonObject(0))).end();
         return this;
     }
 
@@ -55,7 +55,7 @@ public class ConsulClientImpl implements ConsulClient {
     public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + keyPrefix, "recurse", resultHandler, buffer ->
                 buffer.toJsonArray().stream()
-                        .map(obj -> KeyValuePair.parseConsulResponse((JsonObject) obj))
+                        .map(obj -> KeyValuePair.parse((JsonObject) obj))
                         .collect(Collectors.toList())).end();
         return this;
     }
@@ -67,8 +67,9 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) {
-        request(HttpMethod.PUT, "/v1/kv/" + key, resultHandler, buffer -> null).end(value);
+    public ConsulClient putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) {
+        String query = "flags=" + Long.toUnsignedString(pair.getFlags());
+        request(HttpMethod.PUT, "/v1/kv/" + pair.getKey(), query, resultHandler, buffer -> Boolean.valueOf(buffer.toString())).end(pair.getValue());
         return this;
     }
 

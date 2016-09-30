@@ -80,7 +80,27 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[flags]]`flags`|`Number (long)`|-
 |[[key]]`key`|`String`|-
+|[[session]]`session`|`String`|-
+|[[value]]`value`|`String`|-
+|===
+
+[[KeyValuePairOptions]]
+== KeyValuePairOptions
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[acquireSession]]`acquireSession`|`String`|-
+|[[flags]]`flags`|`Number (long)`|-
+|[[key]]`key`|`String`|-
+|[[releaseSession]]`releaseSession`|`String`|-
 |[[value]]`value`|`String`|-
 |===
 

@@ -31,6 +31,7 @@ import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.KeyValuePairOptions;
 
 
 public class ConsulService extends ConsulClient {
@@ -101,14 +102,14 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService putValue(String key, String value, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).putValue(key, value, resultHandler);
+  public ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).putValue(pair, resultHandler);
     return this;
   }
 
-  public Observable<Void> putValueObservable(String key, String value) { 
-    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    putValue(key, value, resultHandler.toHandler());
+  public Observable<Boolean> putValueObservable(KeyValuePairOptions pair) { 
+    io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    putValue(pair, resultHandler.toHandler());
     return resultHandler;
   }
 
