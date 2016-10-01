@@ -69,8 +69,8 @@
 |[[payload]]`payload`|`String`|-
 |===
 
-[[KeyValuePair]]
-== KeyValuePair
+[[KeyValue]]
+== KeyValue
 
 ++++
 ++++
@@ -80,16 +80,20 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[createIndex]]`createIndex`|`Number (long)`|-
 |[[flags]]`flags`|`Number (long)`|-
 |[[key]]`key`|`String`|-
+|[[lockIndex]]`lockIndex`|`Number (long)`|-
+|[[modifyIndex]]`modifyIndex`|`Number (long)`|-
 |[[session]]`session`|`String`|-
 |[[value]]`value`|`String`|-
 |===
 
-[[KeyValuePairOptions]]
-== KeyValuePairOptions
+[[KeyValueOptions]]
+== KeyValueOptions
 
 ++++
+ Options used to put key/value pair to consul.
 ++++
 '''
 
@@ -97,11 +101,24 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[acquireSession]]`acquireSession`|`String`|-
-|[[flags]]`flags`|`Number (long)`|-
-|[[key]]`key`|`String`|-
-|[[releaseSession]]`releaseSession`|`String`|-
-|[[value]]`value`|`String`|-
+|[[acquireSession]]`acquireSession`|`String`|
++++
+Set session ID for lock acquisition operation.
++++
+|[[casIndex]]`casIndex`|`Number (long)`|
++++
+Set the Check-And-Set index. If the index is <code>0</code>, Consul will only put the key if it does not already exist.
+ If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
++++
+|[[flags]]`flags`|`Number (long)`|
++++
+Set the flags. Flags is an value between <code>0</code> and 2<sup>64</sup>-1 that can be attached to each entry.
+ Clients can choose to use this however makes sense for their application.
++++
+|[[releaseSession]]`releaseSession`|`String`|
++++
+Set session ID for lock release operation.
++++
 |===
 
 [[MaintenanceOptions]]

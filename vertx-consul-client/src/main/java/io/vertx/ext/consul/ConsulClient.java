@@ -23,19 +23,22 @@ public interface ConsulClient {
     }
 
     @Fluent
-    ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler);
+    ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
     @Fluent
     ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler);
+    ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
     @Fluent
     ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler);
+    ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
+
+    @Fluent
+    ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
     @Fluent
     ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);

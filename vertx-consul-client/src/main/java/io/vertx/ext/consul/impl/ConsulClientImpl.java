@@ -39,9 +39,9 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
+    public ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + key, resultHandler, buffer ->
-                KeyValuePair.parse(buffer.toJsonArray().getJsonObject(0))).end();
+                KeyValue.parse(buffer.toJsonArray().getJsonObject(0))).end();
         return this;
     }
 
@@ -52,10 +52,10 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
+    public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
         request(HttpMethod.GET, "/v1/kv/" + keyPrefix, "recurse", resultHandler, buffer ->
                 buffer.toJsonArray().stream()
-                        .map(obj -> KeyValuePair.parse((JsonObject) obj))
+                        .map(obj -> KeyValue.parse((JsonObject) obj))
                         .collect(Collectors.toList())).end();
         return this;
     }
@@ -67,9 +67,29 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) {
-        String query = "flags=" + Long.toUnsignedString(pair.getFlags());
-        request(HttpMethod.PUT, "/v1/kv/" + pair.getKey(), query, resultHandler, buffer -> Boolean.valueOf(buffer.toString())).end(pair.getValue());
+    public ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) {
+        return putValueWithOptions(key, value, null, resultHandler);
+    }
+
+    @Override
+    public ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) {
+        String query = null;
+        if (options != null) {
+            query = "flags=" + Long.toUnsignedString(options.getFlags());
+            String acquireSession = options.getAcquireSession();
+            if (acquireSession != null) {
+                query += "&acquire=" + acquireSession;
+            }
+            String releaseSession = options.getReleaseSession();
+            if (releaseSession != null) {
+                query += "&release=" + releaseSession;
+            }
+            long cas = options.getCasIndex();
+            if (cas >= 0) {
+                query += "&cas=" + cas;
+            }
+        }
+        request(HttpMethod.PUT, "/v1/kv/" + key, query, resultHandler, buffer -> Boolean.valueOf(buffer.toString())).end(value);
         return this;
     }
 

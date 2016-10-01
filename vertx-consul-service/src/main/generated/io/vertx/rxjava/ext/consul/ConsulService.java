@@ -24,14 +24,14 @@ import io.vertx.ext.consul.MaintenanceOptions;
 import io.vertx.ext.consul.ServiceInfo;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
-import io.vertx.ext.consul.KeyValuePair;
 import java.util.List;
+import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
-import io.vertx.ext.consul.KeyValuePairOptions;
 
 
 public class ConsulService extends ConsulClient {
@@ -58,13 +58,13 @@ public class ConsulService extends ConsulClient {
     return ret;
   }
 
-  public ConsulService getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) { 
+  public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).getValue(key, resultHandler);
     return this;
   }
 
-  public Observable<KeyValuePair> getValueObservable(String key) { 
-    io.vertx.rx.java.ObservableFuture<KeyValuePair> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<KeyValue> getValueObservable(String key) { 
+    io.vertx.rx.java.ObservableFuture<KeyValue> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValue(key, resultHandler.toHandler());
     return resultHandler;
   }
@@ -80,13 +80,13 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) { 
+  public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).getValues(keyPrefix, resultHandler);
     return this;
   }
 
-  public Observable<List<KeyValuePair>> getValuesObservable(String keyPrefix) { 
-    io.vertx.rx.java.ObservableFuture<List<KeyValuePair>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<List<KeyValue>> getValuesObservable(String keyPrefix) { 
+    io.vertx.rx.java.ObservableFuture<List<KeyValue>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValues(keyPrefix, resultHandler.toHandler());
     return resultHandler;
   }
@@ -102,14 +102,25 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).putValue(pair, resultHandler);
+  public ConsulService putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).putValue(key, value, resultHandler);
     return this;
   }
 
-  public Observable<Boolean> putValueObservable(KeyValuePairOptions pair) { 
+  public Observable<Boolean> putValueObservable(String key, String value) { 
     io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    putValue(pair, resultHandler.toHandler());
+    putValue(key, value, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).putValueWithOptions(key, value, options, resultHandler);
+    return this;
+  }
+
+  public Observable<Boolean> putValueWithOptionsObservable(String key, String value, KeyValueOptions options) { 
+    io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    putValueWithOptions(key, value, options, resultHandler.toHandler());
     return resultHandler;
   }
 

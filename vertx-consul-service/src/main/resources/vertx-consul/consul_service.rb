@@ -65,15 +65,28 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling delete_values(keyPrefix)"
     end
-    # @param [Hash] pair 
+    # @param [String] key 
+    # @param [String] value 
     # @yield 
     # @return [self]
-    def put_value(pair=nil)
-      if pair.class == Hash && block_given?
-        @j_del.java_method(:putValue, [Java::IoVertxExtConsul::KeyValuePairOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::KeyValuePairOptions.new(::Vertx::Util::Utils.to_json_object(pair)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+    def put_value(key=nil,value=nil)
+      if key.class == String && value.class == String && block_given?
+        @j_del.java_method(:putValue, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling put_value(pair)"
+      raise ArgumentError, "Invalid arguments when calling put_value(key,value)"
+    end
+    # @param [String] key 
+    # @param [String] value 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def put_value_with_options(key=nil,value=nil,options=nil)
+      if key.class == String && value.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:putValueWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxExtConsul::KeyValueOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxExtConsul::KeyValueOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling put_value_with_options(key,value,options)"
     end
     # @param [Hash] token 
     # @yield 

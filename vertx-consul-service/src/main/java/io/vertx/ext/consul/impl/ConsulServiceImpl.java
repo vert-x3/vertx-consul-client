@@ -18,7 +18,7 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler) {
+    public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {
         consulClient.getValue(key, resultHandler);
         return this;
     }
@@ -30,7 +30,7 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler) {
+    public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
         consulClient.getValues(keyPrefix, resultHandler);
         return this;
     }
@@ -42,8 +42,14 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler) {
-        consulClient.putValue(pair, resultHandler);
+    public ConsulService putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) {
+        consulClient.putValue(key, value, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) {
+        consulClient.putValueWithOptions(key, value, options, resultHandler);
         return this;
     }
 

@@ -24,14 +24,14 @@ import io.vertx.ext.consul.MaintenanceOptions
 import io.vertx.ext.consul.ServiceInfo
 import io.vertx.ext.consul.CheckInfo
 import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.KeyValue
 import io.vertx.ext.consul.ServiceOptions
-import io.vertx.ext.consul.KeyValuePair
 import java.util.List
+import io.vertx.ext.consul.KeyValueOptions
 import io.vertx.ext.consul.AclToken
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.ext.consul.Session
-import io.vertx.ext.consul.KeyValuePairOptions
 @CompileStatic
 public class ConsulService extends ConsulClient {
   private final def io.vertx.ext.consul.ConsulService delegate;
@@ -53,8 +53,8 @@ public class ConsulService extends ConsulClient {
     return ret;
   }
   public ConsulService getValue(String key, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).getValue(key, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValuePair>>() {
-      public void handle(AsyncResult<io.vertx.ext.consul.KeyValuePair> ar) {
+    ((io.vertx.ext.consul.ConsulService) delegate).getValue(key, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValue>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.KeyValue> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
         } else {
@@ -69,8 +69,8 @@ public class ConsulService extends ConsulClient {
     return this;
   }
   public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).getValues(keyPrefix, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.KeyValuePair>>>() {
-      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.KeyValuePair>> ar) {
+    ((io.vertx.ext.consul.ConsulService) delegate).getValues(keyPrefix, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
         } else {
@@ -84,8 +84,12 @@ public class ConsulService extends ConsulClient {
     ((io.vertx.ext.consul.ConsulService) delegate).deleteValues(keyPrefix, resultHandler);
     return this;
   }
-  public ConsulService putValue(Map<String, Object> pair = [:], Handler<AsyncResult<Boolean>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).putValue(pair != null ? new io.vertx.ext.consul.KeyValuePairOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(pair)) : null, resultHandler);
+  public ConsulService putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).putValue(key, value, resultHandler);
+    return this;
+  }
+  public ConsulService putValueWithOptions(String key, String value, Map<String, Object> options, Handler<AsyncResult<Boolean>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).putValueWithOptions(key, value, options != null ? new io.vertx.ext.consul.KeyValueOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, resultHandler);
     return this;
   }
   public ConsulService createAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {

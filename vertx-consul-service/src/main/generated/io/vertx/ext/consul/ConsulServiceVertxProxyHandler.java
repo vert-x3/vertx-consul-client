@@ -47,14 +47,14 @@ import io.vertx.ext.consul.ServiceInfo;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
-import io.vertx.ext.consul.KeyValuePair;
 import java.util.List;
+import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
-import io.vertx.ext.consul.KeyValuePairOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -161,7 +161,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(KeyValuePair::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(KeyValue::toJson).collect(Collectors.toList())));
             }
          });
           break;
@@ -171,7 +171,11 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "putValue": {
-          service.putValue(json.getJsonObject("pair") == null ? null : new io.vertx.ext.consul.KeyValuePairOptions(json.getJsonObject("pair")), createHandler(msg));
+          service.putValue((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
+          break;
+        }
+        case "putValueWithOptions": {
+          service.putValueWithOptions((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.KeyValueOptions(json.getJsonObject("options")), createHandler(msg));
           break;
         }
         case "createAclToken": {

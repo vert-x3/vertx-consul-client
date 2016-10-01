@@ -27,7 +27,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService getValue(String key, Handler<AsyncResult<KeyValuePair>> resultHandler);
+    ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
     @Override
     @Fluent
@@ -35,7 +35,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValuePair>>> resultHandler);
+    ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
     @Override
     @Fluent
@@ -43,7 +43,11 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService putValue(KeyValuePairOptions pair, Handler<AsyncResult<Boolean>> resultHandler);
+    ConsulService putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
     @Override
     @Fluent
