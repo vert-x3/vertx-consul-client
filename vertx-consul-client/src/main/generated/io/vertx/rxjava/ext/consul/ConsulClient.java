@@ -29,6 +29,7 @@ import io.vertx.ext.consul.ServiceOptions;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.SessionOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -366,14 +367,14 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient createSession(Session session, Handler<AsyncResult<String>> idHandler) { 
-    delegate.createSession(session, idHandler);
+  public ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
+    delegate.createSession(options, idHandler);
     return this;
   }
 
-  public Observable<String> createSessionObservable(Session session) { 
+  public Observable<String> createSessionObservable(SessionOptions options) { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    createSession(session, idHandler.toHandler());
+    createSession(options, idHandler.toHandler());
     return idHandler;
   }
 
@@ -385,6 +386,39 @@ public class ConsulClient {
   public Observable<Session> infoSessionObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Session> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     infoSession(id, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
+    delegate.renewSession(id, resultHandler);
+    return this;
+  }
+
+  public Observable<Session> renewSessionObservable(String id) { 
+    io.vertx.rx.java.ObservableFuture<Session> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    renewSession(id, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler) { 
+    delegate.listSessions(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Session>> listSessionsObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Session>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    listSessions(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) { 
+    delegate.listNodeSessions(nodeId, resultHandler);
+    return this;
+  }
+
+  public Observable<List<Session>> listNodeSessionsObservable(String nodeId) { 
+    io.vertx.rx.java.ObservableFuture<List<Session>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    listNodeSessions(nodeId, resultHandler.toHandler());
     return resultHandler;
   }
 

@@ -14,18 +14,16 @@ import java.util.concurrent.TimeUnit;
 public class Session {
 
     private static final String LOCK_KEY = "LockDelay";
-    private static final String NAME_KEY = "Name";
     private static final String NODE_KEY = "Node";
     private static final String CHECKS_KEY = "Checks";
-    private static final String BEHAVIOR_KEY = "Behavior";
-    private static final String TTL_KEY = "TTL";
+    private static final String ID_KEY = "ID";
+    private static final String CREATE_INDEX_KEY = "CreateIndex";
 
     private String lockDelay;
-    private String name;
     private String node;
     private List<String> checks;
-    private String behavior;
-    private String ttl;
+    private long createIndex;
+    private String id;
 
     public Session() {}
 
@@ -38,12 +36,11 @@ public class Session {
                 this.lockDelay = TimeUnit.NANOSECONDS.toSeconds((Long) delay) + "s";
             }
         }
-        this.name = jsonObject.getString(NAME_KEY);
         this.node = jsonObject.getString(NODE_KEY);
+        this.id = jsonObject.getString(ID_KEY);
+        this.createIndex = jsonObject.getLong(CREATE_INDEX_KEY, 0L);
         JsonArray arr = jsonObject.getJsonArray(CHECKS_KEY);
         this.checks = arr == null ? null : arr.getList();
-        this.behavior = jsonObject.getString(BEHAVIOR_KEY);
-        this.ttl = jsonObject.getString(TTL_KEY);
     }
 
     public JsonObject toJson() {
@@ -51,30 +48,23 @@ public class Session {
         if (lockDelay != null) {
             jsonObject.put(LOCK_KEY, lockDelay);
         }
-        if (name != null) {
-            jsonObject.put(NAME_KEY, name);
-        }
         if (node != null) {
             jsonObject.put(NODE_KEY, node);
         }
         if (checks != null) {
             jsonObject.put(CHECKS_KEY, checks);
         }
-        if (behavior != null) {
-            jsonObject.put(BEHAVIOR_KEY, behavior);
+        if (id != null) {
+            jsonObject.put(ID_KEY, id);
         }
-        if (ttl != null) {
-            jsonObject.put(TTL_KEY, ttl);
+        if (createIndex != 0) {
+            jsonObject.put(CREATE_INDEX_KEY, createIndex);
         }
         return jsonObject;
     }
 
     public String getLockDelay() {
         return lockDelay;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNode() {
@@ -85,41 +75,11 @@ public class Session {
         return checks;
     }
 
-    public String getBehavior() {
-        return behavior;
+    public String getId() {
+        return id;
     }
 
-    public String getTtl() {
-        return ttl;
-    }
-
-    public Session setLockDelay(String lockDelay) {
-        this.lockDelay = lockDelay;
-        return this;
-    }
-
-    public Session setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public Session setNode(String node) {
-        this.node = node;
-        return this;
-    }
-
-    public Session setChecks(List<String> checks) {
-        this.checks = checks;
-        return this;
-    }
-
-    public Session setBehavior(String behavior) {
-        this.behavior = behavior;
-        return this;
-    }
-
-    public Session setTtl(String ttl) {
-        this.ttl = ttl;
-        return this;
+    public long getCreateIndex() {
+        return createIndex;
     }
 }

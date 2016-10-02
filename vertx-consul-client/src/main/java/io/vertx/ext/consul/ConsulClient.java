@@ -107,10 +107,19 @@ public interface ConsulClient {
     ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 
     @Fluent
-    ConsulClient createSession(Session session, Handler<AsyncResult<String>> idHandler);
+    ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler);
 
     @Fluent
     ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Fluent
+    ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Fluent
+    ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler);
+
+    @Fluent
+    ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler);
 
     @Fluent
     ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);

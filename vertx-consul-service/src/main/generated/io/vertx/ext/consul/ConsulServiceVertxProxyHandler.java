@@ -52,6 +52,7 @@ import io.vertx.ext.consul.ServiceOptions;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.SessionOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
@@ -337,7 +338,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "createSession": {
-          service.createSession(json.getJsonObject("session") == null ? null : new io.vertx.ext.consul.Session(json.getJsonObject("session")), createHandler(msg));
+          service.createSession(json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.SessionOptions(json.getJsonObject("options")), createHandler(msg));
           break;
         }
         case "infoSession": {
@@ -350,6 +351,48 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
               }
             } else {
               msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "renewSession": {
+          service.renewSession((java.lang.String)json.getValue("id"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "listSessions": {
+          service.listSessions(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Session::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "listNodeSessions": {
+          service.listNodeSessions((java.lang.String)json.getValue("nodeId"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Session::toJson).collect(Collectors.toList())));
             }
          });
           break;

@@ -45,6 +45,7 @@ import io.vertx.ext.consul.ServiceOptions;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.SessionOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
@@ -604,13 +605,13 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService createSession(Session session, Handler<AsyncResult<String>> idHandler) {
+  public ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
     if (closed) {
       idHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("session", session == null ? null : session.toJson());
+    _json.put("options", options == null ? null : options.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "createSession");
     _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
@@ -638,6 +639,62 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       } else {
         resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new Session(res.result().body())));
                       }
+    });
+    return this;
+  }
+
+  public ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("id", id);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "renewSession");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new Session(res.result().body())));
+                      }
+    });
+    return this;
+  }
+
+  public ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "listSessions");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Session(new JsonObject((Map) o)) : new Session((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("nodeId", nodeId);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "listNodeSessions");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Session(new JsonObject((Map) o)) : new Session((JsonObject) o)).collect(Collectors.toList())));
+      }
     });
     return this;
   }

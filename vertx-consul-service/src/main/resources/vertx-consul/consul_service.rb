@@ -302,15 +302,15 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling peers_status()"
     end
-    # @param [Hash] session 
+    # @param [Hash] options 
     # @yield 
     # @return [self]
-    def create_session(session=nil)
-      if session.class == Hash && block_given?
-        @j_del.java_method(:createSession, [Java::IoVertxExtConsul::Session.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Session.new(::Vertx::Util::Utils.to_json_object(session)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+    def create_session(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:createSession, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling create_session(session)"
+      raise ArgumentError, "Invalid arguments when calling create_session(options)"
     end
     # @param [String] id 
     # @yield 
@@ -321,6 +321,35 @@ module VertxConsul
         return self
       end
       raise ArgumentError, "Invalid arguments when calling info_session(id)"
+    end
+    # @param [String] id 
+    # @yield 
+    # @return [self]
+    def renew_session(id=nil)
+      if id.class == String && block_given?
+        @j_del.java_method(:renewSession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling renew_session(id)"
+    end
+    # @yield 
+    # @return [self]
+    def list_sessions
+      if block_given?
+        @j_del.java_method(:listSessions, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_sessions()"
+    end
+    # @param [String] nodeId 
+    # @yield 
+    # @return [self]
+    def list_node_sessions(nodeId=nil)
+      if nodeId.class == String && block_given?
+        @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_node_sessions(nodeId)"
     end
     # @param [String] id 
     # @yield 

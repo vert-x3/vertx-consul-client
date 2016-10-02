@@ -187,11 +187,53 @@ Set session ID for lock release operation.
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[behavior]]`behavior`|`String`|-
 |[[checks]]`checks`|`Array of String`|-
+|[[createIndex]]`createIndex`|`Number (long)`|-
+|[[id]]`id`|`String`|-
 |[[lockDelay]]`lockDelay`|`String`|-
-|[[name]]`name`|`String`|-
 |[[node]]`node`|`String`|-
-|[[ttl]]`ttl`|`String`|-
+|===
+
+[[SessionOptions]]
+== SessionOptions
+
+++++
+ Options used to create session.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[behavior]]`behavior`|`link:enums.html#SessionBehavior[SessionBehavior]`|
++++
+Sets the behavior when a session is invalidated. The release behavior is the default if none is specified.
++++
+|[[checks]]`checks`|`Array of String`|
++++
+Sets a list of associated health checks. It is highly recommended that,
+ if you override this list, you include the default "serfHealth"
++++
+|[[lockDelay]]`lockDelay`|`String`|
++++
+Sets the lock-delay period. This is a time duration, between 0 and 60 seconds. When a session invalidation
+ takes place, Consul prevents any of the previously held locks from being re-acquired for the lock-delay interval
+ Must be represented by the seconds number with the suffix "s".
++++
+|[[name]]`name`|`String`|
++++
+Sets the human-readable name for the Session
++++
+|[[node]]`node`|`String`|
++++
+Sets the node to which the session will be assigned
++++
+|[[ttl]]`ttl`|`String`|
++++
+Sets the TTL interval. When TTL interval expires without being renewed, the session has expired
+ and an invalidation is triggered. Must be represented by the seconds number with the suffix "s".
+ If specified, it must be between 10s and 86400s currently.
++++
 |===
 

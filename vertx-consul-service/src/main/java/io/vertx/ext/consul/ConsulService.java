@@ -139,11 +139,23 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService createSession(Session session, Handler<AsyncResult<String>> idHandler);
+    ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler);
 
     @Override
     @Fluent
     ConsulService infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler);
 
     @Override
     @Fluent

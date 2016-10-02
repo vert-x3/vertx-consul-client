@@ -29,6 +29,7 @@ import io.vertx.ext.consul.ServiceOptions
 import java.util.List
 import io.vertx.ext.consul.KeyValueOptions
 import io.vertx.ext.consul.AclToken
+import io.vertx.ext.consul.SessionOptions
 import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
@@ -241,8 +242,8 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient createSession(Map<String, Object> session = [:], Handler<AsyncResult<String>> idHandler) {
-    delegate.createSession(session != null ? new io.vertx.ext.consul.Session(io.vertx.lang.groovy.InternalHelper.toJsonObject(session)) : null, idHandler);
+  public ConsulClient createSession(Map<String, Object> options = [:], Handler<AsyncResult<String>> idHandler) {
+    delegate.createSession(options != null ? new io.vertx.ext.consul.SessionOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, idHandler);
     return this;
   }
   public ConsulClient infoSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
@@ -250,6 +251,42 @@ public class ConsulClient {
       public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient renewSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.renewSession(id, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Session>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient listSessions(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.listSessions(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Session>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Session>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.listNodeSessions(nodeId, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Session>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Session>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
         } else {
           resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
         }

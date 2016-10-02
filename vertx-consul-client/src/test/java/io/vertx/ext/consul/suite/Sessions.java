@@ -3,7 +3,8 @@ package io.vertx.ext.consul.suite;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
-import java.util.concurrent.CountDownLatch;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.vertx.ext.consul.Utils.getAsync;
@@ -15,21 +16,42 @@ import static io.vertx.ext.consul.Utils.runAsync;
 public class Sessions extends ConsulTestBase {
 
     @Test
+    public void sessionOptionsSerialization() {
+        SessionOptions options = new SessionOptions()
+                .setBehavior(SessionBehavior.RELEASE)
+                .setChecks(Arrays.asList("c1", "c2"))
+                .setLockDelay("11s")
+                .setName("optName")
+                .setNode("optNode")
+                .setTtl("42s");
+        SessionOptions restored = new SessionOptions(options.toJson());
+        assertEquals(options.getBehavior(), restored.getBehavior());
+        assertEquals(options.getChecks(), restored.getChecks());
+        assertEquals(options.getLockDelay(), restored.getLockDelay());
+        assertEquals(options.getName(), restored.getName());
+        assertEquals(options.getNode(), restored.getNode());
+        assertEquals(options.getTtl(), restored.getTtl());
+    }
+
+    @Test
     public void createAndDestroy() {
-        Session opt = new Session()
-                .setTtl("1h")
+        SessionOptions opt = new SessionOptions()
+                .setTtl("442s")
                 .setLockDelay("42s");
         String id = getAsync(h -> writeClient.createSession(opt, h));
         Session session = getAsync(h -> writeClient.infoSession(id, h));
         assertEquals(opt.getLockDelay(), session.getLockDelay());
-        assertEquals(opt.getTtl(), session.getTtl());
         assertEquals("serfHealth", session.getChecks().get(0));
+        List<Session> list = getAsync(h -> writeClient.listSessions(h));
+        assertEquals(session.getId(), list.get(0).getId());
+        List<Session> nodeSesions = getAsync(h -> writeClient.listNodeSessions(session.getNode(), h));
+        assertEquals(session.getId(), nodeSesions.get(0).getId());
         runAsync(h -> writeClient.destroySession(id, h));
     }
 
     @Test
     public void deleteBehavior() {
-        String id = getAsync(h -> writeClient.createSession(new Session().setTtl("1h").setBehavior("delete"), h));
+        String id = getAsync(h -> writeClient.createSession(new SessionOptions().setTtl("442s").setBehavior(SessionBehavior.DELETE), h));
         assertTrue(getAsync(h -> writeClient.putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), h)));
         KeyValue pair = getAsync(h -> writeClient.getValue("foo/bar", h));
         assertEquals("value1", pair.getValue());

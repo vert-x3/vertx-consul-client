@@ -261,15 +261,35 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient createSession(Session session, Handler<AsyncResult<String>> idHandler) {
+    public ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
         request(HttpMethod.PUT, "/v1/session/create", idHandler, buffer -> buffer.toJsonObject().getString("ID"))
-                .end(session.toJson().encode());
+                .end(options.toJson().encode());
         return this;
     }
 
     @Override
     public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
         request(HttpMethod.GET, "/v1/session/info/" + id, resultHandler, buffer -> new Session(buffer.toJsonArray().getJsonObject(0))).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
+        request(HttpMethod.PUT, "/v1/session/renew/" + id, resultHandler, buffer -> new Session(buffer.toJsonArray().getJsonObject(0))).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/session/list", resultHandler, buffer -> buffer.toJsonArray()
+                .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/session/node/" + nodeId, resultHandler, buffer -> buffer.toJsonArray()
+                .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
         return this;
     }
 

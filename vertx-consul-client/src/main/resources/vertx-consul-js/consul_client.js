@@ -26,6 +26,7 @@ var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
+var SessionOptions = io.vertx.ext.consul.SessionOptions;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
 var Session = io.vertx.ext.consul.Session;
@@ -630,14 +631,14 @@ var ConsulClient = function(j_val) {
   /**
 
    @public
-   @param session {Object} 
+   @param options {Object} 
    @param idHandler {function} 
    @return {ConsulClient}
    */
-  this.createSession = function(session, idHandler) {
+  this.createSession = function(options, idHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["createSession(io.vertx.ext.consul.Session,io.vertx.core.Handler)"](session != null ? new Session(new JsonObject(JSON.stringify(session))) : null, function(ar) {
+      j_consulClient["createSession(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
@@ -661,6 +662,68 @@ var ConsulClient = function(j_val) {
       j_consulClient["infoSession(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.renewSession = function(id, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["renewSession(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.listSessions = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["listSessions(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param nodeId {string} 
+   @param resultHandler {function} 
+   @return {ConsulClient}
+   */
+  this.listNodeSessions = function(nodeId, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["listNodeSessions(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
