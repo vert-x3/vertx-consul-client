@@ -43,9 +43,9 @@ import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.ServiceInfo;
 import io.vertx.ext.consul.CheckInfo;
 import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
@@ -272,7 +272,21 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(ServiceInfo::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "catalogServices": {
+          service.catalogServices(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
             }
          });
           break;
@@ -286,7 +300,21 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(ServiceInfo::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "nodeServices": {
+          service.nodeServices((java.lang.String)json.getValue("nodeId"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
             }
          });
           break;

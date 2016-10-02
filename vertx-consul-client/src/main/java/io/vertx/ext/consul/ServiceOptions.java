@@ -7,6 +7,8 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
+ * Options used to register service.
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
@@ -26,20 +28,46 @@ public class ServiceOptions {
     private int port;
     private CheckOptions checkOptions;
 
-    public ServiceOptions() {
+    /**
+     * Default constructor
+     */
+    public ServiceOptions() {}
+
+    /**
+     * Copy constructor
+     *
+     * @param options  the one to copy
+     */
+    public ServiceOptions(ServiceOptions options) {
+        this.id = options.id;
+        this.name = options.name;
+        this.tags = options.tags;
+        this.address = options.address;
+        this.port = options.port;
+        this.checkOptions = options.checkOptions;
     }
 
-    public ServiceOptions(JsonObject jsonObject) {
-        this.id = jsonObject.getString(SERVICE_ID);
-        this.name = jsonObject.getString(SERVICE_NAME);
-        JsonArray tagsArr = jsonObject.getJsonArray(SERVICE_TAGS);
+    /**
+     * Constructor from JSON
+     *
+     * @param options  the JSON
+     */
+    public ServiceOptions(JsonObject options) {
+        this.id = options.getString(SERVICE_ID);
+        this.name = options.getString(SERVICE_NAME);
+        JsonArray tagsArr = options.getJsonArray(SERVICE_TAGS);
         this.tags = tagsArr == null ? null : tagsArr.getList();
-        this.address = jsonObject.getString(SERVICE_ADDRESS);
-        this.port = jsonObject.getInteger(SERVICE_PORT);
-        JsonObject checkObj = jsonObject.getJsonObject(SERVICE_CHECK);
+        this.address = options.getString(SERVICE_ADDRESS);
+        this.port = options.getInteger(SERVICE_PORT, 0);
+        JsonObject checkObj = options.getJsonObject(SERVICE_CHECK);
         this.checkOptions = checkObj == null ? null : new CheckOptions(checkObj);
     }
 
+    /**
+     * Convert to JSON
+     *
+     * @return  the JSON
+     */
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         if (id != null) {
@@ -63,57 +91,123 @@ public class ServiceOptions {
         return jsonObject;
     }
 
+    /**
+     * Gets the ID of session
+     *
+     * @return the ID of session
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the ID of session
+     *
+     * @param id the ID of session
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setId(String id) {
         this.id = id;
         return this;
     }
 
+    /**
+     * Gets service name
+     *
+     * @return service name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets service name
+     *
+     * @param name service name
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setName(String name) {
         this.name = name;
         return this;
     }
 
+    /**
+     * Gets list of tags associated with service
+     *
+     * @return list of tags
+     */
+    public List<String> getTags() {
+        return tags;
+    }
+
+    /**
+     * Sets list of tags associated with service
+     *
+     * @param tags list of tags
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setTags(List<String> tags) {
         this.tags = tags;
         return this;
     }
 
+    /**
+     * Gets service address
+     *
+     * @return service address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * Sets service address
+     *
+     * @param address service address
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setAddress(String address) {
         this.address = address;
         return this;
     }
 
+    /**
+     * Gets service port
+     *
+     * @return service port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * Sets service port
+     *
+     * @param port service port
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setPort(int port) {
         this.port = port;
         return this;
     }
 
+    /**
+     * Gets check options of service
+     *
+     * @return check options
+     */
+    public CheckOptions getCheckOptions() {
+        return checkOptions;
+    }
+
+    /**
+     * Sets check options of service
+     *
+     * @param checkOptions check options
+     * @return reference to this, for fluency
+     */
     public ServiceOptions setCheckOptions(CheckOptions checkOptions) {
         this.checkOptions = checkOptions;
         return this;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public CheckOptions getCheckOptions() {
-        return checkOptions;
     }
 }

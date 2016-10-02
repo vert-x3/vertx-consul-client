@@ -29,9 +29,9 @@ var AclToken = io.vertx.ext.consul.AclToken;
 var Event = io.vertx.ext.consul.Event;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
-var ServiceInfo = io.vertx.ext.consul.ServiceInfo;
 var Session = io.vertx.ext.consul.Session;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 
 /**
@@ -428,10 +428,51 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
+  this.catalogServices = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["catalogServices(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
   this.localServices = function(resultHandler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulService["localServices(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param nodeId {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.nodeServices = function(nodeId, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["nodeServices(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

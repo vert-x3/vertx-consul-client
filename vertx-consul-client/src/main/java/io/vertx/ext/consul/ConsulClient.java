@@ -74,10 +74,16 @@ public interface ConsulClient {
     ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
     @Fluent
-    ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+    ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
 
     @Fluent
-    ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler);
+    ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler);
+
+    @Fluent
+    ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+
+    @Fluent
+    ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler);
 
     @Fluent
     ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);

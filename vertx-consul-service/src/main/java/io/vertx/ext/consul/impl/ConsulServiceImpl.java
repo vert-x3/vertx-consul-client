@@ -120,8 +120,14 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
+    public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
         consulClient.infoService(name, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+        consulClient.catalogServices(resultHandler);
         return this;
     }
 
@@ -216,8 +222,14 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
+    public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
         consulClient.localServices(resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler) {
+        consulClient.nodeServices(nodeId, resultHandler);
         return this;
     }
 

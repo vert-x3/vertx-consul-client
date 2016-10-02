@@ -137,8 +137,8 @@ Set session ID for lock release operation.
 |[[reason]]`reason`|`String`|-
 |===
 
-[[ServiceInfo]]
-== ServiceInfo
+[[Service]]
+== Service
 
 ++++
 ++++
@@ -161,6 +161,7 @@ Set session ID for lock release operation.
 == ServiceOptions
 
 ++++
+ Options used to register service.
 ++++
 '''
 
@@ -168,12 +169,30 @@ Set session ID for lock release operation.
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[address]]`address`|`String`|-
-|[[checkOptions]]`checkOptions`|`link:dataobjects.html#CheckOptions[CheckOptions]`|-
-|[[id]]`id`|`String`|-
-|[[name]]`name`|`String`|-
-|[[port]]`port`|`Number (int)`|-
-|[[tags]]`tags`|`Array of String`|-
+|[[address]]`address`|`String`|
++++
+Sets service address
++++
+|[[checkOptions]]`checkOptions`|`link:dataobjects.html#CheckOptions[CheckOptions]`|
++++
+Sets check options of service
++++
+|[[id]]`id`|`String`|
++++
+Sets the ID of session
++++
+|[[name]]`name`|`String`|
++++
+Sets service name
++++
+|[[port]]`port`|`Number (int)`|
++++
+Sets service port
++++
+|[[tags]]`tags`|`Array of String`|
++++
+Sets list of tags associated with service
++++
 |===
 
 [[Session]]

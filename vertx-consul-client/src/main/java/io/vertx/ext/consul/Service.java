@@ -5,13 +5,14 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
-public class ServiceInfo {
+public class Service {
 
     private static final String NODE = "Node";
     private static final String ADDRESS = "Address";
@@ -35,20 +36,30 @@ public class ServiceInfo {
     private String address;
     private int port;
 
-    public static ServiceInfo parseAgentInfo(JsonObject jsonObject) {
-        ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.id = jsonObject.getString(AGENT_SERVICE_ID);
-        serviceInfo.name = jsonObject.getString(AGENT_SERVICE_SERVICE);
+    public static Service fromAgentInfo(JsonObject jsonObject) {
+        Service service = new Service();
+        service.id = jsonObject.getString(AGENT_SERVICE_ID);
+        service.name = jsonObject.getString(AGENT_SERVICE_SERVICE);
         JsonArray tagsArr = jsonObject.getJsonArray(AGENT_SERVICE_TAGS);
-        serviceInfo.tags = tagsArr == null ? null : tagsArr.getList();
-        serviceInfo.address = jsonObject.getString(AGENT_SERVICE_ADDRESS);
-        serviceInfo.port = jsonObject.getInteger(AGENT_SERVICE_PORT);
-        return serviceInfo;
+        service.tags = tagsArr == null ? null : tagsArr.getList();
+        service.address = jsonObject.getString(AGENT_SERVICE_ADDRESS);
+        service.port = jsonObject.getInteger(AGENT_SERVICE_PORT);
+        return service;
     }
 
-    private ServiceInfo() {}
+    public static Service fromCatalogInfo(Map.Entry<String, Object> entry) {
+        Service service = new Service();
+        service.name = entry.getKey();
+        Object tags = entry.getValue();
+        if (tags != null) {
+            service.tags = ((JsonArray) tags).stream().map(o -> (String) o).collect(Collectors.toList());
+        }
+        return service;
+    }
 
-    public ServiceInfo(JsonObject jsonObject) {
+    private Service() {}
+
+    public Service(JsonObject jsonObject) {
         this.node = jsonObject.getString(NODE);
         this.nodeAddress = jsonObject.getString(ADDRESS);
         this.id = jsonObject.getString(SERVICE_ID);
@@ -56,7 +67,7 @@ public class ServiceInfo {
         JsonArray tagsArr = jsonObject.getJsonArray(SERVICE_TAGS);
         this.tags = tagsArr == null ? null : tagsArr.stream().map(obj -> (String) obj).collect(Collectors.toList());
         this.address = jsonObject.getString(SERVICE_ADDRESS);
-        this.port = jsonObject.getInteger(SERVICE_PORT);
+        this.port = jsonObject.getInteger(SERVICE_PORT, 0);
     }
 
     public JsonObject toJson() {

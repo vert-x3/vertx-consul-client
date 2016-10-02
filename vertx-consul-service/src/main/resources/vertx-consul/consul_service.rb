@@ -208,12 +208,31 @@ module VertxConsul
     end
     # @yield 
     # @return [self]
+    def catalog_services
+      if block_given?
+        @j_del.java_method(:catalogServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_services()"
+    end
+    # @yield 
+    # @return [self]
     def local_services
       if block_given?
         @j_del.java_method(:localServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling local_services()"
+    end
+    # @param [String] nodeId 
+    # @yield 
+    # @return [self]
+    def node_services(nodeId=nil)
+      if nodeId.class == String && block_given?
+        @j_del.java_method(:nodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling node_services(nodeId)"
     end
     # @yield 
     # @return [self]

@@ -180,10 +180,17 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient infoService(String name, Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
+    public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
         request(HttpMethod.GET, "/v1/catalog/service/" + name, resultHandler, buffer -> buffer.toJsonArray().stream()
-                .map(obj -> new ServiceInfo((JsonObject) obj))
+                .map(obj -> new Service((JsonObject) obj))
                 .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/services", resultHandler, buffer -> buffer.toJsonObject().stream()
+                .map(Service::fromCatalogInfo).collect(Collectors.toList())).end();
         return this;
     }
 
@@ -196,9 +203,19 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient localServices(Handler<AsyncResult<List<ServiceInfo>>> resultHandler) {
+    public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
         request(HttpMethod.GET, "/v1/agent/services", resultHandler, buffer -> buffer.toJsonObject().stream()
-                .map(obj -> ServiceInfo.parseAgentInfo((JsonObject) obj.getValue()))
+                .map(obj -> Service.fromAgentInfo((JsonObject) obj.getValue()))
+                .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/node/" + nodeId, resultHandler, buffer -> buffer.toJsonObject()
+                .getJsonObject("Services")
+                .stream()
+                .map(obj -> Service.fromAgentInfo((JsonObject) obj.getValue()))
                 .collect(Collectors.toList())).end();
         return this;
     }

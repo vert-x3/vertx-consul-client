@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.runAsync;
@@ -24,8 +25,8 @@ public class Services extends ChecksBase {
                 .setPort(8080);
         runAsync(h -> writeClient.registerService(service, h));
 
-        List<ServiceInfo> services = getAsync(h -> writeClient.localServices(h));
-        ServiceInfo s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
+        List<Service> services = getAsync(h -> writeClient.localServices(h));
+        Service s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
         String serviceId = s.getId();
         assertEquals(s.getTags().get(1), "tag2");
         assertEquals(s.getAddress(), "10.0.0.1");
@@ -40,9 +41,12 @@ public class Services extends ChecksBase {
 
     @Test
     public void findConsul() {
-        List<ServiceInfo> services = getAsync(h -> writeClient.infoService("consul", h));
-        long cnt = services.stream().filter(s -> s.getName().equals("consul")).count();
-        assertEquals(cnt, 1);
+        List<Service> localConsulList = getAsync(h -> writeClient.infoService("consul", h));
+        assertEquals(1, localConsulList.size());
+        List<Service> catalogConsulList = Utils.<List<Service>>getAsync(h -> writeClient.catalogServices(h))
+                .stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
+        assertEquals(1, catalogConsulList.size());
+        assertEquals(0, catalogConsulList.get(0).getTags().size());
     }
 
     @Test
