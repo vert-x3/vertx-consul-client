@@ -92,7 +92,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets the ID of session
+     * Get the ID of session
      *
      * @return the ID of session
      */
@@ -101,7 +101,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets the ID of session
+     * Set the ID of session
      *
      * @param id the ID of session
      * @return reference to this, for fluency
@@ -112,7 +112,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets service name
+     * Get service name
      *
      * @return service name
      */
@@ -121,7 +121,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets service name
+     * Set service name
      *
      * @param name service name
      * @return reference to this, for fluency
@@ -132,7 +132,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets list of tags associated with service
+     * Get list of tags associated with service
      *
      * @return list of tags
      */
@@ -141,7 +141,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets list of tags associated with service
+     * Set list of tags associated with service
      *
      * @param tags list of tags
      * @return reference to this, for fluency
@@ -152,7 +152,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets service address
+     * Get service address
      *
      * @return service address
      */
@@ -161,7 +161,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets service address
+     * Set service address
      *
      * @param address service address
      * @return reference to this, for fluency
@@ -172,7 +172,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets service port
+     * Get service port
      *
      * @return service port
      */
@@ -181,7 +181,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets service port
+     * Set service port
      *
      * @param port service port
      * @return reference to this, for fluency
@@ -192,7 +192,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Gets check options of service
+     * Get check options of service
      *
      * @return check options
      */
@@ -201,7 +201,7 @@ public class ServiceOptions {
     }
 
     /**
-     * Sets check options of service
+     * Set check options of service
      *
      * @param checkOptions check options
      * @return reference to this, for fluency

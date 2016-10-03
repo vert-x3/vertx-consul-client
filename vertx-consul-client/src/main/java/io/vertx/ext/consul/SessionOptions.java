@@ -23,12 +23,12 @@ public class SessionOptions {
     private static final String BEHAVIOR_KEY = "Behavior";
     private static final String TTL_KEY = "TTL";
 
-    private String lockDelay;
+    private long lockDelay;
     private String name;
     private String node;
     private List<String> checks;
     private SessionBehavior behavior;
-    private String ttl;
+    private long ttl;
 
     /**
      * Default constructor
@@ -55,20 +55,13 @@ public class SessionOptions {
      * @param options  the JSON
      */
     public SessionOptions(JsonObject options) {
-        Object delay = options.getValue(LOCK_KEY);
-        if (delay != null) {
-            if (delay instanceof String) {
-                this.lockDelay = (String) delay;
-            } else {
-                this.lockDelay = TimeUnit.NANOSECONDS.toSeconds((Long) delay) + "s";
-            }
-        }
+        this.lockDelay = cutSeconds(options.getString(LOCK_KEY));
         this.name = options.getString(NAME_KEY);
         this.node = options.getString(NODE_KEY);
         JsonArray arr = options.getJsonArray(CHECKS_KEY);
         this.checks = arr == null ? null : arr.getList();
         this.behavior = SessionBehavior.of(options.getString(BEHAVIOR_KEY));
-        this.ttl = options.getString(TTL_KEY);
+        this.ttl = cutSeconds(options.getString(TTL_KEY));
     }
 
     /**
@@ -78,8 +71,8 @@ public class SessionOptions {
      */
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        if (lockDelay != null) {
-            jsonObject.put(LOCK_KEY, lockDelay);
+        if (lockDelay != 0) {
+            jsonObject.put(LOCK_KEY, lockDelay + "s");
         }
         if (name != null) {
             jsonObject.put(NAME_KEY, name);
@@ -93,37 +86,36 @@ public class SessionOptions {
         if (behavior != null) {
             jsonObject.put(BEHAVIOR_KEY, behavior.key);
         }
-        if (ttl != null) {
-            jsonObject.put(TTL_KEY, ttl);
+        if (ttl != 0) {
+            jsonObject.put(TTL_KEY, ttl + "s");
         }
         return jsonObject;
     }
 
     /**
-     * Gets the lock-delay period.
+     * Get the lock-delay period.
      *
      * @return the lock-delay period
-     * @see #setLockDelay(String)
+     * @see Session#getLockDelay()
      */
-    public String getLockDelay() {
+    public long getLockDelay() {
         return lockDelay;
     }
 
     /**
-     * Sets the lock-delay period. This is a time duration, between 0 and 60 seconds. When a session invalidation
-     * takes place, Consul prevents any of the previously held locks from being re-acquired for the lock-delay interval
-     * Must be represented by the seconds number with the suffix "s".
+     * Set the lock-delay period.
      *
-     * @param lockDelay the lock-delay period
+     * @param lockDelay the lock-delay period in seconds
      * @return reference to this, for fluency
+     * @see Session#getLockDelay()
      */
-    public SessionOptions setLockDelay(String lockDelay) {
+    public SessionOptions setLockDelay(long lockDelay) {
         this.lockDelay = lockDelay;
         return this;
     }
 
     /**
-     * Gets the human-readable name for the Session
+     * Get the human-readable name for the Session
      *
      * @return the name of session
      */
@@ -132,7 +124,7 @@ public class SessionOptions {
     }
 
     /**
-     * Sets the human-readable name for the Session
+     * Set the human-readable name for the Session
      *
      * @param name the name of session
      * @return reference to this, for fluency
@@ -143,7 +135,7 @@ public class SessionOptions {
     }
 
     /**
-     * Gets the node to which the session will be assigned
+     * Get the node to which the session will be assigned
      *
      * @return the ID of node
      */
@@ -152,7 +144,7 @@ public class SessionOptions {
     }
 
     /**
-     * Sets the node to which the session will be assigned
+     * Set the node to which the session will be assigned
      *
      * @param node the ID of node
      * @return reference to this, for fluency
@@ -163,7 +155,7 @@ public class SessionOptions {
     }
 
     /**
-     * Gets Set a list of associated health checks.
+     * Get a list of associated health checks.
      *
      * @return list of associated health checks
      * @see #setChecks(List)
@@ -173,7 +165,7 @@ public class SessionOptions {
     }
 
     /**
-     * Sets a list of associated health checks. It is highly recommended that,
+     * Set a list of associated health checks. It is highly recommended that,
      * if you override this list, you include the default "serfHealth"
      *
      * @param checks list of associated health checks
@@ -185,7 +177,7 @@ public class SessionOptions {
     }
 
     /**
-     * Gets the behavior when a session is invalidated.
+     * Get the behavior when a session is invalidated.
      *
      * @return the session behavior
      * @see #setBehavior(SessionBehavior)
@@ -195,7 +187,7 @@ public class SessionOptions {
     }
 
     /**
-     * Sets the behavior when a session is invalidated. The release behavior is the default if none is specified.
+     * Set the behavior when a session is invalidated. The release behavior is the default if none is specified.
      *
      * @param behavior the session behavior
      * @return reference to this, for fluency
@@ -206,25 +198,32 @@ public class SessionOptions {
     }
 
     /**
-     * Gets the TTL interval.
+     * Get the TTL interval.
      *
-     * @return the TTL interval
-     * @see #setTtl(String)
+     * @return the TTL interval in seconds
+     * @see #setTtl(long)
      */
-    public String getTtl() {
+    public long getTtl() {
         return ttl;
     }
 
     /**
-     * Sets the TTL interval. When TTL interval expires without being renewed, the session has expired
-     * and an invalidation is triggered. Must be represented by the seconds number with the suffix "s".
-     * If specified, it must be between 10s and 86400s currently.
+     * Set the TTL interval. When TTL interval expires without being renewed, the session has expired
+     * and an invalidation is triggered. If specified, it must be between 10s and 86400s currently.
      *
-     * @param ttl the TTL interval
+     * @param ttl the TTL interval in seconds
      * @return reference to this, for fluency
      */
-    public SessionOptions setTtl(String ttl) {
+    public SessionOptions setTtl(long ttl) {
         this.ttl = ttl;
         return this;
+    }
+
+    private static long cutSeconds(String value) {
+        if (value != null && value.endsWith("s")) {
+            return Integer.parseInt(value.substring(0, value.length() - 1));
+        } else {
+            return 0L;
+        }
     }
 }

@@ -20,10 +20,10 @@ public class Sessions extends ConsulTestBase {
         SessionOptions options = new SessionOptions()
                 .setBehavior(SessionBehavior.RELEASE)
                 .setChecks(Arrays.asList("c1", "c2"))
-                .setLockDelay("11s")
+                .setLockDelay(42)
                 .setName("optName")
                 .setNode("optNode")
-                .setTtl("42s");
+                .setTtl(442);
         SessionOptions restored = new SessionOptions(options.toJson());
         assertEquals(options.getBehavior(), restored.getBehavior());
         assertEquals(options.getChecks(), restored.getChecks());
@@ -36,8 +36,8 @@ public class Sessions extends ConsulTestBase {
     @Test
     public void createAndDestroy() {
         SessionOptions opt = new SessionOptions()
-                .setTtl("442s")
-                .setLockDelay("42s");
+                .setLockDelay(42)
+                .setTtl(442);
         String id = getAsync(h -> writeClient.createSession(opt, h));
         Session session = getAsync(h -> writeClient.infoSession(id, h));
         assertEquals(opt.getLockDelay(), session.getLockDelay());
@@ -51,7 +51,7 @@ public class Sessions extends ConsulTestBase {
 
     @Test
     public void deleteBehavior() {
-        String id = getAsync(h -> writeClient.createSession(new SessionOptions().setTtl("442s").setBehavior(SessionBehavior.DELETE), h));
+        String id = getAsync(h -> writeClient.createSession(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), h));
         assertTrue(getAsync(h -> writeClient.putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), h)));
         KeyValue pair = getAsync(h -> writeClient.getValue("foo/bar", h));
         assertEquals("value1", pair.getValue());

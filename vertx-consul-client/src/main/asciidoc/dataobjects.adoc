@@ -171,27 +171,27 @@ Set session ID for lock release operation.
 ^|Name | Type ^| Description
 |[[address]]`address`|`String`|
 +++
-Sets service address
+Set service address
 +++
 |[[checkOptions]]`checkOptions`|`link:dataobjects.html#CheckOptions[CheckOptions]`|
 +++
-Sets check options of service
+Set check options of service
 +++
 |[[id]]`id`|`String`|
 +++
-Sets the ID of session
+Set the ID of session
 +++
 |[[name]]`name`|`String`|
 +++
-Sets service name
+Set service name
 +++
 |[[port]]`port`|`Number (int)`|
 +++
-Sets service port
+Set service port
 +++
 |[[tags]]`tags`|`Array of String`|
 +++
-Sets list of tags associated with service
+Set list of tags associated with service
 +++
 |===
 
@@ -199,6 +199,7 @@ Sets list of tags associated with service
 == Session
 
 ++++
+ Holds properties of Consul sessions
 ++++
 '''
 
@@ -206,11 +207,28 @@ Sets list of tags associated with service
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[checks]]`checks`|`Array of String`|-
-|[[createIndex]]`createIndex`|`Number (long)`|-
-|[[id]]`id`|`String`|-
-|[[lockDelay]]`lockDelay`|`String`|-
-|[[node]]`node`|`String`|-
+|[[checks]]`checks`|`Array of String`|
++++
+Get the list of associated health checks
++++
+|[[createIndex]]`createIndex`|`Number (long)`|
++++
+Get the create index of session
++++
+|[[id]]`id`|`String`|
++++
+Get the ID of session
++++
+|[[lockDelay]]`lockDelay`|`Number (long)`|
++++
+Lock delay is a time duration, between <code>0</code> and <code>60</code> seconds. When a session invalidation
+ takes place, Consul prevents any of the previously held locks from being re-acquired
+ for the <code>lock-delay</code> interval. The default is <code>15s</code>.
++++
+|[[node]]`node`|`String`|
++++
+Get the human-readable name for the Session
++++
 |===
 
 [[SessionOptions]]
@@ -227,32 +245,29 @@ Sets list of tags associated with service
 ^|Name | Type ^| Description
 |[[behavior]]`behavior`|`link:enums.html#SessionBehavior[SessionBehavior]`|
 +++
-Sets the behavior when a session is invalidated. The release behavior is the default if none is specified.
+Set the behavior when a session is invalidated. The release behavior is the default if none is specified.
 +++
 |[[checks]]`checks`|`Array of String`|
 +++
-Sets a list of associated health checks. It is highly recommended that,
+Set a list of associated health checks. It is highly recommended that,
  if you override this list, you include the default "serfHealth"
 +++
-|[[lockDelay]]`lockDelay`|`String`|
+|[[lockDelay]]`lockDelay`|`Number (long)`|
 +++
-Sets the lock-delay period. This is a time duration, between 0 and 60 seconds. When a session invalidation
- takes place, Consul prevents any of the previously held locks from being re-acquired for the lock-delay interval
- Must be represented by the seconds number with the suffix "s".
+Set the lock-delay period.
 +++
 |[[name]]`name`|`String`|
 +++
-Sets the human-readable name for the Session
+Set the human-readable name for the Session
 +++
 |[[node]]`node`|`String`|
 +++
-Sets the node to which the session will be assigned
+Set the node to which the session will be assigned
 +++
-|[[ttl]]`ttl`|`String`|
+|[[ttl]]`ttl`|`Number (long)`|
 +++
-Sets the TTL interval. When TTL interval expires without being renewed, the session has expired
- and an invalidation is triggered. Must be represented by the seconds number with the suffix "s".
- If specified, it must be between 10s and 86400s currently.
+Set the TTL interval. When TTL interval expires without being renewed, the session has expired
+ and an invalidation is triggered. If specified, it must be between 10s and 86400s currently.
 +++
 |===
 
