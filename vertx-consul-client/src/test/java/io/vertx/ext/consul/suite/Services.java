@@ -36,13 +36,16 @@ public class Services extends ChecksBase {
         CheckInfo c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
         assertEquals(c.getId(), "service:serviceName");
 
+        List<Service> nodeServices = getAsync(h -> writeClient.nodeServices(nodeName, h));
+        assertEquals(2, nodeServices.size());
+
         runAsync(h -> writeClient.deregisterService(serviceId, h));
     }
 
     @Test
     public void findConsul() {
         List<Service> localConsulList = getAsync(h -> writeClient.infoService("consul", h));
-        assertEquals(1, localConsulList.size());
+        assertEquals(3, localConsulList.size());
         List<Service> catalogConsulList = Utils.<List<Service>>getAsync(h -> writeClient.catalogServices(h))
                 .stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
         assertEquals(1, catalogConsulList.size());

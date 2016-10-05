@@ -23,12 +23,12 @@ public class ConsulTestSuite {
 
     @BeforeClass
     public static void startConsul() throws Exception {
-        ConsulProcessHolder.consul();
+        ConsulCluster.consul();
     }
 
     @AfterClass
     public static void stopConsul() {
-        ConsulProcessHolder.consul().close();
+        ConsulCluster.close();
     }
 
 }

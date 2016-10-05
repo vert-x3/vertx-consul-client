@@ -190,7 +190,7 @@ public class ConsulClientImpl implements ConsulClient {
     @Override
     public ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
         request(HttpMethod.GET, "/v1/catalog/services", resultHandler, buffer -> buffer.toJsonObject().stream()
-                .map(Service::fromCatalogInfo).collect(Collectors.toList())).end();
+                .map(ServiceParser::parseCatalogInfo).collect(Collectors.toList())).end();
         return this;
     }
 
@@ -205,18 +205,22 @@ public class ConsulClientImpl implements ConsulClient {
     @Override
     public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
         request(HttpMethod.GET, "/v1/agent/services", resultHandler, buffer -> buffer.toJsonObject().stream()
-                .map(obj -> Service.fromAgentInfo((JsonObject) obj.getValue()))
+                .map(obj -> ServiceParser.parseAgentInfo((JsonObject) obj.getValue()))
                 .collect(Collectors.toList())).end();
         return this;
     }
 
     @Override
     public ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler) {
-        request(HttpMethod.GET, "/v1/catalog/node/" + nodeId, resultHandler, buffer -> buffer.toJsonObject()
-                .getJsonObject("Services")
-                .stream()
-                .map(obj -> Service.fromAgentInfo((JsonObject) obj.getValue()))
-                .collect(Collectors.toList())).end();
+        request(HttpMethod.GET, "/v1/catalog/node/" + nodeId, resultHandler, buffer -> {
+            JsonObject jsonObject = buffer.toJsonObject();
+            JsonObject nodeInfo = jsonObject.getJsonObject("Node");
+            String nodeName = nodeInfo.getString("Node");
+            String nodeAddress = nodeInfo.getString("Address");
+            return jsonObject.getJsonObject("Services").stream()
+                    .map(obj -> ServiceParser.parseNodeInfo(nodeName, nodeAddress, (JsonObject) obj.getValue()))
+                    .collect(Collectors.toList());
+        }).end();
         return this;
     }
 

@@ -5,5 +5,8 @@ key "foo/" {
   policy = "read"
 }
 event "" {
-  policy = "write"
+  policy = "read"
+}
+service "" {
+  policy = "read"
 }

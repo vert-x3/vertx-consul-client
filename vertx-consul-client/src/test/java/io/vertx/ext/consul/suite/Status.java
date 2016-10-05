@@ -21,7 +21,7 @@ public class Status extends ConsulTestBase {
     @Test
     public void peers() {
         List<String> peers = getAsync(h -> readClient.peersStatus(h));
-        assertEquals(1, peers.size());
+        assertEquals(3, peers.size());
     }
 
 }

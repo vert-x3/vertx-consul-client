@@ -18,13 +18,15 @@ public class ConsulTestBase extends VertxTestBase {
     protected ConsulClient masterClient;
     protected ConsulClient writeClient;
     protected ConsulClient readClient;
+    protected String nodeName;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        masterClient = clientCreator.apply(vertx, config(ConsulProcessHolder.masterToken()));
-        writeClient = clientCreator.apply(vertx, config(ConsulProcessHolder.writeToken()));
-        readClient = clientCreator.apply(vertx, config(ConsulProcessHolder.readToken()));
+        masterClient = clientCreator.apply(vertx, config(ConsulCluster.masterToken()));
+        writeClient = clientCreator.apply(vertx, config(ConsulCluster.writeToken()));
+        readClient = clientCreator.apply(vertx, config(ConsulCluster.readToken()));
+        nodeName = ConsulCluster.nodeName();
     }
 
     @Override
@@ -38,9 +40,9 @@ public class ConsulTestBase extends VertxTestBase {
     private JsonObject config(String token) {
         return new JsonObject()
                 .put("acl_token", token)
-                .put("dc", ConsulProcessHolder.dc())
+                .put("dc", ConsulCluster.dc())
                 .put("host", "localhost")
-                .put("port", ConsulProcessHolder.consul().getHttpPort());
+                .put("port", ConsulCluster.consul().getHttpPort());
     }
 
 }

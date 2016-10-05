@@ -5,7 +5,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -22,12 +21,6 @@ public class Service {
     private static final String SERVICE_ADDRESS = "ServiceAddress";
     private static final String SERVICE_PORT = "ServicePort";
 
-    private static final String AGENT_SERVICE_ID = "ID";
-    private static final String AGENT_SERVICE_SERVICE = "Service";
-    private static final String AGENT_SERVICE_TAGS = "Tags";
-    private static final String AGENT_SERVICE_ADDRESS = "Address";
-    private static final String AGENT_SERVICE_PORT = "Port";
-
     private String node;
     private String nodeAddress;
     private String id;
@@ -36,28 +29,7 @@ public class Service {
     private String address;
     private int port;
 
-    public static Service fromAgentInfo(JsonObject jsonObject) {
-        Service service = new Service();
-        service.id = jsonObject.getString(AGENT_SERVICE_ID);
-        service.name = jsonObject.getString(AGENT_SERVICE_SERVICE);
-        JsonArray tagsArr = jsonObject.getJsonArray(AGENT_SERVICE_TAGS);
-        service.tags = tagsArr == null ? null : tagsArr.getList();
-        service.address = jsonObject.getString(AGENT_SERVICE_ADDRESS);
-        service.port = jsonObject.getInteger(AGENT_SERVICE_PORT);
-        return service;
-    }
-
-    public static Service fromCatalogInfo(Map.Entry<String, Object> entry) {
-        Service service = new Service();
-        service.name = entry.getKey();
-        Object tags = entry.getValue();
-        if (tags != null) {
-            service.tags = ((JsonArray) tags).stream().map(o -> (String) o).collect(Collectors.toList());
-        }
-        return service;
-    }
-
-    private Service() {}
+    public Service() {}
 
     public Service(JsonObject jsonObject) {
         this.node = jsonObject.getString(NODE);
@@ -100,27 +72,62 @@ public class Service {
         return node;
     }
 
+    public Service setNode(String node) {
+        this.node = node;
+        return this;
+    }
+
     public String getNodeAddress() {
         return nodeAddress;
+    }
+
+    public Service setNodeAddress(String nodeAddress) {
+        this.nodeAddress = nodeAddress;
+        return this;
     }
 
     public String getId() {
         return id;
     }
 
+    public Service setId(String id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public Service setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public List<String> getTags() {
         return tags;
     }
 
+    public Service setTags(List<String> tags) {
+        this.tags = tags;
+        return this;
+    }
+
     public String getAddress() {
         return address;
     }
 
+    public Service setAddress(String address) {
+        this.address = address;
+        return this;
+    }
+
     public int getPort() {
         return port;
+    }
+
+    public Service setPort(int port) {
+        this.port = port;
+        return this;
     }
 }

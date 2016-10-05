@@ -7,3 +7,6 @@ key "foo/" {
 event "" {
   policy = "write"
 }
+service "" {
+  policy = "write"
+}
