@@ -319,18 +319,30 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling peers_status()"
     end
-    # @param [Hash] options 
-    # @yield 
+    #  Initialize a new session
+    # @yield will be provided with ID of new session
     # @return [self]
-    def create_session(options=nil)
-      if options.class == Hash && block_given?
-        @j_del.java_method(:createSession, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+    def create_session
+      if block_given?
+        @j_del.java_method(:createSession, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling create_session(options)"
+      raise ArgumentError, "Invalid arguments when calling create_session()"
     end
-    # @param [String] id 
-    # @yield 
+    #  Initialize a new session
+    # @param [Hash] options options used to create session
+    # @yield will be provided with ID of new session
+    # @return [self]
+    def create_session_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:createSessionWithOptions, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling create_session_with_options(options)"
+    end
+    #  Returns the requested session information
+    # @param [String] id the ID of requested session
+    # @yield will be provided with info of requested session
     # @return [self]
     def info_session(id=nil)
       if id.class == String && block_given?
@@ -339,8 +351,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling info_session(id)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
+    # @param [String] id the ID of session that should be renewed
+    # @yield will be provided with info of renewed session
     # @return [self]
     def renew_session(id=nil)
       if id.class == String && block_given?
@@ -349,7 +362,8 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling renew_session(id)"
     end
-    # @yield 
+    #  Returns the active sessions
+    # @yield will be provided with list of sessions
     # @return [self]
     def list_sessions
       if block_given?
@@ -358,8 +372,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling list_sessions()"
     end
-    # @param [String] nodeId 
-    # @yield 
+    #  Returns the active sessions for a given node
+    # @param [String] nodeId the ID of node
+    # @yield will be provided with list of sessions
     # @return [self]
     def list_node_sessions(nodeId=nil)
       if nodeId.class == String && block_given?
@@ -368,8 +383,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling list_node_sessions(nodeId)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Destroys the given session
+    # @param [String] id the ID of session
+    # @yield will be called when complete
     # @return [self]
     def destroy_session(id=nil)
       if id.class == String && block_given?

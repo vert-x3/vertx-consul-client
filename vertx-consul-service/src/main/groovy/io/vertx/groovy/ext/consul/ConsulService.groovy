@@ -269,8 +269,12 @@ public class ConsulService extends ConsulClient {
     } : null);
     return this;
   }
-  public ConsulService createSession(Map<String, Object> options = [:], Handler<AsyncResult<String>> idHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).createSession(options != null ? new io.vertx.ext.consul.SessionOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, idHandler);
+  public ConsulService createSession(Handler<AsyncResult<String>> idHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).createSession(idHandler);
+    return this;
+  }
+  public ConsulService createSessionWithOptions(Map<String, Object> options = [:], Handler<AsyncResult<String>> idHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).createSessionWithOptions(options != null ? new io.vertx.ext.consul.SessionOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, idHandler);
     return this;
   }
   public ConsulService infoSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {

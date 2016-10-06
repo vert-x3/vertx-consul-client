@@ -282,15 +282,34 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
-        request(HttpMethod.PUT, "/v1/session/create", idHandler, buffer -> buffer.toJsonObject().getString("ID"))
-                .end(options.toJson().encode());
+    public ConsulClient createSession(Handler<AsyncResult<String>> idHandler) {
+        createSessionWithOptions(null, idHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
+        HttpClientRequest req = request(HttpMethod.PUT, "/v1/session/create", idHandler, buffer -> buffer.toJsonObject().getString("ID"));
+        if (options != null) {
+            req.end(options.toJson().encode());
+        } else {
+            req.end();
+        }
         return this;
     }
 
     @Override
     public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
-        request(HttpMethod.GET, "/v1/session/info/" + id, resultHandler, buffer -> new Session(buffer.toJsonArray().getJsonObject(0))).end();
+        request(HttpMethod.GET, "/v1/session/info/" + id, resultHandler, buffer -> {
+            JsonArray sessions = buffer.toJsonArray();
+            if (sessions == null) {
+                throw new InternalError();
+            } else if (sessions.size() == 0) {
+                throw new RuntimeException("Unknown session ID: " + id);
+            } else {
+                return new Session(sessions.getJsonObject(0));
+            }
+        }).end();
         return this;
     }
 
@@ -353,7 +372,13 @@ public class ConsulClientImpl implements ConsulClient {
         }
         HttpClientRequest rq = httpClient.request(method, path + "?" + query, h -> {
             if (h.statusCode() == 200) {
-                h.bodyHandler(bh -> resultHandler.handle(Future.succeededFuture(mapper.apply(bh))));
+                h.bodyHandler(bh -> {
+                    try {
+                        resultHandler.handle(Future.succeededFuture(mapper.apply(bh)));
+                    } catch (Throwable throwable) {
+                        resultHandler.handle(Future.failedFuture(throwable));
+                    }
+                });
             } else {
                 resultHandler.handle(Future.failedFuture(h.statusMessage()));
             }

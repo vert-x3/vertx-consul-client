@@ -266,10 +266,31 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient createSession(Map<String, Object> options = [:], Handler<AsyncResult<String>> idHandler) {
-    delegate.createSession(options != null ? new io.vertx.ext.consul.SessionOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, idHandler);
+  /**
+   * Initialize a new session
+   * @param idHandler will be provided with ID of new session
+   * @return reference to this, for fluency
+   */
+  public ConsulClient createSession(Handler<AsyncResult<String>> idHandler) {
+    delegate.createSession(idHandler);
     return this;
   }
+  /**
+   * Initialize a new session
+   * @param options options used to create session (see <a href="../../../../../../../cheatsheet/SessionOptions.html">SessionOptions</a>)
+   * @param idHandler will be provided with ID of new session
+   * @return reference to this, for fluency
+   */
+  public ConsulClient createSessionWithOptions(Map<String, Object> options = [:], Handler<AsyncResult<String>> idHandler) {
+    delegate.createSessionWithOptions(options != null ? new io.vertx.ext.consul.SessionOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, idHandler);
+    return this;
+  }
+  /**
+   * Returns the requested session information
+   * @param id the ID of requested session
+   * @param resultHandler will be provided with info of requested session
+   * @return reference to this, for fluency
+   */
   public ConsulClient infoSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
     delegate.infoSession(id, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Session>>() {
       public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
@@ -282,6 +303,12 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
+   * @param id the ID of session that should be renewed
+   * @param resultHandler will be provided with info of renewed session
+   * @return reference to this, for fluency
+   */
   public ConsulClient renewSession(String id, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
     delegate.renewSession(id, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Session>>() {
       public void handle(AsyncResult<io.vertx.ext.consul.Session> ar) {
@@ -294,6 +321,11 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Returns the active sessions
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   */
   public ConsulClient listSessions(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.listSessions(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Session>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Session>> ar) {
@@ -306,6 +338,12 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Returns the active sessions for a given node
+   * @param nodeId the ID of node
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   */
   public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.listNodeSessions(nodeId, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Session>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Session>> ar) {
@@ -318,6 +356,12 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Destroys the given session
+   * @param id the ID of session
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
     delegate.destroySession(id, resultHandler);
     return this;

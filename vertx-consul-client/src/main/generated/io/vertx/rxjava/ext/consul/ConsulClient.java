@@ -389,66 +389,150 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
-    delegate.createSession(options, idHandler);
+  /**
+   * Initialize a new session
+   * @param idHandler will be provided with ID of new session
+   * @return reference to this, for fluency
+   */
+  public ConsulClient createSession(Handler<AsyncResult<String>> idHandler) { 
+    delegate.createSession(idHandler);
     return this;
   }
 
-  public Observable<String> createSessionObservable(SessionOptions options) { 
+  /**
+   * Initialize a new session
+   * @return 
+   */
+  public Observable<String> createSessionObservable() { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    createSession(options, idHandler.toHandler());
+    createSession(idHandler.toHandler());
     return idHandler;
   }
 
+  /**
+   * Initialize a new session
+   * @param options options used to create session
+   * @param idHandler will be provided with ID of new session
+   * @return reference to this, for fluency
+   */
+  public ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
+    delegate.createSessionWithOptions(options, idHandler);
+    return this;
+  }
+
+  /**
+   * Initialize a new session
+   * @param options options used to create session
+   * @return 
+   */
+  public Observable<String> createSessionWithOptionsObservable(SessionOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    createSessionWithOptions(options, idHandler.toHandler());
+    return idHandler;
+  }
+
+  /**
+   * Returns the requested session information
+   * @param id the ID of requested session
+   * @param resultHandler will be provided with info of requested session
+   * @return reference to this, for fluency
+   */
   public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
     delegate.infoSession(id, resultHandler);
     return this;
   }
 
+  /**
+   * Returns the requested session information
+   * @param id the ID of requested session
+   * @return 
+   */
   public Observable<Session> infoSessionObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Session> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     infoSession(id, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
+   * @param id the ID of session that should be renewed
+   * @param resultHandler will be provided with info of renewed session
+   * @return reference to this, for fluency
+   */
   public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
     delegate.renewSession(id, resultHandler);
     return this;
   }
 
+  /**
+   * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
+   * @param id the ID of session that should be renewed
+   * @return 
+   */
   public Observable<Session> renewSessionObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Session> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     renewSession(id, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Returns the active sessions
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   */
   public ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler) { 
     delegate.listSessions(resultHandler);
     return this;
   }
 
+  /**
+   * Returns the active sessions
+   * @return 
+   */
   public Observable<List<Session>> listSessionsObservable() { 
     io.vertx.rx.java.ObservableFuture<List<Session>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     listSessions(resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Returns the active sessions for a given node
+   * @param nodeId the ID of node
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   */
   public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) { 
     delegate.listNodeSessions(nodeId, resultHandler);
     return this;
   }
 
+  /**
+   * Returns the active sessions for a given node
+   * @param nodeId the ID of node
+   * @return 
+   */
   public Observable<List<Session>> listNodeSessionsObservable(String nodeId) { 
     io.vertx.rx.java.ObservableFuture<List<Session>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     listNodeSessions(nodeId, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Destroys the given session
+   * @param id the ID of session
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.destroySession(id, resultHandler);
     return this;
   }
 
+  /**
+   * Destroys the given session
+   * @param id the ID of session
+   * @return 
+   */
   public Observable<Void> destroySessionObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     destroySession(id, resultHandler.toHandler());

@@ -642,7 +642,25 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
+  public ConsulService createSession(Handler<AsyncResult<String>> idHandler) {
+    if (closed) {
+      idHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "createSession");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        idHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        idHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
     if (closed) {
       idHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -650,7 +668,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     JsonObject _json = new JsonObject();
     _json.put("options", options == null ? null : options.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "createSession");
+    _deliveryOptions.addHeader("action", "createSessionWithOptions");
     _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         idHandler.handle(Future.failedFuture(res.cause()));

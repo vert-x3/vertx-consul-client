@@ -34,14 +34,45 @@ public class Sessions extends ConsulTestBase {
     }
 
     @Test
-    public void createAndDestroy() {
-        SessionOptions opt = new SessionOptions()
-                .setLockDelay(42)
-                .setTtl(442);
-        String id = getAsync(h -> writeClient.createSession(opt, h));
+    public void createDefaultSession() {
+        String id = getAsync(h -> writeClient.createSession(h));
         Session session = getAsync(h -> writeClient.infoSession(id, h));
+        assertEquals(id, session.getId());
+        assertEquals(nodeName, session.getNode());
+        runAsync(h -> writeClient.destroySession(id, h));
+    }
+
+    @Test
+    public void createSessionWithOptions() {
+        SessionOptions opt = new SessionOptions()
+                .setBehavior(SessionBehavior.DELETE)
+                .setLockDelay(42)
+                .setName("optName")
+                .setTtl(442);
+        String id = getAsync(h -> writeClient.createSessionWithOptions(opt, h));
+        Session session = getAsync(h -> writeClient.infoSession(id, h));
+        List<String> checks = session.getChecks();
+        assertEquals(1, checks.size());
+        assertTrue("serfHealth".equals(checks.get(0)));
         assertEquals(opt.getLockDelay(), session.getLockDelay());
-        assertEquals("serfHealth", session.getChecks().get(0));
+        assertEquals(nodeName, session.getNode());
+        runAsync(h -> writeClient.destroySession(id, h));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void unknownNode() {
+        Utils.<String>getAsync(h -> writeClient.createSessionWithOptions(new SessionOptions().setNode("unknownNode"), h));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void unknownSession() {
+        Utils.<Session>getAsync(h -> writeClient.infoSession("00000000-0000-0000-0000-000000000000", h));
+    }
+
+    @Test
+    public void listSessions() {
+        String id = getAsync(h -> writeClient.createSession(h));
+        Session session = getAsync(h -> writeClient.infoSession(id, h));
         List<Session> list = getAsync(h -> writeClient.listSessions(h));
         assertEquals(session.getId(), list.get(0).getId());
         List<Session> nodeSesions = getAsync(h -> writeClient.listNodeSessions(session.getNode(), h));
@@ -51,7 +82,7 @@ public class Sessions extends ConsulTestBase {
 
     @Test
     public void deleteBehavior() {
-        String id = getAsync(h -> writeClient.createSession(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), h));
+        String id = getAsync(h -> writeClient.createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), h));
         assertTrue(getAsync(h -> writeClient.putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), h)));
         KeyValue pair = getAsync(h -> writeClient.getValue("foo/bar", h));
         assertEquals("value1", pair.getValue());

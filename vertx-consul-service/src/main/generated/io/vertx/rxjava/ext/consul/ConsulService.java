@@ -389,14 +389,25 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).createSession(options, idHandler);
+  public ConsulService createSession(Handler<AsyncResult<String>> idHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).createSession(idHandler);
     return this;
   }
 
-  public Observable<String> createSessionObservable(SessionOptions options) { 
+  public Observable<String> createSessionObservable() { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    createSession(options, idHandler.toHandler());
+    createSession(idHandler.toHandler());
+    return idHandler;
+  }
+
+  public ConsulService createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).createSessionWithOptions(options, idHandler);
+    return this;
+  }
+
+  public Observable<String> createSessionWithOptionsObservable(SessionOptions options) { 
+    io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    createSessionWithOptions(options, idHandler.toHandler());
     return idHandler;
   }
 

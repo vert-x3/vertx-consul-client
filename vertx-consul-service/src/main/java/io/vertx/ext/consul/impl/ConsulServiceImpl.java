@@ -186,8 +186,14 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
-        consulClient.createSession(options, idHandler);
+    public ConsulService createSession(Handler<AsyncResult<String>> idHandler) {
+        consulClient.createSession(idHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
+        consulClient.createSessionWithOptions(options, idHandler);
         return this;
     }
 

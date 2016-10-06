@@ -112,21 +112,71 @@ public interface ConsulClient {
     @Fluent
     ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 
+    /**
+     * Initialize a new session
+     *
+     * @param idHandler will be provided with ID of new session
+     * @return reference to this, for fluency
+     */
     @Fluent
-    ConsulClient createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler);
+    ConsulClient createSession(Handler<AsyncResult<String>> idHandler);
 
+    /**
+     * Initialize a new session
+     *
+     * @param options options used to create session
+     * @param idHandler will be provided with ID of new session
+     * @return reference to this, for fluency
+     */
+    @Fluent
+    ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler);
+
+    /**
+     * Returns the requested session information
+     *
+     * @param id the ID of requested session
+     * @param resultHandler will be provided with info of requested session
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
+    /**
+     * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
+     *
+     * @param id the ID of session that should be renewed
+     * @param resultHandler will be provided with info of renewed session
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
+    /**
+     * Returns the active sessions
+     *
+     * @param resultHandler will be provided with list of sessions
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler);
 
+    /**
+     * Returns the active sessions for a given node
+     *
+     * @param nodeId the ID of node
+     * @param resultHandler will be provided with list of sessions
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler);
 
+    /**
+     * Destroys the given session
+     *
+     * @param id the ID of session
+     * @param resultHandler will be called when complete
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
 

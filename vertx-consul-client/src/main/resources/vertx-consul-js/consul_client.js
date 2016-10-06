@@ -670,16 +670,16 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Initialize a new session
 
    @public
-   @param options {Object} 
-   @param idHandler {function} 
-   @return {ConsulClient}
+   @param idHandler {function} will be provided with ID of new session 
+   @return {ConsulClient} reference to this, for fluency
    */
-  this.createSession = function(options, idHandler) {
+  this.createSession = function(idHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["createSession(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["createSession(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
@@ -691,11 +691,34 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Initialize a new session
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param options {Object} options used to create session 
+   @param idHandler {function} will be provided with ID of new session 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.createSessionWithOptions = function(options, idHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["createSessionWithOptions(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        idHandler(ar.result(), null);
+      } else {
+        idHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the requested session information
+
+   @public
+   @param id {string} the ID of requested session 
+   @param resultHandler {function} will be provided with info of requested session 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.infoSession = function(id, resultHandler) {
     var __args = arguments;
@@ -712,11 +735,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of session that should be renewed 
+   @param resultHandler {function} will be provided with info of renewed session 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.renewSession = function(id, resultHandler) {
     var __args = arguments;
@@ -733,10 +757,11 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the active sessions
 
    @public
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param resultHandler {function} will be provided with list of sessions 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.listSessions = function(resultHandler) {
     var __args = arguments;
@@ -753,11 +778,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the active sessions for a given node
 
    @public
-   @param nodeId {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param nodeId {string} the ID of node 
+   @param resultHandler {function} will be provided with list of sessions 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.listNodeSessions = function(nodeId, resultHandler) {
     var __args = arguments;
@@ -774,11 +800,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Destroys the given session
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of session 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.destroySession = function(id, resultHandler) {
     var __args = arguments;

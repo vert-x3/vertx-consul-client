@@ -321,15 +321,24 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling peers_status()"
     end
+    # @yield 
+    # @return [self]
+    def create_session
+      if block_given?
+        @j_del.java_method(:createSession, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling create_session()"
+    end
     # @param [Hash] options 
     # @yield 
     # @return [self]
-    def create_session(options=nil)
+    def create_session_with_options(options=nil)
       if options.class == Hash && block_given?
-        @j_del.java_method(:createSession, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
+        @j_del.java_method(:createSessionWithOptions, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling create_session(options)"
+      raise ArgumentError, "Invalid arguments when calling create_session_with_options(options)"
     end
     # @param [String] id 
     # @yield 

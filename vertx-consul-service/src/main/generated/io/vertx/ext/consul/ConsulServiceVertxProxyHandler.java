@@ -366,7 +366,11 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "createSession": {
-          service.createSession(json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.SessionOptions(json.getJsonObject("options")), createHandler(msg));
+          service.createSession(createHandler(msg));
+          break;
+        }
+        case "createSessionWithOptions": {
+          service.createSessionWithOptions(json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.SessionOptions(json.getJsonObject("options")), createHandler(msg));
           break;
         }
         case "infoSession": {

@@ -147,7 +147,11 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService createSession(SessionOptions options, Handler<AsyncResult<String>> idHandler);
+    ConsulService createSession(Handler<AsyncResult<String>> idHandler);
+
+    @Override
+    @Fluent
+    ConsulService createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler);
 
     @Override
     @Fluent

@@ -672,14 +672,34 @@ var ConsulService = function(j_val) {
   /**
 
    @public
+   @param idHandler {function} 
+   @return {ConsulService}
+   */
+  this.createSession = function(idHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["createSession(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        idHandler(ar.result(), null);
+      } else {
+        idHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
    @param options {Object} 
    @param idHandler {function} 
    @return {ConsulService}
    */
-  this.createSession = function(options, idHandler) {
+  this.createSessionWithOptions = function(options, idHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["createSession(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulService["createSessionWithOptions(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
