@@ -18,6 +18,13 @@ import java.util.List;
 @VertxGen
 public interface ConsulClient {
 
+    /**
+     * Create a Consul client.
+     *
+     * @param vertx  the Vert.x instance
+     * @param config  the configuration
+     * @return the client
+     */
     static ConsulClient create(Vertx vertx, JsonObject config) {
         return new ConsulClientImpl(vertx, config);
     }
@@ -58,9 +65,33 @@ public interface ConsulClient {
     @Fluent
     ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    /**
+     * Fires a new user event
+     *
+     * @param name name of event
+     * @param resultHandler will be provided with properties of event
+     * @return reference to this, for fluency
+     */
     @Fluent
-    ConsulClient fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler);
+    ConsulClient fireEvent(String name, Handler<AsyncResult<Event>> resultHandler);
 
+    /**
+     * Fires a new user event
+     *
+     * @param name name of event
+     * @param options options used to create event
+     * @param resultHandler will be provided with properties of event
+     * @return reference to this, for fluency
+     */
+    @Fluent
+    ConsulClient fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler);
+
+    /**
+     * Returns the most recent events known by the agent
+     *
+     * @param resultHandler will be provided with list of events
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
 
@@ -106,9 +137,23 @@ public interface ConsulClient {
     @Fluent
     ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
 
+    /**
+     * Get the Raft leader for the datacenter in which the agent is running.
+     * It returns an address in format "<code>10.1.10.12:8300</code>"
+     *
+     * @param resultHandler will be provided with address of cluster leader
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler);
 
+    /**
+     * Retrieves the Raft peers for the datacenter in which the the agent is running.
+     * It returns a list of addresses "<code>10.1.10.12:8300</code>", "<code>10.1.10.13:8300</code>"
+     *
+     * @param resultHandler will be provided with list of peers
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 

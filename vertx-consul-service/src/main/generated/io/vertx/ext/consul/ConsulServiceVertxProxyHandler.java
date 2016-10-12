@@ -56,6 +56,7 @@ import io.vertx.ext.consul.SessionOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.EventOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -224,7 +225,21 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "fireEvent": {
-          service.fireEvent(json.getJsonObject("event") == null ? null : new io.vertx.ext.consul.Event(json.getJsonObject("event")), res -> {
+          service.fireEvent((java.lang.String)json.getValue("name"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "fireEventWithOptions": {
+          service.fireEventWithOptions((java.lang.String)json.getValue("name"), json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.EventOptions(json.getJsonObject("options")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

@@ -34,6 +34,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.ext.consul.Session
+import io.vertx.ext.consul.EventOptions
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -46,6 +47,12 @@ public class ConsulClient {
   public Object getDelegate() {
     return delegate;
   }
+  /**
+   * Create a Consul client.
+   * @param vertx the Vert.x instance
+   * @param config the configuration
+   * @return the client
+   */
   public static ConsulClient create(Vertx vertx, Map<String, Object> config) {
     def ret = InternalHelper.safeCreate(io.vertx.ext.consul.ConsulClient.create(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, config != null ? new io.vertx.core.json.JsonObject(config) : null), io.vertx.groovy.ext.consul.ConsulClient.class);
     return ret;
@@ -130,8 +137,14 @@ public class ConsulClient {
     delegate.destroyAclToken(id, resultHandler);
     return this;
   }
-  public ConsulClient fireEvent(Map<String, Object> event = [:], Handler<AsyncResult<Map<String, Object>>> resultHandler) {
-    delegate.fireEvent(event != null ? new io.vertx.ext.consul.Event(io.vertx.lang.groovy.InternalHelper.toJsonObject(event)) : null, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Event>>() {
+  /**
+   * Fires a new user event
+   * @param name name of event
+   * @param resultHandler will be provided with properties of event
+   * @return reference to this, for fluency
+   */
+  public ConsulClient fireEvent(String name, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.fireEvent(name, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Event>>() {
       public void handle(AsyncResult<io.vertx.ext.consul.Event> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
@@ -142,6 +155,30 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Fires a new user event
+   * @param name name of event
+   * @param options options used to create event (see <a href="../../../../../../../cheatsheet/EventOptions.html">EventOptions</a>)
+   * @param resultHandler will be provided with properties of event
+   * @return reference to this, for fluency
+   */
+  public ConsulClient fireEventWithOptions(String name, Map<String, Object> options, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.fireEventWithOptions(name, options != null ? new io.vertx.ext.consul.EventOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.Event>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.Event> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
+   * Returns the most recent events known by the agent
+   * @param resultHandler will be provided with list of events
+   * @return reference to this, for fluency
+   */
   public ConsulClient listEvents(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.listEvents(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Event>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Event>> ar) {
@@ -250,10 +287,22 @@ public class ConsulClient {
     delegate.updateCheck(checkInfo != null ? new io.vertx.ext.consul.CheckInfo(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkInfo)) : null, resultHandler);
     return this;
   }
+  /**
+   * Get the Raft leader for the datacenter in which the agent is running.
+   * It returns an address in format "<code>10.1.10.12:8300</code>"
+   * @param resultHandler will be provided with address of cluster leader
+   * @return reference to this, for fluency
+   */
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
     delegate.leaderStatus(resultHandler);
     return this;
   }
+  /**
+   * Retrieves the Raft peers for the datacenter in which the the agent is running.
+   * It returns a list of addresses "<code>10.1.10.12:8300</code>", "<code>10.1.10.13:8300</code>"
+   * @param resultHandler will be provided with list of peers
+   * @return reference to this, for fluency
+   */
   public ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
     delegate.peersStatus(resultHandler != null ? new Handler<AsyncResult<java.util.List<java.lang.String>>>() {
       public void handle(AsyncResult<java.util.List<java.lang.String>> ar) {

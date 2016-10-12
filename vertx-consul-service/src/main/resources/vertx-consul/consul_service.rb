@@ -147,15 +147,26 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling destroy_acl_token(id)"
     end
-    # @param [Hash] event 
+    # @param [String] name 
     # @yield 
     # @return [self]
-    def fire_event(event=nil)
-      if event.class == Hash && block_given?
-        @j_del.java_method(:fireEvent, [Java::IoVertxExtConsul::Event.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Event.new(::Vertx::Util::Utils.to_json_object(event)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+    def fire_event(name=nil)
+      if name.class == String && block_given?
+        @j_del.java_method(:fireEvent, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(name,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fire_event(event)"
+      raise ArgumentError, "Invalid arguments when calling fire_event(name)"
+    end
+    # @param [String] name 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def fire_event_with_options(name=nil,options=nil)
+      if name.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:fireEventWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::EventOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(name,Java::IoVertxExtConsul::EventOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fire_event_with_options(name,options)"
     end
     # @yield 
     # @return [self]

@@ -75,7 +75,11 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler);
+    ConsulService fireEvent(String name, Handler<AsyncResult<Event>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler);
 
     @Override
     @Fluent

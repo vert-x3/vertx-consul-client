@@ -33,6 +33,7 @@ import io.vertx.ext.consul.SessionOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
+import io.vertx.ext.consul.EventOptions;
 
 
 public class ConsulService extends ConsulClient {
@@ -191,14 +192,25 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).fireEvent(event, resultHandler);
+  public ConsulService fireEvent(String name, Handler<AsyncResult<Event>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).fireEvent(name, resultHandler);
     return this;
   }
 
-  public Observable<Event> fireEventObservable(Event event) { 
+  public Observable<Event> fireEventObservable(String name) { 
     io.vertx.rx.java.ObservableFuture<Event> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    fireEvent(event, resultHandler.toHandler());
+    fireEvent(name, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).fireEventWithOptions(name, options, resultHandler);
+    return this;
+  }
+
+  public Observable<Event> fireEventWithOptionsObservable(String name, EventOptions options) { 
+    io.vertx.rx.java.ObservableFuture<Event> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    fireEventWithOptions(name, options, resultHandler.toHandler());
     return resultHandler;
   }
 

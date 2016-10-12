@@ -90,8 +90,14 @@ public class ConsulServiceImpl implements ConsulService {
     }
 
     @Override
-    public ConsulService fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) {
-        consulClient.fireEvent(event, resultHandler);
+    public ConsulService fireEvent(String name, Handler<AsyncResult<Event>> resultHandler) {
+        consulClient.fireEvent(name, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulService fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler) {
+        consulClient.fireEventWithOptions(name, options, resultHandler);
         return this;
     }
 

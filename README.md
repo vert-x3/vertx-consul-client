@@ -4,13 +4,13 @@
 - Access Control Lists
 - Health Checks
 - Consul System Status
+- User Events
+- Sessions
 
 ## TODO
 - features
   - Nodes and Services catalog
   - Network Coordinates
-  - User Events
-  - Sessions
 - documentation
 - testing
 - examples

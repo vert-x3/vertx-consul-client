@@ -2,6 +2,7 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Event;
+import io.vertx.ext.consul.EventOptions;
 import org.junit.Test;
 
 import java.util.List;
@@ -15,10 +16,11 @@ public class Events extends ConsulTestBase {
 
     @Test
     public void testEvents1() {
-        Event init = Event.empty().withName("custom-event").withPayload("content");
-        Event event = getAsync(h -> writeClient.fireEvent(init, h));
-        assertEquals(init.getName(), event.getName());
-        assertEquals(init.getPayload(), event.getPayload());
+        String name = "custom-event";
+        EventOptions opts = new EventOptions().setPayload("content");
+        Event event = getAsync(h -> writeClient.fireEventWithOptions(name, opts, h));
+        assertEquals(name, event.getName());
+        assertEquals(opts.getPayload(), event.getPayload());
         String evId = event.getId();
         List<Event> list = getAsync(h -> writeClient.listEvents(h));
         long cnt = list.stream().map(Event::getId).filter(id -> id.equals(evId)).count();

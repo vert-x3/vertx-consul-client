@@ -31,6 +31,7 @@ var SessionOptions = io.vertx.ext.consul.SessionOptions;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Session = io.vertx.ext.consul.Session;
 var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var EventOptions = io.vertx.ext.consul.EventOptions;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 
@@ -300,14 +301,36 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param event {Object} 
+   @param name {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.fireEvent = function(event, resultHandler) {
+  this.fireEvent = function(name, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["fireEvent(io.vertx.ext.consul.Event,io.vertx.core.Handler)"](event != null ? new Event(new JsonObject(JSON.stringify(event))) : null, function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["fireEvent(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param name {string} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.fireEventWithOptions = function(name, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulService["fireEventWithOptions(java.lang.String,io.vertx.ext.consul.EventOptions,io.vertx.core.Handler)"](name, options != null ? new EventOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {

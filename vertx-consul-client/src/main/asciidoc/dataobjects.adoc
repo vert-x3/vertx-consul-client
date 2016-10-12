@@ -57,6 +57,7 @@
 == Event
 
 ++++
+ Holds properties of Consul event
 ++++
 '''
 
@@ -64,9 +65,64 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[id]]`id`|`String`|-
-|[[name]]`name`|`String`|-
-|[[payload]]`payload`|`String`|-
+|[[id]]`id`|`String`|
++++
+Get ID of event
++++
+|[[name]]`name`|`String`|
++++
+Get name of event
++++
+|[[node]]`node`|`String`|
++++
+Get regular expression to filter by node name
++++
+|[[payload]]`payload`|`String`|
++++
+Get payload of event
++++
+|[[service]]`service`|`String`|
++++
+Get regular expression to filter by service
++++
+|[[tag]]`tag`|`String`|
++++
+Get regular expression to filter by tag
++++
+|[[version]]`version`|`Number (int)`|
++++
+Get version
++++
+|===
+
+[[EventOptions]]
+== EventOptions
+
+++++
+ Options used to trigger a new user event.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[node]]`node`|`String`|
++++
+Set regular expression to filter by node name
++++
+|[[payload]]`payload`|`String`|
++++
+Set payload of event
++++
+|[[service]]`service`|`String`|
++++
+Set regular expression to filter by service
++++
+|[[tag]]`tag`|`String`|
++++
+Set regular expression to filter by tag
++++
 |===
 
 [[KeyValue]]

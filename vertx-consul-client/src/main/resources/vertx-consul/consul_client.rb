@@ -14,9 +14,10 @@ module VertxConsul
     def j_del
       @j_del
     end
-    # @param [::Vertx::Vertx] vertx 
-    # @param [Hash{String => Object}] config 
-    # @return [::VertxConsul::ConsulClient]
+    #  Create a Consul client.
+    # @param [::Vertx::Vertx] vertx the Vert.x instance
+    # @param [Hash{String => Object}] config the configuration
+    # @return [::VertxConsul::ConsulClient] the client
     def self.create(vertx=nil,config=nil)
       if vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
         return ::Vertx::Util::Utils.safe_create(Java::IoVertxExtConsul::ConsulClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxCoreJson::JsonObject.java_class]).call(vertx.j_del,::Vertx::Util::Utils.to_json_object(config)),::VertxConsul::ConsulClient)
@@ -145,17 +146,31 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling destroy_acl_token(id)"
     end
-    # @param [Hash] event 
-    # @yield 
+    #  Fires a new user event
+    # @param [String] name name of event
+    # @yield will be provided with properties of event
     # @return [self]
-    def fire_event(event=nil)
-      if event.class == Hash && block_given?
-        @j_del.java_method(:fireEvent, [Java::IoVertxExtConsul::Event.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::Event.new(::Vertx::Util::Utils.to_json_object(event)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+    def fire_event(name=nil)
+      if name.class == String && block_given?
+        @j_del.java_method(:fireEvent, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(name,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fire_event(event)"
+      raise ArgumentError, "Invalid arguments when calling fire_event(name)"
     end
-    # @yield 
+    #  Fires a new user event
+    # @param [String] name name of event
+    # @param [Hash] options options used to create event
+    # @yield will be provided with properties of event
+    # @return [self]
+    def fire_event_with_options(name=nil,options=nil)
+      if name.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:fireEventWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::EventOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(name,Java::IoVertxExtConsul::EventOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fire_event_with_options(name,options)"
+    end
+    #  Returns the most recent events known by the agent
+    # @yield will be provided with list of events
     # @return [self]
     def list_events
       if block_given?
@@ -301,7 +316,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling update_check(checkInfo)"
     end
-    # @yield 
+    #  Get the Raft leader for the datacenter in which the agent is running.
+    #  It returns an address in format "<code>10.1.10.12:8300</code>"
+    # @yield will be provided with address of cluster leader
     # @return [self]
     def leader_status
       if block_given?
@@ -310,7 +327,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling leader_status()"
     end
-    # @yield 
+    #  Retrieves the Raft peers for the datacenter in which the the agent is running.
+    #  It returns a list of addresses "<code>10.1.10.12:8300</code>", "<code>10.1.10.13:8300</code>"
+    # @yield will be provided with list of peers
     # @return [self]
     def peers_status
       if block_given?

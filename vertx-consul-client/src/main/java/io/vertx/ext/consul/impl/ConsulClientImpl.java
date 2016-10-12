@@ -13,6 +13,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -140,11 +141,32 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient fireEvent(Event event, Handler<AsyncResult<Event>> resultHandler) {
-        request(HttpMethod.PUT, "/v1/event/fire/" + event.getName(), resultHandler, buffer -> {
+    public ConsulClient fireEvent(String name, Handler<AsyncResult<Event>> resultHandler) {
+        fireEventWithOptions(name, null, resultHandler);
+        return this;
+    }
+
+    @Override
+    public ConsulClient fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler) {
+        String query = "";
+        if (options != null) {
+            if (options.getNode() != null) {
+                query += "&node=" + options.getNode();
+            }
+            if (options.getService() != null) {
+                query += "&service=" + options.getService();
+            }
+            if (options.getTag() != null) {
+                query += "&tag=" + options.getTag();
+            }
+            if (!query.isEmpty()) {
+                query = query.substring(1);
+            }
+        }
+        request(HttpMethod.PUT, "/v1/event/fire/" + name, query, resultHandler, buffer -> {
             JsonObject jsonObject = buffer.toJsonObject();
-            return Event.parseConsulResponse(jsonObject);
-        }).end(event.getPayload() == null ? "" : event.getPayload());
+            return new Event(fixEventJson(jsonObject));
+        }).end(options == null || options.getPayload() == null ? "" : options.getPayload());
         return this;
     }
 
@@ -152,9 +174,17 @@ public class ConsulClientImpl implements ConsulClient {
     public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
         request(HttpMethod.GET, "/v1/event/list", resultHandler, buffer -> {
             JsonArray jsonArray = buffer.toJsonArray();
-            return jsonArray.stream().map(obj -> Event.parseConsulResponse((JsonObject) obj)).collect(Collectors.toList());
+            return jsonArray.stream().map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList());
         }).end();
         return this;
+    }
+
+    private static JsonObject fixEventJson(JsonObject jsonObject) {
+        String payload = jsonObject.getString("Payload");
+        if (payload != null) {
+            jsonObject.put("Payload", new String(Base64.getDecoder().decode(payload)));
+        }
+        return jsonObject;
     }
 
     @Override
