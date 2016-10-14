@@ -19,6 +19,7 @@ public class ConsulTestBase extends VertxTestBase {
     protected ConsulClient writeClient;
     protected ConsulClient readClient;
     protected String nodeName;
+    protected String dc;
 
     @Override
     public void setUp() throws Exception {
@@ -27,6 +28,7 @@ public class ConsulTestBase extends VertxTestBase {
         writeClient = clientCreator.apply(vertx, config(ConsulCluster.writeToken()));
         readClient = clientCreator.apply(vertx, config(ConsulCluster.readToken()));
         nodeName = ConsulCluster.nodeName();
+        dc = ConsulCluster.dc();
     }
 
     @Override

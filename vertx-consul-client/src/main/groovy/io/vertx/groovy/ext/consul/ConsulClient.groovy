@@ -35,6 +35,7 @@ import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.ext.consul.Session
 import io.vertx.ext.consul.EventOptions
+import io.vertx.ext.consul.Node
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -203,8 +204,14 @@ public class ConsulClient {
     delegate.deregisterService(id, resultHandler);
     return this;
   }
-  public ConsulClient infoService(String name, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
-    delegate.infoService(name, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+  /**
+   * Returns the nodes providing a service
+   * @param service name of service
+   * @param resultHandler will be provided with list of nodes providing given service
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.catalogServiceNodes(service, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
@@ -215,6 +222,45 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Return all the datacenters that are known by the Consul server
+   * @param resultHandler will be provided with list of datacenters
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
+    delegate.catalogDatacenters(resultHandler != null ? new Handler<AsyncResult<java.util.List<java.lang.String>>>() {
+      public void handle(AsyncResult<java.util.List<java.lang.String>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture(ar.result()));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
+   * Returns the nodes registered in a datacenter
+   * @param resultHandler will be provided with list of nodes
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogNodes(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.catalogNodes(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Node>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Node>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
+   * Returns the services registered in a datacenter
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   */
   public ConsulClient catalogServices(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.catalogServices(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
@@ -227,8 +273,14 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient localServices(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
-    delegate.localServices(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+  /**
+   * Returns the node's registered services
+   * @param node node name
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.catalogNodeServices(node, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
@@ -239,8 +291,8 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
-    delegate.nodeServices(nodeId, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+  public ConsulClient localServices(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.localServices(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));

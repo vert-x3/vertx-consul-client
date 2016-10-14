@@ -57,6 +57,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
+import io.vertx.ext.consul.Node;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -278,8 +279,8 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           service.deregisterService((java.lang.String)json.getValue("id"), createHandler(msg));
           break;
         }
-        case "infoService": {
-          service.infoService((java.lang.String)json.getValue("name"), res -> {
+        case "catalogServiceNodes": {
+          service.catalogServiceNodes((java.lang.String)json.getValue("service"), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -288,6 +289,24 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
               }
             } else {
               msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "catalogDatacenters": {
+          service.catalogDatacenters(createListHandler(msg));
+          break;
+        }
+        case "catalogNodes": {
+          service.catalogNodes(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Node::toJson).collect(Collectors.toList())));
             }
          });
           break;
@@ -320,8 +339,8 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
-        case "nodeServices": {
-          service.nodeServices((java.lang.String)json.getValue("nodeId"), res -> {
+        case "catalogNodeServices": {
+          service.catalogNodeServices((java.lang.String)json.getValue("node"), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         AclTokens.class,
+        Catalog.class,
         Checks.class,
         Events.class,
         KVStore.class,

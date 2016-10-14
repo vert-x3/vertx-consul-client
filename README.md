@@ -3,13 +3,13 @@
 - Key/Value Store
 - Access Control Lists
 - Health Checks
+- Nodes and Services catalog
 - Consul System Status
 - User Events
 - Sessions
 
 ## TODO
 - features
-  - Nodes and Services catalog
   - Network Coordinates
 - documentation
 - testing

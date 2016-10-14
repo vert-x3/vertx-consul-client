@@ -99,7 +99,15 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulService catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler);
+
+    @Override
+    @Fluent
+    ConsulService catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler);
 
     @Override
     @Fluent
@@ -111,7 +119,7 @@ public interface ConsulService extends ConsulClient {
 
     @Override
     @Fluent
-    ConsulService nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulService catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler);
 
     @Override
     @Fluent

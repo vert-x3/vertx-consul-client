@@ -193,6 +193,35 @@ Set session ID for lock release operation.
 |[[reason]]`reason`|`String`|-
 |===
 
+[[Node]]
+== Node
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|
++++
+Get node address
++++
+|[[lanAddress]]`lanAddress`|`String`|
++++
+Get node lan address
++++
+|[[node]]`node`|`String`|
++++
+Get node name
++++
+|[[wanAddress]]`wanAddress`|`String`|
++++
+Get node wan address
++++
+|===
+
 [[Service]]
 == Service
 

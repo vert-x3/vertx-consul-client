@@ -104,17 +104,55 @@ public interface ConsulClient {
     @Fluent
     ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
+    /**
+     * Returns the nodes providing a service
+     *
+     * @param service name of service
+     * @param resultHandler will be provided with list of nodes providing given service
+     * @return reference to this, for fluency
+     */
     @Fluent
-    ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler);
 
+    /**
+     * Return all the datacenters that are known by the Consul server
+     *
+     * @param resultHandler will be provided with list of datacenters
+     * @return reference to this, for fluency
+     */
+    @Fluent
+    ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler);
+
+    /**
+     * Returns the nodes registered in a datacenter
+     *
+     * @param resultHandler will be provided with list of nodes
+     * @return reference to this, for fluency
+     */
+    @Fluent
+    ConsulClient catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler);
+
+    /**
+     * Returns the services registered in a datacenter
+     *
+     * @param resultHandler will be provided with list of services
+     * @return reference to this, for fluency
+     */
     @Fluent
     ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler);
 
+    /**
+     * Returns the node's registered services
+     *
+     * @param node node name
+     * @param resultHandler will be provided with list of services
+     * @return reference to this, for fluency
+     */
     @Fluent
-    ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler);
 
     @Fluent
-    ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler);
+    ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
 
     @Fluent
     ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);

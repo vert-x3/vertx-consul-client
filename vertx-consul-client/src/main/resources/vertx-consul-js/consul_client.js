@@ -21,18 +21,19 @@ var Vertx = require('vertx-js/vertx');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulClient = io.vertx.ext.consul.ConsulClient;
+var Event = io.vertx.ext.consul.Event;
+var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
+var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var Service = io.vertx.ext.consul.Service;
+var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
-var Event = io.vertx.ext.consul.Event;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
-var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Session = io.vertx.ext.consul.Session;
-var CheckInfo = io.vertx.ext.consul.CheckInfo;
 var EventOptions = io.vertx.ext.consul.EventOptions;
-var Service = io.vertx.ext.consul.Service;
-var CheckOptions = io.vertx.ext.consul.CheckOptions;
+var Node = io.vertx.ext.consul.Node;
 
 /**
  A Vert.x service used to interact with Consul.
@@ -428,16 +429,17 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the nodes providing a service
 
    @public
-   @param name {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param service {string} name of service 
+   @param resultHandler {function} will be provided with list of nodes providing given service 
+   @return {ConsulClient} reference to this, for fluency
    */
-  this.infoService = function(name, resultHandler) {
+  this.catalogServiceNodes = function(service, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulClient["infoService(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      j_consulClient["catalogServiceNodes(java.lang.String,io.vertx.core.Handler)"](service, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
@@ -449,15 +451,80 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Return all the datacenters that are known by the Consul server
 
    @public
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param resultHandler {function} will be provided with list of datacenters 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogDatacenters = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["catalogDatacenters(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(ar.result(), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the nodes registered in a datacenter
+
+   @public
+   @param resultHandler {function} will be provided with list of nodes 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogNodes = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["catalogNodes(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the services registered in a datacenter
+
+   @public
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.catalogServices = function(resultHandler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["catalogServices(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the node's registered services
+
+   @public
+   @param node {string} node name 
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogNodeServices = function(node, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulClient["catalogNodeServices(java.lang.String,io.vertx.core.Handler)"](node, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
@@ -478,27 +545,6 @@ var ConsulClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["localServices(io.vertx.core.Handler)"](function(ar) {
-      if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
-      } else {
-        resultHandler(null, ar.cause());
-      }
-    });
-      return that;
-    } else throw new TypeError('function invoked with invalid arguments');
-  };
-
-  /**
-
-   @public
-   @param nodeId {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
-   */
-  this.nodeServices = function(nodeId, resultHandler) {
-    var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulClient["nodeServices(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

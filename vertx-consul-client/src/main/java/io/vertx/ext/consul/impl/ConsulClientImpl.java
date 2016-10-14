@@ -210,9 +210,23 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) {
-        request(HttpMethod.GET, "/v1/catalog/service/" + name, resultHandler, buffer -> buffer.toJsonArray().stream()
+    public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/service/" + service, resultHandler, buffer -> buffer.toJsonArray().stream()
                 .map(obj -> new Service((JsonObject) obj))
+                .collect(Collectors.toList())).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/datacenters", resultHandler, buffer -> buffer.toJsonArray().getList()).end();
+        return this;
+    }
+
+    @Override
+    public ConsulClient catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/nodes", resultHandler, buffer -> buffer.toJsonArray().stream()
+                .map(obj -> new Node((JsonObject) obj))
                 .collect(Collectors.toList())).end();
         return this;
     }
@@ -241,8 +255,8 @@ public class ConsulClientImpl implements ConsulClient {
     }
 
     @Override
-    public ConsulClient nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler) {
-        request(HttpMethod.GET, "/v1/catalog/node/" + nodeId, resultHandler, buffer -> {
+    public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) {
+        request(HttpMethod.GET, "/v1/catalog/node/" + node, resultHandler, buffer -> {
             JsonObject jsonObject = buffer.toJsonObject();
             JsonObject nodeInfo = jsonObject.getJsonObject("Node");
             String nodeName = nodeInfo.getString("Node");

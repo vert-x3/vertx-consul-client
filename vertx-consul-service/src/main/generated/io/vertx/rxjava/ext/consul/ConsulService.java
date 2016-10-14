@@ -34,6 +34,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
+import io.vertx.ext.consul.Node;
 
 
 public class ConsulService extends ConsulClient {
@@ -258,14 +259,36 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService infoService(String name, Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).infoService(name, resultHandler);
+  public ConsulService catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogServiceNodes(service, resultHandler);
     return this;
   }
 
-  public Observable<List<Service>> infoServiceObservable(String name) { 
+  public Observable<List<Service>> catalogServiceNodesObservable(String service) { 
     io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    infoService(name, resultHandler.toHandler());
+    catalogServiceNodes(service, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogDatacenters(resultHandler);
+    return this;
+  }
+
+  public Observable<List<String>> catalogDatacentersObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<String>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    catalogDatacenters(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogNodes(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Node>> catalogNodesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Node>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    catalogNodes(resultHandler.toHandler());
     return resultHandler;
   }
 
@@ -291,14 +314,14 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService nodeServices(String nodeId, Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).nodeServices(nodeId, resultHandler);
+  public ConsulService catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogNodeServices(node, resultHandler);
     return this;
   }
 
-  public Observable<List<Service>> nodeServicesObservable(String nodeId) { 
+  public Observable<List<Service>> catalogNodeServicesObservable(String node) { 
     io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    nodeServices(nodeId, resultHandler.toHandler());
+    catalogNodeServices(node, resultHandler.toHandler());
     return resultHandler;
   }
 

@@ -22,18 +22,19 @@ var ConsulClient = require('vertx-consul-js/consul_client');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulService = io.vertx.ext.consul.ConsulService;
+var Event = io.vertx.ext.consul.Event;
+var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
+var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var Service = io.vertx.ext.consul.Service;
+var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
-var Event = io.vertx.ext.consul.Event;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
-var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Session = io.vertx.ext.consul.Session;
-var CheckInfo = io.vertx.ext.consul.CheckInfo;
 var EventOptions = io.vertx.ext.consul.EventOptions;
-var Service = io.vertx.ext.consul.Service;
-var CheckOptions = io.vertx.ext.consul.CheckOptions;
+var Node = io.vertx.ext.consul.Node;
 
 /**
  @class
@@ -427,14 +428,54 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param name {string} 
+   @param service {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.infoService = function(name, resultHandler) {
+  this.catalogServiceNodes = function(service, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["infoService(java.lang.String,io.vertx.core.Handler)"](name, function(ar) {
+      j_consulService["catalogServiceNodes(java.lang.String,io.vertx.core.Handler)"](service, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.catalogDatacenters = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["catalogDatacenters(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(ar.result(), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.catalogNodes = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["catalogNodes(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
@@ -488,14 +529,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param nodeId {string} 
+   @param node {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.nodeServices = function(nodeId, resultHandler) {
+  this.catalogNodeServices = function(node, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["nodeServices(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
+      j_consulService["catalogNodeServices(java.lang.String,io.vertx.core.Handler)"](node, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

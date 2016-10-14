@@ -209,17 +209,39 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling deregister_service(id)"
     end
-    # @param [String] name 
-    # @yield 
+    #  Returns the nodes providing a service
+    # @param [String] service name of service
+    # @yield will be provided with list of nodes providing given service
     # @return [self]
-    def info_service(name=nil)
-      if name.class == String && block_given?
-        @j_del.java_method(:infoService, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(name,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+    def catalog_service_nodes(service=nil)
+      if service.class == String && block_given?
+        @j_del.java_method(:catalogServiceNodes, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling info_service(name)"
+      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes(service)"
     end
-    # @yield 
+    #  Return all the datacenters that are known by the Consul server
+    # @yield will be provided with list of datacenters
+    # @return [self]
+    def catalog_datacenters
+      if block_given?
+        @j_del.java_method(:catalogDatacenters, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_datacenters()"
+    end
+    #  Returns the nodes registered in a datacenter
+    # @yield will be provided with list of nodes
+    # @return [self]
+    def catalog_nodes
+      if block_given?
+        @j_del.java_method(:catalogNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_nodes()"
+    end
+    #  Returns the services registered in a datacenter
+    # @yield will be provided with list of services
     # @return [self]
     def catalog_services
       if block_given?
@@ -227,6 +249,17 @@ module VertxConsul
         return self
       end
       raise ArgumentError, "Invalid arguments when calling catalog_services()"
+    end
+    #  Returns the node's registered services
+    # @param [String] node node name
+    # @yield will be provided with list of services
+    # @return [self]
+    def catalog_node_services(node=nil)
+      if node.class == String && block_given?
+        @j_del.java_method(:catalogNodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(node,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_node_services(node)"
     end
     # @yield 
     # @return [self]
@@ -236,16 +269,6 @@ module VertxConsul
         return self
       end
       raise ArgumentError, "Invalid arguments when calling local_services()"
-    end
-    # @param [String] nodeId 
-    # @yield 
-    # @return [self]
-    def node_services(nodeId=nil)
-      if nodeId.class == String && block_given?
-        @j_del.java_method(:nodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
-        return self
-      end
-      raise ArgumentError, "Invalid arguments when calling node_services(nodeId)"
     end
     # @yield 
     # @return [self]
