@@ -14,17 +14,17 @@ import static io.vertx.ext.consul.Utils.getAsync;
  */
 public class Events extends ConsulTestBase {
 
-    @Test
-    public void testEvents1() {
-        String name = "custom-event";
-        EventOptions opts = new EventOptions().setPayload("content");
-        Event event = getAsync(h -> writeClient.fireEventWithOptions(name, opts, h));
-        assertEquals(name, event.getName());
-        assertEquals(opts.getPayload(), event.getPayload());
-        String evId = event.getId();
-        List<Event> list = getAsync(h -> writeClient.listEvents(h));
-        long cnt = list.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
-        assertEquals(cnt, 1);
-    }
+  @Test
+  public void testEvents1() {
+    String name = "custom-event";
+    EventOptions opts = new EventOptions().setPayload("content");
+    Event event = getAsync(h -> writeClient.fireEventWithOptions(name, opts, h));
+    assertEquals(name, event.getName());
+    assertEquals(opts.getPayload(), event.getPayload());
+    String evId = event.getId();
+    List<Event> list = getAsync(h -> writeClient.listEvents(h));
+    long cnt = list.stream().map(Event::getId).filter(id -> id.equals(evId)).count();
+    assertEquals(cnt, 1);
+  }
 
 }

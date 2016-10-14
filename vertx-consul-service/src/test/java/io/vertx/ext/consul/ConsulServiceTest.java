@@ -10,17 +10,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ConsulServiceTest extends ConsulTestSuite {
 
-    private static AtomicInteger cnt = new AtomicInteger(1);
+  private static AtomicInteger cnt = new AtomicInteger(1);
 
-    @BeforeClass
-    public static void initClient() {
-        ConsulTestBase.clientCreator = (vertx, config) -> {
-            String addr = "vertx.consul." + cnt.incrementAndGet();
-            DeploymentOptions options = new DeploymentOptions().setConfig(config.put("address", addr));
-            Utils.<String>getAsync(h -> vertx.deployVerticle("service:io.vertx.consul-service", options, h));
-            return ConsulService.createEventBusProxy(vertx, addr);
-        };
-        ConsulTestBase.clientCloser = client -> {};
-    }
+  @BeforeClass
+  public static void initClient() {
+    ConsulTestBase.clientCreator = (vertx, config) -> {
+      String addr = "vertx.consul." + cnt.incrementAndGet();
+      DeploymentOptions options = new DeploymentOptions().setConfig(config.put("address", addr));
+      Utils.<String>getAsync(h -> vertx.deployVerticle("service:io.vertx.consul-service", options, h));
+      return ConsulService.createEventBusProxy(vertx, addr);
+    };
+    ConsulTestBase.clientCloser = client -> {
+    };
+  }
 
 }

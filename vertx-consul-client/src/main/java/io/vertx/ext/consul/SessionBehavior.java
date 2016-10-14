@@ -10,26 +10,26 @@ package io.vertx.ext.consul;
  * the key corresponding to any of the held locks is simply deleted. This can be used to create ephemeral
  * entries that are automatically deleted by Consul.
  *
- * @see <a href="https://www.consul.io/docs/internals/sessions.html">Consul sessions documentation</a>
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
+ * @see <a href="https://www.consul.io/docs/internals/sessions.html">Consul sessions documentation</a>
  */
 public enum SessionBehavior {
 
-    RELEASE("release"),
-    DELETE("delete");
+  RELEASE("release"),
+  DELETE("delete");
 
-    public final String key;
+  public final String key;
 
-    public static SessionBehavior of(String key) {
-        for (SessionBehavior sessionBehavior : values()) {
-            if (sessionBehavior.key.equals(key)) {
-                return sessionBehavior;
-            }
-        }
-        return null;
+  public static SessionBehavior of(String key) {
+    for (SessionBehavior sessionBehavior : values()) {
+      if (sessionBehavior.key.equals(key)) {
+        return sessionBehavior;
+      }
     }
+    return null;
+  }
 
-    SessionBehavior(String key) {
-        this.key = key;
-    }
+  SessionBehavior(String key) {
+    this.key = key;
+  }
 }

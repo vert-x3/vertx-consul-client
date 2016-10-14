@@ -9,133 +9,133 @@ import io.vertx.core.json.JsonObject;
 @DataObject
 public class CheckInfo {
 
-    public enum Status {
-        any, unknown, passing, warning, critical
+  public enum Status {
+    any, unknown, passing, warning, critical
+  }
+
+  private static final String SERVICE_ID_KEY = "ServiceID";
+  private static final String SERVICE_NAME_KEY = "ServiceName";
+  private static final String ID_KEY = "CheckID";
+  private static final String NAME_KEY = "Name";
+  private static final String STATUS_KEY = "Status";
+  private static final String NOTES_KEY = "Notes";
+  private static final String OUTPUT_KEY = "Output";
+
+  private String id;
+  private String name;
+  private Status status;
+  private String notes;
+  private String output;
+  private String serviceId;
+  private String serviceName;
+
+  public CheckInfo(JsonObject jsonObject) {
+    this.id = jsonObject.getString(ID_KEY);
+    this.name = jsonObject.getString(NAME_KEY);
+    this.status = Status.valueOf(jsonObject.getString(STATUS_KEY));
+    this.notes = jsonObject.getString(NOTES_KEY);
+    this.output = jsonObject.getString(OUTPUT_KEY);
+    this.serviceId = jsonObject.getString(SERVICE_ID_KEY);
+    this.serviceName = jsonObject.getString(SERVICE_NAME_KEY);
+  }
+
+  public JsonObject toJson() {
+    JsonObject jsonObject = new JsonObject();
+    if (id != null) {
+      jsonObject.put(ID_KEY, id);
     }
-
-    private static final String SERVICE_ID_KEY = "ServiceID";
-    private static final String SERVICE_NAME_KEY = "ServiceName";
-    private static final String ID_KEY = "CheckID";
-    private static final String NAME_KEY = "Name";
-    private static final String STATUS_KEY = "Status";
-    private static final String NOTES_KEY = "Notes";
-    private static final String OUTPUT_KEY = "Output";
-
-    private String id;
-    private String name;
-    private Status status;
-    private String notes;
-    private String output;
-    private String serviceId;
-    private String serviceName;
-
-    public CheckInfo(JsonObject jsonObject) {
-        this.id = jsonObject.getString(ID_KEY);
-        this.name = jsonObject.getString(NAME_KEY);
-        this.status = Status.valueOf(jsonObject.getString(STATUS_KEY));
-        this.notes = jsonObject.getString(NOTES_KEY);
-        this.output = jsonObject.getString(OUTPUT_KEY);
-        this.serviceId = jsonObject.getString(SERVICE_ID_KEY);
-        this.serviceName = jsonObject.getString(SERVICE_NAME_KEY);
+    if (name != null) {
+      jsonObject.put(NAME_KEY, name);
     }
-
-    public JsonObject toJson() {
-        JsonObject jsonObject = new JsonObject();
-        if (id != null) {
-            jsonObject.put(ID_KEY, id);
-        }
-        if (name != null) {
-            jsonObject.put(NAME_KEY, name);
-        }
-        if (status != null) {
-            jsonObject.put(STATUS_KEY, status.name());
-        }
-        if (notes != null) {
-            jsonObject.put(NOTES_KEY, notes);
-        }
-        if (output != null) {
-            jsonObject.put(OUTPUT_KEY, output);
-        }
-        if (serviceId != null) {
-            jsonObject.put(SERVICE_ID_KEY, serviceId);
-        }
-        if (serviceName != null) {
-            jsonObject.put(SERVICE_NAME_KEY, serviceName);
-        }
-        return jsonObject;
+    if (status != null) {
+      jsonObject.put(STATUS_KEY, status.name());
     }
-
-    public JsonObject updateRequest() {
-        JsonObject jsonObject = new JsonObject();
-        if (status != null) {
-            jsonObject.put(STATUS_KEY, status.name());
-        }
-        if (output != null) {
-            jsonObject.put(OUTPUT_KEY, output);
-        }
-        return jsonObject;
+    if (notes != null) {
+      jsonObject.put(NOTES_KEY, notes);
     }
-
-    public String getId() {
-        return id;
+    if (output != null) {
+      jsonObject.put(OUTPUT_KEY, output);
     }
-
-    public String getName() {
-        return name;
+    if (serviceId != null) {
+      jsonObject.put(SERVICE_ID_KEY, serviceId);
     }
-
-    public Status getStatus() {
-        return status;
+    if (serviceName != null) {
+      jsonObject.put(SERVICE_NAME_KEY, serviceName);
     }
+    return jsonObject;
+  }
 
-    public String getNotes() {
-        return notes;
+  public JsonObject updateRequest() {
+    JsonObject jsonObject = new JsonObject();
+    if (status != null) {
+      jsonObject.put(STATUS_KEY, status.name());
     }
+    if (output != null) {
+      jsonObject.put(OUTPUT_KEY, output);
+    }
+    return jsonObject;
+  }
 
-    public String getOutput() {
-        return output;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getServiceId() {
-        return serviceId;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getServiceName() {
-        return serviceName;
-    }
+  public Status getStatus() {
+    return status;
+  }
 
-    public CheckInfo setId(String id) {
-        this.id = id;
-        return this;
-    }
+  public String getNotes() {
+    return notes;
+  }
 
-    public CheckInfo setName(String name) {
-        this.name = name;
-        return this;
-    }
+  public String getOutput() {
+    return output;
+  }
 
-    public CheckInfo setStatus(Status status) {
-        this.status = status;
-        return this;
-    }
+  public String getServiceId() {
+    return serviceId;
+  }
 
-    public CheckInfo setNotes(String notes) {
-        this.notes = notes;
-        return this;
-    }
+  public String getServiceName() {
+    return serviceName;
+  }
 
-    public CheckInfo setOutput(String output) {
-        this.output = output;
-        return this;
-    }
+  public CheckInfo setId(String id) {
+    this.id = id;
+    return this;
+  }
 
-    public CheckInfo setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-        return this;
-    }
+  public CheckInfo setName(String name) {
+    this.name = name;
+    return this;
+  }
 
-    public CheckInfo setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-        return this;
-    }
+  public CheckInfo setStatus(Status status) {
+    this.status = status;
+    return this;
+  }
+
+  public CheckInfo setNotes(String notes) {
+    this.notes = notes;
+    return this;
+  }
+
+  public CheckInfo setOutput(String output) {
+    this.output = output;
+    return this;
+  }
+
+  public CheckInfo setServiceId(String serviceId) {
+    this.serviceId = serviceId;
+    return this;
+  }
+
+  public CheckInfo setServiceName(String serviceName) {
+    this.serviceName = serviceName;
+    return this;
+  }
 }

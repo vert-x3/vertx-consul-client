@@ -12,16 +12,16 @@ import static io.vertx.ext.consul.Utils.getAsync;
  */
 public class Status extends ConsulTestBase {
 
-    @Test
-    public void leader() {
-        String leader = getAsync(h -> readClient.leaderStatus(h));
-        assertEquals("127.0.0.1", leader.substring(0, leader.indexOf(':')));
-    }
+  @Test
+  public void leader() {
+    String leader = getAsync(h -> readClient.leaderStatus(h));
+    assertEquals("127.0.0.1", leader.substring(0, leader.indexOf(':')));
+  }
 
-    @Test
-    public void peers() {
-        List<String> peers = getAsync(h -> readClient.peersStatus(h));
-        assertEquals(3, peers.size());
-    }
+  @Test
+  public void peers() {
+    List<String> peers = getAsync(h -> readClient.peersStatus(h));
+    assertEquals(3, peers.size());
+  }
 
 }

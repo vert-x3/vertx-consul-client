@@ -9,15 +9,15 @@ import static io.vertx.ext.consul.Utils.runAsync;
  */
 public class Checks extends ChecksBase {
 
-    @Override
-    String createCheck(CheckOptions opts) {
-        String id = opts.getId();
-        if (id == null) {
-            id = "checkId";
-            opts.setId(id);
-        }
-        runAsync(h -> writeClient.registerCheck(opts, h));
-        return id;
+  @Override
+  String createCheck(CheckOptions opts) {
+    String id = opts.getId();
+    if (id == null) {
+      id = "checkId";
+      opts.setId(id);
     }
+    runAsync(h -> writeClient.registerCheck(opts, h));
+    return id;
+  }
 
 }

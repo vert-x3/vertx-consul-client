@@ -11,25 +11,25 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        AclTokens.class,
-        Catalog.class,
-        Checks.class,
-        Events.class,
-        KVStore.class,
-        Services.class,
-        Sessions.class,
-        Status.class
+  AclTokens.class,
+  Catalog.class,
+  Checks.class,
+  Events.class,
+  KVStore.class,
+  Services.class,
+  Sessions.class,
+  Status.class
 })
 public class ConsulTestSuite {
 
-    @BeforeClass
-    public static void startConsul() throws Exception {
-        ConsulCluster.consul();
-    }
+  @BeforeClass
+  public static void startConsul() throws Exception {
+    ConsulCluster.consul();
+  }
 
-    @AfterClass
-    public static void stopConsul() {
-        ConsulCluster.close();
-    }
+  @AfterClass
+  public static void stopConsul() {
+    ConsulCluster.close();
+  }
 
 }

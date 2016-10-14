@@ -11,24 +11,24 @@ import io.vertx.serviceproxy.ProxyHelper;
  */
 public class ConsulServiceVerticle extends AbstractVerticle {
 
-    private ConsulService service;
-    private MessageConsumer<JsonObject> messageConsumer;
+  private ConsulService service;
+  private MessageConsumer<JsonObject> messageConsumer;
 
-    @Override
-    public void start() throws Exception {
-        service = new ConsulServiceImpl(ConsulClient.create(vertx, config()));
-        String address = config().getString("address");
-        if (address == null) {
-            throw new IllegalStateException("address field must be specified in config for client verticle");
-        }
-        messageConsumer = ProxyHelper.registerService(ConsulService.class, vertx, service, address);
+  @Override
+  public void start() throws Exception {
+    service = new ConsulServiceImpl(ConsulClient.create(vertx, config()));
+    String address = config().getString("address");
+    if (address == null) {
+      throw new IllegalStateException("address field must be specified in config for client verticle");
     }
+    messageConsumer = ProxyHelper.registerService(ConsulService.class, vertx, service, address);
+  }
 
-    @Override
-    public void stop() throws Exception {
-        if (messageConsumer != null) {
-            ProxyHelper.unregisterService(messageConsumer);
-        }
-        service.close();
+  @Override
+  public void stop() throws Exception {
+    if (messageConsumer != null) {
+      ProxyHelper.unregisterService(messageConsumer);
     }
+    service.close();
+  }
 }

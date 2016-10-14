@@ -8,10 +8,10 @@ import org.junit.BeforeClass;
  */
 public class ConsulClientTest extends ConsulTestSuite {
 
-    @BeforeClass
-    public static void initCreator() {
-        ConsulTestBase.clientCreator = ConsulClientImpl::new;
-        ConsulTestBase.clientCloser = ConsulClient::close;
-    }
+  @BeforeClass
+  public static void initCreator() {
+    ConsulTestBase.clientCreator = ConsulClientImpl::new;
+    ConsulTestBase.clientCloser = ConsulClient::close;
+  }
 
 }
