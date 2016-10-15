@@ -24,7 +24,7 @@ var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulService = io.vertx.ext.consul.ConsulService;
 var Event = io.vertx.ext.consul.Event;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
-var CheckInfo = io.vertx.ext.consul.CheckInfo;
+var Check = io.vertx.ext.consul.Check;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var KeyValue = io.vertx.ext.consul.KeyValue;
@@ -612,14 +612,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param check {Object} 
+   @param checkId {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.passCheck = function(check, resultHandler) {
+  this.passCheck = function(checkId, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["passCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["passCheck(java.lang.String,io.vertx.core.Handler)"](checkId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -633,14 +633,15 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param check {Object} 
+   @param checkId {string} 
+   @param note {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.warnCheck = function(check, resultHandler) {
+  this.passCheckWithNote = function(checkId, note, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["warnCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulService["passCheckWithNote(java.lang.String,java.lang.String,io.vertx.core.Handler)"](checkId, note, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -654,14 +655,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param check {Object} 
+   @param checkId {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.failCheck = function(check, resultHandler) {
+  this.warnCheck = function(checkId, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["failCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["warnCheck(java.lang.String,io.vertx.core.Handler)"](checkId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -675,14 +676,103 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param checkInfo {Object} 
+   @param checkId {string} 
+   @param note {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.updateCheck = function(checkInfo, resultHandler) {
+  this.warnCheckWithNote = function(checkId, note, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["updateCheck(io.vertx.ext.consul.CheckInfo,io.vertx.core.Handler)"](checkInfo != null ? new CheckInfo(new JsonObject(JSON.stringify(checkInfo))) : null, function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulService["warnCheckWithNote(java.lang.String,java.lang.String,io.vertx.core.Handler)"](checkId, note, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param checkId {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.failCheck = function(checkId, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
+      j_consulService["failCheck(java.lang.String,io.vertx.core.Handler)"](checkId, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param checkId {string} 
+   @param note {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.failCheckWithNote = function(checkId, note, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulService["failCheckWithNote(java.lang.String,java.lang.String,io.vertx.core.Handler)"](checkId, note, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param checkId {string} 
+   @param status {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.updateCheck = function(checkId, status, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulService["updateCheck(java.lang.String,io.vertx.ext.consul.CheckStatus,io.vertx.core.Handler)"](checkId, io.vertx.ext.consul.CheckStatus.valueOf(status), function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param checkId {string} 
+   @param status {Object} 
+   @param note {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.updateCheckWithNote = function(checkId, status, note, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'string' && typeof __args[3] === 'function') {
+      j_consulService["updateCheckWithNote(java.lang.String,io.vertx.ext.consul.CheckStatus,java.lang.String,io.vertx.core.Handler)"](checkId, io.vertx.ext.consul.CheckStatus.valueOf(status), note, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {

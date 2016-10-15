@@ -155,7 +155,7 @@ public interface ConsulClient {
   ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
 
   @Fluent
-  ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
+  ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler);
 
   @Fluent
   ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
@@ -164,16 +164,28 @@ public interface ConsulClient {
   ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
 
   @Fluent
-  ConsulClient passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   @Fluent
-  ConsulClient warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
   @Fluent
-  ConsulClient failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   @Fluent
-  ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
+
+  @Fluent
+  ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
+
+  @Fluent
+  ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
+
+  @Fluent
+  ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler);
+
+  @Fluent
+  ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Get the Raft leader for the datacenter in which the agent is running.

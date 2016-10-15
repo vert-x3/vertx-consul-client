@@ -2,10 +2,7 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
-import io.vertx.ext.consul.CheckInfo;
-import io.vertx.ext.consul.CheckOptions;
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.Utils;
+import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.io.File;
@@ -36,27 +33,27 @@ public abstract class ChecksBase extends ConsulTestBase {
       .setName("checkName");
     String checkId = createCheck(opts);
 
-    CheckInfo checkInfo;
+    Check check;
 
-    runAsync(h -> writeClient.warnCheck(new CheckOptions().setId(checkId).setNote("warn"), h));
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.warning, checkInfo.getStatus());
-    assertEquals("warn", checkInfo.getOutput());
+    runAsync(h -> writeClient.warnCheckWithNote(checkId, "warn", h));
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.WARNING, check.getStatus());
+    assertEquals("warn", check.getOutput());
 
-    runAsync(h -> writeClient.failCheck(new CheckOptions().setId(checkId).setNote("fail"), h));
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
-    assertEquals("fail", checkInfo.getOutput());
+    runAsync(h -> writeClient.failCheckWithNote(checkId, "fail", h));
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
+    assertEquals("fail", check.getOutput());
 
-    runAsync(h -> writeClient.passCheck(new CheckOptions().setId(checkId).setNote("pass"), h));
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
-    assertEquals("pass", checkInfo.getOutput());
+    runAsync(h -> writeClient.passCheckWithNote(checkId, "pass", h));
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.PASSING, check.getStatus());
+    assertEquals("pass", check.getOutput());
 
     sleep(vertx, 1500);
 
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
     runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
@@ -70,18 +67,18 @@ public abstract class ChecksBase extends ConsulTestBase {
     String checkId = createCheck(opts);
 
     sleep(vertx, 1500);
-    CheckInfo checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
+    Check check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.PASSING, check.getStatus());
 
-    reporter.setStatus(CheckInfo.Status.warning);
+    reporter.setStatus(CheckStatus.WARNING);
     sleep(vertx, 1500);
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.warning, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.WARNING, check.getStatus());
 
-    reporter.setStatus(CheckInfo.Status.critical);
+    reporter.setStatus(CheckStatus.CRITICAL);
     sleep(vertx, 1500);
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
     reporter.close();
 
@@ -97,13 +94,13 @@ public abstract class ChecksBase extends ConsulTestBase {
     String checkId = createCheck(opts);
 
     sleep(vertx, 1500);
-    CheckInfo checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
+    Check check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.PASSING, check.getStatus());
 
     reporter.close();
     sleep(vertx, 1500);
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
     runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
@@ -117,24 +114,24 @@ public abstract class ChecksBase extends ConsulTestBase {
     String checkId = createCheck(opts);
 
     sleep(vertx, 1500);
-    CheckInfo checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.passing, checkInfo.getStatus());
+    Check check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.PASSING, check.getStatus());
 
-    reporter.setStatus(CheckInfo.Status.warning);
+    reporter.setStatus(CheckStatus.WARNING);
     sleep(vertx, 1500);
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.warning, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.WARNING, check.getStatus());
 
-    reporter.setStatus(CheckInfo.Status.critical);
+    reporter.setStatus(CheckStatus.CRITICAL);
     sleep(vertx, 1500);
-    checkInfo = getCheckInfo(checkId);
-    assertEquals(CheckInfo.Status.critical, checkInfo.getStatus());
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
     runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
-  private CheckInfo getCheckInfo(String id) {
-    List<CheckInfo> checks = getAsync(h -> writeClient.localChecks(h));
+  private Check getCheckInfo(String id) {
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     return checks.stream()
       .filter(check -> check.getId().equals(id))
       .findFirst()
@@ -161,20 +158,20 @@ public abstract class ChecksBase extends ConsulTestBase {
       } catch (Exception e) {
         e.printStackTrace();
       }
-      setStatus(CheckInfo.Status.passing);
+      setStatus(CheckStatus.PASSING);
     }
 
     String scriptPath() {
       return scriptFile.getAbsolutePath();
     }
 
-    void setStatus(CheckInfo.Status status) {
+    void setStatus(CheckStatus status) {
       int statusCode;
       switch (status) {
-        case passing:
+        case PASSING:
           statusCode = 0;
           break;
-        case warning:
+        case WARNING:
           statusCode = 1;
           break;
         default:
@@ -196,7 +193,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     private final HttpServer server;
     private final int port;
 
-    private CheckInfo.Status status = CheckInfo.Status.passing;
+    private CheckStatus status = CheckStatus.PASSING;
 
     HttpHealthReporter(Vertx vertx) {
       this.port = getFreePort();
@@ -215,7 +212,7 @@ public abstract class ChecksBase extends ConsulTestBase {
       return port;
     }
 
-    void setStatus(CheckInfo.Status status) {
+    void setStatus(CheckStatus status) {
       this.status = status;
     }
 
@@ -223,11 +220,11 @@ public abstract class ChecksBase extends ConsulTestBase {
       server.close();
     }
 
-    private int statusCode(CheckInfo.Status status) {
+    private int statusCode(CheckStatus status) {
       switch (status) {
-        case passing:
+        case PASSING:
           return 200;
-        case warning:
+        case WARNING:
           return 429;
         default:
           return 500;

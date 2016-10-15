@@ -18,10 +18,11 @@ package io.vertx.rxjava.ext.consul;
 
 import java.util.Map;
 import rx.Observable;
+import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.Event;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.KeyValue;
@@ -325,13 +326,13 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) { 
+  public ConsulService localChecks(Handler<AsyncResult<List<Check>>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).localChecks(resultHandler);
     return this;
   }
 
-  public Observable<List<CheckInfo>> localChecksObservable() { 
-    io.vertx.rx.java.ObservableFuture<List<CheckInfo>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+  public Observable<List<Check>> localChecksObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Check>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     localChecks(resultHandler.toHandler());
     return resultHandler;
   }
@@ -358,47 +359,91 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).passCheck(check, resultHandler);
+  public ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).passCheck(checkId, resultHandler);
     return this;
   }
 
-  public Observable<Void> passCheckObservable(CheckOptions check) { 
+  public Observable<Void> passCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    passCheck(check, resultHandler.toHandler());
+    passCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).warnCheck(check, resultHandler);
+  public ConsulService passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
-  public Observable<Void> warnCheckObservable(CheckOptions check) { 
+  public Observable<Void> passCheckWithNoteObservable(String checkId, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    warnCheck(check, resultHandler.toHandler());
+    passCheckWithNote(checkId, note, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).failCheck(check, resultHandler);
+  public ConsulService warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).warnCheck(checkId, resultHandler);
     return this;
   }
 
-  public Observable<Void> failCheckObservable(CheckOptions check) { 
+  public Observable<Void> warnCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    failCheck(check, resultHandler.toHandler());
+    warnCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).updateCheck(checkInfo, resultHandler);
+  public ConsulService warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).warnCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
-  public Observable<Void> updateCheckObservable(CheckInfo checkInfo) { 
+  public Observable<Void> warnCheckWithNoteObservable(String checkId, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    updateCheck(checkInfo, resultHandler.toHandler());
+    warnCheckWithNote(checkId, note, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).failCheck(checkId, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> failCheckObservable(String checkId) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    failCheck(checkId, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).failCheckWithNote(checkId, note, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> failCheckWithNoteObservable(String checkId, String note) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    failCheckWithNote(checkId, note, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).updateCheck(checkId, status, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> updateCheckObservable(String checkId, CheckStatus status) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    updateCheck(checkId, status, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).updateCheckWithNote(checkId, status, note, resultHandler);
+    return this;
+  }
+
+  public Observable<Void> updateCheckWithNoteObservable(String checkId, CheckStatus status, String note) { 
+    io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    updateCheckWithNote(checkId, status, note, resultHandler.toHandler());
     return resultHandler;
   }
 

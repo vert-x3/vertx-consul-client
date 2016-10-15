@@ -4,7 +4,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 /**
- * Options used to put key/value pair to consul.
+ * Options used to put key/value pair to Consul.
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */

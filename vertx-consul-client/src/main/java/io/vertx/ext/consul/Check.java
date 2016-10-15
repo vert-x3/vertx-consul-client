@@ -7,11 +7,7 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
-public class CheckInfo {
-
-  public enum Status {
-    any, unknown, passing, warning, critical
-  }
+public class Check {
 
   private static final String SERVICE_ID_KEY = "ServiceID";
   private static final String SERVICE_NAME_KEY = "ServiceName";
@@ -23,22 +19,32 @@ public class CheckInfo {
 
   private String id;
   private String name;
-  private Status status;
+  private CheckStatus status;
   private String notes;
   private String output;
   private String serviceId;
   private String serviceName;
 
-  public CheckInfo(JsonObject jsonObject) {
-    this.id = jsonObject.getString(ID_KEY);
-    this.name = jsonObject.getString(NAME_KEY);
-    this.status = Status.valueOf(jsonObject.getString(STATUS_KEY));
-    this.notes = jsonObject.getString(NOTES_KEY);
-    this.output = jsonObject.getString(OUTPUT_KEY);
-    this.serviceId = jsonObject.getString(SERVICE_ID_KEY);
-    this.serviceName = jsonObject.getString(SERVICE_NAME_KEY);
+  /**
+   * Constructor from JSON
+   *
+   * @param check the JSON
+   */
+  public Check(JsonObject check) {
+    this.id = check.getString(ID_KEY);
+    this.name = check.getString(NAME_KEY);
+    this.status = CheckStatus.of(check.getString(STATUS_KEY));
+    this.notes = check.getString(NOTES_KEY);
+    this.output = check.getString(OUTPUT_KEY);
+    this.serviceId = check.getString(SERVICE_ID_KEY);
+    this.serviceName = check.getString(SERVICE_NAME_KEY);
   }
 
+  /**
+   * Convert to JSON
+   *
+   * @return the JSON
+   */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
     if (id != null) {
@@ -48,7 +54,7 @@ public class CheckInfo {
       jsonObject.put(NAME_KEY, name);
     }
     if (status != null) {
-      jsonObject.put(STATUS_KEY, status.name());
+      jsonObject.put(STATUS_KEY, status.key);
     }
     if (notes != null) {
       jsonObject.put(NOTES_KEY, notes);
@@ -65,17 +71,6 @@ public class CheckInfo {
     return jsonObject;
   }
 
-  public JsonObject updateRequest() {
-    JsonObject jsonObject = new JsonObject();
-    if (status != null) {
-      jsonObject.put(STATUS_KEY, status.name());
-    }
-    if (output != null) {
-      jsonObject.put(OUTPUT_KEY, output);
-    }
-    return jsonObject;
-  }
-
   public String getId() {
     return id;
   }
@@ -84,7 +79,7 @@ public class CheckInfo {
     return name;
   }
 
-  public Status getStatus() {
+  public CheckStatus getStatus() {
     return status;
   }
 
@@ -102,40 +97,5 @@ public class CheckInfo {
 
   public String getServiceName() {
     return serviceName;
-  }
-
-  public CheckInfo setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public CheckInfo setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public CheckInfo setStatus(Status status) {
-    this.status = status;
-    return this;
-  }
-
-  public CheckInfo setNotes(String notes) {
-    this.notes = notes;
-    return this;
-  }
-
-  public CheckInfo setOutput(String output) {
-    this.output = output;
-    return this;
-  }
-
-  public CheckInfo setServiceId(String serviceId) {
-    this.serviceId = serviceId;
-    return this;
-  }
-
-  public CheckInfo setServiceName(String serviceName) {
-    this.serviceName = serviceName;
-    return this;
   }
 }

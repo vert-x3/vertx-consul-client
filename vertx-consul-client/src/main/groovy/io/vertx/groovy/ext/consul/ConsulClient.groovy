@@ -18,10 +18,11 @@ package io.vertx.groovy.ext.consul;
 import groovy.transform.CompileStatic
 import io.vertx.lang.groovy.InternalHelper
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.consul.CheckStatus
 import io.vertx.ext.consul.Event
 import io.vertx.groovy.core.Vertx
 import io.vertx.ext.consul.MaintenanceOptions
-import io.vertx.ext.consul.CheckInfo
+import io.vertx.ext.consul.Check
 import io.vertx.ext.consul.Service
 import io.vertx.ext.consul.CheckOptions
 import io.vertx.ext.consul.KeyValue
@@ -304,8 +305,8 @@ public class ConsulClient {
     return this;
   }
   public ConsulClient localChecks(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
-    delegate.localChecks(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.CheckInfo>>>() {
-      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.CheckInfo>> ar) {
+    delegate.localChecks(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Check>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Check>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
         } else {
@@ -323,20 +324,36 @@ public class ConsulClient {
     delegate.deregisterCheck(id, resultHandler);
     return this;
   }
-  public ConsulClient passCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.passCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
+  public ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.passCheck(checkId, resultHandler);
     return this;
   }
-  public ConsulClient warnCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.warnCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
+  public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
-  public ConsulClient failCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.failCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
+  public ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.warnCheck(checkId, resultHandler);
     return this;
   }
-  public ConsulClient updateCheck(Map<String, Object> checkInfo = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.updateCheck(checkInfo != null ? new io.vertx.ext.consul.CheckInfo(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkInfo)) : null, resultHandler);
+  public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.warnCheckWithNote(checkId, note, resultHandler);
+    return this;
+  }
+  public ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.failCheck(checkId, resultHandler);
+    return this;
+  }
+  public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.failCheckWithNote(checkId, note, resultHandler);
+    return this;
+  }
+  public ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.updateCheck(checkId, status, resultHandler);
+    return this;
+  }
+  public ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.updateCheckWithNote(checkId, status, note, resultHandler);
     return this;
   }
   /**

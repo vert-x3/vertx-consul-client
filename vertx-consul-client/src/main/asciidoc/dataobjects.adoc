@@ -17,8 +17,8 @@
 |[[type]]`type`|`link:enums.html#Type[Type]`|-
 |===
 
-[[CheckInfo]]
-== CheckInfo
+[[Check]]
+== Check
 
 ++++
 ++++
@@ -34,13 +34,14 @@
 |[[output]]`output`|`String`|-
 |[[serviceId]]`serviceId`|`String`|-
 |[[serviceName]]`serviceName`|`String`|-
-|[[status]]`status`|`link:enums.html#Status[Status]`|-
+|[[status]]`status`|`link:enums.html#CheckStatus[CheckStatus]`|-
 |===
 
 [[CheckOptions]]
 == CheckOptions
 
 ++++
+ Options used to register checks in Consul.
 ++++
 '''
 
@@ -48,9 +49,18 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[id]]`id`|`String`|-
-|[[name]]`name`|`String`|-
-|[[note]]`note`|`String`|-
+|[[id]]`id`|`String`|
++++
+Set check ID
++++
+|[[name]]`name`|`String`|
++++
+Set check name
++++
+|[[note]]`note`|`String`|
++++
+Set check note
++++
 |===
 
 [[Event]]
@@ -149,7 +159,7 @@ Set regular expression to filter by tag
 == KeyValueOptions
 
 ++++
- Options used to put key/value pair to consul.
+ Options used to put key/value pair to Consul.
 ++++
 '''
 

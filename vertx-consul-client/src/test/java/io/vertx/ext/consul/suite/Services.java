@@ -32,8 +32,8 @@ public class Services extends ChecksBase {
     assertEquals(s.getAddress(), "10.0.0.1");
     assertEquals(s.getPort(), 8080);
 
-    List<CheckInfo> checks = getAsync(h -> writeClient.localChecks(h));
-    CheckInfo c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    Check c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
     assertEquals(c.getId(), "service:serviceName");
 
     List<Service> nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
@@ -62,9 +62,9 @@ public class Services extends ChecksBase {
       .setCheckOptions(CheckOptions.ttl("1h"))
       .setPort(8080);
     runAsync(h -> writeClient.registerService(service, h));
-    runAsync(h -> writeClient.passCheck(new CheckOptions().setId("service:" + serviceId), h));
+    runAsync(h -> writeClient.passCheck("service:" + serviceId, h));
 
-    List<CheckInfo> checks = getAsync(h -> writeClient.localChecks(h));
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     assertEquals(1, checks.size());
 
     String reason = "reason!";
@@ -77,7 +77,7 @@ public class Services extends ChecksBase {
     // TODO undocumented (?) behavior
     checks = getAsync(h -> writeClient.localChecks(h));
     assertEquals(2, checks.size());
-    long cnt = checks.stream().filter(info -> info.getStatus() == CheckInfo.Status.critical).count();
+    long cnt = checks.stream().filter(info -> info.getStatus() == CheckStatus.CRITICAL).count();
     assertEquals(1, cnt);
     assertEquals(reason, checks.get(0).getNotes());
 

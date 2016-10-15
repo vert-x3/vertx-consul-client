@@ -150,7 +150,7 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+  public ConsulService localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     consulClient.localChecks(resultHandler);
     return this;
   }
@@ -168,26 +168,50 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.passCheck(check, resultHandler);
+  public ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.passCheck(checkId, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.warnCheck(check, resultHandler);
+  public ConsulService passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.failCheck(check, resultHandler);
+  public ConsulService warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.warnCheck(checkId, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.updateCheck(checkInfo, resultHandler);
+  public ConsulService warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.warnCheckWithNote(checkId, note, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.failCheck(checkId, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.failCheckWithNote(checkId, note, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.updateCheck(checkId, status, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.updateCheckWithNote(checkId, status, note, resultHandler);
     return this;
   }
 

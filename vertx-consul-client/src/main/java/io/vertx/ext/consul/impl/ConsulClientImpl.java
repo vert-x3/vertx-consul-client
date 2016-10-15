@@ -239,9 +239,9 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+  public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     request(HttpMethod.GET, "/v1/agent/checks", resultHandler, buffer -> buffer.toJsonObject().stream()
-      .map(obj -> new CheckInfo((JsonObject) obj.getValue()))
+      .map(obj -> new Check((JsonObject) obj.getValue()))
       .collect(Collectors.toList())).end();
     return this;
   }
@@ -281,30 +281,54 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    String query = check.getNote() == null ? null : "note=" + check.getNote();
-    request(HttpMethod.GET, "/v1/agent/check/pass/" + check.getId(), query, resultHandler).end();
+  public ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    return passCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    String query = note == null ? null : "note=" + note;
+    request(HttpMethod.GET, "/v1/agent/check/pass/" + checkId, query, resultHandler).end();
     return this;
   }
 
   @Override
-  public ConsulClient warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    String query = check.getNote() == null ? null : "note=" + check.getNote();
-    request(HttpMethod.GET, "/v1/agent/check/warn/" + check.getId(), query, resultHandler).end();
+  public ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    return warnCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    String query = note == null ? null : "note=" + note;
+    request(HttpMethod.GET, "/v1/agent/check/warn/" + checkId, query, resultHandler).end();
     return this;
   }
 
   @Override
-  public ConsulClient failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    String query = check.getNote() == null ? null : "note=" + check.getNote();
-    request(HttpMethod.GET, "/v1/agent/check/fail/" + check.getId(), query, resultHandler).end();
+  public ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    return failCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
+    String query = note == null ? null : "note=" + note;
+    request(HttpMethod.GET, "/v1/agent/check/fail/" + checkId, query, resultHandler).end();
     return this;
   }
 
   @Override
-  public ConsulClient updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/agent/check/update/" + checkInfo.getId(), resultHandler)
-      .end(checkInfo.updateRequest().encode());
+  public ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
+    return updateCheckWithNote(checkId, status, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) {
+    JsonObject put = new JsonObject().put("Status", status.key);
+    if (note != null) {
+      put.put("Output", note);
+    }
+    request(HttpMethod.PUT, "/v1/agent/check/update/" + checkId, resultHandler)
+      .end(put.encode());
     return this;
   }
 

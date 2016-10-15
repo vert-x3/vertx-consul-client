@@ -32,11 +32,12 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
@@ -532,7 +533,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler) {
+  public ConsulService localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -544,7 +545,7 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new CheckInfo(new JsonObject((Map) o)) : new CheckInfo((JsonObject) o)).collect(Collectors.toList())));
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Check(new JsonObject((Map) o)) : new Check((JsonObject) o)).collect(Collectors.toList())));
       }
     });
     return this;
@@ -588,13 +589,13 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("check", check == null ? null : check.toJson());
+    _json.put("checkId", checkId);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "passCheck");
     _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
@@ -607,13 +608,33 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("check", check == null ? null : check.toJson());
+    _json.put("checkId", checkId);
+    _json.put("note", note);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "passCheckWithNote");
+    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("checkId", checkId);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "warnCheck");
     _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
@@ -626,13 +647,33 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("check", check == null ? null : check.toJson());
+    _json.put("checkId", checkId);
+    _json.put("note", note);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "warnCheckWithNote");
+    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("checkId", checkId);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "failCheck");
     _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
@@ -645,15 +686,57 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
-  public ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler) {
+  public ConsulService failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("checkInfo", checkInfo == null ? null : checkInfo.toJson());
+    _json.put("checkId", checkId);
+    _json.put("note", note);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "failCheckWithNote");
+    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("checkId", checkId);
+    _json.put("status", status == null ? null : status.toString());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "updateCheck");
+    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("checkId", checkId);
+    _json.put("status", status == null ? null : status.toString());
+    _json.put("note", note);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "updateCheckWithNote");
     _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));

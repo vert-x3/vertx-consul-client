@@ -292,45 +292,91 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling deregister_check(id)"
     end
-    # @param [Hash] check 
+    # @param [String] checkId 
     # @yield 
     # @return [self]
-    def pass_check(check=nil)
-      if check.class == Hash && block_given?
-        @j_del.java_method(:passCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def pass_check(checkId=nil)
+      if checkId.class == String && block_given?
+        @j_del.java_method(:passCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling pass_check(check)"
+      raise ArgumentError, "Invalid arguments when calling pass_check(checkId)"
     end
-    # @param [Hash] check 
+    # @param [String] checkId 
+    # @param [String] note 
     # @yield 
     # @return [self]
-    def warn_check(check=nil)
-      if check.class == Hash && block_given?
-        @j_del.java_method(:warnCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def pass_check_with_note(checkId=nil,note=nil)
+      if checkId.class == String && note.class == String && block_given?
+        @j_del.java_method(:passCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling warn_check(check)"
+      raise ArgumentError, "Invalid arguments when calling pass_check_with_note(checkId,note)"
     end
-    # @param [Hash] check 
+    # @param [String] checkId 
     # @yield 
     # @return [self]
-    def fail_check(check=nil)
-      if check.class == Hash && block_given?
-        @j_del.java_method(:failCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def warn_check(checkId=nil)
+      if checkId.class == String && block_given?
+        @j_del.java_method(:warnCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fail_check(check)"
+      raise ArgumentError, "Invalid arguments when calling warn_check(checkId)"
     end
-    # @param [Hash] checkInfo 
+    # @param [String] checkId 
+    # @param [String] note 
     # @yield 
     # @return [self]
-    def update_check(checkInfo=nil)
-      if checkInfo.class == Hash && block_given?
-        @j_del.java_method(:updateCheck, [Java::IoVertxExtConsul::CheckInfo.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckInfo.new(::Vertx::Util::Utils.to_json_object(checkInfo)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def warn_check_with_note(checkId=nil,note=nil)
+      if checkId.class == String && note.class == String && block_given?
+        @j_del.java_method(:warnCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling update_check(checkInfo)"
+      raise ArgumentError, "Invalid arguments when calling warn_check_with_note(checkId,note)"
+    end
+    # @param [String] checkId 
+    # @yield 
+    # @return [self]
+    def fail_check(checkId=nil)
+      if checkId.class == String && block_given?
+        @j_del.java_method(:failCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fail_check(checkId)"
+    end
+    # @param [String] checkId 
+    # @param [String] note 
+    # @yield 
+    # @return [self]
+    def fail_check_with_note(checkId=nil,note=nil)
+      if checkId.class == String && note.class == String && block_given?
+        @j_del.java_method(:failCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling fail_check_with_note(checkId,note)"
+    end
+    # @param [String] checkId 
+    # @param [:PASSING,:WARNING,:CRITICAL] status 
+    # @yield 
+    # @return [self]
+    def update_check(checkId=nil,status=nil)
+      if checkId.class == String && status.class == Symbol && block_given?
+        @j_del.java_method(:updateCheck, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::CheckStatus.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,Java::IoVertxExtConsul::CheckStatus.valueOf(status),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling update_check(checkId,status)"
+    end
+    # @param [String] checkId 
+    # @param [:PASSING,:WARNING,:CRITICAL] status 
+    # @param [String] note 
+    # @yield 
+    # @return [self]
+    def update_check_with_note(checkId=nil,status=nil,note=nil)
+      if checkId.class == String && status.class == Symbol && note.class == String && block_given?
+        @j_del.java_method(:updateCheckWithNote, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::CheckStatus.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,Java::IoVertxExtConsul::CheckStatus.valueOf(status),note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling update_check_with_note(checkId,status,note)"
     end
     # @yield 
     # @return [self]

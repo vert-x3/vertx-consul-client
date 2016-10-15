@@ -123,7 +123,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService localChecks(Handler<AsyncResult<List<CheckInfo>>> resultHandler);
+  ConsulService localChecks(Handler<AsyncResult<List<Check>>> resultHandler);
 
   @Override
   @Fluent
@@ -135,19 +135,35 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService passCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService warnCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService failCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService updateCheck(CheckInfo checkInfo, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent

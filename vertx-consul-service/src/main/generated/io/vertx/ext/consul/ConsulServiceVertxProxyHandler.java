@@ -39,11 +39,12 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.CheckInfo;
+import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
@@ -362,7 +363,7 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(CheckInfo::toJson).collect(Collectors.toList())));
+              msg.reply(new JsonArray(res.result().stream().map(Check::toJson).collect(Collectors.toList())));
             }
          });
           break;
@@ -376,19 +377,35 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "passCheck": {
-          service.passCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
+          service.passCheck((java.lang.String)json.getValue("checkId"), createHandler(msg));
+          break;
+        }
+        case "passCheckWithNote": {
+          service.passCheckWithNote((java.lang.String)json.getValue("checkId"), (java.lang.String)json.getValue("note"), createHandler(msg));
           break;
         }
         case "warnCheck": {
-          service.warnCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
+          service.warnCheck((java.lang.String)json.getValue("checkId"), createHandler(msg));
+          break;
+        }
+        case "warnCheckWithNote": {
+          service.warnCheckWithNote((java.lang.String)json.getValue("checkId"), (java.lang.String)json.getValue("note"), createHandler(msg));
           break;
         }
         case "failCheck": {
-          service.failCheck(json.getJsonObject("check") == null ? null : new io.vertx.ext.consul.CheckOptions(json.getJsonObject("check")), createHandler(msg));
+          service.failCheck((java.lang.String)json.getValue("checkId"), createHandler(msg));
+          break;
+        }
+        case "failCheckWithNote": {
+          service.failCheckWithNote((java.lang.String)json.getValue("checkId"), (java.lang.String)json.getValue("note"), createHandler(msg));
           break;
         }
         case "updateCheck": {
-          service.updateCheck(json.getJsonObject("checkInfo") == null ? null : new io.vertx.ext.consul.CheckInfo(json.getJsonObject("checkInfo")), createHandler(msg));
+          service.updateCheck((java.lang.String)json.getValue("checkId"), json.getString("status") == null ? null : io.vertx.ext.consul.CheckStatus.valueOf(json.getString("status")), createHandler(msg));
+          break;
+        }
+        case "updateCheckWithNote": {
+          service.updateCheckWithNote((java.lang.String)json.getValue("checkId"), json.getString("status") == null ? null : io.vertx.ext.consul.CheckStatus.valueOf(json.getString("status")), (java.lang.String)json.getValue("note"), createHandler(msg));
           break;
         }
         case "leaderStatus": {
