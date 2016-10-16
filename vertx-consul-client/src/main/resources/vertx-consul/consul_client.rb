@@ -87,8 +87,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling put_value_with_options(key,value,options)"
     end
-    # @param [Hash] token 
-    # @yield 
+    #  Create new Acl token
+    # @param [Hash] token properties of the token
+    # @yield will be provided with ID of created token
     # @return [self]
     def create_acl_token(token=nil)
       if token.class == Hash && block_given?
@@ -97,8 +98,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling create_acl_token(token)"
     end
-    # @param [Hash] token 
-    # @yield 
+    #  Update Acl token
+    # @param [Hash] token properties of the token to be updated
+    # @yield will be provided with ID of updated
     # @return [self]
     def update_acl_token(token=nil)
       if token.class == Hash && block_given?
@@ -107,8 +109,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling update_acl_token(token)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Clone Acl token
+    # @param [String] id the ID of token to be cloned
+    # @yield will be provided with ID of cloned token
     # @return [self]
     def clone_acl_token(id=nil)
       if id.class == String && block_given?
@@ -117,7 +120,8 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling clone_acl_token(id)"
     end
-    # @yield 
+    #  Get list of Acl token
+    # @yield will be provided with list of tokens
     # @return [self]
     def list_acl_tokens
       if block_given?
@@ -126,8 +130,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling list_acl_tokens()"
     end
-    # @param [String] id 
-    # @yield 
+    #  Get info of Acl token
+    # @param [String] id the ID of token
+    # @yield will be provided with token
     # @return [self]
     def info_acl_token(id=nil)
       if id.class == String && block_given?
@@ -136,8 +141,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling info_acl_token(id)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Destroy Acl token
+    # @param [String] id the ID of token
+    # @yield will be called on complete
     # @return [self]
     def destroy_acl_token(id=nil)
       if id.class == String && block_given?

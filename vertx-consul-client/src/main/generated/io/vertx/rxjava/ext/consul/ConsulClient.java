@@ -134,66 +134,130 @@ public class ConsulClient {
     return resultHandler;
   }
 
+  /**
+   * Create new Acl token
+   * @param token properties of the token
+   * @param idHandler will be provided with ID of created token
+   * @return reference to this, for fluency
+   */
   public ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) { 
     delegate.createAclToken(token, idHandler);
     return this;
   }
 
+  /**
+   * Create new Acl token
+   * @param token properties of the token
+   * @return 
+   */
   public Observable<String> createAclTokenObservable(AclToken token) { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
     createAclToken(token, idHandler.toHandler());
     return idHandler;
   }
 
+  /**
+   * Update Acl token
+   * @param token properties of the token to be updated
+   * @param idHandler will be provided with ID of updated
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) { 
     delegate.updateAclToken(token, idHandler);
     return this;
   }
 
+  /**
+   * Update Acl token
+   * @param token properties of the token to be updated
+   * @return 
+   */
   public Observable<String> updateAclTokenObservable(AclToken token) { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
     updateAclToken(token, idHandler.toHandler());
     return idHandler;
   }
 
+  /**
+   * Clone Acl token
+   * @param id the ID of token to be cloned
+   * @param idHandler will be provided with ID of cloned token
+   * @return reference to this, for fluency
+   */
   public ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) { 
     delegate.cloneAclToken(id, idHandler);
     return this;
   }
 
+  /**
+   * Clone Acl token
+   * @param id the ID of token to be cloned
+   * @return 
+   */
   public Observable<String> cloneAclTokenObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<String> idHandler = io.vertx.rx.java.RxHelper.observableFuture();
     cloneAclToken(id, idHandler.toHandler());
     return idHandler;
   }
 
+  /**
+   * Get list of Acl token
+   * @param resultHandler will be provided with list of tokens
+   * @return reference to this, for fluency
+   */
   public ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) { 
     delegate.listAclTokens(resultHandler);
     return this;
   }
 
+  /**
+   * Get list of Acl token
+   * @return 
+   */
   public Observable<List<AclToken>> listAclTokensObservable() { 
     io.vertx.rx.java.ObservableFuture<List<AclToken>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     listAclTokens(resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Get info of Acl token
+   * @param id the ID of token
+   * @param tokenHandler will be provided with token
+   * @return reference to this, for fluency
+   */
   public ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) { 
     delegate.infoAclToken(id, tokenHandler);
     return this;
   }
 
+  /**
+   * Get info of Acl token
+   * @param id the ID of token
+   * @return 
+   */
   public Observable<AclToken> infoAclTokenObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<AclToken> tokenHandler = io.vertx.rx.java.RxHelper.observableFuture();
     infoAclToken(id, tokenHandler.toHandler());
     return tokenHandler;
   }
 
+  /**
+   * Destroy Acl token
+   * @param id the ID of token
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.destroyAclToken(id, resultHandler);
     return this;
   }
 
+  /**
+   * Destroy Acl token
+   * @param id the ID of token
+   * @return 
+   */
   public Observable<Void> destroyAclTokenObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     destroyAclToken(id, resultHandler.toHandler());

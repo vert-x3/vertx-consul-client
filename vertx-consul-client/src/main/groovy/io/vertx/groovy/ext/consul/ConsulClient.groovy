@@ -99,18 +99,41 @@ public class ConsulClient {
     delegate.putValueWithOptions(key, value, options != null ? new io.vertx.ext.consul.KeyValueOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, resultHandler);
     return this;
   }
+  /**
+   * Create new Acl token
+   * @param token properties of the token (see <a href="../../../../../../../cheatsheet/AclToken.html">AclToken</a>)
+   * @param idHandler will be provided with ID of created token
+   * @return reference to this, for fluency
+   */
   public ConsulClient createAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {
     delegate.createAclToken(token != null ? new io.vertx.ext.consul.AclToken(io.vertx.lang.groovy.InternalHelper.toJsonObject(token)) : null, idHandler);
     return this;
   }
+  /**
+   * Update Acl token
+   * @param token properties of the token to be updated (see <a href="../../../../../../../cheatsheet/AclToken.html">AclToken</a>)
+   * @param idHandler will be provided with ID of updated
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateAclToken(Map<String, Object> token = [:], Handler<AsyncResult<String>> idHandler) {
     delegate.updateAclToken(token != null ? new io.vertx.ext.consul.AclToken(io.vertx.lang.groovy.InternalHelper.toJsonObject(token)) : null, idHandler);
     return this;
   }
+  /**
+   * Clone Acl token
+   * @param id the ID of token to be cloned
+   * @param idHandler will be provided with ID of cloned token
+   * @return reference to this, for fluency
+   */
   public ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
     delegate.cloneAclToken(id, idHandler);
     return this;
   }
+  /**
+   * Get list of Acl token
+   * @param resultHandler will be provided with list of tokens
+   * @return reference to this, for fluency
+   */
   public ConsulClient listAclTokens(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.listAclTokens(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.AclToken>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.AclToken>> ar) {
@@ -123,6 +146,12 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Get info of Acl token
+   * @param id the ID of token
+   * @param tokenHandler will be provided with token
+   * @return reference to this, for fluency
+   */
   public ConsulClient infoAclToken(String id, Handler<AsyncResult<Map<String, Object>>> tokenHandler) {
     delegate.infoAclToken(id, tokenHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.AclToken>>() {
       public void handle(AsyncResult<io.vertx.ext.consul.AclToken> ar) {
@@ -135,6 +164,12 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Destroy Acl token
+   * @param id the ID of token
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
     delegate.destroyAclToken(id, resultHandler);
     return this;

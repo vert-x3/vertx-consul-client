@@ -47,21 +47,62 @@ public interface ConsulClient {
   @Fluent
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
+  /**
+   * Create new Acl token
+   *
+   * @param token properties of the token
+   * @param idHandler will be provided with ID of created token
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
+  /**
+   * Update Acl token
+   *
+   * @param token properties of the token to be updated
+   * @param idHandler  will be provided with ID of updated
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
+  /**
+   * Clone Acl token
+   *
+   * @param id the ID of token to be cloned
+   * @param idHandler will be provided with ID of cloned token
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
 
+  /**
+   * Get list of Acl token
+   *
+   * @param resultHandler will be provided with list of tokens
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
 
+  /**
+   * Get info of Acl token
+   *
+   * @param id the ID of token
+   * @param tokenHandler will be provided with token
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
+  /**
+   * Destroy Acl token
+   *
+   * @param id the ID of token
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 

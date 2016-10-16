@@ -4,29 +4,12 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 /**
+ * Holds properties of Acl token
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
 public class AclToken {
-
-  public enum Type {
-    CLIENT("client"),
-    MANAGEMENT("management");
-
-    public final String name;
-
-    public static Type of(String name) {
-      if (name == null) {
-        return null;
-      } else {
-        return CLIENT.name.equals(name) ? CLIENT : MANAGEMENT;
-      }
-    }
-
-    Type(String name) {
-      this.name = name;
-    }
-  }
 
   private static final String ID_KEY = "ID";
   private static final String NAME_KEY = "Name";
@@ -35,50 +18,44 @@ public class AclToken {
 
   private String id;
   private String name;
-  private Type type;
+  private AclTokenType type;
   private String rules;
 
+  /**
+   * Default constructor
+   */
   public AclToken() {
   }
 
-  public AclToken(JsonObject json) {
-    this.id = json.getString(ID_KEY);
-    this.name = json.getString(NAME_KEY);
-    this.type = Type.of(json.getString(TYPE_KEY));
-    this.rules = json.getString(RULES_KEY);
+  /**
+   * Copy constructor
+   *
+   * @param token the one to copy
+   */
+  public AclToken(AclToken token) {
+    this.id = token.id;
+    this.name = token.name;
+    this.type = token.type;
+    this.rules = token.rules;
   }
 
-  public String getId() {
-    return id;
+  /**
+   * Constructor from JSON
+   *
+   * @param token the JSON
+   */
+  public AclToken(JsonObject token) {
+    this.id = token.getString(ID_KEY);
+    this.name = token.getString(NAME_KEY);
+    this.type = AclTokenType.of(token.getString(TYPE_KEY));
+    this.rules = token.getString(RULES_KEY);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public Type getType() {
-    return type;
-  }
-
-  public String getRules() {
-    return rules;
-  }
-
-  public AclToken setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public AclToken setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public AclToken setRules(String rules) {
-    this.rules = rules;
-    return this;
-  }
-
+  /**
+   * Convert to JSON
+   *
+   * @return the JSON
+   */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
     if (id != null) {
@@ -88,11 +65,91 @@ public class AclToken {
       jsonObject.put(NAME_KEY, name);
     }
     if (type != null) {
-      jsonObject.put(TYPE_KEY, type);
+      jsonObject.put(TYPE_KEY, type.key);
     }
     if (rules != null) {
       jsonObject.put(RULES_KEY, rules);
     }
     return jsonObject;
+  }
+
+  /**
+   * Get ID of token
+   *
+   * @return ID of token
+   */
+  public String getId() {
+    return id;
+  }
+
+  /**
+   * Set ID of token
+   *
+   * @param id ID of token
+   * @return reference to this, for fluency
+   */
+  public AclToken setId(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Get name of token
+   *
+   * @return name of token
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Set name of token
+   *
+   * @param name name of token
+   * @return reference to this, for fluency
+   */
+  public AclToken setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Get type of token
+   *
+   * @return type of token
+   */
+  public AclTokenType getType() {
+    return type;
+  }
+
+  /**
+   * Set type of token
+   *
+   * @param type type of token
+   * @return reference to this, for fluency
+   */
+  public AclToken setType(AclTokenType type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * Get rules for token
+   *
+   * @return rules for token
+   */
+  public String getRules() {
+    return rules;
+  }
+
+  /**
+   * Set rules for token
+   *
+   * @param rules rules for token
+   * @return reference to this, for fluency
+   */
+  public AclToken setRules(String rules) {
+    this.rules = rules;
+    return this;
   }
 }

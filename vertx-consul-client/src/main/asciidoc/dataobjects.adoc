@@ -4,6 +4,7 @@
 == AclToken
 
 ++++
+ Holds properties of Acl token
 ++++
 '''
 
@@ -11,10 +12,22 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[id]]`id`|`String`|-
-|[[name]]`name`|`String`|-
-|[[rules]]`rules`|`String`|-
-|[[type]]`type`|`link:enums.html#Type[Type]`|-
+|[[id]]`id`|`String`|
++++
+Set ID of token
++++
+|[[name]]`name`|`String`|
++++
+Set name of token
++++
+|[[rules]]`rules`|`String`|
++++
+Set rules for token
++++
+|[[type]]`type`|`link:enums.html#AclTokenType[AclTokenType]`|
++++
+Set type of token
++++
 |===
 
 [[Check]]

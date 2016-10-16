@@ -1,6 +1,7 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.AclToken;
+import io.vertx.ext.consul.AclTokenType;
 import io.vertx.ext.consul.ConsulTestBase;
 import org.junit.Test;
 
@@ -13,6 +14,34 @@ import static io.vertx.ext.consul.Utils.runAsync;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class AclTokens extends ConsulTestBase {
+
+  @Test
+  public void serializeToken() {
+    AclToken src = new AclToken()
+      .setId("tokenId")
+      .setName("tokenName")
+      .setType(AclTokenType.MANAGEMENT)
+      .setRules("tokenRules");
+    AclToken restored = new AclToken(src.toJson());
+    assertEquals(src.getId(), restored.getId());
+    assertEquals(src.getName(), restored.getName());
+    assertEquals(src.getType(), restored.getType());
+    assertEquals(src.getRules(), restored.getRules());
+  }
+
+  @Test
+  public void copyToken() {
+    AclToken src = new AclToken()
+      .setId("tokenId")
+      .setName("tokenName")
+      .setType(AclTokenType.MANAGEMENT)
+      .setRules("tokenRules");
+    AclToken restored = new AclToken(src);
+    assertEquals(src.getId(), restored.getId());
+    assertEquals(src.getName(), restored.getName());
+    assertEquals(src.getType(), restored.getType());
+    assertEquals(src.getRules(), restored.getRules());
+  }
 
   @Test
   public void tokenLifecycle() {

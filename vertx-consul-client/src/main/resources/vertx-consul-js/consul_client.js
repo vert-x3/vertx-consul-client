@@ -175,11 +175,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Create new Acl token
 
    @public
-   @param token {Object} 
-   @param idHandler {function} 
-   @return {ConsulClient}
+   @param token {Object} properties of the token 
+   @param idHandler {function} will be provided with ID of created token 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.createAclToken = function(token, idHandler) {
     var __args = arguments;
@@ -196,11 +197,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Update Acl token
 
    @public
-   @param token {Object} 
-   @param idHandler {function} 
-   @return {ConsulClient}
+   @param token {Object} properties of the token to be updated 
+   @param idHandler {function} will be provided with ID of updated 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.updateAclToken = function(token, idHandler) {
     var __args = arguments;
@@ -217,11 +219,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Clone Acl token
 
    @public
-   @param id {string} 
-   @param idHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of token to be cloned 
+   @param idHandler {function} will be provided with ID of cloned token 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.cloneAclToken = function(id, idHandler) {
     var __args = arguments;
@@ -238,10 +241,11 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Get list of Acl token
 
    @public
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param resultHandler {function} will be provided with list of tokens 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.listAclTokens = function(resultHandler) {
     var __args = arguments;
@@ -258,11 +262,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Get info of Acl token
 
    @public
-   @param id {string} 
-   @param tokenHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of token 
+   @param tokenHandler {function} will be provided with token 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.infoAclToken = function(id, tokenHandler) {
     var __args = arguments;
@@ -279,11 +284,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Destroy Acl token
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of token 
+   @param resultHandler {function} will be called on complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.destroyAclToken = function(id, resultHandler) {
     var __args = arguments;
