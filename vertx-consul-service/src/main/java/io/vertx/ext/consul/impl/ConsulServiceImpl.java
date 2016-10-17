@@ -132,6 +132,12 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
+    consulClient.catalogServiceNodesWithTag(service, tag, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
     consulClient.catalogDatacenters(resultHandler);
     return this;

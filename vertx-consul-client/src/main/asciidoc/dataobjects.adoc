@@ -249,6 +249,7 @@ Get node wan address
 == Service
 
 ++++
+ Holds properties of service and node that its containing
 ++++
 '''
 
@@ -256,13 +257,34 @@ Get node wan address
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[address]]`address`|`String`|-
-|[[id]]`id`|`String`|-
-|[[name]]`name`|`String`|-
-|[[node]]`node`|`String`|-
-|[[nodeAddress]]`nodeAddress`|`String`|-
-|[[port]]`port`|`Number (int)`|-
-|[[tags]]`tags`|`Array of String`|-
+|[[address]]`address`|`String`|
++++
+Set service address
++++
+|[[id]]`id`|`String`|
++++
+Set ID of service
++++
+|[[name]]`name`|`String`|
++++
+Set service name
++++
+|[[node]]`node`|`String`|
++++
+Set node name
++++
+|[[nodeAddress]]`nodeAddress`|`String`|
++++
+Set node address
++++
+|[[port]]`port`|`Number (int)`|
++++
+Set service port
++++
+|[[tags]]`tags`|`Array of String`|
++++
+Set list of service tags
++++
 |===
 
 [[ServiceOptions]]

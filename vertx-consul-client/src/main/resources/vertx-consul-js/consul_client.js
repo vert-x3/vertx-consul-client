@@ -457,6 +457,29 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the nodes providing a service, filtered by tag
+
+   @public
+   @param service {string} name of service 
+   @param tag {string} service tag 
+   @param resultHandler {function} will be provided with list of nodes providing given service 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogServiceNodesWithTag = function(service, tag, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulClient["catalogServiceNodesWithTag(java.lang.String,java.lang.String,io.vertx.core.Handler)"](service, tag, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
    Return all the datacenters that are known by the Consul server
 
    @public

@@ -442,6 +442,26 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
     return this;
   }
 
+  public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("service", service);
+    _json.put("tag", tag);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "catalogServiceNodesWithTag");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Service(new JsonObject((Map) o)) : new Service((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
+  }
+
   public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));

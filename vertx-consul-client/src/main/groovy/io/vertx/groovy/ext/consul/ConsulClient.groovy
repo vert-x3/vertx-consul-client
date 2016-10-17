@@ -259,6 +259,25 @@ public class ConsulClient {
     return this;
   }
   /**
+   * Returns the nodes providing a service, filtered by tag
+   * @param service name of service
+   * @param tag service tag
+   * @param resultHandler will be provided with list of nodes providing given service
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.catalogServiceNodesWithTag(service, tag, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
    * Return all the datacenters that are known by the Consul server
    * @param resultHandler will be provided with list of datacenters
    * @return reference to this, for fluency

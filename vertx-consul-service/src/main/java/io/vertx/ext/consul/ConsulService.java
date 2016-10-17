@@ -103,6 +103,10 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler);
 
   @Override

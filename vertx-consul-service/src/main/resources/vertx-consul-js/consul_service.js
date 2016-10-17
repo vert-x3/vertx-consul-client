@@ -449,6 +449,28 @@ var ConsulService = function(j_val) {
   /**
 
    @public
+   @param service {string} 
+   @param tag {string} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.catalogServiceNodesWithTag = function(service, tag, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
+      j_consulService["catalogServiceNodesWithTag(java.lang.String,java.lang.String,io.vertx.core.Handler)"](service, tag, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
    @param resultHandler {function} 
    @return {ConsulService}
    */

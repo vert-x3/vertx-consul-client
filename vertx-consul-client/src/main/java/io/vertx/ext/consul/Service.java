@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Holds properties of service and node that its containing
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
@@ -29,20 +31,33 @@ public class Service {
   private String address;
   private int port;
 
+  /**
+   * Default constructor
+   */
   public Service() {
   }
 
-  public Service(JsonObject jsonObject) {
-    this.node = jsonObject.getString(NODE);
-    this.nodeAddress = jsonObject.getString(ADDRESS);
-    this.id = jsonObject.getString(SERVICE_ID);
-    this.name = jsonObject.getString(SERVICE_NAME);
-    JsonArray tagsArr = jsonObject.getJsonArray(SERVICE_TAGS);
+  /**
+   * Constructor from JSON
+   *
+   * @param service the JSON
+   */
+  public Service(JsonObject service) {
+    this.node = service.getString(NODE);
+    this.nodeAddress = service.getString(ADDRESS);
+    this.id = service.getString(SERVICE_ID);
+    this.name = service.getString(SERVICE_NAME);
+    JsonArray tagsArr = service.getJsonArray(SERVICE_TAGS);
     this.tags = tagsArr == null ? null : tagsArr.stream().map(obj -> (String) obj).collect(Collectors.toList());
-    this.address = jsonObject.getString(SERVICE_ADDRESS);
-    this.port = jsonObject.getInteger(SERVICE_PORT, 0);
+    this.address = service.getString(SERVICE_ADDRESS);
+    this.port = service.getInteger(SERVICE_PORT, 0);
   }
 
+  /**
+   * Convert to JSON
+   *
+   * @return the JSON
+   */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
     if (node != null) {
@@ -69,64 +84,140 @@ public class Service {
     return jsonObject;
   }
 
+  /**
+   * Get none name
+   * @return node name
+   */
   public String getNode() {
     return node;
   }
 
+  /**
+   * Set node name
+   *
+   * @param node node name
+   * @return reference to this, for fluency
+   */
   public Service setNode(String node) {
     this.node = node;
     return this;
   }
 
+  /**
+   * Get node address
+   *
+   * @return node address
+   */
   public String getNodeAddress() {
     return nodeAddress;
   }
 
+  /**
+   * Set node address
+   *
+   * @param nodeAddress node address
+   * @return reference to this, for fluency
+   */
   public Service setNodeAddress(String nodeAddress) {
     this.nodeAddress = nodeAddress;
     return this;
   }
 
+  /**
+   * Get ID of service
+   *
+   * @return ID of service
+   */
   public String getId() {
     return id;
   }
 
+  /**
+   * Set ID of service
+   *
+   * @param id ID of service
+   * @return reference to this, for fluency
+   */
   public Service setId(String id) {
     this.id = id;
     return this;
   }
 
+  /**
+   * Get service name
+   *
+   * @return service name
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * Set service name
+   *
+   * @param name service name
+   * @return reference to this, for fluency
+   */
   public Service setName(String name) {
     this.name = name;
     return this;
   }
 
+  /**
+   * Set list of service tags
+   *
+   * @return list of service tags
+   */
   public List<String> getTags() {
     return tags;
   }
 
+  /**
+   * Set list of service tags
+   *
+   * @param tags list of service tags
+   * @return reference to this, for fluency
+   */
   public Service setTags(List<String> tags) {
     this.tags = tags;
     return this;
   }
 
+  /**
+   * Get service address
+   *
+   * @return service address
+   */
   public String getAddress() {
     return address;
   }
 
+  /**
+   * Set service address
+   *
+   * @param address service address
+   * @return reference to this, for fluency
+   */
   public Service setAddress(String address) {
     this.address = address;
     return this;
   }
 
+  /**
+   * Get service port
+   *
+   * @return service port
+   */
   public int getPort() {
     return port;
   }
 
+  /**
+   * Set service port
+   *
+   * @param port service port
+   * @return reference to this, for fluency
+   */
   public Service setPort(int port) {
     this.port = port;
     return this;

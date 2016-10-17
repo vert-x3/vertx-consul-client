@@ -211,7 +211,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/catalog/service/" + service, resultHandler, buffer -> buffer.toJsonArray().stream()
+    return catalogServiceNodesWithTag(service, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
+    String query = tag == null ? null : "tag=" + tag;
+    request(HttpMethod.GET, "/v1/catalog/service/" + service, query, resultHandler, buffer -> buffer.toJsonArray().stream()
       .map(obj -> new Service((JsonObject) obj))
       .collect(Collectors.toList())).end();
     return this;

@@ -16,9 +16,30 @@ import static io.vertx.ext.consul.Utils.runAsync;
 public class Services extends ChecksBase {
 
   @Test
+  public void serializeService() {
+    Service src = new Service()
+      .setNode("node")
+      .setNodeAddress("nodeAddress")
+      .setId("id")
+      .setName("name")
+      .setTags(Arrays.asList("tag1", "tag2"))
+      .setAddress("address")
+      .setPort(48);
+    Service restored = new Service(src.toJson());
+    assertEquals(src.getNode(), restored.getNode());
+    assertEquals(src.getNodeAddress(), restored.getNodeAddress());
+    assertEquals(src.getId(), restored.getId());
+    assertEquals(src.getName(), restored.getName());
+    assertEquals(src.getTags(), restored.getTags());
+    assertEquals(src.getAddress(), restored.getAddress());
+    assertEquals(src.getPort(), restored.getPort());
+  }
+
+  @Test
   public void createLocalService() {
+    String serviceName = "serviceName";
     ServiceOptions service = new ServiceOptions()
-      .setName("serviceName")
+      .setName(serviceName)
       .setTags(Arrays.asList("tag1", "tag2"))
       .setCheckOptions(CheckOptions.ttl("10s"))
       .setAddress("10.0.0.1")
@@ -38,6 +59,12 @@ public class Services extends ChecksBase {
 
     List<Service> nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
     assertEquals(2, nodeServices.size());
+
+    List<Service> nodeServicesWithKnownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "tag1", h));
+    assertEquals(1, nodeServicesWithKnownTag.size());
+
+    List<Service> nodeServicesWithUnknownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "unknownTag", h));
+    assertEquals(0, nodeServicesWithUnknownTag.size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
   }

@@ -386,6 +386,30 @@ public class ConsulClient {
   }
 
   /**
+   * Returns the nodes providing a service, filtered by tag
+   * @param service name of service
+   * @param tag service tag
+   * @param resultHandler will be provided with list of nodes providing given service
+   * @return reference to this, for fluency
+   */
+  public ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    delegate.catalogServiceNodesWithTag(service, tag, resultHandler);
+    return this;
+  }
+
+  /**
+   * Returns the nodes providing a service, filtered by tag
+   * @param service name of service
+   * @param tag service tag
+   * @return 
+   */
+  public Observable<List<Service>> catalogServiceNodesWithTagObservable(String service, String tag) { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    catalogServiceNodesWithTag(service, tag, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  /**
    * Return all the datacenters that are known by the Consul server
    * @param resultHandler will be provided with list of datacenters
    * @return reference to this, for fluency

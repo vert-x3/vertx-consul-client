@@ -217,6 +217,17 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling catalog_service_nodes(service)"
     end
+    # @param [String] service 
+    # @param [String] tag 
+    # @yield 
+    # @return [self]
+    def catalog_service_nodes_with_tag(service=nil,tag=nil)
+      if service.class == String && tag.class == String && block_given?
+        @j_del.java_method(:catalogServiceNodesWithTag, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,tag,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes_with_tag(service,tag)"
+    end
     # @yield 
     # @return [self]
     def catalog_datacenters

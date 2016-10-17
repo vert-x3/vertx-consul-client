@@ -271,6 +271,17 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
+  public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogServiceNodesWithTag(service, tag, resultHandler);
+    return this;
+  }
+
+  public Observable<List<Service>> catalogServiceNodesWithTagObservable(String service, String tag) { 
+    io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    catalogServiceNodesWithTag(service, tag, resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).catalogDatacenters(resultHandler);
     return this;

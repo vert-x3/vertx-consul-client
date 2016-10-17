@@ -294,6 +294,20 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
+        case "catalogServiceNodesWithTag": {
+          service.catalogServiceNodesWithTag((java.lang.String)json.getValue("service"), (java.lang.String)json.getValue("tag"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Service::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
         case "catalogDatacenters": {
           service.catalogDatacenters(createListHandler(msg));
           break;

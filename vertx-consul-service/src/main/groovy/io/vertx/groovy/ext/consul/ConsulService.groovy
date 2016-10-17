@@ -196,6 +196,18 @@ public class ConsulService extends ConsulClient {
     } : null);
     return this;
   }
+  public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).catalogServiceNodesWithTag(service, tag, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).catalogDatacenters(resultHandler != null ? new Handler<AsyncResult<java.util.List<java.lang.String>>>() {
       public void handle(AsyncResult<java.util.List<java.lang.String>> ar) {
