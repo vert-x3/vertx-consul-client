@@ -31,11 +31,19 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent
   ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
   @Override
   @Fluent

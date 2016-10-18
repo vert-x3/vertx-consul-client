@@ -33,10 +33,16 @@ public interface ConsulClient {
   ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
   @Fluent
+  ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
+
+  @Fluent
   ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
 
   @Fluent
   ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+
+  @Fluent
+  ConsulClient getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
   @Fluent
   ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);

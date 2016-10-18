@@ -1,15 +1,14 @@
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.KeyValue;
-import io.vertx.ext.consul.KeyValueOptions;
-import io.vertx.ext.consul.Utils;
+import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.runAsync;
+import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -98,4 +97,26 @@ public class KVStore extends ConsulTestBase {
     runAsync(h -> writeClient.deleteValue("unknown", h));
   }
 
+  @Test
+  public void canGetValueBlocking() throws InterruptedException {
+    assertTrue(getAsync(h -> writeClient.putValue("foo/barBlock", "valueBlock1", h)));
+    KeyValue pair1 = getAsync(h -> readClient.getValue("foo/barBlock", h));
+    CountDownLatch latch = new CountDownLatch(2);
+    readClient.getValueBlocking(pair1.getKey(), new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
+      assertEquals(h.result().getValue(), "valueBlock2");
+      assertTrue(h.result().getModifyIndex() > pair1.getModifyIndex());
+      latch.countDown();
+    });
+    readClient.getValuesBlocking("foo/bar", new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
+      assertEquals(h.result().size(), 1);
+      assertTrue(h.result().get(0).getModifyIndex() > pair1.getModifyIndex());
+      latch.countDown();
+    });
+    sleep(vertx, 1000);
+    assertEquals(latch.getCount(), 2);
+    assertTrue(getAsync(h -> writeClient.putValue("foo/barBlock", "valueBlock2", h)));
+    awaitLatch(latch);
+
+    runAsync(h -> writeClient.deleteValue("foo/barBlock", h));
+  }
 }

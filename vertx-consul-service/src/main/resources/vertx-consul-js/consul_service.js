@@ -22,6 +22,7 @@ var ConsulClient = require('vertx-consul-js/consul_client');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulService = io.vertx.ext.consul.ConsulService;
+var BlockingQueryOptions = io.vertx.ext.consul.BlockingQueryOptions;
 var Event = io.vertx.ext.consul.Event;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
@@ -70,6 +71,28 @@ var ConsulService = function(j_val) {
 
    @public
    @param key {string} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.getValueBlocking = function(key, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulService["getValueBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param key {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
@@ -98,6 +121,28 @@ var ConsulService = function(j_val) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulService["getValues(java.lang.String,io.vertx.core.Handler)"](keyPrefix, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param keyPrefix {string} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.getValuesBlocking = function(keyPrefix, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulService["getValuesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

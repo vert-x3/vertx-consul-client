@@ -18,6 +18,7 @@ package io.vertx.rxjava.ext.consul;
 
 import java.util.Map;
 import rx.Observable;
+import io.vertx.ext.consul.BlockingQueryOptions;
 import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.Event;
 import io.vertx.rxjava.core.Vertx;
@@ -73,6 +74,17 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
+  public ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).getValueBlocking(key, options, resultHandler);
+    return this;
+  }
+
+  public Observable<KeyValue> getValueBlockingObservable(String key, BlockingQueryOptions options) { 
+    io.vertx.rx.java.ObservableFuture<KeyValue> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    getValueBlocking(key, options, resultHandler.toHandler());
+    return resultHandler;
+  }
+
   public ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) { 
     ((io.vertx.ext.consul.ConsulService) delegate).deleteValue(key, resultHandler);
     return this;
@@ -92,6 +104,17 @@ public class ConsulService extends ConsulClient {
   public Observable<List<KeyValue>> getValuesObservable(String keyPrefix) { 
     io.vertx.rx.java.ObservableFuture<List<KeyValue>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValues(keyPrefix, resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).getValuesBlocking(keyPrefix, options, resultHandler);
+    return this;
+  }
+
+  public Observable<List<KeyValue>> getValuesBlockingObservable(String keyPrefix, BlockingQueryOptions options) { 
+    io.vertx.rx.java.ObservableFuture<List<KeyValue>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    getValuesBlocking(keyPrefix, options, resultHandler.toHandler());
     return resultHandler;
   }
 

@@ -39,6 +39,7 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import io.vertx.ext.consul.BlockingQueryOptions;
 import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.ConsulService;
 import io.vertx.ext.consul.Event;
@@ -152,12 +153,40 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
+        case "getValueBlocking": {
+          service.getValueBlocking((java.lang.String)json.getValue("key"), json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.BlockingQueryOptions(json.getJsonObject("options")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
         case "deleteValue": {
           service.deleteValue((java.lang.String)json.getValue("key"), createHandler(msg));
           break;
         }
         case "getValues": {
           service.getValues((java.lang.String)json.getValue("keyPrefix"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(KeyValue::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "getValuesBlocking": {
+          service.getValuesBlocking((java.lang.String)json.getValue("keyPrefix"), json.getJsonObject("options") == null ? null : new io.vertx.ext.consul.BlockingQueryOptions(json.getJsonObject("options")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

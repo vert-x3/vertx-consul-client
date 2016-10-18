@@ -35,6 +35,17 @@ module VertxConsul
       raise ArgumentError, "Invalid arguments when calling get_value(key)"
     end
     # @param [String] key 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def get_value_blocking(key=nil,options=nil)
+      if key.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:getValueBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling get_value_blocking(key,options)"
+    end
+    # @param [String] key 
     # @yield 
     # @return [self]
     def delete_value(key=nil)
@@ -53,6 +64,17 @@ module VertxConsul
         return self
       end
       raise ArgumentError, "Invalid arguments when calling get_values(keyPrefix)"
+    end
+    # @param [String] keyPrefix 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def get_values_blocking(keyPrefix=nil,options=nil)
+      if keyPrefix.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:getValuesBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling get_values_blocking(keyPrefix,options)"
     end
     # @param [String] keyPrefix 
     # @yield 

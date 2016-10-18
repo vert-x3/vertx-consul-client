@@ -18,6 +18,7 @@ package io.vertx.groovy.ext.consul;
 import groovy.transform.CompileStatic
 import io.vertx.lang.groovy.InternalHelper
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.consul.BlockingQueryOptions
 import io.vertx.ext.consul.CheckStatus
 import io.vertx.ext.consul.Event
 import io.vertx.groovy.core.Vertx
@@ -68,12 +69,36 @@ public class ConsulService extends ConsulClient {
     } : null);
     return this;
   }
+  public ConsulService getValueBlocking(String key, Map<String, Object> options, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).getValueBlocking(key, options != null ? new io.vertx.ext.consul.BlockingQueryOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValue>>() {
+      public void handle(AsyncResult<io.vertx.ext.consul.KeyValue> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result()?.toJson())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
   public ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).deleteValue(key, resultHandler);
     return this;
   }
   public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).getValues(keyPrefix, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulService getValuesBlocking(String keyPrefix, Map<String, Object> options, Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).getValuesBlocking(keyPrefix, options != null ? new io.vertx.ext.consul.BlockingQueryOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(options)) : null, resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.KeyValue>> ar) {
         if (ar.succeeded()) {
           resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
