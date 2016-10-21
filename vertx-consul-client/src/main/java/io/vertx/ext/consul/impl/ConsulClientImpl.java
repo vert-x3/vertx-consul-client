@@ -10,9 +10,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -36,6 +34,22 @@ public class ConsulClientImpl implements ConsulClient {
     );
     aclToken = config.getString("acl_token");
     dc = config.getString("dc");
+  }
+
+  @Override
+  public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
+    request(HttpMethod.GET, "/v1/coordinate/nodes", resultHandler, (buffer, headers) ->
+      buffer.toJsonArray().stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())
+    ).end();
+    return this;
+  }
+
+  @Override
+  public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
+    request(HttpMethod.GET, "/v1/coordinate/datacenters", resultHandler, (buffer, headers) ->
+      buffer.toJsonArray().stream().map(obj -> new DcCoordinates((JsonObject) obj)).collect(Collectors.toList())
+    ).end();
+    return this;
   }
 
   @Override

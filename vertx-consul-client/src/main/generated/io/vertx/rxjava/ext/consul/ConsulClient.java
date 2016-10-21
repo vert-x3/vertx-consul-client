@@ -18,26 +18,28 @@ package io.vertx.rxjava.ext.consul;
 
 import java.util.Map;
 import rx.Observable;
-import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.Event;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
 import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.Coordinate;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.ext.consul.Node;
+import io.vertx.ext.consul.BlockingQueryOptions;
+import io.vertx.ext.consul.CheckStatus;
+import io.vertx.rxjava.core.Vertx;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.SessionOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.DcCoordinates;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
-import io.vertx.ext.consul.Node;
 
 /**
  * A Vert.x service used to interact with Consul.
@@ -67,6 +69,46 @@ public class ConsulClient {
   public static ConsulClient create(Vertx vertx, JsonObject config) { 
     ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create((io.vertx.core.Vertx)vertx.getDelegate(), config));
     return ret;
+  }
+
+  /**
+   * Returns the LAN network coordinates for all nodes in a given DC
+   * @param resultHandler will be provided with network coordinates of nodes in datacenter
+   * @return reference to this, for fluency
+   */
+  public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) { 
+    delegate.coordinateNodes(resultHandler);
+    return this;
+  }
+
+  /**
+   * Returns the LAN network coordinates for all nodes in a given DC
+   * @return 
+   */
+  public Observable<List<Coordinate>> coordinateNodesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Coordinate>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    coordinateNodes(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  /**
+   * Returns the WAN network coordinates for all Consul servers, organized by DCs
+   * @param resultHandler will be provided with network coordinates for all Consul servers
+   * @return reference to this, for fluency
+   */
+  public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) { 
+    delegate.coordinateDatacenters(resultHandler);
+    return this;
+  }
+
+  /**
+   * Returns the WAN network coordinates for all Consul servers, organized by DCs
+   * @return 
+   */
+  public Observable<List<DcCoordinates>> coordinateDatacentersObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<DcCoordinates>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    coordinateDatacenters(resultHandler.toHandler());
+    return resultHandler;
   }
 
   public ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) { 

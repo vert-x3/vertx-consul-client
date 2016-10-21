@@ -18,6 +18,18 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
+    consulClient.coordinateNodes(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
+    consulClient.coordinateDatacenters(resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {
     consulClient.getValue(key, resultHandler);
     return this;

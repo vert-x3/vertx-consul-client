@@ -100,6 +100,50 @@ Set check note
 +++
 |===
 
+[[Coordinate]]
+== Coordinate
+
+++++
+ Holds network coordinates of node
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[adj]]`adj`|`Number (float)`|-
+|[[err]]`err`|`Number (float)`|-
+|[[height]]`height`|`Number (float)`|-
+|[[node]]`node`|`String`|
++++
+Get name of node
++++
+|[[vec]]`vec`|`Array of Number (Float)`|-
+|===
+
+[[DcCoordinates]]
+== DcCoordinates
+
+++++
+ Holds coordinates of servers in datacenter
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[datacenter]]`datacenter`|`String`|
++++
+Get datacenter
++++
+|[[servers]]`servers`|`Array of link:dataobjects.html#Coordinate[Coordinate]`|
++++
+Get list of servers in datacenter
++++
+|===
+
 [[Event]]
 == Event
 

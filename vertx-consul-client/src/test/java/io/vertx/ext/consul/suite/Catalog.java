@@ -17,16 +17,16 @@ public class Catalog extends ConsulTestBase {
   @Test
   public void datacenters() {
     List<String> datacenters = getAsync(h -> readClient.catalogDatacenters(h));
-    assertEquals(1, datacenters.size());
-    assertEquals(dc, datacenters.get(0));
+    assertEquals(datacenters.size(), 1);
+    assertEquals(datacenters.get(0), dc);
   }
 
   @Test
   public void nodes() {
     List<Node> nodes = getAsync(h -> readClient.catalogNodes(h));
-    assertEquals(3, nodes.size());
-    Optional<Node> node = nodes.stream().filter(n -> n.getNode().equals(nodeName)).findFirst();
-    assertTrue(node.isPresent());
+    assertEquals(nodes.size(), 1);
+    Node node = nodes.get(0);
+    assertEquals(node.getNode(), nodeName);
   }
 
 }

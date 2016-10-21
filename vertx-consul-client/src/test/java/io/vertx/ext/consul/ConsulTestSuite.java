@@ -14,6 +14,7 @@ import org.junit.runners.Suite;
   AclTokens.class,
   Catalog.class,
   Checks.class,
+  Coordinates.class,
   Events.class,
   KVStore.class,
   Services.class,

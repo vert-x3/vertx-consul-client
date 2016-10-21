@@ -28,11 +28,13 @@ var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
+var Coordinate = io.vertx.ext.consul.Coordinate;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
+var DcCoordinates = io.vertx.ext.consul.DcCoordinates;
 var Session = io.vertx.ext.consul.Session;
 var EventOptions = io.vertx.ext.consul.EventOptions;
 var Node = io.vertx.ext.consul.Node;
@@ -45,6 +47,46 @@ var ConsulService = function(j_val) {
   var j_consulService = j_val;
   var that = this;
   ConsulClient.call(this, j_val);
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.coordinateNodes = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["coordinateNodes(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.coordinateDatacenters = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["coordinateDatacenters(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
 
   /**
 

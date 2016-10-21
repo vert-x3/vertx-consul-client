@@ -18,26 +18,28 @@ package io.vertx.groovy.ext.consul;
 import groovy.transform.CompileStatic
 import io.vertx.lang.groovy.InternalHelper
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.CheckStatus
 import io.vertx.ext.consul.Event
-import io.vertx.groovy.core.Vertx
 import io.vertx.ext.consul.MaintenanceOptions
 import io.vertx.ext.consul.Check
 import io.vertx.ext.consul.Service
 import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.Coordinate
 import io.vertx.ext.consul.KeyValue
 import io.vertx.ext.consul.ServiceOptions
+import io.vertx.core.json.JsonObject
+import io.vertx.core.AsyncResult
+import io.vertx.ext.consul.Node
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.ext.consul.CheckStatus
+import io.vertx.groovy.core.Vertx
 import java.util.List
 import io.vertx.ext.consul.KeyValueOptions
 import io.vertx.ext.consul.AclToken
 import io.vertx.ext.consul.SessionOptions
-import io.vertx.core.json.JsonObject
-import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
+import io.vertx.ext.consul.DcCoordinates
 import io.vertx.ext.consul.Session
 import io.vertx.ext.consul.EventOptions
-import io.vertx.ext.consul.Node
 /**
  * A Vert.x service used to interact with Consul.
 */
@@ -59,6 +61,40 @@ public class ConsulClient {
   public static ConsulClient create(Vertx vertx, Map<String, Object> config) {
     def ret = InternalHelper.safeCreate(io.vertx.ext.consul.ConsulClient.create(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, config != null ? new io.vertx.core.json.JsonObject(config) : null), io.vertx.groovy.ext.consul.ConsulClient.class);
     return ret;
+  }
+  /**
+   * Returns the LAN network coordinates for all nodes in a given DC
+   * @param resultHandler will be provided with network coordinates of nodes in datacenter
+   * @return reference to this, for fluency
+   */
+  public ConsulClient coordinateNodes(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.coordinateNodes(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Coordinate>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Coordinate>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
+   * Returns the WAN network coordinates for all Consul servers, organized by DCs
+   * @param resultHandler will be provided with network coordinates for all Consul servers
+   * @return reference to this, for fluency
+   */
+  public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    delegate.coordinateDatacenters(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.DcCoordinates>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.DcCoordinates>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
   }
   public ConsulClient getValue(String key, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
     delegate.getValue(key, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValue>>() {

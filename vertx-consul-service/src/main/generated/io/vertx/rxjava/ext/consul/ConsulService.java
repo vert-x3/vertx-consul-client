@@ -18,25 +18,27 @@ package io.vertx.rxjava.ext.consul;
 
 import java.util.Map;
 import rx.Observable;
-import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.Event;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.ext.consul.MaintenanceOptions;
 import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.Coordinate;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.AsyncResult;
+import io.vertx.ext.consul.Node;
+import io.vertx.ext.consul.BlockingQueryOptions;
+import io.vertx.ext.consul.CheckStatus;
+import io.vertx.rxjava.core.Vertx;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.SessionOptions;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.DcCoordinates;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
-import io.vertx.ext.consul.Node;
 
 
 public class ConsulService extends ConsulClient {
@@ -61,6 +63,28 @@ public class ConsulService extends ConsulClient {
   public static ConsulService createEventBusProxy(Vertx vertx, String address) { 
     ConsulService ret = ConsulService.newInstance(io.vertx.ext.consul.ConsulService.createEventBusProxy((io.vertx.core.Vertx)vertx.getDelegate(), address));
     return ret;
+  }
+
+  public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).coordinateNodes(resultHandler);
+    return this;
+  }
+
+  public Observable<List<Coordinate>> coordinateNodesObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<Coordinate>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    coordinateNodes(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  public ConsulService coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).coordinateDatacenters(resultHandler);
+    return this;
+  }
+
+  public Observable<List<DcCoordinates>> coordinateDatacentersObservable() { 
+    io.vertx.rx.java.ObservableFuture<List<DcCoordinates>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    coordinateDatacenters(resultHandler.toHandler());
+    return resultHandler;
   }
 
   public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) { 

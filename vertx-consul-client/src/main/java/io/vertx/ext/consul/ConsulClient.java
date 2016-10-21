@@ -29,6 +29,24 @@ public interface ConsulClient {
     return new ConsulClientImpl(vertx, config);
   }
 
+  /**
+   * Returns the LAN network coordinates for all nodes in a given DC
+   *
+   * @param resultHandler will be provided with network coordinates of nodes in datacenter
+   * @return reference to this, for fluency
+   */
+  @Fluent
+  ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler);
+
+  /**
+   * Returns the WAN network coordinates for all Consul servers, organized by DCs
+   *
+   * @param resultHandler will be provided with network coordinates for all Consul servers
+   * @return reference to this, for fluency
+   */
+  @Fluent
+  ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
+
   @Fluent
   ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 

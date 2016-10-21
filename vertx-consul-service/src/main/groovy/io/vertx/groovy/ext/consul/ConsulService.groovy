@@ -18,25 +18,27 @@ package io.vertx.groovy.ext.consul;
 import groovy.transform.CompileStatic
 import io.vertx.lang.groovy.InternalHelper
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.CheckStatus
 import io.vertx.ext.consul.Event
-import io.vertx.groovy.core.Vertx
 import io.vertx.ext.consul.MaintenanceOptions
 import io.vertx.ext.consul.Check
 import io.vertx.ext.consul.Service
 import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.Coordinate
 import io.vertx.ext.consul.KeyValue
 import io.vertx.ext.consul.ServiceOptions
+import io.vertx.core.AsyncResult
+import io.vertx.ext.consul.Node
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.ext.consul.CheckStatus
+import io.vertx.groovy.core.Vertx
 import java.util.List
 import io.vertx.ext.consul.KeyValueOptions
 import io.vertx.ext.consul.AclToken
 import io.vertx.ext.consul.SessionOptions
-import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
+import io.vertx.ext.consul.DcCoordinates
 import io.vertx.ext.consul.Session
 import io.vertx.ext.consul.EventOptions
-import io.vertx.ext.consul.Node
 @CompileStatic
 public class ConsulService extends ConsulClient {
   private final def io.vertx.ext.consul.ConsulService delegate;
@@ -56,6 +58,30 @@ public class ConsulService extends ConsulClient {
   public static ConsulService createEventBusProxy(Vertx vertx, String address) {
     def ret = InternalHelper.safeCreate(io.vertx.ext.consul.ConsulService.createEventBusProxy(vertx != null ? (io.vertx.core.Vertx)vertx.getDelegate() : null, address), io.vertx.groovy.ext.consul.ConsulService.class);
     return ret;
+  }
+  public ConsulService coordinateNodes(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).coordinateNodes(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Coordinate>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Coordinate>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  public ConsulService coordinateDatacenters(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).coordinateDatacenters(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.DcCoordinates>>>() {
+      public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.DcCoordinates>> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((List)ar.result()?.collect({(Map<String, Object>)InternalHelper.wrapObject(it?.toJson())})));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
   }
   public ConsulService getValue(String key, Handler<AsyncResult<Map<String, Object>>> resultHandler) {
     ((io.vertx.ext.consul.ConsulService) delegate).getValue(key, resultHandler != null ? new Handler<AsyncResult<io.vertx.ext.consul.KeyValue>>() {

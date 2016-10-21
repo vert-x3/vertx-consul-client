@@ -32,27 +32,29 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import io.vertx.ext.consul.Event;
+import io.vertx.ext.consul.MaintenanceOptions;
+import io.vertx.ext.consul.Check;
+import io.vertx.ext.consul.Service;
+import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.Coordinate;
+import io.vertx.ext.consul.KeyValue;
+import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.AsyncResult;
+import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.BlockingQueryOptions;
 import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.ConsulService;
-import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
-import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Service;
-import io.vertx.ext.consul.CheckOptions;
-import io.vertx.ext.consul.KeyValue;
-import io.vertx.ext.consul.ServiceOptions;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.SessionOptions;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.DcCoordinates;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
-import io.vertx.ext.consul.Node;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -78,6 +80,42 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       this._vertx.eventBus().registerDefaultCodec(ServiceException.class,
           new ServiceExceptionMessageCodec());
     } catch (IllegalStateException ex) {}
+  }
+
+  public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "coordinateNodes");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new Coordinate(new JsonObject((Map) o)) : new Coordinate((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
+  }
+
+  public ConsulService coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "coordinateDatacenters");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new DcCoordinates(new JsonObject((Map) o)) : new DcCoordinates((JsonObject) o)).collect(Collectors.toList())));
+      }
+    });
+    return this;
   }
 
   public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {

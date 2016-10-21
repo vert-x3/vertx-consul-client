@@ -20,7 +20,7 @@ class ConsulCluster {
 
   private static final String MASTER_TOKEN = "topSecret";
   private static final String DC = "test-dc";
-  private static final String NODE_NAME[] = {"nodeName1", "nodeName2", "nodeName3"};
+  private static final String NODE_NAME = "nodeName";
 
   private static ConsulCluster instance;
 
@@ -36,13 +36,11 @@ class ConsulCluster {
   }
 
   static ConsulProcess consul() {
-    return instance().consul[0];
+    return instance().consul;
   }
 
   static void close() {
-    for (ConsulProcess consulProcess : instance().consul) {
-      consulProcess.close();
-    }
+    instance().consul.close();
   }
 
   static String dc() {
@@ -62,10 +60,10 @@ class ConsulCluster {
   }
 
   static String nodeName() {
-    return NODE_NAME[0];
+    return NODE_NAME;
   }
 
-  private ConsulProcess[] consul = new ConsulProcess[3];
+  private ConsulProcess consul;
   private String writeToken;
   private String readToken;
 
@@ -78,23 +76,18 @@ class ConsulCluster {
   }
 
   private void create() throws Exception {
-    for (int i = 0; i < 3; i++) {
-      JsonObject config = new JsonObject()
-        .put("server", true)
-        .put("datacenter", DC)
-        .put("node_name", NODE_NAME[i])
-        .put("acl_default_policy", "deny")
-        .put("acl_master_token", MASTER_TOKEN)
-        .put("acl_datacenter", DC);
-      if (i > 0) {
-        config.put("start_join", new JsonArray().add("127.0.0.1:" + consul[0].getSerfLanPort()));
-      }
-      consul[i] = ConsulStarterBuilder.consulStarter()
-        .withLogLevel(LogLevel.ERR)
-        .withCustomConfig(config.encode())
-        .build()
-        .start();
-    }
+    JsonObject config = new JsonObject()
+      .put("server", true)
+      .put("datacenter", DC)
+      .put("node_name", NODE_NAME)
+      .put("acl_default_policy", "deny")
+      .put("acl_master_token", MASTER_TOKEN)
+      .put("acl_datacenter", DC);
+    consul = ConsulStarterBuilder.consulStarter()
+      .withLogLevel(LogLevel.ERR)
+      .withCustomConfig(config.encode())
+      .build()
+      .start();
 
     CountDownLatch latch = new CountDownLatch(2);
     Vertx vertx = Vertx.vertx();
@@ -115,7 +108,7 @@ class ConsulCluster {
   }
 
   private void createToken(Vertx vertx, String rules, Handler<String> tokenHandler) {
-    HttpClientOptions httpClientOptions = new HttpClientOptions().setDefaultPort(consul[0].getHttpPort());
+    HttpClientOptions httpClientOptions = new HttpClientOptions().setDefaultPort(consul.getHttpPort());
     HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
     String rulesBody;
     try {

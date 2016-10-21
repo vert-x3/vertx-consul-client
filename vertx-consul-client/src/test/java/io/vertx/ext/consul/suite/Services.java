@@ -72,7 +72,7 @@ public class Services extends ChecksBase {
   @Test
   public void findConsul() {
     List<Service> localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
-    assertEquals(3, localConsulList.size());
+    assertEquals(localConsulList.size(), 1);
     List<Service> catalogConsulList = Utils.<List<Service>>getAsync(h -> writeClient.catalogServices(h))
       .stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
     assertEquals(1, catalogConsulList.size());

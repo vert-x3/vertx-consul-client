@@ -39,27 +39,29 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import io.vertx.ext.consul.Event;
+import io.vertx.ext.consul.MaintenanceOptions;
+import io.vertx.ext.consul.Check;
+import io.vertx.ext.consul.Service;
+import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.Coordinate;
+import io.vertx.ext.consul.KeyValue;
+import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.AsyncResult;
+import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.BlockingQueryOptions;
 import io.vertx.ext.consul.CheckStatus;
 import io.vertx.ext.consul.ConsulService;
-import io.vertx.ext.consul.Event;
 import io.vertx.core.Vertx;
-import io.vertx.ext.consul.MaintenanceOptions;
-import io.vertx.ext.consul.Check;
 import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Service;
-import io.vertx.ext.consul.CheckOptions;
-import io.vertx.ext.consul.KeyValue;
-import io.vertx.ext.consul.ServiceOptions;
 import java.util.List;
 import io.vertx.ext.consul.KeyValueOptions;
 import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.SessionOptions;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.ext.consul.DcCoordinates;
 import io.vertx.ext.consul.Session;
 import io.vertx.ext.consul.EventOptions;
-import io.vertx.ext.consul.Node;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -139,6 +141,34 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
+        case "coordinateNodes": {
+          service.coordinateNodes(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(Coordinate::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
+        case "coordinateDatacenters": {
+          service.coordinateDatacenters(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(DcCoordinates::toJson).collect(Collectors.toList())));
+            }
+         });
+          break;
+        }
         case "getValue": {
           service.getValue((java.lang.String)json.getValue("key"), res -> {
             if (res.failed()) {

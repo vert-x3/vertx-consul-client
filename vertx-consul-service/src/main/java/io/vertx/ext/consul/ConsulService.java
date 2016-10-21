@@ -27,6 +27,14 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
   @Override

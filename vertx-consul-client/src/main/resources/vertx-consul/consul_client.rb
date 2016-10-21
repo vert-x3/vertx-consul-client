@@ -24,6 +24,26 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling create(vertx,config)"
     end
+    #  Returns the LAN network coordinates for all nodes in a given DC
+    # @yield will be provided with network coordinates of nodes in datacenter
+    # @return [self]
+    def coordinate_nodes
+      if block_given?
+        @j_del.java_method(:coordinateNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling coordinate_nodes()"
+    end
+    #  Returns the WAN network coordinates for all Consul servers, organized by DCs
+    # @yield will be provided with network coordinates for all Consul servers
+    # @return [self]
+    def coordinate_datacenters
+      if block_given?
+        @j_del.java_method(:coordinateDatacenters, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling coordinate_datacenters()"
+    end
     # @param [String] key 
     # @yield 
     # @return [self]
