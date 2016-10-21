@@ -7,10 +7,10 @@
 - Consul System Status
 - User Events
 - Sessions
+- Network Coordinates
 
 ## TODO
 - features
-  - Network Coordinates
 - documentation
 - testing
 - examples
