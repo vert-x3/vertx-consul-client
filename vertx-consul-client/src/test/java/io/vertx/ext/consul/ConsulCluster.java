@@ -21,6 +21,7 @@ class ConsulCluster {
   private static final String MASTER_TOKEN = "topSecret";
   private static final String DC = "test-dc";
   private static final String NODE_NAME = "nodeName";
+  private static final String CONSUL_VERSION = "0.6.4";
 
   private static ConsulCluster instance;
 
@@ -85,6 +86,7 @@ class ConsulCluster {
       .put("acl_datacenter", DC);
     consul = ConsulStarterBuilder.consulStarter()
       .withLogLevel(LogLevel.ERR)
+      .withConsulVersion(CONSUL_VERSION)
       .withCustomConfig(config.encode())
       .build()
       .start();
