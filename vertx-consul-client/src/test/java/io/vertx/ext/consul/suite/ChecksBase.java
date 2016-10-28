@@ -202,7 +202,7 @@ public abstract class ChecksBase extends ConsulTestBase {
         .setStatusCode(statusCode(status))
         .end(status.name())).listen(port, h -> latch.countDown());
       try {
-        latch.await(1, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

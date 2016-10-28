@@ -37,7 +37,7 @@ public class Utils {
       latch.countDown();
     });
     try {
-      latch.await(1, TimeUnit.SECONDS);
+      latch.await(10, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
@@ -58,7 +58,7 @@ public class Utils {
       latch.countDown();
     });
     try {
-      latch.await(1, TimeUnit.SECONDS);
+      latch.await(10, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

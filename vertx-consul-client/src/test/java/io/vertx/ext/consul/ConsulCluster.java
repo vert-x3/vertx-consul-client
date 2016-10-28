@@ -101,7 +101,7 @@ class ConsulCluster {
       readToken = token;
       latch.countDown();
     });
-    latch.await(1, TimeUnit.SECONDS);
+    latch.await(10, TimeUnit.SECONDS);
     vertx.close();
 
     if (writeToken == null || readToken == null) {

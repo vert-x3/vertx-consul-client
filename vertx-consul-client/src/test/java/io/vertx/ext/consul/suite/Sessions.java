@@ -93,6 +93,6 @@ public class Sessions extends ConsulTestBase {
         testComplete();
       }
     });
-    await(1, TimeUnit.SECONDS);
+    await(10, TimeUnit.SECONDS);
   }
 }
