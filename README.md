@@ -1,6 +1,6 @@
-= Consul Client
+# Consul Client
 
-image:https://vertx.ci.cloudbees.com/buildStatus/icon?job=vert.x3-consul-client["Build Status",link="https://vertx.ci.cloudbees.com/view/vert.x-3/job/vert.x3-consul-client/"]
+![Build Status](https://vertx.ci.cloudbees.com/buildStatus/icon?job=vert.x3-consul-client)
 
 An asynchronous client for interacting with a Consul
 
