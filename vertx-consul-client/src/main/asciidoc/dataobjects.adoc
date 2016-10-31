@@ -272,6 +272,10 @@ Set session ID for lock release operation.
 == MaintenanceOptions
 
 ++++
+ Options used to placing a given service into "maintenance mode".
+ During maintenance mode, the service will be marked as unavailable
+ and will not be present in DNS or API queries. Maintenance mode is persistent
+ and will be automatically restored on agent restart.
 ++++
 '''
 
@@ -279,9 +283,20 @@ Set session ID for lock release operation.
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[enable]]`enable`|`Boolean`|-
-|[[id]]`id`|`String`|-
-|[[reason]]`reason`|`String`|-
+|[[enable]]`enable`|`Boolean`|
++++
+Set maintenance mode to enabled: <code>true</code> to enter maintenance mode or <code>false</code> to resume normal operation.
+ This flag is required.
++++
+|[[id]]`id`|`String`|
++++
+Set the ID of service. This field is required.
++++
+|[[reason]]`reason`|`String`|
++++
+Set the reason message. If provided, its value should be a text string explaining the reason for placing
+ the service into maintenance mode. This is simply to aid human operators.
++++
 |===
 
 [[Node]]

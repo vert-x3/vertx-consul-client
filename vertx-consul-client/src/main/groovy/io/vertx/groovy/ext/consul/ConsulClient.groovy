@@ -289,14 +289,33 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient registerService(Map<String, Object> service = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.registerService(service != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(service)) : null, resultHandler);
+  /**
+   * Adds a new service, with an optional health check, to the local agent.
+   * @param serviceOptions the options of new service (see <a href="../../../../../../../cheatsheet/ServiceOptions.html">ServiceOptions</a>)
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient registerService(Map<String, Object> serviceOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.registerService(serviceOptions != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(serviceOptions)) : null, resultHandler);
     return this;
   }
+  /**
+   * Places a given service into "maintenance mode"
+   * @param maintenanceOptions the maintenance options (see <a href="../../../../../../../cheatsheet/MaintenanceOptions.html">MaintenanceOptions</a>)
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient maintenanceService(Map<String, Object> maintenanceOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
     delegate.maintenanceService(maintenanceOptions != null ? new io.vertx.ext.consul.MaintenanceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(maintenanceOptions)) : null, resultHandler);
     return this;
   }
+  /**
+   * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+   * If there is an associated check, that is also deregistered.
+   * @param id the ID of service
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
     delegate.deregisterService(id, resultHandler);
     return this;

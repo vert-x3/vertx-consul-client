@@ -103,7 +103,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent

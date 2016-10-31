@@ -227,18 +227,20 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling list_events()"
     end
-    # @param [Hash] service 
-    # @yield 
+    #  Adds a new service, with an optional health check, to the local agent.
+    # @param [Hash] serviceOptions the options of new service
+    # @yield will be called when complete
     # @return [self]
-    def register_service(service=nil)
-      if service.class == Hash && block_given?
-        @j_del.java_method(:registerService, [Java::IoVertxExtConsul::ServiceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::ServiceOptions.new(::Vertx::Util::Utils.to_json_object(service)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def register_service(serviceOptions=nil)
+      if serviceOptions.class == Hash && block_given?
+        @j_del.java_method(:registerService, [Java::IoVertxExtConsul::ServiceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::ServiceOptions.new(::Vertx::Util::Utils.to_json_object(serviceOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling register_service(service)"
+      raise ArgumentError, "Invalid arguments when calling register_service(serviceOptions)"
     end
-    # @param [Hash] maintenanceOptions 
-    # @yield 
+    #  Places a given service into "maintenance mode"
+    # @param [Hash] maintenanceOptions the maintenance options
+    # @yield will be called when complete
     # @return [self]
     def maintenance_service(maintenanceOptions=nil)
       if maintenanceOptions.class == Hash && block_given?
@@ -247,8 +249,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling maintenance_service(maintenanceOptions)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+    #  If there is an associated check, that is also deregistered.
+    # @param [String] id the ID of service
+    # @yield will be called when complete
     # @return [self]
     def deregister_service(id=nil)
       if id.class == String && block_given?

@@ -461,16 +461,17 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Adds a new service, with an optional health check, to the local agent.
 
    @public
-   @param service {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param serviceOptions {Object} the options of new service 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
-  this.registerService = function(service, resultHandler) {
+  this.registerService = function(serviceOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](service != null ? new ServiceOptions(new JsonObject(JSON.stringify(service))) : null, function(ar) {
+      j_consulClient["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](serviceOptions != null ? new ServiceOptions(new JsonObject(JSON.stringify(serviceOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -482,11 +483,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Places a given service into "maintenance mode"
 
    @public
-   @param maintenanceOptions {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param maintenanceOptions {Object} the maintenance options 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.maintenanceService = function(maintenanceOptions, resultHandler) {
     var __args = arguments;
@@ -503,11 +505,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+   If there is an associated check, that is also deregistered.
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param id {string} the ID of service 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.deregisterService = function(id, resultHandler) {
     var __args = arguments;

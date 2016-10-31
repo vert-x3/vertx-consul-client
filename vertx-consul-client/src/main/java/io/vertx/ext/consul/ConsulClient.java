@@ -160,12 +160,36 @@ public interface ConsulClient {
   @Fluent
   ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
 
+  /**
+   * Adds a new service, with an optional health check, to the local agent.
+   *
+   * @param serviceOptions the options of new service
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see ServiceOptions
+   */
   @Fluent
-  ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Places a given service into "maintenance mode"
+   *
+   * @param maintenanceOptions the maintenance options
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see MaintenanceOptions
+   */
   @Fluent
   ConsulClient maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+   * If there is an associated check, that is also deregistered.
+   *
+   * @param id the ID of service
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 

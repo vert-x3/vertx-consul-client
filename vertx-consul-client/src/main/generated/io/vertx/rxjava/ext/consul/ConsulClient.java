@@ -395,33 +395,68 @@ public class ConsulClient {
     return resultHandler;
   }
 
-  public ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.registerService(service, resultHandler);
+  /**
+   * Adds a new service, with an optional health check, to the local agent.
+   * @param serviceOptions the options of new service
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.registerService(serviceOptions, resultHandler);
     return this;
   }
 
-  public Observable<Void> registerServiceObservable(ServiceOptions service) { 
+  /**
+   * Adds a new service, with an optional health check, to the local agent.
+   * @param serviceOptions the options of new service
+   * @return 
+   */
+  public Observable<Void> registerServiceObservable(ServiceOptions serviceOptions) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    registerService(service, resultHandler.toHandler());
+    registerService(serviceOptions, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Places a given service into "maintenance mode"
+   * @param maintenanceOptions the maintenance options
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.maintenanceService(maintenanceOptions, resultHandler);
     return this;
   }
 
+  /**
+   * Places a given service into "maintenance mode"
+   * @param maintenanceOptions the maintenance options
+   * @return 
+   */
   public Observable<Void> maintenanceServiceObservable(MaintenanceOptions maintenanceOptions) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     maintenanceService(maintenanceOptions, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+   * If there is an associated check, that is also deregistered.
+   * @param id the ID of service
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.deregisterService(id, resultHandler);
     return this;
   }
 
+  /**
+   * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
+   * If there is an associated check, that is also deregistered.
+   * @param id the ID of service
+   * @return 
+   */
   public Observable<Void> deregisterServiceObservable(String id) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     deregisterService(id, resultHandler.toHandler());

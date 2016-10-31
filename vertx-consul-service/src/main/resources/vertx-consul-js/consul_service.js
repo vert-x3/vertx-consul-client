@@ -452,14 +452,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param service {Object} 
+   @param serviceOptions {Object} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.registerService = function(service, resultHandler) {
+  this.registerService = function(serviceOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](service != null ? new ServiceOptions(new JsonObject(JSON.stringify(service))) : null, function(ar) {
+      j_consulService["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](serviceOptions != null ? new ServiceOptions(new JsonObject(JSON.stringify(serviceOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {

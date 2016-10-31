@@ -274,14 +274,14 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).registerService(service, resultHandler);
+  public ConsulService registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).registerService(serviceOptions, resultHandler);
     return this;
   }
 
-  public Observable<Void> registerServiceObservable(ServiceOptions service) { 
+  public Observable<Void> registerServiceObservable(ServiceOptions serviceOptions) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    registerService(service, resultHandler.toHandler());
+    registerService(serviceOptions, resultHandler.toHandler());
     return resultHandler;
   }
 

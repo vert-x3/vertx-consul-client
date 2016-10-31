@@ -132,8 +132,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.registerService(service, resultHandler);
+  public ConsulService registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.registerService(serviceOptions, resultHandler);
     return this;
   }
 

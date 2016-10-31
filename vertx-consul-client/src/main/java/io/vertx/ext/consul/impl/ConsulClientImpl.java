@@ -226,8 +226,8 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient registerService(ServiceOptions service, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(service.toJson().encode());
+  public ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) {
+    request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(serviceOptions.toJson().encode());
     return this;
   }
 

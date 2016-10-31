@@ -223,8 +223,8 @@ public class ConsulService extends ConsulClient {
     } : null);
     return this;
   }
-  public ConsulService registerService(Map<String, Object> service = [:], Handler<AsyncResult<Void>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).registerService(service != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(service)) : null, resultHandler);
+  public ConsulService registerService(Map<String, Object> serviceOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).registerService(serviceOptions != null ? new io.vertx.ext.consul.ServiceOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(serviceOptions)) : null, resultHandler);
     return this;
   }
   public ConsulService maintenanceService(Map<String, Object> maintenanceOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
