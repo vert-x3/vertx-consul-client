@@ -426,6 +426,11 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Returns list of services registered with the local agent.
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   */
   public ConsulClient localServices(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.localServices(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Service>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Service>> ar) {
@@ -438,6 +443,11 @@ public class ConsulClient {
     } : null);
     return this;
   }
+  /**
+   * Return all the checks that are registered with the local agent.
+   * @param resultHandler will be provided with list of checks
+   * @return reference to this, for fluency
+   */
   public ConsulClient localChecks(Handler<AsyncResult<List<Map<String, Object>>>> resultHandler) {
     delegate.localChecks(resultHandler != null ? new Handler<AsyncResult<java.util.List<io.vertx.ext.consul.Check>>>() {
       public void handle(AsyncResult<java.util.List<io.vertx.ext.consul.Check>> ar) {
@@ -450,42 +460,109 @@ public class ConsulClient {
     } : null);
     return this;
   }
-  public ConsulClient registerCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
-    delegate.registerCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
+  /**
+   * Add a new check to the local agent. The agent is responsible for managing the status of the check
+   * and keeping the Catalog in sync.
+   * @param checkOptions options used to register new check (see <a href="../../../../../../../cheatsheet/CheckOptions.html">CheckOptions</a>)
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient registerCheck(Map<String, Object> checkOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
+    delegate.registerCheck(checkOptions != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkOptions)) : null, resultHandler);
     return this;
   }
-  public ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    delegate.deregisterCheck(id, resultHandler);
+  /**
+   * Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    delegate.deregisterCheck(checkId, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     delegate.passCheck(checkId, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     delegate.passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     delegate.warnCheck(checkId, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     delegate.warnCheckWithNote(checkId, note, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     delegate.failCheck(checkId, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
     delegate.failCheckWithNote(checkId, note, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
     delegate.updateCheck(checkId, status, resultHandler);
     return this;
   }
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) {
     delegate.updateCheckWithNote(checkId, status, note, resultHandler);
     return this;

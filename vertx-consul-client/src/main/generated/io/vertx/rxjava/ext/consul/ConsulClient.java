@@ -591,132 +591,274 @@ public class ConsulClient {
     return resultHandler;
   }
 
+  /**
+   * Returns list of services registered with the local agent.
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   */
   public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
     delegate.localServices(resultHandler);
     return this;
   }
 
+  /**
+   * Returns list of services registered with the local agent.
+   * @return 
+   */
   public Observable<List<Service>> localServicesObservable() { 
     io.vertx.rx.java.ObservableFuture<List<Service>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     localServices(resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Return all the checks that are registered with the local agent.
+   * @param resultHandler will be provided with list of checks
+   * @return reference to this, for fluency
+   */
   public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) { 
     delegate.localChecks(resultHandler);
     return this;
   }
 
+  /**
+   * Return all the checks that are registered with the local agent.
+   * @return 
+   */
   public Observable<List<Check>> localChecksObservable() { 
     io.vertx.rx.java.ObservableFuture<List<Check>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     localChecks(resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.registerCheck(check, resultHandler);
+  /**
+   * Add a new check to the local agent. The agent is responsible for managing the status of the check
+   * and keeping the Catalog in sync.
+   * @param checkOptions options used to register new check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.registerCheck(checkOptions, resultHandler);
     return this;
   }
 
-  public Observable<Void> registerCheckObservable(CheckOptions check) { 
+  /**
+   * Add a new check to the local agent. The agent is responsible for managing the status of the check
+   * and keeping the Catalog in sync.
+   * @param checkOptions options used to register new check
+   * @return 
+   */
+  public Observable<Void> registerCheckObservable(CheckOptions checkOptions) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    registerCheck(check, resultHandler.toHandler());
+    registerCheck(checkOptions, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    delegate.deregisterCheck(id, resultHandler);
+  /**
+   * Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
+  public ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
+    delegate.deregisterCheck(checkId, resultHandler);
     return this;
   }
 
-  public Observable<Void> deregisterCheckObservable(String id) { 
+  /**
+   * Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
+   * @param checkId the ID of check
+   * @return 
+   */
+  public Observable<Void> deregisterCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    deregisterCheck(id, resultHandler.toHandler());
+    deregisterCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.passCheck(checkId, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @return 
+   */
   public Observable<Void> passCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     passCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @return 
+   */
   public Observable<Void> passCheckWithNoteObservable(String checkId, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     passCheckWithNote(checkId, note, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.warnCheck(checkId, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @return 
+   */
   public Observable<Void> warnCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     warnCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.warnCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @return 
+   */
   public Observable<Void> warnCheckWithNoteObservable(String checkId, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     warnCheckWithNote(checkId, note, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.failCheck(checkId, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @return 
+   */
   public Observable<Void> failCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     failCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.failCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param note a human-readable message with the status of the check
+   * @return 
+   */
   public Observable<Void> failCheckWithNoteObservable(String checkId, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     failCheckWithNote(checkId, note, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.updateCheck(checkId, status, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @return 
+   */
   public Observable<Void> updateCheckObservable(String checkId, CheckStatus status) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     updateCheck(checkId, status, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @param note a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.updateCheckWithNote(checkId, status, note, resultHandler);
     return this;
   }
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   * @param checkId the ID of check
+   * @param status new status of check
+   * @param note a human-readable message with the status of the check
+   * @return 
+   */
   public Observable<Void> updateCheckWithNoteObservable(String checkId, CheckStatus status, String note) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     updateCheckWithNote(checkId, status, note, resultHandler.toHandler());

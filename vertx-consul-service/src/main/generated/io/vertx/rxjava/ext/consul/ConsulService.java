@@ -395,25 +395,25 @@ public class ConsulService extends ConsulClient {
     return resultHandler;
   }
 
-  public ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).registerCheck(check, resultHandler);
+  public ConsulService registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).registerCheck(checkOptions, resultHandler);
     return this;
   }
 
-  public Observable<Void> registerCheckObservable(CheckOptions check) { 
+  public Observable<Void> registerCheckObservable(CheckOptions checkOptions) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    registerCheck(check, resultHandler.toHandler());
+    registerCheck(checkOptions, resultHandler.toHandler());
     return resultHandler;
   }
 
-  public ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).deregisterCheck(id, resultHandler);
+  public ConsulService deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).deregisterCheck(checkId, resultHandler);
     return this;
   }
 
-  public Observable<Void> deregisterCheckObservable(String id) { 
+  public Observable<Void> deregisterCheckObservable(String checkId) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
-    deregisterCheck(id, resultHandler.toHandler());
+    deregisterCheck(checkId, resultHandler.toHandler());
     return resultHandler;
   }
 

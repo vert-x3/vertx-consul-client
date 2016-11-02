@@ -679,14 +679,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param check {Object} 
+   @param checkOptions {Object} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.registerCheck = function(check, resultHandler) {
+  this.registerCheck = function(checkOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
+      j_consulService["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](checkOptions != null ? new CheckOptions(new JsonObject(JSON.stringify(checkOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -700,14 +700,14 @@ var ConsulService = function(j_val) {
   /**
 
    @public
-   @param id {string} 
+   @param checkId {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.deregisterCheck = function(id, resultHandler) {
+  this.deregisterCheck = function(checkId, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulService["deregisterCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      j_consulService["deregisterCheck(java.lang.String,io.vertx.core.Handler)"](checkId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {

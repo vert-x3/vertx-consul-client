@@ -658,10 +658,11 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns list of services registered with the local agent.
 
    @public
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.localServices = function(resultHandler) {
     var __args = arguments;
@@ -678,10 +679,11 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Return all the checks that are registered with the local agent.
 
    @public
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param resultHandler {function} will be provided with list of checks 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.localChecks = function(resultHandler) {
     var __args = arguments;
@@ -698,16 +700,18 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Add a new check to the local agent. The agent is responsible for managing the status of the check
+   and keeping the Catalog in sync.
 
    @public
-   @param check {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkOptions {Object} options used to register new check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
-  this.registerCheck = function(check, resultHandler) {
+  this.registerCheck = function(checkOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](check != null ? new CheckOptions(new JsonObject(JSON.stringify(check))) : null, function(ar) {
+      j_consulClient["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](checkOptions != null ? new CheckOptions(new JsonObject(JSON.stringify(checkOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -719,16 +723,17 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
 
    @public
-   @param id {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
-  this.deregisterCheck = function(id, resultHandler) {
+  this.deregisterCheck = function(checkId, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
-      j_consulClient["deregisterCheck(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
+      j_consulClient["deregisterCheck(java.lang.String,io.vertx.core.Handler)"](checkId, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -740,11 +745,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.passCheck = function(checkId, resultHandler) {
     var __args = arguments;
@@ -761,12 +767,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param note {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param note {string} a human-readable message with the status of the check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.passCheckWithNote = function(checkId, note, resultHandler) {
     var __args = arguments;
@@ -783,11 +790,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.warnCheck = function(checkId, resultHandler) {
     var __args = arguments;
@@ -804,12 +812,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param note {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param note {string} a human-readable message with the status of the check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.warnCheckWithNote = function(checkId, note, resultHandler) {
     var __args = arguments;
@@ -826,11 +835,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.failCheck = function(checkId, resultHandler) {
     var __args = arguments;
@@ -847,12 +857,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param note {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param note {string} a human-readable message with the status of the check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.failCheckWithNote = function(checkId, note, resultHandler) {
     var __args = arguments;
@@ -869,12 +880,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param status {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param status {Object} new status of check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.updateCheck = function(checkId, status, resultHandler) {
     var __args = arguments;
@@ -891,13 +903,14 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
 
    @public
-   @param checkId {string} 
-   @param status {Object} 
-   @param note {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param checkId {string} the ID of check 
+   @param status {Object} new status of check 
+   @param note {string} a human-readable message with the status of the check 
+   @param resultHandler {function} will be called when complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.updateCheckWithNote = function(checkId, status, note, resultHandler) {
     var __args = arguments;

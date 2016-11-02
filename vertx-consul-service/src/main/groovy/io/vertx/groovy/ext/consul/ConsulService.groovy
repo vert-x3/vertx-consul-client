@@ -331,12 +331,12 @@ public class ConsulService extends ConsulClient {
     } : null);
     return this;
   }
-  public ConsulService registerCheck(Map<String, Object> check = [:], Handler<AsyncResult<Void>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).registerCheck(check != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(check)) : null, resultHandler);
+  public ConsulService registerCheck(Map<String, Object> checkOptions = [:], Handler<AsyncResult<Void>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).registerCheck(checkOptions != null ? new io.vertx.ext.consul.CheckOptions(io.vertx.lang.groovy.InternalHelper.toJsonObject(checkOptions)) : null, resultHandler);
     return this;
   }
-  public ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    ((io.vertx.ext.consul.ConsulService) delegate).deregisterCheck(id, resultHandler);
+  public ConsulService deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    ((io.vertx.ext.consul.ConsulService) delegate).deregisterCheck(checkId, resultHandler);
     return this;
   }
   public ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {

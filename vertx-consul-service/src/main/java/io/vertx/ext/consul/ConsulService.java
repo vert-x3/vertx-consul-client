@@ -147,11 +147,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
   @Fluent

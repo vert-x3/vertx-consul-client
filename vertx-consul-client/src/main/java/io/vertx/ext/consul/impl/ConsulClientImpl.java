@@ -313,14 +313,14 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/check/register", resultHandler).end(check.toJson().encode());
+  public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
+    request(HttpMethod.GET, "/v1/agent/check/register", resultHandler).end(checkOptions.toJson().encode());
     return this;
   }
 
   @Override
-  public ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/check/deregister/" + id, resultHandler).end();
+  public ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    request(HttpMethod.GET, "/v1/agent/check/deregister/" + checkId, resultHandler).end();
     return this;
   }
 

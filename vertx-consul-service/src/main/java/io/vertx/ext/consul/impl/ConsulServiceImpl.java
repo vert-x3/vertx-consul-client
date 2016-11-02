@@ -186,14 +186,14 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.registerCheck(check, resultHandler);
+  public ConsulService registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.registerCheck(checkOptions, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.deregisterCheck(id, resultHandler);
+  public ConsulService deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.deregisterCheck(checkId, resultHandler);
     return this;
   }
 

@@ -323,25 +323,25 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling local_checks()"
     end
-    # @param [Hash] check 
+    # @param [Hash] checkOptions 
     # @yield 
     # @return [self]
-    def register_check(check=nil)
-      if check.class == Hash && block_given?
-        @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def register_check(checkOptions=nil)
+      if checkOptions.class == Hash && block_given?
+        @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(checkOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling register_check(check)"
+      raise ArgumentError, "Invalid arguments when calling register_check(checkOptions)"
     end
-    # @param [String] id 
+    # @param [String] checkId 
     # @yield 
     # @return [self]
-    def deregister_check(id=nil)
-      if id.class == String && block_given?
-        @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def deregister_check(checkId=nil)
+      if checkId.class == String && block_given?
+        @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling deregister_check(id)"
+      raise ArgumentError, "Invalid arguments when calling deregister_check(checkId)"
     end
     # @param [String] checkId 
     # @yield 

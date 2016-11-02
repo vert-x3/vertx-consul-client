@@ -74,7 +74,7 @@ public interface ConsulClient {
   /**
    * Create new Acl token
    *
-   * @param token properties of the token
+   * @param token     properties of the token
    * @param idHandler will be provided with ID of created token
    * @return reference to this, for fluency
    */
@@ -84,8 +84,8 @@ public interface ConsulClient {
   /**
    * Update Acl token
    *
-   * @param token properties of the token to be updated
-   * @param idHandler  will be provided with ID of updated
+   * @param token     properties of the token to be updated
+   * @param idHandler will be provided with ID of updated
    * @return reference to this, for fluency
    */
   @Fluent
@@ -94,7 +94,7 @@ public interface ConsulClient {
   /**
    * Clone Acl token
    *
-   * @param id the ID of token to be cloned
+   * @param id        the ID of token to be cloned
    * @param idHandler will be provided with ID of cloned token
    * @return reference to this, for fluency
    */
@@ -113,7 +113,7 @@ public interface ConsulClient {
   /**
    * Get info of Acl token
    *
-   * @param id the ID of token
+   * @param id           the ID of token
    * @param tokenHandler will be provided with token
    * @return reference to this, for fluency
    */
@@ -123,7 +123,7 @@ public interface ConsulClient {
   /**
    * Destroy Acl token
    *
-   * @param id the ID of token
+   * @param id            the ID of token
    * @param resultHandler will be called on complete
    * @return reference to this, for fluency
    */
@@ -164,7 +164,7 @@ public interface ConsulClient {
    * Adds a new service, with an optional health check, to the local agent.
    *
    * @param serviceOptions the options of new service
-   * @param resultHandler will be called when complete
+   * @param resultHandler  will be called when complete
    * @return reference to this, for fluency
    * @see ServiceOptions
    */
@@ -175,7 +175,7 @@ public interface ConsulClient {
    * Places a given service into "maintenance mode"
    *
    * @param maintenanceOptions the maintenance options
-   * @param resultHandler will be called when complete
+   * @param resultHandler      will be called when complete
    * @return reference to this, for fluency
    * @see MaintenanceOptions
    */
@@ -186,7 +186,7 @@ public interface ConsulClient {
    * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
    * If there is an associated check, that is also deregistered.
    *
-   * @param id the ID of service
+   * @param id            the ID of service
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    */
@@ -206,8 +206,8 @@ public interface ConsulClient {
   /**
    * Returns the nodes providing a service, filtered by tag
    *
-   * @param service name of service
-   * @param tag service tag
+   * @param service       name of service
+   * @param tag           service tag
    * @param resultHandler will be provided with list of nodes providing given service
    * @return reference to this, for fluency
    */
@@ -251,39 +251,134 @@ public interface ConsulClient {
   @Fluent
   ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler);
 
+  /**
+   * Returns list of services registered with the local agent.
+   *
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
 
+  /**
+   * Return all the checks that are registered with the local agent.
+   *
+   * @param resultHandler will be provided with list of checks
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler);
 
+  /**
+   * Add a new check to the local agent. The agent is responsible for managing the status of the check
+   * and keeping the Catalog in sync.
+   *
+   * @param checkOptions  options used to register new check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   @Fluent
-  ConsulClient registerCheck(CheckOptions check, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
+   *
+   * @param checkId       the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   @Fluent
-  ConsulClient deregisterCheck(String id, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param note          a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param note          a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param note          a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see CheckStatus
+   */
   @Fluent
   ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param status        new status of check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+   *
+   * @param checkId       the ID of check
+   * @param status        new status of check
+   * @param note          a human-readable message with the status of the check
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
 

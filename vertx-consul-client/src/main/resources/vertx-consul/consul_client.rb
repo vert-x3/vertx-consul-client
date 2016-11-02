@@ -325,7 +325,8 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling catalog_node_services(node)"
     end
-    # @yield 
+    #  Returns list of services registered with the local agent.
+    # @yield will be provided with list of services
     # @return [self]
     def local_services
       if block_given?
@@ -334,7 +335,8 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling local_services()"
     end
-    # @yield 
+    #  Return all the checks that are registered with the local agent.
+    # @yield will be provided with list of checks
     # @return [self]
     def local_checks
       if block_given?
@@ -343,28 +345,32 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling local_checks()"
     end
-    # @param [Hash] check 
-    # @yield 
+    #  Add a new check to the local agent. The agent is responsible for managing the status of the check
+    #  and keeping the Catalog in sync.
+    # @param [Hash] checkOptions options used to register new check
+    # @yield will be called when complete
     # @return [self]
-    def register_check(check=nil)
-      if check.class == Hash && block_given?
-        @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(check)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def register_check(checkOptions=nil)
+      if checkOptions.class == Hash && block_given?
+        @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(checkOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling register_check(check)"
+      raise ArgumentError, "Invalid arguments when calling register_check(checkOptions)"
     end
-    # @param [String] id 
-    # @yield 
+    #  Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
+    # @param [String] checkId the ID of check
+    # @yield will be called when complete
     # @return [self]
-    def deregister_check(id=nil)
-      if id.class == String && block_given?
-        @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
+    def deregister_check(checkId=nil)
+      if checkId.class == String && block_given?
+        @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling deregister_check(id)"
+      raise ArgumentError, "Invalid arguments when calling deregister_check(checkId)"
     end
-    # @param [String] checkId 
-    # @yield 
+    #  Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @yield will be called when complete
     # @return [self]
     def pass_check(checkId=nil)
       if checkId.class == String && block_given?
@@ -373,9 +379,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling pass_check(checkId)"
     end
-    # @param [String] checkId 
-    # @param [String] note 
-    # @yield 
+    #  Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @param [String] note a human-readable message with the status of the check
+    # @yield will be called when complete
     # @return [self]
     def pass_check_with_note(checkId=nil,note=nil)
       if checkId.class == String && note.class == String && block_given?
@@ -384,8 +391,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling pass_check_with_note(checkId,note)"
     end
-    # @param [String] checkId 
-    # @yield 
+    #  Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @yield will be called when complete
     # @return [self]
     def warn_check(checkId=nil)
       if checkId.class == String && block_given?
@@ -394,9 +402,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling warn_check(checkId)"
     end
-    # @param [String] checkId 
-    # @param [String] note 
-    # @yield 
+    #  Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @param [String] note a human-readable message with the status of the check
+    # @yield will be called when complete
     # @return [self]
     def warn_check_with_note(checkId=nil,note=nil)
       if checkId.class == String && note.class == String && block_given?
@@ -405,8 +414,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling warn_check_with_note(checkId,note)"
     end
-    # @param [String] checkId 
-    # @yield 
+    #  Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @yield will be called when complete
     # @return [self]
     def fail_check(checkId=nil)
       if checkId.class == String && block_given?
@@ -415,9 +425,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling fail_check(checkId)"
     end
-    # @param [String] checkId 
-    # @param [String] note 
-    # @yield 
+    #  Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @param [String] note a human-readable message with the status of the check
+    # @yield will be called when complete
     # @return [self]
     def fail_check_with_note(checkId=nil,note=nil)
       if checkId.class == String && note.class == String && block_given?
@@ -426,9 +437,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling fail_check_with_note(checkId,note)"
     end
-    # @param [String] checkId 
-    # @param [:PASSING,:WARNING,:CRITICAL] status 
-    # @yield 
+    #  Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @param [:PASSING,:WARNING,:CRITICAL] status new status of check
+    # @yield will be called when complete
     # @return [self]
     def update_check(checkId=nil,status=nil)
       if checkId.class == String && status.class == Symbol && block_given?
@@ -437,10 +449,11 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling update_check(checkId,status)"
     end
-    # @param [String] checkId 
-    # @param [:PASSING,:WARNING,:CRITICAL] status 
-    # @param [String] note 
-    # @yield 
+    #  Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
+    # @param [String] checkId the ID of check
+    # @param [:PASSING,:WARNING,:CRITICAL] status new status of check
+    # @param [String] note a human-readable message with the status of the check
+    # @yield will be called when complete
     # @return [self]
     def update_check_with_note(checkId=nil,status=nil,note=nil)
       if checkId.class == String && status.class == Symbol && note.class == String && block_given?
