@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 
 import java.util.List;
@@ -24,6 +25,10 @@ public interface ConsulService extends ConsulClient {
   static ConsulService createEventBusProxy(Vertx vertx, String address) {
     return ProxyHelper.createProxy(ConsulService.class, vertx, address);
   }
+
+  @Override
+  @Fluent
+  ConsulService agentInfo(Handler<AsyncResult<JsonObject>> resultHandler);
 
   @Override
   @Fluent

@@ -11,6 +11,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+  AgentInfo.class,
   AclTokens.class,
   Catalog.class,
   Checks.class,

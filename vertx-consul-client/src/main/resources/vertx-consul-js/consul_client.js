@@ -49,6 +49,27 @@ var ConsulClient = function(j_val) {
   var that = this;
 
   /**
+   Returns the configuration and member information of the local agent
+
+   @public
+   @param resultHandler {function} will be provided with the configuration and member information of the local agent 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.agentInfo = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulClient["agentInfo(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnJson(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
    Returns the LAN network coordinates for all nodes in a given DC
 
    @public

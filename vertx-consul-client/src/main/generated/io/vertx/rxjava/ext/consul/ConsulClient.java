@@ -72,6 +72,26 @@ public class ConsulClient {
   }
 
   /**
+   * Returns the configuration and member information of the local agent
+   * @param resultHandler will be provided with the configuration and member information of the local agent
+   * @return reference to this, for fluency
+   */
+  public ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.agentInfo(resultHandler);
+    return this;
+  }
+
+  /**
+   * Returns the configuration and member information of the local agent
+   * @return 
+   */
+  public Observable<JsonObject> agentInfoObservable() { 
+    io.vertx.rx.java.ObservableFuture<JsonObject> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    agentInfo(resultHandler.toHandler());
+    return resultHandler;
+  }
+
+  /**
    * Returns the LAN network coordinates for all nodes in a given DC
    * @param resultHandler will be provided with network coordinates of nodes in datacenter
    * @return reference to this, for fluency

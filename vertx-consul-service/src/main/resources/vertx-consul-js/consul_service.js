@@ -54,6 +54,26 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
+  this.agentInfo = function(resultHandler) {
+    var __args = arguments;
+    if (__args.length === 1 && typeof __args[0] === 'function') {
+      j_consulService["agentInfo(io.vertx.core.Handler)"](function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnJson(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
   this.coordinateNodes = function(resultHandler) {
     var __args = arguments;
     if (__args.length === 1 && typeof __args[0] === 'function') {

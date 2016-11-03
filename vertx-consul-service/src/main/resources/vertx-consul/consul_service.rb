@@ -27,6 +27,15 @@ module VertxConsul
     end
     # @yield 
     # @return [self]
+    def agent_info
+      if block_given?
+        @j_del.java_method(:agentInfo, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling agent_info()"
+    end
+    # @yield 
+    # @return [self]
     def coordinate_nodes
       if block_given?
         @j_del.java_method(:coordinateNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))

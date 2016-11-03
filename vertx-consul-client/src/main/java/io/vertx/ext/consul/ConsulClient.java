@@ -30,6 +30,15 @@ public interface ConsulClient {
   }
 
   /**
+   * Returns the configuration and member information of the local agent
+   *
+   * @param resultHandler will be provided with the configuration and member information of the local agent
+   * @return reference to this, for fluency
+   */
+  @Fluent
+  ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler);
+
+  /**
    * Returns the LAN network coordinates for all nodes in a given DC
    *
    * @param resultHandler will be provided with network coordinates of nodes in datacenter

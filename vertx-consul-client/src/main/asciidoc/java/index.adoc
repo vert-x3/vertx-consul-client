@@ -1,8 +1,7 @@
 = Vert.x Consul Client
 
-<p>
 == Creating a client
-<p>
+
 [source,java]
 ----
 ConsulClient client = ConsulClient.create(vertx, config);

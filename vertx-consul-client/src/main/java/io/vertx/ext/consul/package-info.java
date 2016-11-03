@@ -1,8 +1,8 @@
 /**
  * = Vert.x Consul Client
- * <p>
+ *
  * == Creating a client
- * <p>
+ *
  * [source,java]
  * ----
  * {@link examples.Examples#exampleCreateClient}

@@ -47,6 +47,7 @@ import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.Coordinate;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.BlockingQueryOptions;
@@ -141,6 +142,10 @@ public class ConsulServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
+        case "agentInfo": {
+          service.agentInfo(createHandler(msg));
+          break;
+        }
         case "coordinateNodes": {
           service.coordinateNodes(res -> {
             if (res.failed()) {

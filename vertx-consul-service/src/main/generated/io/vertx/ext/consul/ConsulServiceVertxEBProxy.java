@@ -40,6 +40,7 @@ import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.Coordinate;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.BlockingQueryOptions;
@@ -80,6 +81,24 @@ public class ConsulServiceVertxEBProxy implements ConsulService {
       this._vertx.eventBus().registerDefaultCodec(ServiceException.class,
           new ServiceExceptionMessageCodec());
     } catch (IllegalStateException ex) {}
+  }
+
+  public ConsulService agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return this;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "agentInfo");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+    return this;
   }
 
   public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {

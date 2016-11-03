@@ -1,8 +1,7 @@
 = Vert.x Consul Client
 
-<p>
 == Creating a client
-<p>
+
 [source,java]
 ----
 var ConsulClient = require("vertx-consul-js/consul_client");

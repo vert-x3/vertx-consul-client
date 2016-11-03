@@ -24,6 +24,16 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling create(vertx,config)"
     end
+    #  Returns the configuration and member information of the local agent
+    # @yield will be provided with the configuration and member information of the local agent
+    # @return [self]
+    def agent_info
+      if block_given?
+        @j_del.java_method(:agentInfo, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling agent_info()"
+    end
     #  Returns the LAN network coordinates for all nodes in a given DC
     # @yield will be provided with network coordinates of nodes in datacenter
     # @return [self]

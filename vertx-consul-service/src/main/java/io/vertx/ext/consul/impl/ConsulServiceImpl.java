@@ -2,6 +2,7 @@ package io.vertx.ext.consul.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
 import java.util.List;
@@ -15,6 +16,12 @@ public class ConsulServiceImpl implements ConsulService {
 
   public ConsulServiceImpl(ConsulClient consulClient) {
     this.consulClient = consulClient;
+  }
+
+  @Override
+  public ConsulService agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) {
+    consulClient.agentInfo(resultHandler);
+    return this;
   }
 
   @Override

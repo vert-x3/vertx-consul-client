@@ -26,6 +26,7 @@ import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.Coordinate;
 import io.vertx.ext.consul.KeyValue;
 import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.BlockingQueryOptions;
@@ -63,6 +64,17 @@ public class ConsulService extends ConsulClient {
   public static ConsulService createEventBusProxy(Vertx vertx, String address) { 
     ConsulService ret = ConsulService.newInstance(io.vertx.ext.consul.ConsulService.createEventBusProxy((io.vertx.core.Vertx)vertx.getDelegate(), address));
     return ret;
+  }
+
+  public ConsulService agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) { 
+    ((io.vertx.ext.consul.ConsulService) delegate).agentInfo(resultHandler);
+    return this;
+  }
+
+  public Observable<JsonObject> agentInfoObservable() { 
+    io.vertx.rx.java.ObservableFuture<JsonObject> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
+    agentInfo(resultHandler.toHandler());
+    return resultHandler;
   }
 
   public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) { 

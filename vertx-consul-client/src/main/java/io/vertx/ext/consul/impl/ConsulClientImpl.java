@@ -37,6 +37,12 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) {
+    request(HttpMethod.GET, "/v1/agent/self", resultHandler, (buffer, headers) -> buffer.toJsonObject()).end();
+    return this;
+  }
+
+  @Override
   public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
     request(HttpMethod.GET, "/v1/coordinate/nodes", resultHandler, (buffer, headers) ->
       buffer.toJsonArray().stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())

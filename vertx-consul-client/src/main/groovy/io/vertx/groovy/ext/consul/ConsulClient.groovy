@@ -63,6 +63,23 @@ public class ConsulClient {
     return ret;
   }
   /**
+   * Returns the configuration and member information of the local agent
+   * @param resultHandler will be provided with the configuration and member information of the local agent
+   * @return reference to this, for fluency
+   */
+  public ConsulClient agentInfo(Handler<AsyncResult<Map<String, Object>>> resultHandler) {
+    delegate.agentInfo(resultHandler != null ? new Handler<AsyncResult<io.vertx.core.json.JsonObject>>() {
+      public void handle(AsyncResult<io.vertx.core.json.JsonObject> ar) {
+        if (ar.succeeded()) {
+          resultHandler.handle(io.vertx.core.Future.succeededFuture((Map<String, Object>)InternalHelper.wrapObject(ar.result())));
+        } else {
+          resultHandler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
+        }
+      }
+    } : null);
+    return this;
+  }
+  /**
    * Returns the LAN network coordinates for all nodes in a given DC
    * @param resultHandler will be provided with network coordinates of nodes in datacenter
    * @return reference to this, for fluency
