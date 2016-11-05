@@ -4,7 +4,7 @@
 
 [source,java]
 ----
-import io.vertx.groovy.ext.consul.ConsulClient
+import io.vertx.ext.consul.ConsulClient
 
 def client = ConsulClient.create(vertx, config)
 

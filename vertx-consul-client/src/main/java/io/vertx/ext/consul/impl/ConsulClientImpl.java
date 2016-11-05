@@ -10,7 +10,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -38,22 +40,22 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/self", resultHandler, (buffer, headers) -> buffer.toJsonObject()).end();
+    requestObject(HttpMethod.GET, "/v1/agent/self", null, resultHandler, (obj, headers) -> obj).end();
     return this;
   }
 
   @Override
   public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/coordinate/nodes", resultHandler, (buffer, headers) ->
-      buffer.toJsonArray().stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())
+    requestArray(HttpMethod.GET, "/v1/coordinate/nodes", null, resultHandler, (arr, headers) ->
+      arr.stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())
     ).end();
     return this;
   }
 
   @Override
   public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/coordinate/datacenters", resultHandler, (buffer, headers) ->
-      buffer.toJsonArray().stream().map(obj -> new DcCoordinates((JsonObject) obj)).collect(Collectors.toList())
+    requestArray(HttpMethod.GET, "/v1/coordinate/datacenters", null, resultHandler, (arr, headers) ->
+      arr.stream().map(obj -> new DcCoordinates((JsonObject) obj)).collect(Collectors.toList())
     ).end();
     return this;
   }
@@ -65,29 +67,14 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
-    request(HttpMethod.GET, "/v1/kv/" + key, blockingQuery("", options), resultHandler, (buffer, headers) ->
-      KeyValue.parse(buffer.toJsonArray().getJsonObject(0))).end();
+    requestArray(HttpMethod.GET, "/v1/kv/" + key, new Query().put(options), resultHandler, (arr, headers) ->
+      KeyValue.parse(arr.getJsonObject(0))).end();
     return this;
-  }
-
-  private static String blockingQuery(String query, BlockingQueryOptions options) {
-    if (options != null) {
-      if (options.getIndex() > 0) {
-        query += "&index=" + options.getIndex();
-      }
-      if (options.getWait() != null) {
-        query += "&wait=" + options.getWait();
-      }
-      if (query.startsWith("&")) {
-        query = query.substring(1);
-      }
-    }
-    return query;
   }
 
   @Override
   public ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.DELETE, "/v1/kv/" + key, resultHandler).end();
+    requestVoid(HttpMethod.DELETE, "/v1/kv/" + key, null, resultHandler).end();
     return this;
   }
 
@@ -98,8 +85,9 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/kv/" + keyPrefix, blockingQuery("recurse", options), resultHandler, (buffer, headers) ->
-      buffer.toJsonArray().stream()
+    Query query = Query.of("recurse", true).put(options);
+    requestArray(HttpMethod.GET, "/v1/kv/" + keyPrefix, query, resultHandler, (arr, headers) ->
+      arr.stream()
         .map(obj -> KeyValue.parse((JsonObject) obj))
         .collect(Collectors.toList())).end();
     return this;
@@ -107,7 +95,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.DELETE, "/v1/kv/" + keyPrefix, "recurse", resultHandler).end();
+    requestVoid(HttpMethod.DELETE, "/v1/kv/" + keyPrefix, Query.of("recurse", true), resultHandler).end();
     return this;
   }
 
@@ -118,20 +106,14 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) {
-    String query = null;
+    Query query = new Query();
     if (options != null) {
-      query = "flags=" + Long.toUnsignedString(options.getFlags());
-      String acquireSession = options.getAcquireSession();
-      if (acquireSession != null) {
-        query += "&acquire=" + acquireSession;
-      }
-      String releaseSession = options.getReleaseSession();
-      if (releaseSession != null) {
-        query += "&release=" + releaseSession;
-      }
+      query.put("flags", Long.toUnsignedString(options.getFlags()))
+        .put("acquire", options.getAcquireSession())
+        .put("release", options.getReleaseSession());
       long cas = options.getCasIndex();
       if (cas >= 0) {
-        query += "&cas=" + cas;
+        query.put("cas", cas);
       }
     }
     request(HttpMethod.PUT, "/v1/kv/" + key, query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString())).end(value);
@@ -140,29 +122,29 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
-    request(HttpMethod.PUT, "/v1/acl/create", idHandler, (buffer, headers) ->
-      buffer.toJsonObject().getString("ID")).end(token.toJson().encode());
+    requestObject(HttpMethod.PUT, "/v1/acl/create", null, idHandler, (obj, headers) ->
+      obj.getString("ID")).end(token.toJson().encode());
     return this;
   }
 
   @Override
   public ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
-    request(HttpMethod.PUT, "/v1/acl/update", idHandler, (buffer, headers) ->
-      buffer.toJsonObject().getString("ID")).end(token.toJson().encode());
+    requestObject(HttpMethod.PUT, "/v1/acl/update", null, idHandler, (obj, headers) ->
+      obj.getString("ID")).end(token.toJson().encode());
     return this;
   }
 
   @Override
   public ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
-    request(HttpMethod.PUT, "/v1/acl/clone/" + id, idHandler, (buffer, headers) ->
-      buffer.toJsonObject().getString("ID")).end();
+    requestObject(HttpMethod.PUT, "/v1/acl/clone/" + id, null, idHandler, (obj, headers) ->
+      obj.getString("ID")).end();
     return this;
   }
 
   @Override
   public ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/acl/list", resultHandler, (buffer, headers) ->
-      buffer.toJsonArray().stream()
+    requestArray(HttpMethod.GET, "/v1/acl/list", null, resultHandler, (arr, headers) ->
+      arr.stream()
         .map(obj -> new AclToken((JsonObject) obj))
         .collect(Collectors.toList()))
       .end();
@@ -171,8 +153,8 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
-    request(HttpMethod.GET, "/v1/acl/info/" + id, tokenHandler, (buffer, headers) -> {
-      JsonObject jsonObject = buffer.toJsonArray().getJsonObject(0);
+    requestArray(HttpMethod.GET, "/v1/acl/info/" + id, null, tokenHandler, (arr, headers) -> {
+      JsonObject jsonObject = arr.getJsonObject(0);
       return new AclToken(jsonObject);
     }).end();
     return this;
@@ -180,7 +162,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/acl/destroy/" + id, resultHandler).end();
+    requestVoid(HttpMethod.PUT, "/v1/acl/destroy/" + id, null, resultHandler).end();
     return this;
   }
 
@@ -192,34 +174,19 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler) {
-    String query = "";
+    Query query = new Query();
     if (options != null) {
-      if (options.getNode() != null) {
-        query += "&node=" + options.getNode();
-      }
-      if (options.getService() != null) {
-        query += "&service=" + options.getService();
-      }
-      if (options.getTag() != null) {
-        query += "&tag=" + options.getTag();
-      }
-      if (!query.isEmpty()) {
-        query = query.substring(1);
-      }
+      query.put("node", options.getNode()).put("service", options.getService()).put("tag", options.getTag());
     }
-    request(HttpMethod.PUT, "/v1/event/fire/" + name, query, resultHandler, (buffer, headers) -> {
-      JsonObject jsonObject = buffer.toJsonObject();
-      return new Event(fixEventJson(jsonObject));
-    }).end(options == null || options.getPayload() == null ? "" : options.getPayload());
+    requestObject(HttpMethod.PUT, "/v1/event/fire/" + name, query, resultHandler, (jsonObject, headers) -> new Event(fixEventJson(jsonObject)))
+      .end(options == null || options.getPayload() == null ? "" : options.getPayload());
     return this;
   }
 
   @Override
   public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/event/list", resultHandler, (buffer, headers) -> {
-      JsonArray jsonArray = buffer.toJsonArray();
-      return jsonArray.stream().map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList());
-    }).end();
+    requestArray(HttpMethod.GET, "/v1/event/list", null, resultHandler, (jsonArray, headers) -> jsonArray.stream()
+      .map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList())).end();
     return this;
   }
 
@@ -233,23 +200,20 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/agent/service/register", resultHandler).end(serviceOptions.toJson().encode());
+    requestVoid(HttpMethod.PUT, "/v1/agent/service/register", null, resultHandler).end(serviceOptions.toJson().encode());
     return this;
   }
 
   @Override
   public ConsulClient maintenanceService(MaintenanceOptions opts, Handler<AsyncResult<Void>> resultHandler) {
-    String query = "enable=" + opts.isEnable();
-    if (opts.getReason() != null) {
-      query += "&reason=" + opts.getReason();
-    }
-    request(HttpMethod.PUT, "/v1/agent/service/maintenance/" + opts.getId(), query, resultHandler).end();
+    Query query = Query.of("enable", opts.isEnable()).put("reason", opts.getReason());
+    requestVoid(HttpMethod.PUT, "/v1/agent/service/maintenance/" + opts.getId(), query, resultHandler).end();
     return this;
   }
 
   @Override
   public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/service/deregister/" + id, resultHandler).end();
+    requestVoid(HttpMethod.GET, "/v1/agent/service/deregister/" + id, null, resultHandler).end();
     return this;
   }
 
@@ -260,8 +224,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
-    String query = tag == null ? null : "tag=" + tag;
-    request(HttpMethod.GET, "/v1/catalog/service/" + service, query, resultHandler, (buffer, headers) -> buffer.toJsonArray().stream()
+    requestArray(HttpMethod.GET, "/v1/catalog/service/" + service, Query.of("tag", tag), resultHandler, (arr, headers) -> arr.stream()
       .map(obj -> new Service((JsonObject) obj))
       .collect(Collectors.toList())).end();
     return this;
@@ -269,13 +232,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/catalog/datacenters", resultHandler, (buffer, headers) -> buffer.toJsonArray().getList()).end();
+    requestArray(HttpMethod.GET, "/v1/catalog/datacenters", null, resultHandler, (arr, headers) -> arr.getList()).end();
     return this;
   }
 
   @Override
   public ConsulClient catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/catalog/nodes", resultHandler, (buffer, headers) -> buffer.toJsonArray().stream()
+    requestArray(HttpMethod.GET, "/v1/catalog/nodes", null, resultHandler, (arr, headers) -> arr.stream()
       .map(obj -> new Node((JsonObject) obj))
       .collect(Collectors.toList())).end();
     return this;
@@ -283,14 +246,14 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/catalog/services", resultHandler, (buffer, headers) -> buffer.toJsonObject().stream()
+    requestObject(HttpMethod.GET, "/v1/catalog/services", null, resultHandler, (json, headers) -> json.stream()
       .map(ServiceParser::parseCatalogInfo).collect(Collectors.toList())).end();
     return this;
   }
 
   @Override
   public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/checks", resultHandler, (buffer, headers) -> buffer.toJsonObject().stream()
+    requestObject(HttpMethod.GET, "/v1/agent/checks", null, resultHandler, (json, headers) -> json.stream()
       .map(obj -> new Check((JsonObject) obj.getValue()))
       .collect(Collectors.toList())).end();
     return this;
@@ -298,7 +261,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/services", resultHandler, (buffer, headers) -> buffer.toJsonObject().stream()
+    requestObject(HttpMethod.GET, "/v1/agent/services", null, resultHandler, (json, headers) -> json.stream()
       .map(obj -> ServiceParser.parseAgentInfo((JsonObject) obj.getValue()))
       .collect(Collectors.toList())).end();
     return this;
@@ -306,12 +269,11 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/catalog/node/" + node, resultHandler, (buffer, headers) -> {
-      JsonObject jsonObject = buffer.toJsonObject();
-      JsonObject nodeInfo = jsonObject.getJsonObject("Node");
+    requestObject(HttpMethod.GET, "/v1/catalog/node/" + node, null, resultHandler, (json, headers) -> {
+      JsonObject nodeInfo = json.getJsonObject("Node");
       String nodeName = nodeInfo.getString("Node");
       String nodeAddress = nodeInfo.getString("Address");
-      return jsonObject.getJsonObject("Services").stream()
+      return json.getJsonObject("Services").stream()
         .map(obj -> ServiceParser.parseNodeInfo(nodeName, nodeAddress, (JsonObject) obj.getValue()))
         .collect(Collectors.toList());
     }).end();
@@ -320,13 +282,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/check/register", resultHandler).end(checkOptions.toJson().encode());
+    requestVoid(HttpMethod.GET, "/v1/agent/check/register", null, resultHandler).end(checkOptions.toJson().encode());
     return this;
   }
 
   @Override
   public ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.GET, "/v1/agent/check/deregister/" + checkId, resultHandler).end();
+    requestVoid(HttpMethod.GET, "/v1/agent/check/deregister/" + checkId, null, resultHandler).end();
     return this;
   }
 
@@ -337,8 +299,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    String query = note == null ? null : "note=" + note;
-    request(HttpMethod.GET, "/v1/agent/check/pass/" + checkId, query, resultHandler).end();
+    requestVoid(HttpMethod.GET, "/v1/agent/check/pass/" + checkId, Query.of("note", note), resultHandler).end();
     return this;
   }
 
@@ -349,8 +310,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    String query = note == null ? null : "note=" + note;
-    request(HttpMethod.GET, "/v1/agent/check/warn/" + checkId, query, resultHandler).end();
+    requestVoid(HttpMethod.GET, "/v1/agent/check/warn/" + checkId, Query.of("note", note), resultHandler).end();
     return this;
   }
 
@@ -361,8 +321,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    String query = note == null ? null : "note=" + note;
-    request(HttpMethod.GET, "/v1/agent/check/fail/" + checkId, query, resultHandler).end();
+    requestVoid(HttpMethod.GET, "/v1/agent/check/fail/" + checkId, Query.of("note", note), resultHandler).end();
     return this;
   }
 
@@ -377,14 +336,14 @@ public class ConsulClientImpl implements ConsulClient {
     if (note != null) {
       put.put("Output", note);
     }
-    request(HttpMethod.PUT, "/v1/agent/check/update/" + checkId, resultHandler)
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/update/" + checkId, null, resultHandler)
       .end(put.encode());
     return this;
   }
 
   @Override
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
-    request(HttpMethod.GET, "/v1/status/leader", resultHandler, (buffer, headers) -> {
+    request(HttpMethod.GET, "/v1/status/leader", null, resultHandler, (buffer, headers) -> {
       String leader = buffer.toString();
       return leader.substring(1, leader.length() - 2);
     }).end();
@@ -393,7 +352,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/status/peers", resultHandler, (buffer, headers) -> buffer.toJsonArray().stream()
+    requestArray(HttpMethod.GET, "/v1/status/peers", null, resultHandler, (arr, headers) -> arr.stream()
       .map(obj -> (String) obj)
       .collect(Collectors.toList())).end();
     return this;
@@ -407,7 +366,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) {
-    HttpClientRequest req = request(HttpMethod.PUT, "/v1/session/create", idHandler, (buffer, headers) -> buffer.toJsonObject().getString("ID"));
+    HttpClientRequest req = requestObject(HttpMethod.PUT, "/v1/session/create", null, idHandler, (obj, headers) -> obj.getString("ID"));
     if (options != null) {
       req.end(options.toJson().encode());
     } else {
@@ -418,11 +377,8 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
-    request(HttpMethod.GET, "/v1/session/info/" + id, resultHandler, (buffer, headers) -> {
-      JsonArray sessions = buffer.toJsonArray();
-      if (sessions == null) {
-        throw new InternalError();
-      } else if (sessions.size() == 0) {
+    requestArray(HttpMethod.GET, "/v1/session/info/" + id, null, resultHandler, (sessions, headers) -> {
+      if (sessions.size() == 0) {
         throw new RuntimeException("Unknown session ID: " + id);
       } else {
         return new Session(sessions.getJsonObject(0));
@@ -433,27 +389,28 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/session/renew/" + id, resultHandler, (buffer, headers) -> new Session(buffer.toJsonArray().getJsonObject(0))).end();
+    requestArray(HttpMethod.PUT, "/v1/session/renew/" + id, null, resultHandler, (arr, headers) ->
+      new Session(arr.getJsonObject(0))).end();
     return this;
   }
 
   @Override
   public ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/session/list", resultHandler, (buffer, headers) -> buffer.toJsonArray()
+    requestArray(HttpMethod.GET, "/v1/session/list", null, resultHandler, (arr, headers) -> arr
       .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
     return this;
   }
 
   @Override
   public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
-    request(HttpMethod.GET, "/v1/session/node/" + nodeId, resultHandler, (buffer, headers) -> buffer.toJsonArray()
+    requestArray(HttpMethod.GET, "/v1/session/node/" + nodeId, null, resultHandler, (arr, headers) -> arr
       .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
     return this;
   }
 
   @Override
   public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
-    request(HttpMethod.PUT, "/v1/session/destroy/" + id, resultHandler).end();
+    requestVoid(HttpMethod.PUT, "/v1/session/destroy/" + id, null, resultHandler).end();
     return this;
   }
 
@@ -462,33 +419,33 @@ public class ConsulClientImpl implements ConsulClient {
     httpClient.close();
   }
 
-  private <T> HttpClientRequest request(HttpMethod method, String path,
-                                        Handler<AsyncResult<T>> resultHandler) {
-    return request(method, path, "", resultHandler, (buffer, headers) -> null);
+  private <T> HttpClientRequest requestArray(HttpMethod method, String path, Query query,
+                                             Handler<AsyncResult<T>> resultHandler,
+                                             BiFunction<JsonArray, MultiMap, T> mapper) {
+    return request(method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonArray(), headers));
   }
 
-  private <T> HttpClientRequest request(HttpMethod method, String path, String query,
+  private <T> HttpClientRequest requestObject(HttpMethod method, String path, Query query,
+                                             Handler<AsyncResult<T>> resultHandler,
+                                             BiFunction<JsonObject, MultiMap, T> mapper) {
+    return request(method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonObject(), headers));
+  }
+
+  private <T> HttpClientRequest requestVoid(HttpMethod method, String path, Query query,
                                         Handler<AsyncResult<T>> resultHandler) {
     return request(method, path, query, resultHandler, (buffer, headers) -> null);
   }
 
-  private <T> HttpClientRequest request(HttpMethod method, String path,
-                                        Handler<AsyncResult<T>> resultHandler, BiFunction<Buffer, MultiMap, T> mapper) {
-    return request(method, path, "", resultHandler, mapper);
-  }
-
-  private <T> HttpClientRequest request(HttpMethod method, String path, String query,
-                                        Handler<AsyncResult<T>> resultHandler, BiFunction<Buffer, MultiMap, T> mapper) {
+  private <T> HttpClientRequest request(HttpMethod method, String path, Query query,
+                                        Handler<AsyncResult<T>> resultHandler,
+                                        BiFunction<Buffer, MultiMap, T> mapper) {
     if (query == null) {
-      query = "";
+      query = new Query();
     }
     if (dc != null) {
-      if (!query.isEmpty()) {
-        query += "&";
-      }
-      query += "dc=" + dc;
+      query.put("dc", dc);
     }
-    HttpClientRequest rq = httpClient.request(method, path + "?" + query, h -> {
+    HttpClientRequest rq = httpClient.request(method, path + query, h -> {
       if (h.statusCode() == 200) {
         h.bodyHandler(bh -> {
           try {
