@@ -112,11 +112,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns key/value pair that corresponding to the specified key
 
    @public
-   @param key {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param key {string} the key 
+   @param resultHandler {function} will be provided with key/value pair 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.getValue = function(key, resultHandler) {
     var __args = arguments;
@@ -133,12 +134,14 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns key/value pair that corresponding to the specified key.
+   This is blocking query unlike {@link ConsulClient#getValue}
 
    @public
-   @param key {string} 
-   @param options {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param key {string} the key 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with key/value pair 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.getValueBlocking = function(key, options, resultHandler) {
     var __args = arguments;
@@ -155,11 +158,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Remove the key/value pair that corresponding to the specified key
 
    @public
-   @param key {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param key {string} the key 
+   @param resultHandler {function} will be called on complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.deleteValue = function(key, resultHandler) {
     var __args = arguments;
@@ -176,11 +180,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the list of key/value pairs that corresponding to the specified key prefix.
 
    @public
-   @param keyPrefix {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param keyPrefix {string} the prefix 
+   @param resultHandler {function} will be provided with list of key/value pairs 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.getValues = function(keyPrefix, resultHandler) {
     var __args = arguments;
@@ -197,12 +202,14 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the list of key/value pairs that corresponding to the specified key prefix.
+   This is blocking query unlike {@link ConsulClient#getValues}
 
    @public
-   @param keyPrefix {string} 
-   @param options {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param keyPrefix {string} the prefix 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of key/value pairs 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.getValuesBlocking = function(keyPrefix, options, resultHandler) {
     var __args = arguments;
@@ -219,11 +226,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Removes all the key/value pair that corresponding to the specified key prefix
 
    @public
-   @param keyPrefix {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param keyPrefix {string} the prefix 
+   @param resultHandler {function} will be called on complete 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.deleteValues = function(keyPrefix, resultHandler) {
     var __args = arguments;
@@ -240,12 +248,13 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Adds specified key/value pair
 
    @public
-   @param key {string} 
-   @param value {string} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param key {string} the key 
+   @param value {string} the value 
+   @param resultHandler {function} will be provided with success of operation 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.putValue = function(key, value, resultHandler) {
     var __args = arguments;
@@ -264,11 +273,11 @@ var ConsulClient = function(j_val) {
   /**
 
    @public
-   @param key {string} 
-   @param value {string} 
-   @param options {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param key {string} the key 
+   @param value {string} the value 
+   @param options {Object} options used to push pair 
+   @param resultHandler {function} will be provided with success of operation 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.putValueWithOptions = function(key, value, options, resultHandler) {
     var __args = arguments;

@@ -54,8 +54,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling coordinate_datacenters()"
     end
-    # @param [String] key 
-    # @yield 
+    #  Returns key/value pair that corresponding to the specified key
+    # @param [String] key the key
+    # @yield will be provided with key/value pair
     # @return [self]
     def get_value(key=nil)
       if key.class == String && block_given?
@@ -64,9 +65,11 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling get_value(key)"
     end
-    # @param [String] key 
-    # @param [Hash] options 
-    # @yield 
+    #  Returns key/value pair that corresponding to the specified key.
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#get_value}
+    # @param [String] key the key
+    # @param [Hash] options the blocking options
+    # @yield will be provided with key/value pair
     # @return [self]
     def get_value_blocking(key=nil,options=nil)
       if key.class == String && options.class == Hash && block_given?
@@ -75,8 +78,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling get_value_blocking(key,options)"
     end
-    # @param [String] key 
-    # @yield 
+    #  Remove the key/value pair that corresponding to the specified key
+    # @param [String] key the key
+    # @yield will be called on complete
     # @return [self]
     def delete_value(key=nil)
       if key.class == String && block_given?
@@ -85,8 +89,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling delete_value(key)"
     end
-    # @param [String] keyPrefix 
-    # @yield 
+    #  Returns the list of key/value pairs that corresponding to the specified key prefix.
+    # @param [String] keyPrefix the prefix
+    # @yield will be provided with list of key/value pairs
     # @return [self]
     def get_values(keyPrefix=nil)
       if keyPrefix.class == String && block_given?
@@ -95,9 +100,11 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling get_values(keyPrefix)"
     end
-    # @param [String] keyPrefix 
-    # @param [Hash] options 
-    # @yield 
+    #  Returns the list of key/value pairs that corresponding to the specified key prefix.
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#get_values}
+    # @param [String] keyPrefix the prefix
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of key/value pairs
     # @return [self]
     def get_values_blocking(keyPrefix=nil,options=nil)
       if keyPrefix.class == String && options.class == Hash && block_given?
@@ -106,8 +113,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling get_values_blocking(keyPrefix,options)"
     end
-    # @param [String] keyPrefix 
-    # @yield 
+    #  Removes all the key/value pair that corresponding to the specified key prefix
+    # @param [String] keyPrefix the prefix
+    # @yield will be called on complete
     # @return [self]
     def delete_values(keyPrefix=nil)
       if keyPrefix.class == String && block_given?
@@ -116,9 +124,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling delete_values(keyPrefix)"
     end
-    # @param [String] key 
-    # @param [String] value 
-    # @yield 
+    #  Adds specified key/value pair
+    # @param [String] key the key
+    # @param [String] value the value
+    # @yield will be provided with success of operation
     # @return [self]
     def put_value(key=nil,value=nil)
       if key.class == String && value.class == String && block_given?
@@ -127,10 +136,10 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling put_value(key,value)"
     end
-    # @param [String] key 
-    # @param [String] value 
-    # @param [Hash] options 
-    # @yield 
+    # @param [String] key the key
+    # @param [String] value the value
+    # @param [Hash] options options used to push pair
+    # @yield will be provided with success of operation
     # @return [self]
     def put_value_with_options(key=nil,value=nil,options=nil)
       if key.class == String && value.class == String && options.class == Hash && block_given?

@@ -30,22 +30,6 @@ public class KeyValue {
   private long modifyIndex;
   private long lockIndex;
 
-  public static KeyValue parse(JsonObject jsonObject) {
-    KeyValue pair = new KeyValue();
-    pair.key = jsonObject.getString(KEY_KEY);
-    pair.value = new String(Base64.getDecoder().decode(jsonObject.getString(VALUE_KEY)));
-    pair.session = jsonObject.getString(SESSION_KEY);
-    Object valObj = jsonObject.getValue(FLAGS_KEY);
-    pair.flags = valObj == null ? 0L : ((Number) valObj).longValue();
-    pair.createIndex = jsonObject.getLong(CREATE_KEY, 0L);
-    pair.modifyIndex = jsonObject.getLong(MODIFY_KEY, 0L);
-    pair.lockIndex = jsonObject.getLong(LOCK_KEY, 0L);
-    return pair;
-  }
-
-  private KeyValue() {
-  }
-
   /**
    * Constructor from JSON
    *

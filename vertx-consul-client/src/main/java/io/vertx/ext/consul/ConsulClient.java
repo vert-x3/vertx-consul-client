@@ -56,27 +56,88 @@ public interface ConsulClient {
   @Fluent
   ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
 
+  /**
+   * Returns key/value pair that corresponding to the specified key
+   *
+   * @param key           the key
+   * @param resultHandler will be provided with key/value pair
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
+  /**
+   * Returns key/value pair that corresponding to the specified key.
+   * This is blocking query unlike {@link ConsulClient#getValue(String, Handler)}
+   *
+   * @param key           the key
+   * @param options       the blocking options
+   * @param resultHandler will be provided with key/value pair
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
 
+  /**
+   * Remove the key/value pair that corresponding to the specified key
+   *
+   * @param key           the key
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   *
+   * @param keyPrefix     the prefix
+   * @param resultHandler will be provided with list of key/value pairs
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * This is blocking query unlike {@link ConsulClient#getValues(String, Handler)}
+   *
+   * @param keyPrefix     the prefix
+   * @param options       the blocking options
+   * @param resultHandler will be provided with list of key/value pairs
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
+  /**
+   * Removes all the key/value pair that corresponding to the specified key prefix
+   *
+   * @param keyPrefix     the prefix
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
+  /**
+   * Adds specified key/value pair
+   *
+   * @param key           the key
+   * @param value         the value
+   * @param resultHandler will be provided with success of operation
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
 
+  /**
+   * @param key           the key
+   * @param value         the value
+   * @param options       options used to push pair
+   * @param resultHandler will be provided with success of operation
+   * @return reference to this, for fluency
+   */
   @Fluent
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 

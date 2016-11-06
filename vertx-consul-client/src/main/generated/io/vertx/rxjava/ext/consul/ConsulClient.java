@@ -131,88 +131,188 @@ public class ConsulClient {
     return resultHandler;
   }
 
+  /**
+   * Returns key/value pair that corresponding to the specified key
+   * @param key the key
+   * @param resultHandler will be provided with key/value pair
+   * @return reference to this, for fluency
+   */
   public ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) { 
     delegate.getValue(key, resultHandler);
     return this;
   }
 
+  /**
+   * Returns key/value pair that corresponding to the specified key
+   * @param key the key
+   * @return 
+   */
   public Observable<KeyValue> getValueObservable(String key) { 
     io.vertx.rx.java.ObservableFuture<KeyValue> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValue(key, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Returns key/value pair that corresponding to the specified key.
+   * This is blocking query unlike {@link io.vertx.rxjava.ext.consul.ConsulClient#getValue}
+   * @param key the key
+   * @param options the blocking options
+   * @param resultHandler will be provided with key/value pair
+   * @return reference to this, for fluency
+   */
   public ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) { 
     delegate.getValueBlocking(key, options, resultHandler);
     return this;
   }
 
+  /**
+   * Returns key/value pair that corresponding to the specified key.
+   * This is blocking query unlike {@link io.vertx.rxjava.ext.consul.ConsulClient#getValue}
+   * @param key the key
+   * @param options the blocking options
+   * @return 
+   */
   public Observable<KeyValue> getValueBlockingObservable(String key, BlockingQueryOptions options) { 
     io.vertx.rx.java.ObservableFuture<KeyValue> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValueBlocking(key, options, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Remove the key/value pair that corresponding to the specified key
+   * @param key the key
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.deleteValue(key, resultHandler);
     return this;
   }
 
+  /**
+   * Remove the key/value pair that corresponding to the specified key
+   * @param key the key
+   * @return 
+   */
   public Observable<Void> deleteValueObservable(String key) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     deleteValue(key, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * @param keyPrefix the prefix
+   * @param resultHandler will be provided with list of key/value pairs
+   * @return reference to this, for fluency
+   */
   public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
     delegate.getValues(keyPrefix, resultHandler);
     return this;
   }
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * @param keyPrefix the prefix
+   * @return 
+   */
   public Observable<List<KeyValue>> getValuesObservable(String keyPrefix) { 
     io.vertx.rx.java.ObservableFuture<List<KeyValue>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValues(keyPrefix, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * This is blocking query unlike {@link io.vertx.rxjava.ext.consul.ConsulClient#getValues}
+   * @param keyPrefix the prefix
+   * @param options the blocking options
+   * @param resultHandler will be provided with list of key/value pairs
+   * @return reference to this, for fluency
+   */
   public ConsulClient getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
     delegate.getValuesBlocking(keyPrefix, options, resultHandler);
     return this;
   }
 
+  /**
+   * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * This is blocking query unlike {@link io.vertx.rxjava.ext.consul.ConsulClient#getValues}
+   * @param keyPrefix the prefix
+   * @param options the blocking options
+   * @return 
+   */
   public Observable<List<KeyValue>> getValuesBlockingObservable(String keyPrefix, BlockingQueryOptions options) { 
     io.vertx.rx.java.ObservableFuture<List<KeyValue>> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     getValuesBlocking(keyPrefix, options, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Removes all the key/value pair that corresponding to the specified key prefix
+   * @param keyPrefix the prefix
+   * @param resultHandler will be called on complete
+   * @return reference to this, for fluency
+   */
   public ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) { 
     delegate.deleteValues(keyPrefix, resultHandler);
     return this;
   }
 
+  /**
+   * Removes all the key/value pair that corresponding to the specified key prefix
+   * @param keyPrefix the prefix
+   * @return 
+   */
   public Observable<Void> deleteValuesObservable(String keyPrefix) { 
     io.vertx.rx.java.ObservableFuture<Void> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     deleteValues(keyPrefix, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * Adds specified key/value pair
+   * @param key the key
+   * @param value the value
+   * @param resultHandler will be provided with success of operation
+   * @return reference to this, for fluency
+   */
   public ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) { 
     delegate.putValue(key, value, resultHandler);
     return this;
   }
 
+  /**
+   * Adds specified key/value pair
+   * @param key the key
+   * @param value the value
+   * @return 
+   */
   public Observable<Boolean> putValueObservable(String key, String value) { 
     io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     putValue(key, value, resultHandler.toHandler());
     return resultHandler;
   }
 
+  /**
+   * @param key the key
+   * @param value the value
+   * @param options options used to push pair
+   * @param resultHandler will be provided with success of operation
+   * @return reference to this, for fluency
+   */
   public ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) { 
     delegate.putValueWithOptions(key, value, options, resultHandler);
     return this;
   }
 
+  /**
+   * @param key the key
+   * @param value the value
+   * @param options options used to push pair
+   * @return 
+   */
   public Observable<Boolean> putValueWithOptionsObservable(String key, String value, KeyValueOptions options) { 
     io.vertx.rx.java.ObservableFuture<Boolean> resultHandler = io.vertx.rx.java.RxHelper.observableFuture();
     putValueWithOptions(key, value, options, resultHandler.toHandler());

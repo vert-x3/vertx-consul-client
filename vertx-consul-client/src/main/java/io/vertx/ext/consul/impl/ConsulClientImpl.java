@@ -68,8 +68,16 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/kv/" + key, new Query().put(options), resultHandler, (arr, headers) ->
-      KeyValue.parse(arr.getJsonObject(0))).end();
+      new KeyValue(fixKeyValueJson(arr.getJsonObject(0)))).end();
     return this;
+  }
+
+  private static JsonObject fixKeyValueJson(JsonObject jsonObject) {
+    String value = jsonObject.getString("Value");
+    if (value != null) {
+      jsonObject.put("Value", new String(Base64.getDecoder().decode(value)));
+    }
+    return jsonObject;
   }
 
   @Override
@@ -88,7 +96,7 @@ public class ConsulClientImpl implements ConsulClient {
     Query query = Query.of("recurse", true).put(options);
     requestArray(HttpMethod.GET, "/v1/kv/" + keyPrefix, query, resultHandler, (arr, headers) ->
       arr.stream()
-        .map(obj -> KeyValue.parse((JsonObject) obj))
+        .map(obj -> new KeyValue(fixKeyValueJson((JsonObject) obj)))
         .collect(Collectors.toList())).end();
     return this;
   }
