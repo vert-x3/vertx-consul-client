@@ -5,12 +5,13 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -18,11 +19,10 @@ import java.util.function.Consumer;
 public class Utils {
 
   public static String readResource(String fileName) throws Exception {
-    final URL resource = Utils.class.getClassLoader().getResource(fileName);
-    if (resource == null) {
-      throw new RuntimeException("resource not found");
+    final InputStream is = Utils.class.getClassLoader().getResourceAsStream(fileName);
+    try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
+      return buffer.lines().collect(Collectors.joining("\n"));
     }
-    return new String(Files.readAllBytes(Paths.get(resource.toURI())));
   }
 
   public static void runAsync(Consumer<Handler<AsyncResult<Void>>> runner) {
