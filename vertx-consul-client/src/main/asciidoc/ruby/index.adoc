@@ -28,7 +28,7 @@ compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
 
 == Creating a client
 
-Just use static factory method:
+Just use factory method:
 
 [source,ruby]
 ----
@@ -141,5 +141,37 @@ consulClient.register_check(opts) { |res_err,res|
   end
 
 }
+
+----
+
+=== Service discovery
+
+[source,ruby]
+----
+
+consulClient.catalog_service_nodes("consul") { |res_err,res|
+
+  if (res_err == nil)
+
+    serviceList = res
+
+    puts "found #{serviceList.length} services"
+
+    serviceList.each do |service|
+
+      puts "Service node: #{service['node']}"
+
+      puts "Service node address: #{service['nodeAddress']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
 
 ----

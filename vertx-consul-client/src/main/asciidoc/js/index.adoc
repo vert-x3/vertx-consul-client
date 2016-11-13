@@ -28,7 +28,7 @@ compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
 
 == Creating a client
 
-Just use static factory method:
+Just use factory method:
 
 [source,js]
 ----
@@ -141,5 +141,37 @@ consulClient.registerCheck(opts, function (res, res_err) {
   }
 
 });
+
+----
+
+=== Service discovery
+
+[source,js]
+----
+
+consulClient.catalogServiceNodes("consul", function (res, res_err) {
+
+  if (res_err == null) {
+
+    var serviceList = res;
+
+    console.log("found " + serviceList.length + " services");
+
+    Array.prototype.forEach.call(serviceList, function(service) {
+
+      console.log("Service node: " + service.node);
+
+      console.log("Service node address: " + service.nodeAddress);
+
+    });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
 
 ----

@@ -28,7 +28,7 @@ compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
 
 == Creating a client
 
-Just use static factory method:
+Just use factory method:
 
 [source,java]
 ----
@@ -121,6 +121,35 @@ consulClient.registerCheck(opts, res -> {
   if (res.succeeded()) {
 
     System.out.println("check successfully registered");
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+----
+
+=== Service discovery
+
+[source,java]
+----
+consulClient.catalogServiceNodes("consul", res -> {
+
+  if (res.succeeded()) {
+
+    List<Service> serviceList = res.result();
+
+    System.out.println("found " + serviceList.size() + " services");
+
+    for (Service service : serviceList) {
+
+      System.out.println("Service node: " + service.getNode());
+
+      System.out.println("Service node address: " + service.getNodeAddress());
+
+    }
 
   } else {
 

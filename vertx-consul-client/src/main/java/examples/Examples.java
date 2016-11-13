@@ -2,12 +2,13 @@ package examples;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.KeyValue;
+import io.vertx.ext.consul.Service;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -99,4 +100,32 @@ public class Examples {
 
   }
 
+  public void services(ConsulClient consulClient) {
+
+    consulClient.catalogServiceNodes("consul", res -> {
+
+      if (res.succeeded()) {
+
+        List<Service> serviceList = res.result();
+
+        System.out.println("found " + serviceList.size() + " services");
+
+        for (Service service : serviceList) {
+
+          System.out.println("Service node: " + service.getNode());
+
+          System.out.println("Service node address: " + service.getNodeAddress());
+
+        }
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+  }
+  
 }

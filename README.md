@@ -4,15 +4,9 @@
 
 An asynchronous client for interacting with a Consul
 
-- Access Control Lists
-- Key/Value Store
-- Health Checks
-- Nodes and Services catalog
-- Consul System Status
-- User Events
-- Sessions
-- Network Coordinates
+Please see the asciidoc documentation:
 
-## TODO
-- documentation
-- examples
+* link:vertx-consul-client/src/main/asciidoc/java/index.adoc[Java in-source docs]
+* link:vertx-consul-client/src/main/asciidoc/js/index.adoc[JavaScript in-source docs]
+* link:vertx-consul-client/src/main/asciidoc/groovy/index.adoc[Groovy in-source docs]
+* link:vertx-consul-client/src/main/asciidoc/ruby/index.adoc[Ruby in-source docs]

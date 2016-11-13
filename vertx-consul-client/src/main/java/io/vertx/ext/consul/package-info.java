@@ -28,7 +28,7 @@
  *
  * == Creating a client
  *
- * Just use static factory method:
+ * Just use factory method:
  *
  * [source,$lang]
  * ----
@@ -70,6 +70,12 @@
  * {@link examples.Examples#tcpHealth}
  * ----
  *
+ * === Service discovery
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#services}
+ * ----
  */
 @Document(fileName = "index.adoc")
 @ModuleGen(name = "vertx-consul", groupPackage = "io.vertx")
