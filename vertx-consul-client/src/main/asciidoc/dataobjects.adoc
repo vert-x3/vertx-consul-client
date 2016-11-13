@@ -108,9 +108,17 @@ Get the status of check
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[http]]`http`|`String`|
++++
+Set HTTP address to check. Also you should set checking interval
++++
 |[[id]]`id`|`String`|
 +++
 Set check ID
++++
+|[[interval]]`interval`|`String`|
++++
+Set checking interval
 +++
 |[[name]]`name`|`String`|
 +++
@@ -119,6 +127,18 @@ Set check name
 |[[note]]`note`|`String`|
 +++
 Set check note
++++
+|[[script]]`script`|`String`|
++++
+Set path to checking script. Also you should set checking interval
++++
+|[[tcp]]`tcp`|`String`|
++++
+Set TCP address to check. Also you should set checking interval
++++
+|[[ttl]]`ttl`|`String`|
++++
+Set Time to Live of check.
 +++
 |===
 

@@ -29,7 +29,8 @@ public abstract class ChecksBase extends ConsulTestBase {
 
   @Test
   public void ttlCheckLifecycle() {
-    CheckOptions opts = CheckOptions.ttl("1s")
+    CheckOptions opts = new CheckOptions()
+      .setTtl("1s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
@@ -62,7 +63,9 @@ public abstract class ChecksBase extends ConsulTestBase {
   public void httpCheckLifecycle() {
     HttpHealthReporter reporter = new HttpHealthReporter(vertx);
 
-    CheckOptions opts = CheckOptions.http("http://localhost:" + reporter.port(), "1s")
+    CheckOptions opts = new CheckOptions()
+      .setHttp("http://localhost:" + reporter.port())
+      .setInterval("1s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
@@ -89,7 +92,9 @@ public abstract class ChecksBase extends ConsulTestBase {
   public void tcpCheckLifecycle() {
     HttpHealthReporter reporter = new HttpHealthReporter(vertx);
 
-    CheckOptions opts = CheckOptions.tcp("localhost:" + reporter.port(), "1s")
+    CheckOptions opts = new CheckOptions()
+      .setTcp("localhost:" + reporter.port())
+      .setInterval("1s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
@@ -109,7 +114,9 @@ public abstract class ChecksBase extends ConsulTestBase {
   public void scriptCheckLifecycle() {
     ScriptHealthReporter reporter = new ScriptHealthReporter();
 
-    CheckOptions opts = CheckOptions.script(reporter.scriptPath(), "1s")
+    CheckOptions opts = new CheckOptions()
+      .setScript(reporter.scriptPath())
+      .setInterval("1s")
       .setName("checkName");
     String checkId = createCheck(opts);
 

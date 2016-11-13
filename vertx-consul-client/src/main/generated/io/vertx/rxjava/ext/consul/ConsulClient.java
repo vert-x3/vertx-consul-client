@@ -61,6 +61,16 @@ public class ConsulClient {
   }
 
   /**
+   * Create a Consul client with default configuration.
+   * @param vertx the Vert.x instance
+   * @return the client
+   */
+  public static ConsulClient create(Vertx vertx) { 
+    ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create((io.vertx.core.Vertx)vertx.getDelegate()));
+    return ret;
+  }
+
+  /**
    * Create a Consul client.
    * @param vertx the Vert.x instance
    * @param config the configuration

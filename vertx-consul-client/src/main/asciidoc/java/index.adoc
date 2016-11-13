@@ -1,8 +1,132 @@
 = Vert.x Consul Client
 
+https://www.consul.io[Consul] is a tool for discovering and configuring services in your infrastructure.
+
+A Vert.x client allowing applications to interact with a Consul system via blocking and non-blocking HTTP API.
+
+== Using Vert.x Consul Client
+
+To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
+
+* Maven (in your `pom.xml`):
+
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-consul-client</artifactId>
+  <version>3.4.0-SNAPSHOT</version>
+</dependency>
+----
+
+* Gradle (in your `build.gradle` file):
+
+[source,groovy,subs="+attributes"]
+----
+compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
+----
+
 == Creating a client
+
+Just use static factory method:
 
 [source,java]
 ----
+ConsulClient client = ConsulClient.create(vertx);
+----
+
+Also the client can be configured with a json object.
+
+[source,java]
+----
+JsonObject config = new JsonObject().put("host", "consul.example.com");
+
 ConsulClient client = ConsulClient.create(vertx, config);
+----
+
+The following configuration is supported by the consul client:
+
+`host`:: Consul host. Defaults to `localhost`
+`port`:: Consul HTTP API port. Defaults to `8500`
+`acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
+ACL policy, is used.
+`dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
+by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
+
+== Using the API
+
+The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`.
+
+=== Key/Value Store
+
+[source,java]
+----
+consulClient.putValue("foo", "bar", res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("result of the operation: " + (res.result() ? "success" : "fail"));
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+
+//  get Key/Value pair from Consul Store
+consulClient.getValue("foo", res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("retrieved value: " + res.result().getValue());
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+----
+
+=== Health Checks
+
+[source,java]
+----
+Handler<HttpServerRequest> alwaysGood = h -> h.response()
+
+  .setStatusCode(200)
+
+  .end();
+
+// create HTTP server to responce health check
+
+vertx.createHttpServer()
+
+  .requestHandler(alwaysGood)
+
+  .listen(4848);
+
+// check health via TCP port every 1 sec
+
+CheckOptions opts = new CheckOptions().setTcp("localhost:4848").setInterval("1s");
+
+// register TCP check
+
+consulClient.registerCheck(opts, res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("check successfully registered");
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
 ----

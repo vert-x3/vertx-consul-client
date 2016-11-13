@@ -1,12 +1,145 @@
 = Vert.x Consul Client
 
+https://www.consul.io[Consul] is a tool for discovering and configuring services in your infrastructure.
+
+A Vert.x client allowing applications to interact with a Consul system via blocking and non-blocking HTTP API.
+
+== Using Vert.x Consul Client
+
+To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
+
+* Maven (in your `pom.xml`):
+
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-consul-client</artifactId>
+  <version>3.4.0-SNAPSHOT</version>
+</dependency>
+----
+
+* Gradle (in your `build.gradle` file):
+
+[source,groovy,subs="+attributes"]
+----
+compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
+----
+
 == Creating a client
 
-[source,java]
+Just use static factory method:
+
+[source,js]
 ----
 var ConsulClient = require("vertx-consul-js/consul_client");
 
+var client = ConsulClient.create(vertx);
+
+
+----
+
+Also the client can be configured with a json object.
+
+[source,js]
+----
+var ConsulClient = require("vertx-consul-js/consul_client");
+
+var config = {
+  "host" : "consul.example.com"
+};
+
 var client = ConsulClient.create(vertx, config);
 
+
+----
+
+The following configuration is supported by the consul client:
+
+`host`:: Consul host. Defaults to `localhost`
+`port`:: Consul HTTP API port. Defaults to `8500`
+`acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
+ACL policy, is used.
+`dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
+by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
+
+== Using the API
+
+The client API is represented by `link:../../jsdoc/module-vertx-consul-js_consul_client-ConsulClient.html[ConsulClient]`.
+
+=== Key/Value Store
+
+[source,js]
+----
+
+// put Key/Value pair to Consul Store
+consulClient.putValue("foo", "bar", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("result of the operation: " + (res ? "success" : "fail"));
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+//  get Key/Value pair from Consul Store
+consulClient.getValue("foo", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("retrieved value: " + res.value);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
+
+=== Health Checks
+
+[source,js]
+----
+
+var alwaysGood = function (h) {
+  h.response().setStatusCode(200).end();
+};
+
+// create HTTP server to responce health check
+
+vertx.createHttpServer().requestHandler(alwaysGood).listen(4848);
+
+// check health via TCP port every 1 sec
+
+var opts = {
+  "tcp" : "localhost:4848",
+  "interval" : "1s"
+};
+
+// register TCP check
+
+consulClient.registerCheck(opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("check successfully registered");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
 
 ----

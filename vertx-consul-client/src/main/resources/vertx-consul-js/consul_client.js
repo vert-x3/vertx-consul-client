@@ -1179,10 +1179,12 @@ var ConsulClient = function(j_val) {
  @param config {Object} the configuration 
  @return {ConsulClient} the client
  */
-ConsulClient.create = function(vertx, config) {
+ConsulClient.create = function() {
   var __args = arguments;
-  if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
-    return utils.convReturnVertxGen(JConsulClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](vertx._jdel, utils.convParamJsonObject(config)), ConsulClient);
+  if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
+    return utils.convReturnVertxGen(JConsulClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), ConsulClient);
+  }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
+    return utils.convReturnVertxGen(JConsulClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](__args[0]._jdel, utils.convParamJsonObject(__args[1])), ConsulClient);
   } else throw new TypeError('function invoked with invalid arguments');
 };
 

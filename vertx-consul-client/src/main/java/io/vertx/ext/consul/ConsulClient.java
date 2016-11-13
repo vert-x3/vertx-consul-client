@@ -19,6 +19,16 @@ import java.util.List;
 public interface ConsulClient {
 
   /**
+   * Create a Consul client with default configuration.
+   *
+   * @param vertx  the Vert.x instance
+   * @return the client
+   */
+  static ConsulClient create(Vertx vertx) {
+    return new ConsulClientImpl(vertx, new JsonObject());
+  }
+
+  /**
    * Create a Consul client.
    *
    * @param vertx  the Vert.x instance

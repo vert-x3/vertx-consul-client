@@ -41,7 +41,7 @@ public class Services extends ChecksBase {
     ServiceOptions service = new ServiceOptions()
       .setName(serviceName)
       .setTags(Arrays.asList("tag1", "tag2"))
-      .setCheckOptions(CheckOptions.ttl("10s"))
+      .setCheckOptions(new CheckOptions().setTtl("10s"))
       .setAddress("10.0.0.1")
       .setPort(8080);
     runAsync(h -> writeClient.registerService(service, h));
@@ -86,7 +86,7 @@ public class Services extends ChecksBase {
       .setName("serviceName")
       .setId(serviceId)
       .setAddress("10.0.0.1")
-      .setCheckOptions(CheckOptions.ttl("1h"))
+      .setCheckOptions(new CheckOptions().setTtl("1h"))
       .setPort(8080);
     runAsync(h -> writeClient.registerService(service, h));
     runAsync(h -> writeClient.passCheck("service:" + serviceId, h));

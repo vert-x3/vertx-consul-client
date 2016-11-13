@@ -20,68 +20,6 @@ public class CheckOptions {
   private static final String TTL_KEY = "TTL";
   private static final String TCP_KEY = "TCP";
 
-  /**
-   * Create check option for Script+Interval check
-   *
-   * @param script path to script
-   * @param interval checking interval in Go's time format which is sequence of decimal numbers,
-   *                 each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-   *                 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
-   * @return a new CheckOption object
-   */
-  public static CheckOptions script(String script, String interval) {
-    CheckOptions checkOptions = new CheckOptions();
-    checkOptions.script = script;
-    checkOptions.interval = interval;
-    return checkOptions;
-  }
-
-  /**
-   * Create check option for HTTP+Interval check
-   *
-   * @param http check HTTP address
-   * @param interval checking interval in Go's time format which is sequence of decimal numbers,
-   *                 each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-   *                 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
-   * @return a new CheckOption object
-   */
-  public static CheckOptions http(String http, String interval) {
-    CheckOptions checkOptions = new CheckOptions();
-    checkOptions.http = http;
-    checkOptions.interval = interval;
-    return checkOptions;
-  }
-
-  /**
-   * Create check option for Time to Live (TTL) check
-   *
-   * @param ttl TTL interval in Go's time format which is sequence of decimal numbers,
-   *                 each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-   *                 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
-   * @return a new CheckOption object
-   */
-  public static CheckOptions ttl(String ttl) {
-    CheckOptions checkOptions = new CheckOptions();
-    checkOptions.ttl = ttl;
-    return checkOptions;
-  }
-
-  /**
-   * Create check option for TCP+Interval check
-   *
-   * @param tcp check TCP address
-   * @param interval checking interval in Go's time format which is sequence of decimal numbers,
-   *                 each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
-   *                 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
-   * @return a new CheckOption object
-   */
-  public static CheckOptions tcp(String tcp, String interval) {
-    CheckOptions checkOptions = new CheckOptions();
-    checkOptions.tcp = tcp;
-    checkOptions.interval = interval;
-    return checkOptions;
-  }
-
   private String id;
   private String name;
   private String script;
@@ -91,7 +29,11 @@ public class CheckOptions {
   private String interval;
   private String note;
 
-  private CheckOptions() {}
+  /**
+   * Default constructor
+   */
+  public CheckOptions() {
+  }
 
   /**
    * Copy constructor
@@ -157,6 +99,108 @@ public class CheckOptions {
       jsonObject.put(INTERVAL_KEY, interval);
     }
     return jsonObject;
+  }
+
+  /**
+   * Get path to checking script
+   *
+   * @return path to script
+   */
+  public String getScript() {
+    return script;
+  }
+
+  /**
+   * Set path to checking script. Also you should set checking interval
+   *
+   * @param script path to script
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setScript(String script) {
+    this.script = script;
+    return this;
+  }
+
+  /**
+   * Get HTTP address
+   *
+   * @return HTTP address
+   */
+  public String getHttp() {
+    return http;
+  }
+
+  /**
+   * Set HTTP address to check. Also you should set checking interval
+   *
+   * @param http HTTP address
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setHttp(String http) {
+    this.http = http;
+    return this;
+  }
+
+  /**
+   * Get Time to Live of check
+   *
+   * @return Time to Live of check
+   */
+  public String getTtl() {
+    return ttl;
+  }
+
+  /**
+   * Set Time to Live of check.
+   *
+   * @param ttl Time to Live of check
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setTtl(String ttl) {
+    this.ttl = ttl;
+    return this;
+  }
+
+  /**
+   * Get TCP address. Also you should set checking interval
+   *
+   * @return TCP address
+   */
+  public String getTcp() {
+    return tcp;
+  }
+
+  /**
+   * Set TCP address to check. Also you should set checking interval
+   *
+   * @param tcp TCP address
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setTcp(String tcp) {
+    this.tcp = tcp;
+    return this;
+  }
+
+  /**
+   * Get checking interval
+   *
+   * @return interval
+   */
+  public String getInterval() {
+    return interval;
+  }
+
+  /**
+   * Set checking interval
+   *
+   * @param interval checking interval in Go's time format which is sequence of decimal numbers,
+   *                 each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+   *                 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setInterval(String interval) {
+    this.interval = interval;
+    return this;
   }
 
   /**
