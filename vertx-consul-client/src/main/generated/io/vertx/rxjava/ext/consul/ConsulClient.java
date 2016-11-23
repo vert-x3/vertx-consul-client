@@ -50,13 +50,18 @@ import io.vertx.ext.consul.EventOptions;
 
 public class ConsulClient {
 
-  final io.vertx.ext.consul.ConsulClient delegate;
+  public static final io.vertx.lang.rxjava.TypeArg<ConsulClient> arg = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new ConsulClient((io.vertx.ext.consul.ConsulClient) obj),
+    ConsulClient::getDelegate
+  );
 
+  final io.vertx.ext.consul.ConsulClient delegate;
+  
   public ConsulClient(io.vertx.ext.consul.ConsulClient delegate) {
     this.delegate = delegate;
   }
 
-  public Object getDelegate() {
+  public io.vertx.ext.consul.ConsulClient getDelegate() {
     return delegate;
   }
 
@@ -66,7 +71,7 @@ public class ConsulClient {
    * @return the client
    */
   public static ConsulClient create(Vertx vertx) { 
-    ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create((io.vertx.core.Vertx)vertx.getDelegate()));
+    ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create(vertx.getDelegate()));
     return ret;
   }
 
@@ -77,7 +82,7 @@ public class ConsulClient {
    * @return the client
    */
   public static ConsulClient create(Vertx vertx, JsonObject config) { 
-    ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create((io.vertx.core.Vertx)vertx.getDelegate(), config));
+    ConsulClient ret = ConsulClient.newInstance(io.vertx.ext.consul.ConsulClient.create(vertx.getDelegate(), config));
     return ret;
   }
 

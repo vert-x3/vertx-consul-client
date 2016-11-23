@@ -1115,6 +1115,25 @@ var ConsulService = function(j_val) {
   this._jdel = j_consulService;
 };
 
+ConsulService._jclass = utils.getJavaClass("io.vertx.ext.consul.ConsulService");
+ConsulService._jtype = {
+  accept: function(obj) {
+    return ConsulService._jclass.isInstance(obj._jdel);
+  },
+  wrap: function(jdel) {
+    var obj = Object.create(ConsulService.prototype, {});
+    ConsulService.apply(obj, arguments);
+    return obj;
+  },
+  unwrap: function(obj) {
+    return obj._jdel;
+  }
+};
+ConsulService._create = function(jdel) {
+  var obj = Object.create(ConsulService.prototype, {});
+  ConsulService.apply(obj, arguments);
+  return obj;
+}
 /**
  Create a proxy to a service that is deployed somewhere on the event bus
 
@@ -1126,9 +1145,8 @@ var ConsulService = function(j_val) {
 ConsulService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
-    return utils.convReturnVertxGen(JConsulService["createEventBusProxy(io.vertx.core.Vertx,java.lang.String)"](vertx._jdel, address), ConsulService);
+    return utils.convReturnVertxGen(ConsulService, JConsulService["createEventBusProxy(io.vertx.core.Vertx,java.lang.String)"](vertx._jdel, address));
   } else throw new TypeError('function invoked with invalid arguments');
 };
 
-// We export the Constructor function
 module.exports = ConsulService;

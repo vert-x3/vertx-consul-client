@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+  BrokenClient.class,
   AgentInfo.class,
   AclTokens.class,
   Catalog.class,

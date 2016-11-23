@@ -15,6 +15,22 @@ module VertxConsul
     def j_del
       @j_del
     end
+    @@j_api_type = Object.new
+    def @@j_api_type.accept?(obj)
+      obj.class == ConsulService
+    end
+    def @@j_api_type.wrap(obj)
+      ConsulService.new(obj)
+    end
+    def @@j_api_type.unwrap(obj)
+      obj.j_del
+    end
+    def self.j_api_type
+      @@j_api_type
+    end
+    def self.j_class
+      Java::IoVertxExtConsul::ConsulService.java_class
+    end
     #  Create a proxy to a service that is deployed somewhere on the event bus
     # @param [::Vertx::Vertx] vertx the Vert.x instance
     # @param [String] address the address the service is listening on on the event bus
@@ -23,7 +39,7 @@ module VertxConsul
       if vertx.class.method_defined?(:j_del) && address.class == String && !block_given?
         return ::Vertx::Util::Utils.safe_create(Java::IoVertxExtConsul::ConsulService.java_method(:createEventBusProxy, [Java::IoVertxCore::Vertx.java_class,Java::java.lang.String.java_class]).call(vertx.j_del,address),::VertxConsul::ConsulService)
       end
-      raise ArgumentError, "Invalid arguments when calling create_event_bus_proxy(vertx,address)"
+      raise ArgumentError, "Invalid arguments when calling create_event_bus_proxy(#{vertx},#{address})"
     end
     # @yield 
     # @return [self]
@@ -60,7 +76,7 @@ module VertxConsul
         @j_del.java_method(:getValue, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_value(key)"
+      raise ArgumentError, "Invalid arguments when calling get_value(#{key})"
     end
     # @param [String] key 
     # @param [Hash] options 
@@ -71,7 +87,7 @@ module VertxConsul
         @j_del.java_method(:getValueBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_value_blocking(key,options)"
+      raise ArgumentError, "Invalid arguments when calling get_value_blocking(#{key},#{options})"
     end
     # @param [String] key 
     # @yield 
@@ -81,7 +97,7 @@ module VertxConsul
         @j_del.java_method(:deleteValue, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling delete_value(key)"
+      raise ArgumentError, "Invalid arguments when calling delete_value(#{key})"
     end
     # @param [String] keyPrefix 
     # @yield 
@@ -91,7 +107,7 @@ module VertxConsul
         @j_del.java_method(:getValues, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_values(keyPrefix)"
+      raise ArgumentError, "Invalid arguments when calling get_values(#{keyPrefix})"
     end
     # @param [String] keyPrefix 
     # @param [Hash] options 
@@ -102,7 +118,7 @@ module VertxConsul
         @j_del.java_method(:getValuesBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_values_blocking(keyPrefix,options)"
+      raise ArgumentError, "Invalid arguments when calling get_values_blocking(#{keyPrefix},#{options})"
     end
     # @param [String] keyPrefix 
     # @yield 
@@ -112,7 +128,7 @@ module VertxConsul
         @j_del.java_method(:deleteValues, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling delete_values(keyPrefix)"
+      raise ArgumentError, "Invalid arguments when calling delete_values(#{keyPrefix})"
     end
     # @param [String] key 
     # @param [String] value 
@@ -123,7 +139,7 @@ module VertxConsul
         @j_del.java_method(:putValue, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling put_value(key,value)"
+      raise ArgumentError, "Invalid arguments when calling put_value(#{key},#{value})"
     end
     # @param [String] key 
     # @param [String] value 
@@ -135,7 +151,7 @@ module VertxConsul
         @j_del.java_method(:putValueWithOptions, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxExtConsul::KeyValueOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,value,Java::IoVertxExtConsul::KeyValueOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling put_value_with_options(key,value,options)"
+      raise ArgumentError, "Invalid arguments when calling put_value_with_options(#{key},#{value},#{options})"
     end
     # @param [Hash] token 
     # @yield 
@@ -145,7 +161,7 @@ module VertxConsul
         @j_del.java_method(:createAclToken, [Java::IoVertxExtConsul::AclToken.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::AclToken.new(::Vertx::Util::Utils.to_json_object(token)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling create_acl_token(token)"
+      raise ArgumentError, "Invalid arguments when calling create_acl_token(#{token})"
     end
     # @param [Hash] token 
     # @yield 
@@ -155,7 +171,7 @@ module VertxConsul
         @j_del.java_method(:updateAclToken, [Java::IoVertxExtConsul::AclToken.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::AclToken.new(::Vertx::Util::Utils.to_json_object(token)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling update_acl_token(token)"
+      raise ArgumentError, "Invalid arguments when calling update_acl_token(#{token})"
     end
     # @param [String] id 
     # @yield 
@@ -165,7 +181,7 @@ module VertxConsul
         @j_del.java_method(:cloneAclToken, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling clone_acl_token(id)"
+      raise ArgumentError, "Invalid arguments when calling clone_acl_token(#{id})"
     end
     # @yield 
     # @return [self]
@@ -184,7 +200,7 @@ module VertxConsul
         @j_del.java_method(:infoAclToken, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling info_acl_token(id)"
+      raise ArgumentError, "Invalid arguments when calling info_acl_token(#{id})"
     end
     # @param [String] id 
     # @yield 
@@ -194,7 +210,7 @@ module VertxConsul
         @j_del.java_method(:destroyAclToken, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling destroy_acl_token(id)"
+      raise ArgumentError, "Invalid arguments when calling destroy_acl_token(#{id})"
     end
     # @param [String] name 
     # @yield 
@@ -204,7 +220,7 @@ module VertxConsul
         @j_del.java_method(:fireEvent, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(name,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fire_event(name)"
+      raise ArgumentError, "Invalid arguments when calling fire_event(#{name})"
     end
     # @param [String] name 
     # @param [Hash] options 
@@ -215,7 +231,7 @@ module VertxConsul
         @j_del.java_method(:fireEventWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::EventOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(name,Java::IoVertxExtConsul::EventOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fire_event_with_options(name,options)"
+      raise ArgumentError, "Invalid arguments when calling fire_event_with_options(#{name},#{options})"
     end
     # @yield 
     # @return [self]
@@ -234,7 +250,7 @@ module VertxConsul
         @j_del.java_method(:registerService, [Java::IoVertxExtConsul::ServiceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::ServiceOptions.new(::Vertx::Util::Utils.to_json_object(serviceOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling register_service(serviceOptions)"
+      raise ArgumentError, "Invalid arguments when calling register_service(#{serviceOptions})"
     end
     # @param [Hash] maintenanceOptions 
     # @yield 
@@ -244,7 +260,7 @@ module VertxConsul
         @j_del.java_method(:maintenanceService, [Java::IoVertxExtConsul::MaintenanceOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::MaintenanceOptions.new(::Vertx::Util::Utils.to_json_object(maintenanceOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling maintenance_service(maintenanceOptions)"
+      raise ArgumentError, "Invalid arguments when calling maintenance_service(#{maintenanceOptions})"
     end
     # @param [String] id 
     # @yield 
@@ -254,7 +270,7 @@ module VertxConsul
         @j_del.java_method(:deregisterService, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling deregister_service(id)"
+      raise ArgumentError, "Invalid arguments when calling deregister_service(#{id})"
     end
     # @param [String] service 
     # @yield 
@@ -264,7 +280,7 @@ module VertxConsul
         @j_del.java_method(:catalogServiceNodes, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes(service)"
+      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes(#{service})"
     end
     # @param [String] service 
     # @param [String] tag 
@@ -275,7 +291,7 @@ module VertxConsul
         @j_del.java_method(:catalogServiceNodesWithTag, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,tag,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes_with_tag(service,tag)"
+      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes_with_tag(#{service},#{tag})"
     end
     # @yield 
     # @return [self]
@@ -321,7 +337,7 @@ module VertxConsul
         @j_del.java_method(:catalogNodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(node,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_node_services(node)"
+      raise ArgumentError, "Invalid arguments when calling catalog_node_services(#{node})"
     end
     # @yield 
     # @return [self]
@@ -340,7 +356,7 @@ module VertxConsul
         @j_del.java_method(:registerCheck, [Java::IoVertxExtConsul::CheckOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::CheckOptions.new(::Vertx::Util::Utils.to_json_object(checkOptions)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling register_check(checkOptions)"
+      raise ArgumentError, "Invalid arguments when calling register_check(#{checkOptions})"
     end
     # @param [String] checkId 
     # @yield 
@@ -350,7 +366,7 @@ module VertxConsul
         @j_del.java_method(:deregisterCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling deregister_check(checkId)"
+      raise ArgumentError, "Invalid arguments when calling deregister_check(#{checkId})"
     end
     # @param [String] checkId 
     # @yield 
@@ -360,7 +376,7 @@ module VertxConsul
         @j_del.java_method(:passCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling pass_check(checkId)"
+      raise ArgumentError, "Invalid arguments when calling pass_check(#{checkId})"
     end
     # @param [String] checkId 
     # @param [String] note 
@@ -371,7 +387,7 @@ module VertxConsul
         @j_del.java_method(:passCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling pass_check_with_note(checkId,note)"
+      raise ArgumentError, "Invalid arguments when calling pass_check_with_note(#{checkId},#{note})"
     end
     # @param [String] checkId 
     # @yield 
@@ -381,7 +397,7 @@ module VertxConsul
         @j_del.java_method(:warnCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling warn_check(checkId)"
+      raise ArgumentError, "Invalid arguments when calling warn_check(#{checkId})"
     end
     # @param [String] checkId 
     # @param [String] note 
@@ -392,7 +408,7 @@ module VertxConsul
         @j_del.java_method(:warnCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling warn_check_with_note(checkId,note)"
+      raise ArgumentError, "Invalid arguments when calling warn_check_with_note(#{checkId},#{note})"
     end
     # @param [String] checkId 
     # @yield 
@@ -402,7 +418,7 @@ module VertxConsul
         @j_del.java_method(:failCheck, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fail_check(checkId)"
+      raise ArgumentError, "Invalid arguments when calling fail_check(#{checkId})"
     end
     # @param [String] checkId 
     # @param [String] note 
@@ -413,7 +429,7 @@ module VertxConsul
         @j_del.java_method(:failCheckWithNote, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling fail_check_with_note(checkId,note)"
+      raise ArgumentError, "Invalid arguments when calling fail_check_with_note(#{checkId},#{note})"
     end
     # @param [String] checkId 
     # @param [:PASSING,:WARNING,:CRITICAL] status 
@@ -424,7 +440,7 @@ module VertxConsul
         @j_del.java_method(:updateCheck, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::CheckStatus.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,Java::IoVertxExtConsul::CheckStatus.valueOf(status),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling update_check(checkId,status)"
+      raise ArgumentError, "Invalid arguments when calling update_check(#{checkId},#{status})"
     end
     # @param [String] checkId 
     # @param [:PASSING,:WARNING,:CRITICAL] status 
@@ -436,7 +452,7 @@ module VertxConsul
         @j_del.java_method(:updateCheckWithNote, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::CheckStatus.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(checkId,Java::IoVertxExtConsul::CheckStatus.valueOf(status),note,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling update_check_with_note(checkId,status,note)"
+      raise ArgumentError, "Invalid arguments when calling update_check_with_note(#{checkId},#{status},#{note})"
     end
     # @yield 
     # @return [self]
@@ -473,7 +489,7 @@ module VertxConsul
         @j_del.java_method(:createSessionWithOptions, [Java::IoVertxExtConsul::SessionOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::SessionOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling create_session_with_options(options)"
+      raise ArgumentError, "Invalid arguments when calling create_session_with_options(#{options})"
     end
     # @param [String] id 
     # @yield 
@@ -483,7 +499,7 @@ module VertxConsul
         @j_del.java_method(:infoSession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling info_session(id)"
+      raise ArgumentError, "Invalid arguments when calling info_session(#{id})"
     end
     # @param [String] id 
     # @yield 
@@ -493,7 +509,7 @@ module VertxConsul
         @j_del.java_method(:renewSession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling renew_session(id)"
+      raise ArgumentError, "Invalid arguments when calling renew_session(#{id})"
     end
     # @yield 
     # @return [self]
@@ -512,7 +528,7 @@ module VertxConsul
         @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling list_node_sessions(nodeId)"
+      raise ArgumentError, "Invalid arguments when calling list_node_sessions(#{nodeId})"
     end
     # @param [String] id 
     # @yield 
@@ -522,7 +538,7 @@ module VertxConsul
         @j_del.java_method(:destroySession, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(id,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling destroy_session(id)"
+      raise ArgumentError, "Invalid arguments when calling destroy_session(#{id})"
     end
     # @return [void]
     def close

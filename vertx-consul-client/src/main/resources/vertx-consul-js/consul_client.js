@@ -1171,6 +1171,25 @@ var ConsulClient = function(j_val) {
   this._jdel = j_consulClient;
 };
 
+ConsulClient._jclass = utils.getJavaClass("io.vertx.ext.consul.ConsulClient");
+ConsulClient._jtype = {
+  accept: function(obj) {
+    return ConsulClient._jclass.isInstance(obj._jdel);
+  },
+  wrap: function(jdel) {
+    var obj = Object.create(ConsulClient.prototype, {});
+    ConsulClient.apply(obj, arguments);
+    return obj;
+  },
+  unwrap: function(obj) {
+    return obj._jdel;
+  }
+};
+ConsulClient._create = function(jdel) {
+  var obj = Object.create(ConsulClient.prototype, {});
+  ConsulClient.apply(obj, arguments);
+  return obj;
+}
 /**
  Create a Consul client.
 
@@ -1182,11 +1201,10 @@ var ConsulClient = function(j_val) {
 ConsulClient.create = function() {
   var __args = arguments;
   if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
-    return utils.convReturnVertxGen(JConsulClient["create(io.vertx.core.Vertx)"](__args[0]._jdel), ConsulClient);
+    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx)"](__args[0]._jdel));
   }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
-    return utils.convReturnVertxGen(JConsulClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](__args[0]._jdel, utils.convParamJsonObject(__args[1])), ConsulClient);
+    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](__args[0]._jdel, utils.convParamJsonObject(__args[1])));
   } else throw new TypeError('function invoked with invalid arguments');
 };
 
-// We export the Constructor function
 module.exports = ConsulClient;

@@ -27,8 +27,8 @@ import java.util.function.Consumer;
  */
 public class ConsulTestBase extends VertxTestBase {
 
-  static BiFunction<Vertx, JsonObject, ConsulClient> clientCreator;
-  static Consumer<ConsulClient> clientCloser;
+  protected static BiFunction<Vertx, JsonObject, ConsulClient> clientCreator;
+  protected static Consumer<ConsulClient> clientCloser;
 
   protected ConsulClient masterClient;
   protected ConsulClient writeClient;

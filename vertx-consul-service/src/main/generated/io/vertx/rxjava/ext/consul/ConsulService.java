@@ -44,14 +44,19 @@ import io.vertx.ext.consul.EventOptions;
 
 public class ConsulService extends ConsulClient {
 
-  final io.vertx.ext.consul.ConsulService delegate;
+  public static final io.vertx.lang.rxjava.TypeArg<ConsulService> arg = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new ConsulService((io.vertx.ext.consul.ConsulService) obj),
+    ConsulService::getDelegate
+  );
 
+  final io.vertx.ext.consul.ConsulService delegate;
+  
   public ConsulService(io.vertx.ext.consul.ConsulService delegate) {
     super(delegate);
     this.delegate = delegate;
   }
 
-  public Object getDelegate() {
+  public io.vertx.ext.consul.ConsulService getDelegate() {
     return delegate;
   }
 
@@ -62,12 +67,12 @@ public class ConsulService extends ConsulClient {
    * @return the service
    */
   public static ConsulService createEventBusProxy(Vertx vertx, String address) { 
-    ConsulService ret = ConsulService.newInstance(io.vertx.ext.consul.ConsulService.createEventBusProxy((io.vertx.core.Vertx)vertx.getDelegate(), address));
+    ConsulService ret = ConsulService.newInstance(io.vertx.ext.consul.ConsulService.createEventBusProxy(vertx.getDelegate(), address));
     return ret;
   }
 
   public ConsulService agentInfo(Handler<AsyncResult<JsonObject>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).agentInfo(resultHandler);
+    delegate.agentInfo(resultHandler);
     return this;
   }
 
@@ -78,7 +83,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).coordinateNodes(resultHandler);
+    delegate.coordinateNodes(resultHandler);
     return this;
   }
 
@@ -89,7 +94,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).coordinateDatacenters(resultHandler);
+    delegate.coordinateDatacenters(resultHandler);
     return this;
   }
 
@@ -100,7 +105,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).getValue(key, resultHandler);
+    delegate.getValue(key, resultHandler);
     return this;
   }
 
@@ -111,7 +116,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).getValueBlocking(key, options, resultHandler);
+    delegate.getValueBlocking(key, options, resultHandler);
     return this;
   }
 
@@ -122,7 +127,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).deleteValue(key, resultHandler);
+    delegate.deleteValue(key, resultHandler);
     return this;
   }
 
@@ -133,7 +138,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).getValues(keyPrefix, resultHandler);
+    delegate.getValues(keyPrefix, resultHandler);
     return this;
   }
 
@@ -144,7 +149,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).getValuesBlocking(keyPrefix, options, resultHandler);
+    delegate.getValuesBlocking(keyPrefix, options, resultHandler);
     return this;
   }
 
@@ -155,7 +160,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).deleteValues(keyPrefix, resultHandler);
+    delegate.deleteValues(keyPrefix, resultHandler);
     return this;
   }
 
@@ -166,7 +171,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).putValue(key, value, resultHandler);
+    delegate.putValue(key, value, resultHandler);
     return this;
   }
 
@@ -177,7 +182,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).putValueWithOptions(key, value, options, resultHandler);
+    delegate.putValueWithOptions(key, value, options, resultHandler);
     return this;
   }
 
@@ -188,7 +193,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).createAclToken(token, idHandler);
+    delegate.createAclToken(token, idHandler);
     return this;
   }
 
@@ -199,7 +204,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).updateAclToken(token, idHandler);
+    delegate.updateAclToken(token, idHandler);
     return this;
   }
 
@@ -210,7 +215,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).cloneAclToken(id, idHandler);
+    delegate.cloneAclToken(id, idHandler);
     return this;
   }
 
@@ -221,7 +226,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).listAclTokens(resultHandler);
+    delegate.listAclTokens(resultHandler);
     return this;
   }
 
@@ -232,7 +237,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).infoAclToken(id, tokenHandler);
+    delegate.infoAclToken(id, tokenHandler);
     return this;
   }
 
@@ -243,7 +248,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).destroyAclToken(id, resultHandler);
+    delegate.destroyAclToken(id, resultHandler);
     return this;
   }
 
@@ -254,7 +259,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService fireEvent(String name, Handler<AsyncResult<Event>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).fireEvent(name, resultHandler);
+    delegate.fireEvent(name, resultHandler);
     return this;
   }
 
@@ -265,7 +270,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).fireEventWithOptions(name, options, resultHandler);
+    delegate.fireEventWithOptions(name, options, resultHandler);
     return this;
   }
 
@@ -276,7 +281,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).listEvents(resultHandler);
+    delegate.listEvents(resultHandler);
     return this;
   }
 
@@ -287,7 +292,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).registerService(serviceOptions, resultHandler);
+    delegate.registerService(serviceOptions, resultHandler);
     return this;
   }
 
@@ -298,7 +303,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).maintenanceService(maintenanceOptions, resultHandler);
+    delegate.maintenanceService(maintenanceOptions, resultHandler);
     return this;
   }
 
@@ -309,7 +314,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).deregisterService(id, resultHandler);
+    delegate.deregisterService(id, resultHandler);
     return this;
   }
 
@@ -320,7 +325,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogServiceNodes(service, resultHandler);
+    delegate.catalogServiceNodes(service, resultHandler);
     return this;
   }
 
@@ -331,7 +336,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogServiceNodesWithTag(service, tag, resultHandler);
+    delegate.catalogServiceNodesWithTag(service, tag, resultHandler);
     return this;
   }
 
@@ -342,7 +347,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogDatacenters(resultHandler);
+    delegate.catalogDatacenters(resultHandler);
     return this;
   }
 
@@ -353,7 +358,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogNodes(resultHandler);
+    delegate.catalogNodes(resultHandler);
     return this;
   }
 
@@ -364,7 +369,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogServices(resultHandler);
+    delegate.catalogServices(resultHandler);
     return this;
   }
 
@@ -375,7 +380,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).localServices(resultHandler);
+    delegate.localServices(resultHandler);
     return this;
   }
 
@@ -386,7 +391,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).catalogNodeServices(node, resultHandler);
+    delegate.catalogNodeServices(node, resultHandler);
     return this;
   }
 
@@ -397,7 +402,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService localChecks(Handler<AsyncResult<List<Check>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).localChecks(resultHandler);
+    delegate.localChecks(resultHandler);
     return this;
   }
 
@@ -408,7 +413,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).registerCheck(checkOptions, resultHandler);
+    delegate.registerCheck(checkOptions, resultHandler);
     return this;
   }
 
@@ -419,7 +424,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).deregisterCheck(checkId, resultHandler);
+    delegate.deregisterCheck(checkId, resultHandler);
     return this;
   }
 
@@ -430,7 +435,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).passCheck(checkId, resultHandler);
+    delegate.passCheck(checkId, resultHandler);
     return this;
   }
 
@@ -441,7 +446,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).passCheckWithNote(checkId, note, resultHandler);
+    delegate.passCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
@@ -452,7 +457,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).warnCheck(checkId, resultHandler);
+    delegate.warnCheck(checkId, resultHandler);
     return this;
   }
 
@@ -463,7 +468,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).warnCheckWithNote(checkId, note, resultHandler);
+    delegate.warnCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
@@ -474,7 +479,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).failCheck(checkId, resultHandler);
+    delegate.failCheck(checkId, resultHandler);
     return this;
   }
 
@@ -485,7 +490,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).failCheckWithNote(checkId, note, resultHandler);
+    delegate.failCheckWithNote(checkId, note, resultHandler);
     return this;
   }
 
@@ -496,7 +501,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).updateCheck(checkId, status, resultHandler);
+    delegate.updateCheck(checkId, status, resultHandler);
     return this;
   }
 
@@ -507,7 +512,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).updateCheckWithNote(checkId, status, note, resultHandler);
+    delegate.updateCheckWithNote(checkId, status, note, resultHandler);
     return this;
   }
 
@@ -518,7 +523,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService leaderStatus(Handler<AsyncResult<String>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).leaderStatus(resultHandler);
+    delegate.leaderStatus(resultHandler);
     return this;
   }
 
@@ -529,7 +534,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService peersStatus(Handler<AsyncResult<List<String>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).peersStatus(resultHandler);
+    delegate.peersStatus(resultHandler);
     return this;
   }
 
@@ -540,7 +545,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService createSession(Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).createSession(idHandler);
+    delegate.createSession(idHandler);
     return this;
   }
 
@@ -551,7 +556,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).createSessionWithOptions(options, idHandler);
+    delegate.createSessionWithOptions(options, idHandler);
     return this;
   }
 
@@ -562,7 +567,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService infoSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).infoSession(id, resultHandler);
+    delegate.infoSession(id, resultHandler);
     return this;
   }
 
@@ -573,7 +578,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).renewSession(id, resultHandler);
+    delegate.renewSession(id, resultHandler);
     return this;
   }
 
@@ -584,7 +589,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).listSessions(resultHandler);
+    delegate.listSessions(resultHandler);
     return this;
   }
 
@@ -595,7 +600,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).listNodeSessions(nodeId, resultHandler);
+    delegate.listNodeSessions(nodeId, resultHandler);
     return this;
   }
 
@@ -606,7 +611,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler) { 
-    ((io.vertx.ext.consul.ConsulService) delegate).destroySession(id, resultHandler);
+    delegate.destroySession(id, resultHandler);
     return this;
   }
 
@@ -617,7 +622,7 @@ public class ConsulService extends ConsulClient {
   }
 
   public void close() { 
-    ((io.vertx.ext.consul.ConsulService) delegate).close();
+    delegate.close();
   }
 
 

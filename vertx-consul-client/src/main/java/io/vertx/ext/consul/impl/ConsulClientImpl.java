@@ -480,7 +480,7 @@ public class ConsulClientImpl implements ConsulClient {
       } else {
         resultHandler.handle(Future.failedFuture(h.statusMessage()));
       }
-    });
+    }).exceptionHandler(e -> resultHandler.handle(Future.failedFuture(e)));
     if (aclToken != null) {
       rq.putHeader(TOKEN_HEADER, aclToken);
     }
