@@ -18,10 +18,9 @@ package io.vertx.ext.consul.suite;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.consul.Utils;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.function.Function;
 
 /**
@@ -37,7 +36,7 @@ public class BrokenClient extends ConsulTestBase {
 
   @Test
   public void unknownPort() {
-    ConsulClient unknownPort = clientCreator.apply(vertx, new JsonObject().put("port", getUnusedPort()));
+    ConsulClient unknownPort = clientCreator.apply(vertx, new JsonObject().put("port", Utils.getFreePort()));
     tryClient(unknownPort, message -> message.contains("Connection refused"));
   }
 
@@ -51,14 +50,4 @@ public class BrokenClient extends ConsulTestBase {
     clientCloser.accept(client);
   }
 
-  private static int getUnusedPort() {
-    int port = 0;
-    try {
-      ServerSocket s = new ServerSocket(0);
-      port = s.getLocalPort();
-      s.close();
-    } catch (IOException ignore) {
-    }
-    return port;
-  }
 }

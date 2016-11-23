@@ -476,7 +476,7 @@ public class ConsulClientImpl implements ConsulClient {
           } catch (Throwable throwable) {
             resultHandler.handle(Future.failedFuture(throwable));
           }
-        });
+        }).exceptionHandler(e -> resultHandler.handle(Future.failedFuture(e)));
       } else {
         resultHandler.handle(Future.failedFuture(h.statusMessage()));
       }

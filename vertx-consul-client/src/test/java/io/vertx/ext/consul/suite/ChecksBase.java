@@ -218,7 +218,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     private CheckStatus status = CheckStatus.PASSING;
 
     HttpHealthReporter(Vertx vertx) {
-      this.port = getFreePort();
+      this.port = Utils.getFreePort();
       CountDownLatch latch = new CountDownLatch(1);
       this.server = vertx.createHttpServer().requestHandler(h -> h.response()
         .setStatusCode(statusCode(status))
@@ -253,16 +253,5 @@ public abstract class ChecksBase extends ConsulTestBase {
       }
     }
 
-    private static int getFreePort() {
-      int port = -1;
-      try {
-        ServerSocket socket = new ServerSocket(0);
-        port = socket.getLocalPort();
-        socket.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      return port;
-    }
   }
 }
