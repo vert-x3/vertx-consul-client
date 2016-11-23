@@ -37,6 +37,11 @@ public class DcCoordinates {
   private List<Coordinate> servers;
 
   /**
+   * Default constructor
+   */
+  public DcCoordinates() {}
+
+  /**
    * Constructor from JSON
    *
    * @param coords the JSON

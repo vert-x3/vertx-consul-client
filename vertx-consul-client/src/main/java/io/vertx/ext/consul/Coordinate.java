@@ -44,6 +44,11 @@ public class Coordinate {
   private List<Float> vec;
 
   /**
+   * Default constructor
+   */
+  public Coordinate() {}
+
+  /**
    * Copy constructor
    *
    * @param coordinate the one to copy

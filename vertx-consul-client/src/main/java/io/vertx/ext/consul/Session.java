@@ -43,6 +43,11 @@ public class Session {
   private String id;
 
   /**
+   * Default constructor
+   */
+  public Session() {}
+
+  /**
    * Constructor from JSON
    *
    * @param session the JSON

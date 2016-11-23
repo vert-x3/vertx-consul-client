@@ -43,6 +43,11 @@ public class Check {
   private String serviceName;
 
   /**
+   * Default constructor
+   */
+  public Check() {}
+
+  /**
    * Constructor from JSON
    *
    * @param check the JSON

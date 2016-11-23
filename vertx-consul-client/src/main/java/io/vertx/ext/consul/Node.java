@@ -36,6 +36,11 @@ public class Node {
   private String wanAddress;
 
   /**
+   * Default constructor
+   */
+  public Node() {}
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON

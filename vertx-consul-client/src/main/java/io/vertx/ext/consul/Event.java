@@ -45,6 +45,11 @@ public class Event {
   private int lTime;
 
   /**
+   * Default constructor
+   */
+  public Event() {}
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON

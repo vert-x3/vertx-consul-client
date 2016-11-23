@@ -44,6 +44,11 @@ public class KeyValue {
   private long lockIndex;
 
   /**
+   * Default constructor
+   */
+  public KeyValue() {}
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON
