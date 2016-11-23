@@ -41,6 +41,7 @@ public class ConsulClientImpl implements ConsulClient {
   private final HttpClient httpClient;
   private final String aclToken;
   private final String dc;
+  private final long timeoutMs;
 
   public ConsulClientImpl(Vertx vertx, JsonObject config) {
     Objects.requireNonNull(vertx);
@@ -51,6 +52,7 @@ public class ConsulClientImpl implements ConsulClient {
     );
     aclToken = config.getString("acl_token");
     dc = config.getString("dc");
+    timeoutMs = config.getLong("timeout", 0L);
   }
 
   @Override
@@ -483,6 +485,9 @@ public class ConsulClientImpl implements ConsulClient {
     }).exceptionHandler(e -> resultHandler.handle(Future.failedFuture(e)));
     if (aclToken != null) {
       rq.putHeader(TOKEN_HEADER, aclToken);
+    }
+    if (timeoutMs > 0) {
+      rq.setTimeout(timeoutMs);
     }
     return rq;
   }

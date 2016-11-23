@@ -15,9 +15,11 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulTestBase;
@@ -33,6 +35,20 @@ import java.util.concurrent.TimeUnit;
 public class BrokenConsul extends ConsulTestBase {
 
   @Test
+  public void timeout() {
+    SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
+    ConsulClient client = clientCreator.apply(vertx, new JsonObject().put("port", slowConsul.port()).put("timeout", 2000));
+    client.agentInfo(h -> {
+      if (h.failed() && h.cause().getMessage().contains("The timeout period of 2000ms")) {
+        testComplete();
+      }
+    });
+    await();
+    clientCloser.accept(client);
+    slowConsul.close();
+  }
+
+  @Test
   public void closedConnection() {
     BrokenHttpServer brokenConsul = new BrokenHttpServer(vertx);
     ConsulClient client = clientCreator.apply(vertx, new JsonObject().put("port", brokenConsul.port()));
@@ -46,16 +62,28 @@ public class BrokenConsul extends ConsulTestBase {
     brokenConsul.close();
   }
 
-  static class BrokenHttpServer {
+  static class SlowHttpServer extends CustomHttpServer {
+    SlowHttpServer(Vertx vertx, long delay) {
+      super(vertx, h -> vertx.setTimer(delay, t -> h.response().end()));
+    }
+  }
+
+  static class BrokenHttpServer extends CustomHttpServer {
+    BrokenHttpServer(Vertx vertx) {
+      super(vertx, h -> h.response().putHeader(HttpHeaders.CONTENT_LENGTH, "10000").write("start and ... ").close());
+    }
+  }
+
+  static class CustomHttpServer {
 
     private final HttpServer server;
     private final int port;
 
-    BrokenHttpServer(Vertx vertx) {
+    CustomHttpServer(Vertx vertx, Handler<HttpServerRequest> handler) {
       this.port = Utils.getFreePort();
       CountDownLatch latch = new CountDownLatch(1);
       this.server = vertx.createHttpServer()
-        .requestHandler(h -> h.response().putHeader(HttpHeaders.CONTENT_LENGTH, "10000").write("start and ... ").close())
+        .requestHandler(handler)
         .listen(port, h -> latch.countDown());
       try {
         latch.await(10, TimeUnit.SECONDS);
