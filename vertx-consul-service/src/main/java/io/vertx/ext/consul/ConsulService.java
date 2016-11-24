@@ -2,6 +2,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.ProxyIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -227,5 +228,6 @@ public interface ConsulService extends ConsulClient {
   ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
+  @ProxyIgnore
   void close();
 }
