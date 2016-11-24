@@ -45,7 +45,7 @@ public abstract class ChecksBase extends ConsulTestBase {
   @Test
   public void ttlCheckLifecycle() {
     CheckOptions opts = new CheckOptions()
-      .setTtl("1s")
+      .setTtl("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
@@ -66,7 +66,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     assertEquals(CheckStatus.PASSING, check.getStatus());
     assertEquals("pass", check.getOutput());
 
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
 
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
@@ -80,21 +80,21 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     CheckOptions opts = new CheckOptions()
       .setHttp("http://localhost:" + reporter.port())
-      .setInterval("1s")
+      .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
     reporter.setStatus(CheckStatus.WARNING);
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
 
     reporter.setStatus(CheckStatus.CRITICAL);
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
@@ -109,16 +109,16 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     CheckOptions opts = new CheckOptions()
       .setTcp("localhost:" + reporter.port())
-      .setInterval("1s")
+      .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
     reporter.close();
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
@@ -131,21 +131,21 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     CheckOptions opts = new CheckOptions()
       .setScript(reporter.scriptPath())
-      .setInterval("1s")
+      .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
 
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
     reporter.setStatus(CheckStatus.WARNING);
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
 
     reporter.setStatus(CheckStatus.CRITICAL);
-    sleep(vertx, 1500);
+    sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 

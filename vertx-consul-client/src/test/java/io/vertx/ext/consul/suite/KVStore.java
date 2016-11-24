@@ -127,7 +127,7 @@ public class KVStore extends ConsulTestBase {
       assertTrue(h.result().get(0).getModifyIndex() > pair1.getModifyIndex());
       latch.countDown();
     });
-    sleep(vertx, 1000);
+    sleep(vertx, 2000);
     assertEquals(latch.getCount(), 2);
     assertTrue(getAsync(h -> writeClient.putValue("foo/barBlock", "valueBlock2", h)));
     awaitLatch(latch);
