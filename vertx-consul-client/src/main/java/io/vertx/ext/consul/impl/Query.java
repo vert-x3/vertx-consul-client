@@ -17,6 +17,8 @@ package io.vertx.ext.consul.impl;
 
 import io.vertx.ext.consul.BlockingQueryOptions;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,8 +66,16 @@ class Query {
       if (sb.length() > 1) {
         sb.append('&');
       }
-      sb.append(e.getKey()).append('=').append(e.getValue());
+      sb.append(e.getKey()).append('=').append(urlEncode(e.getValue()));
     });
     return sb.toString();
+  }
+
+  static String urlEncode(String str) {
+    try {
+      return URLEncoder.encode(str, "UTF-8");
+    } catch (UnsupportedEncodingException ignore) {
+    }
+    return "";
   }
 }

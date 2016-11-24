@@ -109,7 +109,7 @@ public class Services extends ChecksBase {
     List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     assertEquals(1, checks.size());
 
-    String reason = "reason!";
+    String reason = "special symbols like `&` are allowed (хорошо)";
     MaintenanceOptions opts = new MaintenanceOptions()
       .setId(serviceId)
       .setReason(reason)
