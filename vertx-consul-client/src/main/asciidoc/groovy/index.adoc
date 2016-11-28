@@ -146,26 +146,198 @@ consulClient.registerCheck(opts, { res ->
 
 ----
 
-=== Service discovery
+=== Services
 
 [source,groovy]
 ----
 
-consulClient.catalogServiceNodes("consul", { res ->
+def opts = [
+  id:"serviceId",
+  name:"serviceName",
+  tags:["tag1", "tag2"],
+  checkOptions:[
+    ttl:"10s"
+  ],
+  address:"10.0.0.1",
+  port:8080
+]
+
+// Service registration
+
+consulClient.registerService(opts, { res ->
 
   if (res.succeeded()) {
 
-    def serviceList = res.result()
+    println("Service successfully registered")
 
-    println("found ${serviceList.size()} services")
+  } else {
 
-    serviceList.each { service ->
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Discovery registered service
+
+consulClient.catalogServiceNodes("serviceName", { res ->
+
+  if (res.succeeded()) {
+
+    println("found ${res.result().size()} services")
+
+    res.result().each { service ->
 
       println("Service node: ${service.node}")
 
-      println("Service node address: ${service.nodeAddress}")
+      println("Service address: ${service.address}")
+
+      println("Service port: ${service.port}")
 
     }
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Service deregistration
+
+consulClient.deregisterService("serviceId", { res ->
+
+  if (res.succeeded()) {
+
+    println("Service successfully deregistered")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+
+----
+
+=== Events
+
+[source,groovy]
+----
+
+def opts = [
+  tag:"tag",
+  payload:"message"
+]
+
+// trigger a new user event
+
+consulClient.fireEventWithOptions("eventName", opts, { res ->
+
+  if (res.succeeded()) {
+
+    println("Event sent")
+
+    println("id: ${res.result().id}")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// most recent events known by the agent
+
+consulClient.listEvents({ res ->
+
+  if (res.succeeded()) {
+
+    res.result().each { event ->
+
+      println("Event id: ${event.id}")
+
+      println("Event name: ${event.name}")
+
+      println("Event payload: ${event.payload}")
+
+    }
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+
+----
+
+=== Sessions
+
+[source,groovy]
+----
+import io.vertx.ext.consul.SessionBehavior
+
+def opts = [
+  node:"nodeId",
+  behavior:"RELEASE"
+]
+
+// Create session
+
+consulClient.createSessionWithOptions(opts, { res ->
+
+  if (res.succeeded()) {
+
+    println("Session successfully created")
+
+    println("id: ${res.result()}")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Lists sessions belonging to a node
+
+consulClient.listNodeSessions("nodeId", { res ->
+
+  if (res.succeeded()) {
+
+    res.result().each { session ->
+
+      println("Session id: ${session.id}")
+
+      println("Session node: ${session.node}")
+
+      println("Session create index: ${session.createIndex}")
+
+    }
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Destroy session
+
+consulClient.destroySession(sessionId, { res ->
+
+  if (res.succeeded()) {
+
+    println("Session successfully destroyed")
 
   } else {
 

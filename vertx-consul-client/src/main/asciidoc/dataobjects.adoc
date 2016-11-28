@@ -504,7 +504,7 @@ Lock delay is a time duration, between <code>0</code> and <code>60</code> second
 +++
 |[[node]]`node`|`String`|
 +++
-Get the human-readable name for the Session
+Get the ID of node
 +++
 |===
 

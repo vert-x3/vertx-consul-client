@@ -72,11 +72,25 @@
  * {@link examples.Examples#tcpHealth}
  * ----
  *
- * === Service discovery
+ * === Services
  *
  * [source,$lang]
  * ----
  * {@link examples.Examples#services}
+ * ----
+ *
+ * === Events
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#events}
+ * ----
+ *
+ * === Sessions
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#sessions}
  * ----
  */
 @Document(fileName = "index.adoc")

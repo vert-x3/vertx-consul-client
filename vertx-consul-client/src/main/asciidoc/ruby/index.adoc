@@ -146,26 +146,197 @@ consulClient.register_check(opts) { |res_err,res|
 
 ----
 
-=== Service discovery
+=== Services
 
 [source,ruby]
 ----
 
-consulClient.catalog_service_nodes("consul") { |res_err,res|
+opts = {
+  'id' => "serviceId",
+  'name' => "serviceName",
+  'tags' => ["tag1", "tag2"],
+  'checkOptions' => {
+    'ttl' => "10s"
+  },
+  'address' => "10.0.0.1",
+  'port' => 8080
+}
+
+# Service registration
+
+consulClient.register_service(opts) { |res_err,res|
 
   if (res_err == nil)
 
-    serviceList = res
+    puts "Service successfully registered"
 
-    puts "found #{serviceList.length} services"
+  else
 
-    serviceList.each do |service|
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Discovery registered service
+
+consulClient.catalog_service_nodes("serviceName") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "found #{res.length} services"
+
+    res.each do |service|
 
       puts "Service node: #{service['node']}"
 
-      puts "Service node address: #{service['nodeAddress']}"
+      puts "Service address: #{service['address']}"
+
+      puts "Service port: #{service['port']}"
 
     end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Service deregistration
+
+consulClient.deregister_service("serviceId") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Service successfully deregistered"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Events
+
+[source,ruby]
+----
+
+opts = {
+  'tag' => "tag",
+  'payload' => "message"
+}
+
+# trigger a new user event
+
+consulClient.fire_event_with_options("eventName", opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Event sent"
+
+    puts "id: #{res['id']}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# most recent events known by the agent
+
+consulClient.list_events() { |res_err,res|
+
+  if (res_err == nil)
+
+    res.each do |event|
+
+      puts "Event id: #{event['id']}"
+
+      puts "Event name: #{event['name']}"
+
+      puts "Event payload: #{event['payload']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Sessions
+
+[source,ruby]
+----
+
+opts = {
+  'node' => "nodeId",
+  'behavior' => "RELEASE"
+}
+
+# Create session
+
+consulClient.create_session_with_options(opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Session successfully created"
+
+    puts "id: #{res}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Lists sessions belonging to a node
+
+consulClient.list_node_sessions("nodeId") { |res_err,res|
+
+  if (res_err == nil)
+
+    res.each do |session|
+
+      puts "Session id: #{session['id']}"
+
+      puts "Session node: #{session['node']}"
+
+      puts "Session create index: #{session['createIndex']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Destroy session
+
+consulClient.destroy_session(sessionId) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Session successfully destroyed"
 
   else
 

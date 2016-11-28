@@ -98,9 +98,9 @@ public class Session {
   }
 
   /**
-   * Get the human-readable name for the Session
+   * Get the ID of node
    *
-   * @return the name of session
+   * @return the ID of node
    */
   public String getNode() {
     return node;
