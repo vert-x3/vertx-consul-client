@@ -1,0 +1,9 @@
+{
+  "main": "io.vertx.ext.consul.ConsulServiceVerticle",
+  "options": {
+    "worker": false,
+    "config": {
+      "address": "vertx.consul"
+    }
+  }
+}

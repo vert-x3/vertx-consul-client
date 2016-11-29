@@ -1,0 +1,350 @@
+= Vert.x Consul Client
+
+https://www.consul.io[Consul] is a tool for discovering and configuring services in your infrastructure.
+
+A Vert.x client allowing applications to interact with a Consul system via blocking and non-blocking HTTP API.
+
+== Using Vert.x Consul Client
+
+To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
+
+* Maven (in your `pom.xml`):
+
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-consul-client</artifactId>
+  <version>3.4.0-SNAPSHOT</version>
+</dependency>
+----
+
+* Gradle (in your `build.gradle` file):
+
+[source,groovy,subs="+attributes"]
+----
+compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
+----
+
+== Creating a client
+
+Just use factory method:
+
+[source,js]
+----
+var ConsulClient = require("vertx-consul-js/consul_client");
+
+var client = ConsulClient.create(vertx);
+
+
+----
+
+Also the client can be configured with a json object.
+
+[source,js]
+----
+var ConsulClient = require("vertx-consul-js/consul_client");
+
+var config = {
+  "host" : "consul.example.com"
+};
+
+var client = ConsulClient.create(vertx, config);
+
+
+----
+
+The following configuration is supported by the consul client:
+
+`host`:: Consul host. Defaults to `localhost`
+`port`:: Consul HTTP API port. Defaults to `8500`
+`timeout`:: Sets the amount of time (in milliseconds) after which if the request does not return any data
+within the timeout period an failure will be passed to the handler and the request will be closed.
+`acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
+ACL policy, is used.
+`dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
+by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
+
+== Using the API
+
+The client API is represented by `link:../../jsdoc/module-vertx-consul-js_consul_client-ConsulClient.html[ConsulClient]`.
+
+=== Key/Value Store
+
+[source,js]
+----
+
+// put Key/Value pair to Consul Store
+consulClient.putValue("foo", "bar", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("result of the operation: " + (res ? "success" : "fail"));
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+//  get Key/Value pair from Consul Store
+consulClient.getValue("foo", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("retrieved value: " + res.value);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
+
+=== Health Checks
+
+[source,js]
+----
+
+var alwaysGood = function (h) {
+  h.response().setStatusCode(200).end();
+};
+
+// create HTTP server to responce health check
+
+vertx.createHttpServer().requestHandler(alwaysGood).listen(4848);
+
+// check health via TCP port every 1 sec
+
+var opts = {
+  "tcp" : "localhost:4848",
+  "interval" : "1s"
+};
+
+// register TCP check
+
+consulClient.registerCheck(opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("check successfully registered");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+----
+
+=== Services
+
+[source,js]
+----
+
+var opts = {
+  "id" : "serviceId",
+  "name" : "serviceName",
+  "tags" : ["tag1", "tag2"],
+  "checkOptions" : {
+    "ttl" : "10s"
+  },
+  "address" : "10.0.0.1",
+  "port" : 8080
+};
+
+// Service registration
+
+consulClient.registerService(opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Service successfully registered");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Discovery registered service
+
+consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("found " + res.length + " services");
+
+    Array.prototype.forEach.call(res, function(service) {
+
+      console.log("Service node: " + service.node);
+
+      console.log("Service address: " + service.address);
+
+      console.log("Service port: " + service.port);
+
+    });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Service deregistration
+
+consulClient.deregisterService("serviceId", function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Service successfully deregistered");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
+
+=== Events
+
+[source,js]
+----
+
+var opts = {
+  "tag" : "tag",
+  "payload" : "message"
+};
+
+// trigger a new user event
+
+consulClient.fireEventWithOptions("eventName", opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Event sent");
+
+    console.log("id: " + res.id);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// most recent events known by the agent
+
+consulClient.listEvents(function (res, res_err) {
+
+  if (res_err == null) {
+
+    Array.prototype.forEach.call(res, function(event) {
+
+      console.log("Event id: " + event.id);
+
+      console.log("Event name: " + event.name);
+
+      console.log("Event payload: " + event.payload);
+
+    });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
+
+=== Sessions
+
+[source,js]
+----
+
+var opts = {
+  "node" : "nodeId",
+  "behavior" : "RELEASE"
+};
+
+// Create session
+
+consulClient.createSessionWithOptions(opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Session successfully created");
+
+    console.log("id: " + res);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Lists sessions belonging to a node
+
+consulClient.listNodeSessions("nodeId", function (res, res_err) {
+
+  if (res_err == null) {
+
+    Array.prototype.forEach.call(res, function(session) {
+
+      console.log("Session id: " + session.id);
+
+      console.log("Session node: " + session.node);
+
+      console.log("Session create index: " + session.createIndex);
+
+    });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Destroy session
+
+consulClient.destroySession(sessionId, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Session successfully destroyed");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----

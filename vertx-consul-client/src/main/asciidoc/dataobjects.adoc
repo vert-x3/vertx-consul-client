@@ -1,0 +1,550 @@
+= Cheatsheets
+
+[[AclToken]]
+== AclToken
+
+++++
+ Holds properties of Acl token
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|
++++
+Set ID of token
++++
+|[[name]]`name`|`String`|
++++
+Set name of token
++++
+|[[rules]]`rules`|`String`|
++++
+Set rules for token
++++
+|[[type]]`type`|`link:enums.html#AclTokenType[AclTokenType]`|
++++
+Set type of token
++++
+|===
+
+[[BlockingQueryOptions]]
+== BlockingQueryOptions
+
+++++
+ Options used to perform blocking query that used to wait for a potential change using long polling.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set index indicating that the client wishes to wait for any changes subsequent to that index.
++++
+|[[wait]]`wait`|`String`|
++++
+Specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+ If not set, the wait time defaults to 5 minutes. This value can be specified in the form of "10s" or "5m"
+ (i.e., 10 seconds or 5 minutes, respectively).
++++
+|===
+
+[[Check]]
+== Check
+
+++++
+ Holds check properties
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|
++++
+Get the ID of check
++++
+|[[name]]`name`|`String`|
++++
+Get the name of check
++++
+|[[notes]]`notes`|`String`|
++++
+Get the human-readable note of check
++++
+|[[output]]`output`|`String`|
++++
+Get the output of check
++++
+|[[serviceId]]`serviceId`|`String`|
++++
+Get the ID of service with which this check associated
++++
+|[[serviceName]]`serviceName`|`String`|
++++
+Get the name of service with which this check associated
++++
+|[[status]]`status`|`link:enums.html#CheckStatus[CheckStatus]`|
++++
+Get the status of check
++++
+|===
+
+[[CheckOptions]]
+== CheckOptions
+
+++++
+ Options used to register checks in Consul.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[http]]`http`|`String`|
++++
+Set HTTP address to check. Also you should set checking interval
++++
+|[[id]]`id`|`String`|
++++
+Set check ID
++++
+|[[interval]]`interval`|`String`|
++++
+Set checking interval
++++
+|[[name]]`name`|`String`|
++++
+Set check name
++++
+|[[note]]`note`|`String`|
++++
+Set check note
++++
+|[[script]]`script`|`String`|
++++
+Set path to checking script. Also you should set checking interval
++++
+|[[tcp]]`tcp`|`String`|
++++
+Set TCP address to check. Also you should set checking interval
++++
+|[[ttl]]`ttl`|`String`|
++++
+Set Time to Live of check.
++++
+|===
+
+[[Coordinate]]
+== Coordinate
+
+++++
+ Holds network coordinates of node
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[adj]]`adj`|`Number (float)`|-
+|[[err]]`err`|`Number (float)`|-
+|[[height]]`height`|`Number (float)`|-
+|[[node]]`node`|`String`|
++++
+Get name of node
++++
+|[[vec]]`vec`|`Array of Number (Float)`|-
+|===
+
+[[DcCoordinates]]
+== DcCoordinates
+
+++++
+ Holds coordinates of servers in datacenter
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[datacenter]]`datacenter`|`String`|
++++
+Get datacenter
++++
+|[[servers]]`servers`|`Array of link:dataobjects.html#Coordinate[Coordinate]`|
++++
+Get list of servers in datacenter
++++
+|===
+
+[[Event]]
+== Event
+
+++++
+ Holds properties of Consul event
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|
++++
+Get ID of event
++++
+|[[name]]`name`|`String`|
++++
+Get name of event
++++
+|[[node]]`node`|`String`|
++++
+Get regular expression to filter by node name
++++
+|[[payload]]`payload`|`String`|
++++
+Get payload of event
++++
+|[[service]]`service`|`String`|
++++
+Get regular expression to filter by service
++++
+|[[tag]]`tag`|`String`|
++++
+Get regular expression to filter by tag
++++
+|[[version]]`version`|`Number (int)`|
++++
+Get version
++++
+|===
+
+[[EventOptions]]
+== EventOptions
+
+++++
+ Options used to trigger a new user event.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[node]]`node`|`String`|
++++
+Set regular expression to filter by node name
++++
+|[[payload]]`payload`|`String`|
++++
+Set payload of event
++++
+|[[service]]`service`|`String`|
++++
+Set regular expression to filter by service
++++
+|[[tag]]`tag`|`String`|
++++
+Set regular expression to filter by tag
++++
+|===
+
+[[KeyValue]]
+== KeyValue
+
+++++
+ Represents key/value pair stored in Consul
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[createIndex]]`createIndex`|`Number (long)`|
++++
+Get the internal index value that represents when the entry was created.
++++
+|[[flags]]`flags`|`Number (long)`|
++++
+Get the flags attached to this entry. Clients can choose to use this however makes sense for their application.
++++
+|[[key]]`key`|`String`|
++++
+Get the key
++++
+|[[lockIndex]]`lockIndex`|`Number (long)`|
++++
+Get the number of times this key has successfully been acquired in a lock.
++++
+|[[modifyIndex]]`modifyIndex`|`Number (long)`|
++++
+Get the last index that modified this key.
++++
+|[[session]]`session`|`String`|
++++
+Get the session that owns the lock
++++
+|[[value]]`value`|`String`|
++++
+Get the value
++++
+|===
+
+[[KeyValueOptions]]
+== KeyValueOptions
+
+++++
+ Options used to put key/value pair to Consul.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[acquireSession]]`acquireSession`|`String`|
++++
+Set session ID for lock acquisition operation.
++++
+|[[casIndex]]`casIndex`|`Number (long)`|
++++
+Set the Check-And-Set index. If the index is <code>0</code>, Consul will only put the key if it does not already exist.
+ If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
++++
+|[[flags]]`flags`|`Number (long)`|
++++
+Set the flags. Flags is an value between <code>0</code> and 2<sup>64</sup>-1 that can be attached to each entry.
+ Clients can choose to use this however makes sense for their application.
++++
+|[[releaseSession]]`releaseSession`|`String`|
++++
+Set session ID for lock release operation.
++++
+|===
+
+[[MaintenanceOptions]]
+== MaintenanceOptions
+
+++++
+ Options used to placing a given service into "maintenance mode".
+ During maintenance mode, the service will be marked as unavailable
+ and will not be present in DNS or API queries. Maintenance mode is persistent
+ and will be automatically restored on agent restart.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[enable]]`enable`|`Boolean`|
++++
+Set maintenance mode to enabled: <code>true</code> to enter maintenance mode or <code>false</code> to resume normal operation.
+ This flag is required.
++++
+|[[id]]`id`|`String`|
++++
+Set the ID of service. This field is required.
++++
+|[[reason]]`reason`|`String`|
++++
+Set the reason message. If provided, its value should be a text string explaining the reason for placing
+ the service into maintenance mode. This is simply to aid human operators.
++++
+|===
+
+[[Node]]
+== Node
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|
++++
+Get node address
++++
+|[[lanAddress]]`lanAddress`|`String`|
++++
+Get node lan address
++++
+|[[node]]`node`|`String`|
++++
+Get node name
++++
+|[[wanAddress]]`wanAddress`|`String`|
++++
+Get node wan address
++++
+|===
+
+[[Service]]
+== Service
+
+++++
+ Holds properties of service and node that its containing
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|
++++
+Set service address
++++
+|[[id]]`id`|`String`|
++++
+Set ID of service
++++
+|[[name]]`name`|`String`|
++++
+Set service name
++++
+|[[node]]`node`|`String`|
++++
+Set node name
++++
+|[[nodeAddress]]`nodeAddress`|`String`|
++++
+Set node address
++++
+|[[port]]`port`|`Number (int)`|
++++
+Set service port
++++
+|[[tags]]`tags`|`Array of String`|
++++
+Set list of service tags
++++
+|===
+
+[[ServiceOptions]]
+== ServiceOptions
+
+++++
+ Options used to register service.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[address]]`address`|`String`|
++++
+Set service address
++++
+|[[checkOptions]]`checkOptions`|`link:dataobjects.html#CheckOptions[CheckOptions]`|
++++
+Set check options of service
++++
+|[[id]]`id`|`String`|
++++
+Set the ID of session
++++
+|[[name]]`name`|`String`|
++++
+Set service name
++++
+|[[port]]`port`|`Number (int)`|
++++
+Set service port
++++
+|[[tags]]`tags`|`Array of String`|
++++
+Set list of tags associated with service
++++
+|===
+
+[[Session]]
+== Session
+
+++++
+ Holds properties of Consul sessions
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[checks]]`checks`|`Array of String`|
++++
+Get the list of associated health checks
++++
+|[[createIndex]]`createIndex`|`Number (long)`|
++++
+Get the create index of session
++++
+|[[id]]`id`|`String`|
++++
+Get the ID of session
++++
+|[[lockDelay]]`lockDelay`|`Number (long)`|
++++
+Lock delay is a time duration, between <code>0</code> and <code>60</code> seconds. When a session invalidation
+ takes place, Consul prevents any of the previously held locks from being re-acquired
+ for the <code>lock-delay</code> interval. The default is <code>15s</code>.
++++
+|[[node]]`node`|`String`|
++++
+Get the ID of node
++++
+|===
+
+[[SessionOptions]]
+== SessionOptions
+
+++++
+ Options used to create session.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[behavior]]`behavior`|`link:enums.html#SessionBehavior[SessionBehavior]`|
++++
+Set the behavior when a session is invalidated. The release behavior is the default if none is specified.
++++
+|[[checks]]`checks`|`Array of String`|
++++
+Set a list of associated health checks. It is highly recommended that,
+ if you override this list, you include the default "serfHealth"
++++
+|[[lockDelay]]`lockDelay`|`Number (long)`|
++++
+Set the lock-delay period.
++++
+|[[name]]`name`|`String`|
++++
+Set the human-readable name for the Session
++++
+|[[node]]`node`|`String`|
++++
+Set the node to which the session will be assigned
++++
+|[[ttl]]`ttl`|`Number (long)`|
++++
+Set the TTL interval. When TTL interval expires without being renewed, the session has expired
+ and an invalidation is triggered. If specified, it must be between 10s and 86400s currently.
++++
+|===
+

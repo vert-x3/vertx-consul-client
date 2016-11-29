@@ -1,0 +1,350 @@
+= Vert.x Consul Client
+
+https://www.consul.io[Consul] is a tool for discovering and configuring services in your infrastructure.
+
+A Vert.x client allowing applications to interact with a Consul system via blocking and non-blocking HTTP API.
+
+== Using Vert.x Consul Client
+
+To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
+
+* Maven (in your `pom.xml`):
+
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-consul-client</artifactId>
+  <version>3.4.0-SNAPSHOT</version>
+</dependency>
+----
+
+* Gradle (in your `build.gradle` file):
+
+[source,groovy,subs="+attributes"]
+----
+compile 'io.vertx:vertx-consul-client:3.4.0-SNAPSHOT'
+----
+
+== Creating a client
+
+Just use factory method:
+
+[source,ruby]
+----
+require 'vertx-consul/consul_client'
+
+client = VertxConsul::ConsulClient.create(vertx)
+
+
+----
+
+Also the client can be configured with a json object.
+
+[source,ruby]
+----
+require 'vertx-consul/consul_client'
+
+config = {
+  'host' => "consul.example.com"
+}
+
+client = VertxConsul::ConsulClient.create(vertx, config)
+
+
+----
+
+The following configuration is supported by the consul client:
+
+`host`:: Consul host. Defaults to `localhost`
+`port`:: Consul HTTP API port. Defaults to `8500`
+`timeout`:: Sets the amount of time (in milliseconds) after which if the request does not return any data
+within the timeout period an failure will be passed to the handler and the request will be closed.
+`acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
+ACL policy, is used.
+`dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
+by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
+
+== Using the API
+
+The client API is represented by `link:../../yardoc/VertxConsul/ConsulClient.html[ConsulClient]`.
+
+=== Key/Value Store
+
+[source,ruby]
+----
+
+# put Key/Value pair to Consul Store
+consulClient.put_value("foo", "bar") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "result of the operation: #{(res ? "success" : "fail")}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+#  get Key/Value pair from Consul Store
+consulClient.get_value("foo") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "retrieved value: #{res['value']}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Health Checks
+
+[source,ruby]
+----
+
+alwaysGood = lambda { |h|
+  h.response().set_status_code(200).end()
+}
+
+# create HTTP server to responce health check
+
+vertx.create_http_server().request_handler(&alwaysGood).listen(4848)
+
+# check health via TCP port every 1 sec
+
+opts = {
+  'tcp' => "localhost:4848",
+  'interval' => "1s"
+}
+
+# register TCP check
+
+consulClient.register_check(opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "check successfully registered"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+----
+
+=== Services
+
+[source,ruby]
+----
+
+opts = {
+  'id' => "serviceId",
+  'name' => "serviceName",
+  'tags' => ["tag1", "tag2"],
+  'checkOptions' => {
+    'ttl' => "10s"
+  },
+  'address' => "10.0.0.1",
+  'port' => 8080
+}
+
+# Service registration
+
+consulClient.register_service(opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Service successfully registered"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Discovery registered service
+
+consulClient.catalog_service_nodes("serviceName") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "found #{res.length} services"
+
+    res.each do |service|
+
+      puts "Service node: #{service['node']}"
+
+      puts "Service address: #{service['address']}"
+
+      puts "Service port: #{service['port']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Service deregistration
+
+consulClient.deregister_service("serviceId") { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Service successfully deregistered"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Events
+
+[source,ruby]
+----
+
+opts = {
+  'tag' => "tag",
+  'payload' => "message"
+}
+
+# trigger a new user event
+
+consulClient.fire_event_with_options("eventName", opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Event sent"
+
+    puts "id: #{res['id']}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# most recent events known by the agent
+
+consulClient.list_events() { |res_err,res|
+
+  if (res_err == nil)
+
+    res.each do |event|
+
+      puts "Event id: #{event['id']}"
+
+      puts "Event name: #{event['name']}"
+
+      puts "Event payload: #{event['payload']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Sessions
+
+[source,ruby]
+----
+
+opts = {
+  'node' => "nodeId",
+  'behavior' => "RELEASE"
+}
+
+# Create session
+
+consulClient.create_session_with_options(opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Session successfully created"
+
+    puts "id: #{res}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Lists sessions belonging to a node
+
+consulClient.list_node_sessions("nodeId") { |res_err,res|
+
+  if (res_err == nil)
+
+    res.each do |session|
+
+      puts "Session id: #{session['id']}"
+
+      puts "Session node: #{session['node']}"
+
+      puts "Session create index: #{session['createIndex']}"
+
+    end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Destroy session
+
+consulClient.destroy_session(sessionId) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Session successfully destroyed"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
