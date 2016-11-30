@@ -320,19 +320,19 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_service">/v1/catalog/service/&lt;service&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
-   * Returns the nodes providing a service, filtered by tag
+   * Returns the nodes providing a service
    *
    * @param service       name of service
-   * @param tag           service tag
+   * @param options       options used to request services
    * @param resultHandler will be provided with list of nodes providing given service
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_service">/v1/catalog/service/&lt;service&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulClient catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
    * Return all the datacenters that are known by the Consul server
@@ -352,7 +352,18 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_nodes">/v1/catalog/nodes</a> endpoint
    */
   @Fluent
-  ConsulClient catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler);
+  ConsulClient catalogNodes(Handler<AsyncResult<NodeList>> resultHandler);
+
+  /**
+   * Returns the nodes registered in a datacenter
+   *
+   * @param resultHandler will be provided with list of nodes
+   * @param options       options used to request nodes
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_nodes">/v1/catalog/nodes</a> endpoint
+   */
+  @Fluent
+  ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
 
   /**
    * Returns the services registered in a datacenter
@@ -362,7 +373,19 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_services">/v1/catalog/services</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler);
+
+  /**
+   * Returns the services registered in a datacenter
+   * This is blocking query unlike {@link ConsulClient#catalogServices(Handler)}
+   *
+   * @param resultHandler will be provided with list of services
+   * @param options       the blocking options
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_services">/v1/catalog/services</a> endpoint
+   */
+  @Fluent
+  ConsulClient catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
    * Returns the node's registered services
@@ -373,7 +396,20 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_node">/v1/catalog/node/&lt;node&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler);
+
+  /**
+   * Returns the node's registered services
+   * This is blocking query unlike {@link ConsulClient#catalogNodeServices(String, Handler)}
+   *
+   * @param node          node name
+   * @param options       the blocking options
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_node">/v1/catalog/node/&lt;node&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
    * Returns list of services registered with the local agent.

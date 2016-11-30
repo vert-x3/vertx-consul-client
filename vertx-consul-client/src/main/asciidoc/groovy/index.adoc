@@ -184,9 +184,9 @@ consulClient.catalogServiceNodes("serviceName", { res ->
 
   if (res.succeeded()) {
 
-    println("found ${res.result().size()} services")
+    println("found ${res.result().list.size()} services")
 
-    res.result().each { service ->
+    res.result().list.each { service ->
 
       println("Service node: ${service.node}")
 

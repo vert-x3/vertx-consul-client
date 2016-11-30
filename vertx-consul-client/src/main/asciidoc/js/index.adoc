@@ -184,9 +184,9 @@ consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
 
   if (res_err == null) {
 
-    console.log("found " + res.length + " services");
+    console.log("found " + res.list.length + " services");
 
-    Array.prototype.forEach.call(res, function(service) {
+    Array.prototype.forEach.call(res.list, function(service) {
 
       console.log("Service node: " + service.node);
 

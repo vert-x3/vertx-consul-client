@@ -121,11 +121,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulService catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulService catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent
@@ -133,11 +133,19 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler);
+  ConsulService catalogNodes(Handler<AsyncResult<NodeList>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService catalogServices(Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulService catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService catalogServices(Handler<AsyncResult<ServiceList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent
@@ -145,7 +153,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler);
+  ConsulService catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent

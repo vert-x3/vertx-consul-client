@@ -72,24 +72,26 @@ public class Services extends ChecksBase {
     Check c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
     assertEquals(c.getId(), "service:serviceName");
 
-    List<Service> nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
-    assertEquals(2, nodeServices.size());
+    ServiceList nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
+    assertEquals(2, nodeServices.getList().size());
 
-    List<Service> nodeServicesWithKnownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "tag1", h));
-    assertEquals(1, nodeServicesWithKnownTag.size());
+    ServiceQueryOptions knownOpts = new ServiceQueryOptions().setTag("tag1");
+    ServiceList nodeServicesWithKnownTag = getAsync(h -> writeClient.catalogServiceNodesWithOptions(serviceName, knownOpts, h));
+    assertEquals(1, nodeServicesWithKnownTag.getList().size());
 
-    List<Service> nodeServicesWithUnknownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "unknownTag", h));
-    assertEquals(0, nodeServicesWithUnknownTag.size());
+    ServiceQueryOptions unknownOpts = new ServiceQueryOptions().setTag("unknownTag");
+    ServiceList nodeServicesWithUnknownTag = getAsync(h -> writeClient.catalogServiceNodesWithOptions(serviceName, unknownOpts, h));
+    assertEquals(0, nodeServicesWithUnknownTag.getList().size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
   }
 
   @Test
   public void findConsul() {
-    List<Service> localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
-    assertEquals(localConsulList.size(), 1);
-    List<Service> catalogConsulList = Utils.<List<Service>>getAsync(h -> writeClient.catalogServices(h))
-      .stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
+    ServiceList localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
+    assertEquals(localConsulList.getList().size(), 1);
+    List<Service> catalogConsulList = Utils.<ServiceList>getAsync(h -> writeClient.catalogServices(h))
+      .getList().stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
     assertEquals(1, catalogConsulList.size());
     assertEquals(0, catalogConsulList.get(0).getTags().size());
   }

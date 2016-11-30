@@ -184,9 +184,9 @@ consulClient.catalog_service_nodes("serviceName") { |res_err,res|
 
   if (res_err == nil)
 
-    puts "found #{res.length} services"
+    puts "found #{res['list'].length} services"
 
-    res.each do |service|
+    res['list'].each do |service|
 
       puts "Service node: #{service['node']}"
 

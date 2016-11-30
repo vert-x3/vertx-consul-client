@@ -29,6 +29,10 @@ class Query {
 
   private final Map<String, String> map = new HashMap<>();
 
+  static Query of(BlockingQueryOptions options) {
+    return new Query().put(options);
+  }
+
   static Query of(String key, Object value) {
     return new Query().put(key, value);
   }

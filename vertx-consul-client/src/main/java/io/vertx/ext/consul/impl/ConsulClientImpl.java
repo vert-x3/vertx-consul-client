@@ -39,6 +39,7 @@ import static io.vertx.ext.consul.impl.Query.urlEncode;
 public class ConsulClientImpl implements ConsulClient {
 
   private static final String TOKEN_HEADER = "X-Consul-Token";
+  private static final String INDEX_HEADER = "X-Consul-Index";
 
   private final HttpClient httpClient;
   private final String aclToken;
@@ -245,15 +246,17 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) {
-    return catalogServiceNodesWithTag(service, null, resultHandler);
+  public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler) {
+    return catalogServiceNodesWithOptions(service, null, resultHandler);
   }
 
   @Override
-  public ConsulClient catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/catalog/service/" + urlEncode(service), Query.of("tag", tag), resultHandler, (arr, headers) -> arr.stream()
-      .map(obj -> new Service((JsonObject) obj))
-      .collect(Collectors.toList())).end();
+  public ConsulClient catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    Query query = options == null ? null : Query.of("tag", options.getTag()).put("near", options.getNear()).put(options.getBlockingOptions());
+    requestArray(HttpMethod.GET, "/v1/catalog/service/" + urlEncode(service), query, resultHandler, (arr, headers) -> {
+      List<Service> list = arr.stream().map(obj -> new Service((JsonObject) obj)).collect(Collectors.toList());
+      return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
@@ -264,17 +267,36 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/catalog/nodes", null, resultHandler, (arr, headers) -> arr.stream()
-      .map(obj -> new Node((JsonObject) obj))
-      .collect(Collectors.toList())).end();
+  public ConsulClient catalogNodes(Handler<AsyncResult<NodeList>> resultHandler) {
+    return catalogNodesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler) {
+    Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
+    requestArray(HttpMethod.GET, "/v1/catalog/nodes", query, resultHandler, (arr, headers) -> {
+      List<Node> list = arr.stream().map(obj -> new Node((JsonObject) obj)).collect(Collectors.toList());
+      return new NodeList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
   @Override
-  public ConsulClient catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
-    requestObject(HttpMethod.GET, "/v1/catalog/services", null, resultHandler, (json, headers) -> json.stream()
-      .map(ServiceParser::parseCatalogInfo).collect(Collectors.toList())).end();
+  public ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler) {
+    return catalogServicesBlocking(null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler) {
+    return catalogNodeServicesBlocking(node, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    requestObject(HttpMethod.GET, "/v1/catalog/services", Query.of(options), resultHandler, (json, headers) -> {
+      List<Service> list = json.stream().map(ServiceParser::parseCatalogInfo).collect(Collectors.toList());
+      return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
@@ -295,14 +317,15 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulClient catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/catalog/node/" + urlEncode(node), null, resultHandler, (json, headers) -> {
       JsonObject nodeInfo = json.getJsonObject("Node");
       String nodeName = nodeInfo.getString("Node");
       String nodeAddress = nodeInfo.getString("Address");
-      return json.getJsonObject("Services").stream()
+      List<Service> list = json.getJsonObject("Services").stream()
         .map(obj -> ServiceParser.parseNodeInfo(nodeName, nodeAddress, (JsonObject) obj.getValue()))
         .collect(Collectors.toList());
+      return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
     }).end();
     return this;
   }

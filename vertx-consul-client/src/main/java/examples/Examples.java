@@ -145,9 +145,9 @@ public class Examples {
 
       if (res.succeeded()) {
 
-        System.out.println("found " + res.result().size() + " services");
+        System.out.println("found " + res.result().getList().size() + " services");
 
-        for (Service service : res.result()) {
+        for (Service service : res.result().getList()) {
 
           System.out.println("Service node: " + service.getNode());
 

@@ -17,11 +17,11 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Node;
+import io.vertx.ext.consul.NodeList;
+import io.vertx.ext.consul.Utils;
 import org.junit.Test;
 
 import java.util.List;
-
-import static io.vertx.ext.consul.Utils.getAsync;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -30,14 +30,14 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void datacenters() {
-    List<String> datacenters = getAsync(h -> readClient.catalogDatacenters(h));
+    List<String> datacenters = Utils.getAsync(h -> readClient.catalogDatacenters(h));
     assertEquals(datacenters.size(), 1);
     assertEquals(datacenters.get(0), dc);
   }
 
   @Test
   public void nodes() {
-    List<Node> nodes = getAsync(h -> readClient.catalogNodes(h));
+    List<Node> nodes = Utils.<NodeList>getAsync(h -> readClient.catalogNodes(h)).getList();
     assertEquals(nodes.size(), 1);
     Node node = nodes.get(0);
     assertEquals(node.getNode(), nodeName);
