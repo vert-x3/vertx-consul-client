@@ -145,7 +145,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulService catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent
@@ -157,7 +157,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulService catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   @Override
   @Fluent

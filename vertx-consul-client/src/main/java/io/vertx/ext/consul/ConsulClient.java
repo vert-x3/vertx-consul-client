@@ -385,7 +385,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_services">/v1/catalog/services</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulClient catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
    * Returns the node's registered services
@@ -409,7 +409,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_node">/v1/catalog/node/&lt;node&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulClient catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
    * Returns list of services registered with the local agent.

@@ -699,10 +699,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with list of services 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.catalogServicesBlocking = function(options, resultHandler) {
+  this.catalogServicesWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["catalogServicesBlocking(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogServicesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -745,10 +745,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with list of services 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.catalogNodeServicesBlocking = function(node, options, resultHandler) {
+  this.catalogNodeServicesWithOptions = function(node, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["catalogNodeServicesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogNodeServicesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {

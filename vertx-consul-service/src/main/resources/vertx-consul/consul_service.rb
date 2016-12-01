@@ -333,12 +333,12 @@ module VertxConsul
     # @param [Hash] options 
     # @yield 
     # @return [self]
-    def catalog_services_blocking(options=nil)
+    def catalog_services_with_options(options=nil)
       if options.class == Hash && block_given?
-        @j_del.java_method(:catalogServicesBlocking, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        @j_del.java_method(:catalogServicesWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_services_blocking(#{options})"
+      raise ArgumentError, "Invalid arguments when calling catalog_services_with_options(#{options})"
     end
     # @yield 
     # @return [self]
@@ -363,12 +363,12 @@ module VertxConsul
     # @param [Hash] options 
     # @yield 
     # @return [self]
-    def catalog_node_services_blocking(node=nil,options=nil)
+    def catalog_node_services_with_options(node=nil,options=nil)
       if node.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:catalogNodeServicesBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(node,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        @j_del.java_method(:catalogNodeServicesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(node,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_node_services_blocking(#{node},#{options})"
+      raise ArgumentError, "Invalid arguments when calling catalog_node_services_with_options(#{node},#{options})"
     end
     # @yield 
     # @return [self]

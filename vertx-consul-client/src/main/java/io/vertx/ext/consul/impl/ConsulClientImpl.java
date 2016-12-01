@@ -283,16 +283,11 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler) {
-    return catalogServicesBlocking(null, resultHandler);
+    return catalogServicesWithOptions(null, resultHandler);
   }
 
   @Override
-  public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler) {
-    return catalogNodeServicesBlocking(node, null, resultHandler);
-  }
-
-  @Override
-  public ConsulClient catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+  public ConsulClient catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/catalog/services", Query.of(options), resultHandler, (json, headers) -> {
       List<Service> list = json.stream().map(ServiceParser::parseCatalogInfo).collect(Collectors.toList());
       return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
@@ -317,8 +312,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
-    requestObject(HttpMethod.GET, "/v1/catalog/node/" + urlEncode(node), null, resultHandler, (json, headers) -> {
+  public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler) {
+    return catalogNodeServicesWithOptions(node, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    requestObject(HttpMethod.GET, "/v1/catalog/node/" + urlEncode(node), Query.of(options), resultHandler, (json, headers) -> {
       JsonObject nodeInfo = json.getJsonObject("Node");
       String nodeName = nodeInfo.getString("Node");
       String nodeAddress = nodeInfo.getString("Address");

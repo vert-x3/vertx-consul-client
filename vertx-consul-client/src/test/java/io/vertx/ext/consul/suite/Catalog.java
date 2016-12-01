@@ -15,13 +15,17 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.Node;
-import io.vertx.ext.consul.NodeList;
-import io.vertx.ext.consul.Utils;
+import com.pszymczyk.consul.ConsulProcess;
+import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static io.vertx.ext.consul.Utils.getAsync;
+import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -43,4 +47,32 @@ public class Catalog extends ConsulTestBase {
     assertEquals(node.getNode(), nodeName);
   }
 
+  @Test
+  public void blockingQuery() throws InterruptedException {
+    NodeList nodes1 = getAsync(h -> readClient.catalogNodes(h));
+    CountDownLatch latch1 = new CountDownLatch(1);
+    BlockingQueryOptions blockingQueryOptions1 = new BlockingQueryOptions().setIndex(nodes1.getIndex());
+    readClient.catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions1), h -> {
+      List<String> names = h.result().getList().stream().map(Node::getNode).collect(Collectors.toList());
+      assertEquals(names.size(), 2);
+      assertTrue(names.contains("attached_node"));
+      latch1.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch1.getCount(), 1);
+    ConsulProcess attached = attachConsul("attached_node");
+    latch1.await(2, TimeUnit.MINUTES);
+    assertEquals(latch1.getCount(), 0);
+
+    // wait until second consul closes
+    CountDownLatch latch2 = new CountDownLatch(1);
+    NodeList nodes2 = getAsync(h -> readClient.catalogNodes(h));
+    BlockingQueryOptions blockingQueryOptions2 = new BlockingQueryOptions().setIndex(nodes2.getIndex());
+    readClient.catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions2), h -> {
+      latch2.countDown();
+    });
+    attached.close();
+    latch2.await(2, TimeUnit.MINUTES);
+    assertEquals(latch2.getCount(), 0);
+  }
 }

@@ -193,8 +193,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService catalogServicesBlocking(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
-    consulClient.catalogServicesBlocking(options, resultHandler);
+  public ConsulService catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    consulClient.catalogServicesWithOptions(options, resultHandler);
     return this;
   }
 
@@ -331,8 +331,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService catalogNodeServicesBlocking(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
-    consulClient.catalogNodeServicesBlocking(node, options, resultHandler);
+  public ConsulService catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    consulClient.catalogNodeServicesWithOptions(node, options, resultHandler);
     return this;
   }
 

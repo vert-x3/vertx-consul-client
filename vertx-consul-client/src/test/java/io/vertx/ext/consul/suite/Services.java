@@ -15,15 +15,18 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -132,6 +135,33 @@ public class Services extends ChecksBase {
     assertEquals(1, checks.size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
+  }
+
+  @Test
+  public void catalogServicesBlocking() throws InterruptedException {
+    testServicesBlocking((opts, h) -> readClient.catalogServicesWithOptions(opts, h));
+  }
+
+  @Test
+  public void catalogNodeServicesBlocking() throws InterruptedException {
+    testServicesBlocking((opts, h) -> readClient.catalogNodeServicesWithOptions(nodeName, opts, h));
+  }
+
+  private void testServicesBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request) throws InterruptedException {
+    runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service1").setId("id1"), h));
+    ServiceList list1 = getAsync(h -> readClient.catalogServices(h));
+    CountDownLatch latch = new CountDownLatch(1);
+    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
+      assertTrue(names.contains("service2"));
+      latch.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 1);
+    runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service2").setId("id2"), h));
+    awaitLatch(latch);
+    runAsync(h -> writeClient.deregisterService("id1", h));
+    runAsync(h -> writeClient.deregisterService("id2", h));
   }
 
   @Override

@@ -666,10 +666,10 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.catalogServicesBlocking = function(options, resultHandler) {
+  this.catalogServicesWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["catalogServicesBlocking(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulService["catalogServicesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -729,10 +729,10 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.catalogNodeServicesBlocking = function(node, options, resultHandler) {
+  this.catalogNodeServicesWithOptions = function(node, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulService["catalogNodeServicesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulService["catalogNodeServicesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
