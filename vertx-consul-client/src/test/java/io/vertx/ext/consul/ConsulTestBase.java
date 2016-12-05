@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.consul;
 
+import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
@@ -52,6 +53,10 @@ public class ConsulTestBase extends VertxTestBase {
     clientCloser.accept(writeClient);
     clientCloser.accept(readClient);
     super.tearDown();
+  }
+
+  protected ConsulProcess attachConsul(String nodeName) {
+    return ConsulCluster.attach(nodeName);
   }
 
   private JsonObject config(String token) {

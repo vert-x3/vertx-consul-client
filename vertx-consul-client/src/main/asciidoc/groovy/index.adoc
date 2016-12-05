@@ -68,7 +68,28 @@ by providing the "?dc" query parameter. When not provided, the datacenter of the
 
 == Using the API
 
-The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`.
+The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
+HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
+
+=== Blocking queries
+
+Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
+the current state of the requested resource. The following configuration is used to perform blocking queries:
+
+`index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
+`wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+
+[source,groovy]
+----
+
+def opts = [
+  index:lastIndex,
+  wait:"1m"
+]
+
+
+----
 
 === Key/Value Store
 
@@ -97,6 +118,8 @@ consulClient.getValue("foo", { res ->
 
     println("retrieved value: ${res.result().value}")
 
+    println("modify index: ${res.result().modifyIndex}")
+
   } else {
 
     res.cause().printStackTrace()
@@ -107,7 +130,31 @@ consulClient.getValue("foo", { res ->
 
 
 ----
+The modify index can be used for blocking requests:
 
+[source,groovy]
+----
+
+def opts = [
+  index:modifyIndex
+]
+
+consulClient.getValueBlocking("foo", opts, { res ->
+
+  if (res.succeeded()) {
+
+    println("retrieved value: ${res.result().value}")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+
+----
 === Health Checks
 
 [source,groovy]
@@ -184,9 +231,11 @@ consulClient.catalogServiceNodes("serviceName", { res ->
 
   if (res.succeeded()) {
 
-    println("found ${res.result().size()} services")
+    println("found ${res.result().list.size()} services")
 
-    res.result().each { service ->
+    println("consul state index: ${res.result().index}")
+
+    res.result().list.each { service ->
 
       println("Service node: ${service.node}")
 
@@ -195,6 +244,29 @@ consulClient.catalogServiceNodes("serviceName", { res ->
       println("Service port: ${service.port}")
 
     }
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Blocking request for nodes that provide given service, sorted by distance from agent
+
+def queryOpts = [
+  near:"_agent",
+  blockingOptions:[
+    index:lastIndex
+  ]
+]
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
+
+  if (res.succeeded()) {
+
+    println("found ${res.result().list.size()} services")
 
   } else {
 
@@ -338,6 +410,53 @@ consulClient.destroySession(sessionId, { res ->
   if (res.succeeded()) {
 
     println("Session successfully destroyed")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+
+----
+
+=== Nodes in cluster
+
+[source,groovy]
+----
+
+consulClient.catalogNodes({ res ->
+
+  if (res.succeeded()) {
+
+    println("found ${res.result().list.size()} nodes")
+
+    println("consul state index ${res.result().index}")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// blocking request to catalog for nodes, sorted by distance from agent
+
+def opts = [
+  near:"_agent",
+  blockingOptions:[
+    index:lastIndex
+  ]
+]
+
+consulClient.catalogNodesWithOptions(opts, { res ->
+
+  if (res.succeeded()) {
+
+    println("found ${res.result().list.size()} nodes")
 
   } else {
 

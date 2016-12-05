@@ -15,15 +15,18 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -72,24 +75,26 @@ public class Services extends ChecksBase {
     Check c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
     assertEquals(c.getId(), "service:serviceName");
 
-    List<Service> nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
-    assertEquals(2, nodeServices.size());
+    ServiceList nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
+    assertEquals(2, nodeServices.getList().size());
 
-    List<Service> nodeServicesWithKnownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "tag1", h));
-    assertEquals(1, nodeServicesWithKnownTag.size());
+    ServiceQueryOptions knownOpts = new ServiceQueryOptions().setTag("tag1");
+    ServiceList nodeServicesWithKnownTag = getAsync(h -> writeClient.catalogServiceNodesWithOptions(serviceName, knownOpts, h));
+    assertEquals(1, nodeServicesWithKnownTag.getList().size());
 
-    List<Service> nodeServicesWithUnknownTag = getAsync(h -> writeClient.catalogServiceNodesWithTag(serviceName, "unknownTag", h));
-    assertEquals(0, nodeServicesWithUnknownTag.size());
+    ServiceQueryOptions unknownOpts = new ServiceQueryOptions().setTag("unknownTag");
+    ServiceList nodeServicesWithUnknownTag = getAsync(h -> writeClient.catalogServiceNodesWithOptions(serviceName, unknownOpts, h));
+    assertEquals(0, nodeServicesWithUnknownTag.getList().size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
   }
 
   @Test
   public void findConsul() {
-    List<Service> localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
-    assertEquals(localConsulList.size(), 1);
-    List<Service> catalogConsulList = Utils.<List<Service>>getAsync(h -> writeClient.catalogServices(h))
-      .stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
+    ServiceList localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
+    assertEquals(localConsulList.getList().size(), 1);
+    List<Service> catalogConsulList = Utils.<ServiceList>getAsync(h -> writeClient.catalogServices(h))
+      .getList().stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
     assertEquals(1, catalogConsulList.size());
     assertEquals(0, catalogConsulList.get(0).getTags().size());
   }
@@ -130,6 +135,33 @@ public class Services extends ChecksBase {
     assertEquals(1, checks.size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
+  }
+
+  @Test
+  public void catalogServicesBlocking() throws InterruptedException {
+    testServicesBlocking((opts, h) -> readClient.catalogServicesWithOptions(opts, h));
+  }
+
+  @Test
+  public void catalogNodeServicesBlocking() throws InterruptedException {
+    testServicesBlocking((opts, h) -> readClient.catalogNodeServicesWithOptions(nodeName, opts, h));
+  }
+
+  private void testServicesBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request) throws InterruptedException {
+    runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service1").setId("id1"), h));
+    ServiceList list1 = getAsync(h -> readClient.catalogServices(h));
+    CountDownLatch latch = new CountDownLatch(1);
+    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
+      assertTrue(names.contains("service2"));
+      latch.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 1);
+    runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service2").setId("id2"), h));
+    awaitLatch(latch);
+    runAsync(h -> writeClient.deregisterService("id1", h));
+    runAsync(h -> writeClient.deregisterService("id2", h));
   }
 
   @Override

@@ -392,6 +392,50 @@ Get node wan address
 +++
 |===
 
+[[NodeList]]
+== NodeList
+
+++++
+ Holds result of nodes query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested list of services
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Node[Node]`|
++++
+Set list of nodes
++++
+|===
+
+[[NodeQueryOptions]]
+== NodeQueryOptions
+
+++++
+ Options used to requesting list of nodes
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockingOptions]]`blockingOptions`|`link:dataobjects.html#BlockingQueryOptions[BlockingQueryOptions]`|
++++
+Set options for blocking query
++++
+|[[near]]`near`|`String`|
++++
+Set node name for sorting the list in ascending order based on the estimated round trip time from that node.
++++
+|===
+
 [[Service]]
 == Service
 
@@ -434,6 +478,28 @@ Set list of service tags
 +++
 |===
 
+[[ServiceList]]
+== ServiceList
+
+++++
+ Holds result of services query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested list of services
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Service[Service]`|
++++
+Set list of services
++++
+|===
+
 [[ServiceOptions]]
 == ServiceOptions
 
@@ -469,6 +535,32 @@ Set service port
 |[[tags]]`tags`|`Array of String`|
 +++
 Set list of tags associated with service
++++
+|===
+
+[[ServiceQueryOptions]]
+== ServiceQueryOptions
+
+++++
+ Options used to requesting list of services
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockingOptions]]`blockingOptions`|`link:dataobjects.html#BlockingQueryOptions[BlockingQueryOptions]`|
++++
+Set options for blocking query
++++
+|[[near]]`near`|`String`|
++++
+Set node name for sorting the list in ascending order based on the estimated round trip time from that node.
++++
+|[[tag]]`tag`|`String`|
++++
+Set tag for filtering request results
 +++
 |===
 

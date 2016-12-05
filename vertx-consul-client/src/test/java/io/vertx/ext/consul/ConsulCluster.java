@@ -22,6 +22,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.concurrent.CountDownLatch;
@@ -90,14 +91,29 @@ class ConsulCluster {
     }
   }
 
-  private void create() throws Exception {
-    JsonObject config = new JsonObject()
+  static ConsulProcess attach(String nodeName) {
+    JsonObject config = instance().consulConfig(nodeName)
+      .put("leave_on_terminate", true)
+      .put("start_join", new JsonArray().add("127.0.0.1:" + instance().consul.getSerfLanPort()));;
+    return ConsulStarterBuilder.consulStarter()
+      .withLogLevel(LogLevel.ERR)
+      .withCustomConfig(config.encode())
+      .build()
+      .start();
+  }
+
+  private JsonObject consulConfig(String nodeName) {
+    return new JsonObject()
       .put("server", true)
       .put("datacenter", DC)
-      .put("node_name", NODE_NAME)
+      .put("node_name", nodeName)
       .put("acl_default_policy", "deny")
       .put("acl_master_token", MASTER_TOKEN)
       .put("acl_datacenter", DC);
+  }
+
+  private void create() throws Exception {
+    JsonObject config = consulConfig(NODE_NAME);
     consul = ConsulStarterBuilder.consulStarter()
       .withLogLevel(LogLevel.ERR)
       .withConsulVersion(CONSUL_VERSION)

@@ -304,22 +304,22 @@ module VertxConsul
     # @return [self]
     def catalog_service_nodes(service=nil)
       if service.class == String && block_given?
-        @j_del.java_method(:catalogServiceNodes, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:catalogServiceNodes, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling catalog_service_nodes(#{service})"
     end
-    #  Returns the nodes providing a service, filtered by tag
+    #  Returns the nodes providing a service
     # @param [String] service name of service
-    # @param [String] tag service tag
+    # @param [Hash] options options used to request services
     # @yield will be provided with list of nodes providing given service
     # @return [self]
-    def catalog_service_nodes_with_tag(service=nil,tag=nil)
-      if service.class == String && tag.class == String && block_given?
-        @j_del.java_method(:catalogServiceNodesWithTag, [Java::java.lang.String.java_class,Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(service,tag,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+    def catalog_service_nodes_with_options(service=nil,options=nil)
+      if service.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:catalogServiceNodesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::ServiceQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(service,Java::IoVertxExtConsul::ServiceQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes_with_tag(#{service},#{tag})"
+      raise ArgumentError, "Invalid arguments when calling catalog_service_nodes_with_options(#{service},#{options})"
     end
     #  Return all the datacenters that are known by the Consul server
     # @yield will be provided with list of datacenters
@@ -336,20 +336,43 @@ module VertxConsul
     # @return [self]
     def catalog_nodes
       if block_given?
-        @j_del.java_method(:catalogNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:catalogNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling catalog_nodes()"
+    end
+    #  Returns the nodes registered in a datacenter
+    # @param [Hash] options options used to request nodes
+    # @yield will be provided with list of nodes
+    # @return [self]
+    def catalog_nodes_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:catalogNodesWithOptions, [Java::IoVertxExtConsul::NodeQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::NodeQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_nodes_with_options(#{options})"
     end
     #  Returns the services registered in a datacenter
     # @yield will be provided with list of services
     # @return [self]
     def catalog_services
       if block_given?
-        @j_del.java_method(:catalogServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:catalogServices, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling catalog_services()"
+    end
+    #  Returns the services registered in a datacenter
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#catalog_services}
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of services
+    # @return [self]
+    def catalog_services_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:catalogServicesWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_services_with_options(#{options})"
     end
     #  Returns the node's registered services
     # @param [String] node node name
@@ -357,10 +380,23 @@ module VertxConsul
     # @return [self]
     def catalog_node_services(node=nil)
       if node.class == String && block_given?
-        @j_del.java_method(:catalogNodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(node,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:catalogNodeServices, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(node,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling catalog_node_services(#{node})"
+    end
+    #  Returns the node's registered services
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#catalog_node_services}
+    # @param [String] node node name
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of services
+    # @return [self]
+    def catalog_node_services_with_options(node=nil,options=nil)
+      if node.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:catalogNodeServicesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(node,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling catalog_node_services_with_options(#{node},#{options})"
     end
     #  Returns list of services registered with the local agent.
     # @yield will be provided with list of services

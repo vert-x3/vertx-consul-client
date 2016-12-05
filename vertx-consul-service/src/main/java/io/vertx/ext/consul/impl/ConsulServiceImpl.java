@@ -157,14 +157,14 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService catalogServiceNodes(String service, Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulService catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler) {
     consulClient.catalogServiceNodes(service, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService catalogServiceNodesWithTag(String service, String tag, Handler<AsyncResult<List<Service>>> resultHandler) {
-    consulClient.catalogServiceNodesWithTag(service, tag, resultHandler);
+  public ConsulService catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    consulClient.catalogServiceNodesWithOptions(service, options, resultHandler);
     return this;
   }
 
@@ -175,14 +175,26 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService catalogNodes(Handler<AsyncResult<List<Node>>> resultHandler) {
+  public ConsulService catalogNodes(Handler<AsyncResult<NodeList>> resultHandler) {
     consulClient.catalogNodes(resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService catalogServices(Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulService catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler) {
+    consulClient.catalogNodesWithOptions(options, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService catalogServices(Handler<AsyncResult<ServiceList>> resultHandler) {
     consulClient.catalogServices(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    consulClient.catalogServicesWithOptions(options, resultHandler);
     return this;
   }
 
@@ -313,8 +325,14 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService catalogNodeServices(String node, Handler<AsyncResult<List<Service>>> resultHandler) {
+  public ConsulService catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler) {
     consulClient.catalogNodeServices(node, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler) {
+    consulClient.catalogNodeServicesWithOptions(node, options, resultHandler);
     return this;
   }
 

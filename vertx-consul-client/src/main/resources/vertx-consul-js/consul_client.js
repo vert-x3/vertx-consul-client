@@ -22,21 +22,24 @@ var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulClient = io.vertx.ext.consul.ConsulClient;
 var BlockingQueryOptions = io.vertx.ext.consul.BlockingQueryOptions;
+var ServiceQueryOptions = io.vertx.ext.consul.ServiceQueryOptions;
 var Event = io.vertx.ext.consul.Event;
+var NodeList = io.vertx.ext.consul.NodeList;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var Coordinate = io.vertx.ext.consul.Coordinate;
+var NodeQueryOptions = io.vertx.ext.consul.NodeQueryOptions;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
 var DcCoordinates = io.vertx.ext.consul.DcCoordinates;
+var ServiceList = io.vertx.ext.consul.ServiceList;
 var Session = io.vertx.ext.consul.Session;
 var EventOptions = io.vertx.ext.consul.EventOptions;
-var Node = io.vertx.ext.consul.Node;
 
 /**
  A Vert.x service used to interact with Consul.
@@ -570,7 +573,7 @@ var ConsulClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulClient["catalogServiceNodes(java.lang.String,io.vertx.core.Handler)"](service, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -580,20 +583,20 @@ var ConsulClient = function(j_val) {
   };
 
   /**
-   Returns the nodes providing a service, filtered by tag
+   Returns the nodes providing a service
 
    @public
    @param service {string} name of service 
-   @param tag {string} service tag 
+   @param options {Object} options used to request services 
    @param resultHandler {function} will be provided with list of nodes providing given service 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.catalogServiceNodesWithTag = function(service, tag, resultHandler) {
+  this.catalogServiceNodesWithOptions = function(service, options, resultHandler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && typeof __args[2] === 'function') {
-      j_consulClient["catalogServiceNodesWithTag(java.lang.String,java.lang.String,io.vertx.core.Handler)"](service, tag, function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulClient["catalogServiceNodesWithOptions(java.lang.String,io.vertx.ext.consul.ServiceQueryOptions,io.vertx.core.Handler)"](service, options != null ? new ServiceQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -635,7 +638,29 @@ var ConsulClient = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["catalogNodes(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the nodes registered in a datacenter
+
+   @public
+   @param options {Object} options used to request nodes 
+   @param resultHandler {function} will be provided with list of nodes 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogNodesWithOptions = function(options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["catalogNodesWithOptions(io.vertx.ext.consul.NodeQueryOptions,io.vertx.core.Handler)"](options != null ? new NodeQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -656,7 +681,30 @@ var ConsulClient = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["catalogServices(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the services registered in a datacenter
+   This is blocking query unlike {@link ConsulClient#catalogServices}
+
+   @public
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogServicesWithOptions = function(options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["catalogServicesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -678,7 +726,31 @@ var ConsulClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulClient["catalogNodeServices(java.lang.String,io.vertx.core.Handler)"](node, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the node's registered services
+   This is blocking query unlike {@link ConsulClient#catalogNodeServices}
+
+   @public
+   @param node {string} node name 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.catalogNodeServicesWithOptions = function(node, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulClient["catalogNodeServicesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

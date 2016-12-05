@@ -58,7 +58,24 @@ by providing the "?dc" query parameter. When not provided, the datacenter of the
 
 == Using the API
 
-The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`.
+The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
+HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
+
+=== Blocking queries
+
+Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
+the current state of the requested resource. The following configuration is used to perform blocking queries:
+
+`index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
+`wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+
+[source,java]
+----
+BlockingQueryOptions opts = new BlockingQueryOptions()
+  .setIndex(lastIndex)
+  .setWait("1m");
+----
 
 === Key/Value Store
 
@@ -85,6 +102,8 @@ consulClient.getValue("foo", res -> {
 
     System.out.println("retrieved value: " + res.result().getValue());
 
+    System.out.println("modify index: " + res.result().getModifyIndex());
+
   } else {
 
     res.cause().printStackTrace();
@@ -93,7 +112,26 @@ consulClient.getValue("foo", res -> {
 
 });
 ----
+The modify index can be used for blocking requests:
 
+[source,java]
+----
+BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
+
+consulClient.getValueBlocking("foo", opts, res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("retrieved value: " + res.result().getValue());
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+----
 === Health Checks
 
 [source,java]
@@ -167,9 +205,11 @@ consulClient.catalogServiceNodes("serviceName", res -> {
 
   if (res.succeeded()) {
 
-    System.out.println("found " + res.result().size() + " services");
+    System.out.println("found " + res.result().getList().size() + " services");
 
-    for (Service service : res.result()) {
+    System.out.println("consul state index: " + res.result().getIndex());
+
+    for (Service service : res.result().getList()) {
 
       System.out.println("Service node: " + service.getNode());
 
@@ -178,6 +218,26 @@ consulClient.catalogServiceNodes("serviceName", res -> {
       System.out.println("Service port: " + service.getPort());
 
     }
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+
+// Blocking request for nodes that provide given service, sorted by distance from agent
+
+ServiceQueryOptions queryOpts = new ServiceQueryOptions()
+  .setNear("_agent")
+  .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("found " + res.result().getList().size() + " services");
 
   } else {
 
@@ -312,6 +372,47 @@ consulClient.destroySession(sessionId, res -> {
   if (res.succeeded()) {
 
     System.out.println("Session successfully destroyed");
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+----
+
+=== Nodes in cluster
+
+[source,java]
+----
+consulClient.catalogNodes(res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("found " + res.result().getList().size() + " nodes");
+
+    System.out.println("consul state index " + res.result().getIndex());
+
+  } else {
+
+    res.cause().printStackTrace();
+
+  }
+
+});
+
+// blocking request to catalog for nodes, sorted by distance from agent
+
+NodeQueryOptions opts = new NodeQueryOptions()
+  .setNear("_agent")
+  .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
+
+consulClient.catalogNodesWithOptions(opts, res -> {
+
+  if (res.succeeded()) {
+
+    System.out.println("found " + res.result().getList().size() + " nodes");
 
   } else {
 
