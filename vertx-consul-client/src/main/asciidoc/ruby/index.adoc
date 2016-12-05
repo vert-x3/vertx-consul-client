@@ -68,7 +68,28 @@ by providing the "?dc" query parameter. When not provided, the datacenter of the
 
 == Using the API
 
-The client API is represented by `link:../../yardoc/VertxConsul/ConsulClient.html[ConsulClient]`.
+The client API is represented by `link:../../yardoc/VertxConsul/ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
+HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
+
+=== Blocking queries
+
+Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
+the current state of the requested resource. The following configuration is used to perform blocking queries:
+
+`index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
+`wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+
+[source,ruby]
+----
+
+opts = {
+  'index' => lastIndex,
+  'wait' => "1m"
+}
+
+
+----
 
 === Key/Value Store
 
@@ -97,6 +118,8 @@ consulClient.get_value("foo") { |res_err,res|
 
     puts "retrieved value: #{res['value']}"
 
+    puts "modify index: #{res['modifyIndex']}"
+
   else
 
     res_err.print_stack_trace()
@@ -107,7 +130,31 @@ consulClient.get_value("foo") { |res_err,res|
 
 
 ----
+The modify index can be used for blocking requests:
 
+[source,ruby]
+----
+
+opts = {
+  'index' => modifyIndex
+}
+
+consulClient.get_value_blocking("foo", opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "retrieved value: #{res['value']}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
 === Health Checks
 
 [source,ruby]
@@ -186,6 +233,8 @@ consulClient.catalog_service_nodes("serviceName") { |res_err,res|
 
     puts "found #{res['list'].length} services"
 
+    puts "consul state index: #{res['index']}"
+
     res['list'].each do |service|
 
       puts "Service node: #{service['node']}"
@@ -195,6 +244,29 @@ consulClient.catalog_service_nodes("serviceName") { |res_err,res|
       puts "Service port: #{service['port']}"
 
     end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Blocking request for nodes that provide given service, sorted by distance from agent
+
+queryOpts = {
+  'near' => "_agent",
+  'blockingOptions' => {
+    'index' => lastIndex
+  }
+}
+
+consulClient.catalog_service_nodes_with_options("serviceName", queryOpts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "found #{res['list'].length} services"
 
   else
 
@@ -337,6 +409,53 @@ consulClient.destroy_session(sessionId) { |res_err,res|
   if (res_err == nil)
 
     puts "Session successfully destroyed"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+
+----
+
+=== Nodes in cluster
+
+[source,ruby]
+----
+
+consulClient.catalog_nodes() { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "found #{res['list'].length} nodes"
+
+    puts "consul state index #{res['index']}"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# blocking request to catalog for nodes, sorted by distance from agent
+
+opts = {
+  'near' => "_agent",
+  'blockingOptions' => {
+    'index' => lastIndex
+  }
+}
+
+consulClient.catalog_nodes_with_options(opts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "found #{res['list'].length} nodes"
 
   else
 

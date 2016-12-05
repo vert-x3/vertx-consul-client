@@ -56,7 +56,22 @@
  *
  * == Using the API
  *
- * The client API is represented by {@link io.vertx.ext.consul.ConsulClient}.
+ * The client API is represented by {@link io.vertx.ext.consul.ConsulClient}. The API is very similar to Consul's
+ * HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
+ *
+ * === Blocking queries
+ *
+ * Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+ * change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
+ * the current state of the requested resource. The following configuration is used to perform blocking queries:
+ *
+ * `index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
+ * `wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#blockingOptions}
+ * ----
  *
  * === Key/Value Store
  *
@@ -64,7 +79,12 @@
  * ----
  * {@link examples.Examples#kv}
  * ----
+ * The modify index can be used for blocking requests:
  *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#kvBlocking}
+ * ----
  * === Health Checks
  *
  * [source,$lang]
@@ -91,6 +111,13 @@
  * [source,$lang]
  * ----
  * {@link examples.Examples#sessions}
+ * ----
+ *
+ * === Nodes in cluster
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Examples#nodes}
  * ----
  */
 @Document(fileName = "index.adoc")

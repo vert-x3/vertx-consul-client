@@ -42,6 +42,14 @@ public class Examples {
 
   }
 
+  public void blockingOptions(long lastIndex) {
+
+    BlockingQueryOptions opts = new BlockingQueryOptions()
+      .setIndex(lastIndex)
+      .setWait("1m");
+
+  }
+
   public void tcpHealth(ConsulClient consulClient, Vertx vertx) {
 
     Handler<HttpServerRequest> alwaysGood = h -> h.response()
@@ -103,6 +111,8 @@ public class Examples {
 
         System.out.println("retrieved value: " + res.result().getValue());
 
+        System.out.println("modify index: " + res.result().getModifyIndex());
+
       } else {
 
         res.cause().printStackTrace();
@@ -113,7 +123,27 @@ public class Examples {
 
   }
 
-  public void services(ConsulClient consulClient) {
+  public void kvBlocking(ConsulClient consulClient, long modifyIndex) {
+
+    BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
+
+    consulClient.getValueBlocking("foo", opts, res -> {
+
+      if (res.succeeded()) {
+
+        System.out.println("retrieved value: " + res.result().getValue());
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+  }
+
+  public void services(ConsulClient consulClient, long lastIndex) {
 
     ServiceOptions opts = new ServiceOptions()
       .setId("serviceId")
@@ -147,6 +177,8 @@ public class Examples {
 
         System.out.println("found " + res.result().getList().size() + " services");
 
+        System.out.println("consul state index: " + res.result().getIndex());
+
         for (Service service : res.result().getList()) {
 
           System.out.println("Service node: " + service.getNode());
@@ -156,6 +188,26 @@ public class Examples {
           System.out.println("Service port: " + service.getPort());
 
         }
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+    // Blocking request for nodes that provide given service, sorted by distance from agent
+
+    ServiceQueryOptions queryOpts = new ServiceQueryOptions()
+      .setNear("_agent")
+      .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
+
+    consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
+
+      if (res.succeeded()) {
+
+        System.out.println("found " + res.result().getList().size() + " services");
 
       } else {
 
@@ -288,6 +340,46 @@ public class Examples {
       if (res.succeeded()) {
 
         System.out.println("Session successfully destroyed");
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+  }
+
+  public void nodes(ConsulClient consulClient, long lastIndex) {
+
+    consulClient.catalogNodes(res -> {
+
+      if (res.succeeded()) {
+
+        System.out.println("found " + res.result().getList().size() + " nodes");
+
+        System.out.println("consul state index " + res.result().getIndex());
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+    // blocking request to catalog for nodes, sorted by distance from agent
+
+    NodeQueryOptions opts = new NodeQueryOptions()
+      .setNear("_agent")
+      .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
+
+    consulClient.catalogNodesWithOptions(opts, res -> {
+
+      if (res.succeeded()) {
+
+        System.out.println("found " + res.result().getList().size() + " nodes");
 
       } else {
 

@@ -68,7 +68,28 @@ by providing the "?dc" query parameter. When not provided, the datacenter of the
 
 == Using the API
 
-The client API is represented by `link:../../jsdoc/module-vertx-consul-js_consul_client-ConsulClient.html[ConsulClient]`.
+The client API is represented by `link:../../jsdoc/module-vertx-consul-js_consul_client-ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
+HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
+
+=== Blocking queries
+
+Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
+the current state of the requested resource. The following configuration is used to perform blocking queries:
+
+`index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
+`wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
+
+[source,js]
+----
+
+var opts = {
+  "index" : lastIndex,
+  "wait" : "1m"
+};
+
+
+----
 
 === Key/Value Store
 
@@ -97,6 +118,8 @@ consulClient.getValue("foo", function (res, res_err) {
 
     console.log("retrieved value: " + res.value);
 
+    console.log("modify index: " + res.modifyIndex);
+
   } else {
 
     res_err.printStackTrace();
@@ -107,7 +130,31 @@ consulClient.getValue("foo", function (res, res_err) {
 
 
 ----
+The modify index can be used for blocking requests:
 
+[source,js]
+----
+
+var opts = {
+  "index" : modifyIndex
+};
+
+consulClient.getValueBlocking("foo", opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("retrieved value: " + res.value);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
 === Health Checks
 
 [source,js]
@@ -186,6 +233,8 @@ consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
 
     console.log("found " + res.list.length + " services");
 
+    console.log("consul state index: " + res.index);
+
     Array.prototype.forEach.call(res.list, function(service) {
 
       console.log("Service node: " + service.node);
@@ -195,6 +244,29 @@ consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
       console.log("Service port: " + service.port);
 
     });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Blocking request for nodes that provide given service, sorted by distance from agent
+
+var queryOpts = {
+  "near" : "_agent",
+  "blockingOptions" : {
+    "index" : lastIndex
+  }
+};
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("found " + res.list.length + " services");
 
   } else {
 
@@ -337,6 +409,53 @@ consulClient.destroySession(sessionId, function (res, res_err) {
   if (res_err == null) {
 
     console.log("Session successfully destroyed");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+
+----
+
+=== Nodes in cluster
+
+[source,js]
+----
+
+consulClient.catalogNodes(function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("found " + res.list.length + " nodes");
+
+    console.log("consul state index " + res.index);
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// blocking request to catalog for nodes, sorted by distance from agent
+
+var opts = {
+  "near" : "_agent",
+  "blockingOptions" : {
+    "index" : lastIndex
+  }
+};
+
+consulClient.catalogNodesWithOptions(opts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("found " + res.list.length + " nodes");
 
   } else {
 
