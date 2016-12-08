@@ -24,11 +24,8 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/agent/http.html">Blocking Queries documentation</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class BlockingQueryOptions {
-
-  private static final String INDEX_KEY = "index";
-  private static final String WAIT_KEY = "wait";
 
   private long index;
   private String wait;
@@ -54,8 +51,7 @@ public class BlockingQueryOptions {
    * @param options the JSON
    */
   public BlockingQueryOptions(JsonObject options) {
-    this.index = options.getLong(INDEX_KEY, 0L);
-    this.wait = options.getString(WAIT_KEY);
+    BlockingQueryOptionsConverter.fromJson(options, this);
   }
 
   /**
@@ -65,12 +61,7 @@ public class BlockingQueryOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (index > 0) {
-      jsonObject.put(INDEX_KEY, index);
-    }
-    if (wait != null) {
-      jsonObject.put(WAIT_KEY, wait);
-    }
+    BlockingQueryOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 

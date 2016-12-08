@@ -89,12 +89,12 @@ module VertxConsul
     # @param [Hash] options the blocking options
     # @yield will be provided with key/value pair
     # @return [self]
-    def get_value_blocking(key=nil,options=nil)
+    def get_value_with_options(key=nil,options=nil)
       if key.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:getValueBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        @j_del.java_method(:getValueWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(key,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_value_blocking(#{key},#{options})"
+      raise ArgumentError, "Invalid arguments when calling get_value_with_options(#{key},#{options})"
     end
     #  Remove the key/value pair that corresponding to the specified key
     # @param [String] key the key
@@ -124,12 +124,12 @@ module VertxConsul
     # @param [Hash] options the blocking options
     # @yield will be provided with list of key/value pairs
     # @return [self]
-    def get_values_blocking(keyPrefix=nil,options=nil)
+    def get_values_with_options(keyPrefix=nil,options=nil)
       if keyPrefix.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:getValuesBlocking, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:getValuesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
         return self
       end
-      raise ArgumentError, "Invalid arguments when calling get_values_blocking(#{keyPrefix},#{options})"
+      raise ArgumentError, "Invalid arguments when calling get_values_with_options(#{keyPrefix},#{options})"
     end
     #  Removes all the key/value pair that corresponding to the specified key prefix
     # @param [String] keyPrefix the prefix

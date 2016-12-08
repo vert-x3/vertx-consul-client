@@ -127,7 +127,7 @@ public class Examples {
 
     BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
 
-    consulClient.getValueBlocking("foo", opts, res -> {
+    consulClient.getValueWithOptions("foo", opts, res -> {
 
       if (res.succeeded()) {
 

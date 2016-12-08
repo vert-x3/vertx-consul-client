@@ -139,7 +139,7 @@ var opts = {
   "index" : modifyIndex
 };
 
-consulClient.getValueBlocking("foo", opts, function (res, res_err) {
+consulClient.getValueWithOptions("foo", opts, function (res, res_err) {
 
   if (res_err == null) {
 

@@ -23,12 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class ServiceQueryOptions {
-
-  private static final String NEAR_KEY = "Near";
-  private static final String TAG_KEY = "Tag";
-  private static final String BLOCK_KEY = "Block";
 
   private String tag;
   private String near;
@@ -45,9 +41,7 @@ public class ServiceQueryOptions {
    * @param json the JSON
    */
   public ServiceQueryOptions(JsonObject json) {
-    tag = json.getString(TAG_KEY);
-    near = json.getString(NEAR_KEY);
-    options = json.containsKey(BLOCK_KEY) ? new BlockingQueryOptions(json.getJsonObject(BLOCK_KEY)) : null;
+    ServiceQueryOptionsConverter.fromJson(json, this);
   }
 
   /**
@@ -57,15 +51,7 @@ public class ServiceQueryOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (tag != null) {
-      jsonObject.put(TAG_KEY, tag);
-    }
-    if (near != null) {
-      jsonObject.put(NEAR_KEY, near);
-    }
-    if (options != null) {
-      jsonObject.put(BLOCK_KEY, options.toJson());
-    }
+    ServiceQueryOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 

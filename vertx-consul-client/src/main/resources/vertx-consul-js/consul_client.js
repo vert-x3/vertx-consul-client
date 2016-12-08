@@ -146,10 +146,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with key/value pair 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.getValueBlocking = function(key, options, resultHandler) {
+  this.getValueWithOptions = function(key, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValueBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValueWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -214,10 +214,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with list of key/value pairs 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.getValuesBlocking = function(keyPrefix, options, resultHandler) {
+  this.getValuesWithOptions = function(keyPrefix, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValuesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {

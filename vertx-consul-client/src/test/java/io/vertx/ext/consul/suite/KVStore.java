@@ -117,12 +117,12 @@ public class KVStore extends ConsulTestBase {
     assertTrue(getAsync(h -> writeClient.putValue("foo/barBlock", "valueBlock1", h)));
     KeyValue pair1 = getAsync(h -> readClient.getValue("foo/barBlock", h));
     CountDownLatch latch = new CountDownLatch(2);
-    readClient.getValueBlocking(pair1.getKey(), new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
+    readClient.getValueWithOptions(pair1.getKey(), new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
       assertEquals(h.result().getValue(), "valueBlock2");
       assertTrue(h.result().getModifyIndex() > pair1.getModifyIndex());
       latch.countDown();
     });
-    readClient.getValuesBlocking("foo/bar", new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
+    readClient.getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
       assertEquals(h.result().size(), 1);
       assertTrue(h.result().get(0).getModifyIndex() > pair1.getModifyIndex());
       latch.countDown();

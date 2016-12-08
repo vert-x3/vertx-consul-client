@@ -139,7 +139,7 @@ opts = {
   'index' => modifyIndex
 }
 
-consulClient.get_value_blocking("foo", opts) { |res_err,res|
+consulClient.get_value_with_options("foo", opts) { |res_err,res|
 
   if (res_err == nil)
 

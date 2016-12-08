@@ -118,7 +118,7 @@ The modify index can be used for blocking requests:
 ----
 BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
 
-consulClient.getValueBlocking("foo", opts, res -> {
+consulClient.getValueWithOptions("foo", opts, res -> {
 
   if (res.succeeded()) {
 

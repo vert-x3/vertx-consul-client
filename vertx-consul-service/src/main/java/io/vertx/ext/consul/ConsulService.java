@@ -45,7 +45,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
+  ConsulService getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
 
   @Override
   @Fluent
@@ -57,7 +57,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+  ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
 
   @Override
   @Fluent

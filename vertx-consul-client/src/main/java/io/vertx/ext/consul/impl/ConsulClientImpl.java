@@ -82,11 +82,11 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {
-    return getValueBlocking(key, null, resultHandler);
+    return getValueWithOptions(key, null, resultHandler);
   }
 
   @Override
-  public ConsulClient getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
+  public ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(key), new Query().put(options), resultHandler, (arr, headers) ->
       new KeyValue(fixKeyValueJson(arr.getJsonObject(0)))).end();
     return this;
@@ -108,11 +108,11 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
-    return getValuesBlocking(keyPrefix, null, resultHandler);
+    return getValuesWithOptions(keyPrefix, null, resultHandler);
   }
 
   @Override
-  public ConsulClient getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+  public ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
     Query query = Query.of("recurse", true).put(options);
     requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, resultHandler, (arr, headers) ->
       arr.stream()

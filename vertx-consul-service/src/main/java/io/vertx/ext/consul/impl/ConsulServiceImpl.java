@@ -43,8 +43,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
-    consulClient.getValueBlocking(key, options, resultHandler);
+  public ConsulService getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
+    consulClient.getValueWithOptions(key, options, resultHandler);
     return this;
   }
 
@@ -61,8 +61,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
-    consulClient.getValuesBlocking(keyPrefix, options, resultHandler);
+  public ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+    consulClient.getValuesWithOptions(keyPrefix, options, resultHandler);
     return this;
   }
 

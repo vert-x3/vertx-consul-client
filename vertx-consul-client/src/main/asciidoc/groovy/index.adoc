@@ -139,7 +139,7 @@ def opts = [
   index:modifyIndex
 ]
 
-consulClient.getValueBlocking("foo", opts, { res ->
+consulClient.getValueWithOptions("foo", opts, { res ->
 
   if (res.succeeded()) {
 
