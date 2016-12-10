@@ -384,7 +384,7 @@ consulClient.list_node_sessions("nodeId") { |res_err,res|
 
   if (res_err == nil)
 
-    res.each do |session|
+    res['list'].each do |session|
 
       puts "Session id: #{session['id']}"
 

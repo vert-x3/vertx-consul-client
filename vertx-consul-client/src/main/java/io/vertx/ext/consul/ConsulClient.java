@@ -609,6 +609,19 @@ public interface ConsulClient {
   ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
   /**
+   * Returns the requested session information
+   * This is blocking query unlike {@link ConsulClient#infoSession(String, Handler)}
+   *
+   * @param id            the ID of requested session
+   * @param options       the blocking options
+   * @param resultHandler will be provided with info of requested session
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_info">/v1/session/info/&lt;session&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler);
+
+  /**
    * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
    *
    * @param id            the ID of session that should be renewed
@@ -627,7 +640,19 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_list">/v1/session/list</a> endpoint
    */
   @Fluent
-  ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler);
+  ConsulClient listSessions(Handler<AsyncResult<SessionList>> resultHandler);
+
+  /**
+   * Returns the active sessions
+   * This is blocking query unlike {@link ConsulClient#listSessions(Handler)}
+   *
+   * @param options       the blocking options
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_list">/v1/session/list</a> endpoint
+   */
+  @Fluent
+  ConsulClient listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
    * Returns the active sessions for a given node
@@ -638,7 +663,20 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_node">/v1/session/node/&lt;node&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler);
+  ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler);
+
+  /**
+   * Returns the active sessions for a given node
+   * This is blocking query unlike {@link ConsulClient#listNodeSessions(String, Handler)}
+   *
+   * @param nodeId        the ID of node
+   * @param options       the blocking options
+   * @param resultHandler will be provided with list of sessions
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_node">/v1/session/node/&lt;node&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
    * Destroys the given session

@@ -589,6 +589,19 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling info_session(#{id})"
     end
+    #  Returns the requested session information
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#info_session}
+    # @param [String] id the ID of requested session
+    # @param [Hash] options the blocking options
+    # @yield will be provided with info of requested session
+    # @return [self]
+    def info_session_with_options(id=nil,options=nil)
+      if id.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:infoSessionWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(id,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling info_session_with_options(#{id},#{options})"
+    end
     #  Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
     # @param [String] id the ID of session that should be renewed
     # @yield will be provided with info of renewed session
@@ -605,10 +618,22 @@ module VertxConsul
     # @return [self]
     def list_sessions
       if block_given?
-        @j_del.java_method(:listSessions, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:listSessions, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_sessions()"
+    end
+    #  Returns the active sessions
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#list_sessions}
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of sessions
+    # @return [self]
+    def list_sessions_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:listSessionsWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_sessions_with_options(#{options})"
     end
     #  Returns the active sessions for a given node
     # @param [String] nodeId the ID of node
@@ -616,10 +641,23 @@ module VertxConsul
     # @return [self]
     def list_node_sessions(nodeId=nil)
       if nodeId.class == String && block_given?
-        @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_node_sessions(#{nodeId})"
+    end
+    #  Returns the active sessions for a given node
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#list_node_sessions}
+    # @param [String] nodeId the ID of node
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of sessions
+    # @return [self]
+    def list_node_sessions_with_options(nodeId=nil,options=nil)
+      if nodeId.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:listNodeSessionsWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_node_sessions_with_options(#{nodeId},#{options})"
     end
     #  Destroys the given session
     # @param [String] id the ID of session

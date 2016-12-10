@@ -21,28 +21,28 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
- * Holds result of services query
+ * Holds result of sessions query
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class ServiceList {
+public class SessionList {
 
   private long index;
-  private List<Service> list;
+  private List<Session> list;
 
   /**
    * Default constructor
    */
-  public ServiceList() {}
+  public SessionList() {}
 
   /**
    * Constructor from JSON
    *
    * @param json the JSON
    */
-  public ServiceList(JsonObject json) {
-    ServiceListConverter.fromJson(json, this);
+  public SessionList(JsonObject json) {
+    SessionListConverter.fromJson(json, this);
   }
 
   /**
@@ -52,7 +52,7 @@ public class ServiceList {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    ServiceListConverter.toJson(this, jsonObject);
+    SessionListConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -66,32 +66,32 @@ public class ServiceList {
   }
 
   /**
-   * Set Consul index, a unique identifier representing the current state of the requested list of services
+   * Set Consul index, a unique identifier representing the current state of the requested list of sessions
    *
    * @param index the consul index
    * @return reference to this, for fluency
    */
-  public ServiceList setIndex(long index) {
+  public SessionList setIndex(long index) {
     this.index = index;
     return this;
   }
 
   /**
-   * Get list of services
+   * Get list of sessions
    *
-   * @return the list of services
+   * @return the list of sessions
    */
-  public List<Service> getList() {
+  public List<Session> getList() {
     return list;
   }
 
   /**
-   * Set list of services
+   * Set list of sessions
    *
-   * @param list the list of services
+   * @param list the list of sessions
    * @return reference to this, for fluency
    */
-  public ServiceList setList(List<Service> list) {
+  public SessionList setList(List<Session> list) {
     this.list = list;
     return this;
   }

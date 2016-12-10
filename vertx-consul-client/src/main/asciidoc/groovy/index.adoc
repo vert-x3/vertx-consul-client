@@ -385,7 +385,7 @@ consulClient.listNodeSessions("nodeId", { res ->
 
   if (res.succeeded()) {
 
-    res.result().each { session ->
+    res.result().list.each { session ->
 
       println("Session id: ${session.id}")
 

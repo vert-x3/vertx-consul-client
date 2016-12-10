@@ -427,11 +427,16 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/session/info/" + urlEncode(id), null, resultHandler, (sessions, headers) -> {
+    return infoSessionWithOptions(id, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/session/info/" + urlEncode(id), Query.of(options), resultHandler, (sessions, headers) -> {
       if (sessions.size() == 0) {
         throw new RuntimeException("Unknown session ID: " + id);
       } else {
-        return new Session(sessions.getJsonObject(0));
+        return SessionParser.parse(sessions.getJsonObject(0), Long.parseLong(headers.get(INDEX_HEADER)));
       }
     }).end();
     return this;
@@ -440,21 +445,35 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
     requestArray(HttpMethod.PUT, "/v1/session/renew/" + urlEncode(id), null, resultHandler, (arr, headers) ->
-      new Session(arr.getJsonObject(0))).end();
+      SessionParser.parse(arr.getJsonObject(0))).end();
     return this;
   }
 
   @Override
-  public ConsulClient listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/session/list", null, resultHandler, (arr, headers) -> arr
-      .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
+  public ConsulClient listSessions(Handler<AsyncResult<SessionList>> resultHandler) {
+    return listSessionsWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/session/list", Query.of(options), resultHandler, (arr, headers) -> {
+      List<Session> list = arr.stream().map(obj -> SessionParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new SessionList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
   @Override
-  public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/session/node/" + urlEncode(nodeId), null, resultHandler, (arr, headers) -> arr
-      .stream().map(obj -> new Session((JsonObject) obj)).collect(Collectors.toList())).end();
+  public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler) {
+    return listNodeSessionsWithOptions(nodeId, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/session/node/" + urlEncode(nodeId), Query.of(options), resultHandler, (arr, headers) -> {
+      List<Session> list = arr.stream().map(obj -> SessionParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new SessionList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 

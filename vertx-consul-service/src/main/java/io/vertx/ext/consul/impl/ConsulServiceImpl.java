@@ -295,20 +295,38 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler) {
+    consulClient.infoSessionWithOptions(id, options, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
     consulClient.renewSession(id, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
+  public ConsulService listSessions(Handler<AsyncResult<SessionList>> resultHandler) {
     consulClient.listSessions(resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
+  public ConsulService listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    consulClient.listSessionsWithOptions(options, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler) {
     consulClient.listNodeSessions(nodeId, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    consulClient.listNodeSessionsWithOptions(nodeId, options, resultHandler);
     return this;
   }
 

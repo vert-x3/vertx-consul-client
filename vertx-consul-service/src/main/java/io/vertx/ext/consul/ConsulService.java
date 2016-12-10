@@ -225,15 +225,27 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler);
+  ConsulService listSessions(Handler<AsyncResult<SessionList>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler);
+  ConsulService listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
 
   @Override
   @Fluent

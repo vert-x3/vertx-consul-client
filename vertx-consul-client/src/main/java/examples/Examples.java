@@ -315,7 +315,7 @@ public class Examples {
 
       if (res.succeeded()) {
 
-        for(Session session: res.result()) {
+        for(Session session: res.result().getList()) {
 
           System.out.println("Session id: " + session.getId());
 

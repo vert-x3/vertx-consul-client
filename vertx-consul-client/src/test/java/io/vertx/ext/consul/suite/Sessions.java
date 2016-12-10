@@ -15,15 +15,21 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.runAsync;
+import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -88,11 +94,50 @@ public class Sessions extends ConsulTestBase {
   public void listSessions() {
     String id = getAsync(h -> writeClient.createSession(h));
     Session session = getAsync(h -> writeClient.infoSession(id, h));
-    List<Session> list = getAsync(h -> writeClient.listSessions(h));
-    assertEquals(session.getId(), list.get(0).getId());
-    List<Session> nodeSesions = getAsync(h -> writeClient.listNodeSessions(session.getNode(), h));
-    assertEquals(session.getId(), nodeSesions.get(0).getId());
+    SessionList list = getAsync(h -> writeClient.listSessions(h));
+    assertEquals(session.getId(), list.getList().get(0).getId());
+    SessionList nodeSesions = getAsync(h -> writeClient.listNodeSessions(session.getNode(), h));
+    assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
     runAsync(h -> writeClient.destroySession(id, h));
+  }
+
+  @Test
+  public void listSessionsBlocking() throws InterruptedException {
+    testSessionsBlocking((opts, h) -> readClient.listSessionsWithOptions(opts, h));
+  }
+
+  @Test
+  public void listNodeSessionsBlocking() throws InterruptedException {
+    testSessionsBlocking((opts, h) -> readClient.listNodeSessionsWithOptions(nodeName, opts, h));
+  }
+
+  private void testSessionsBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) throws InterruptedException {
+    String id1 = getAsync(h -> writeClient.createSession(h));
+    SessionList list1 = getAsync(h -> readClient.listSessions(h));
+    CountDownLatch latch = new CountDownLatch(1);
+    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
+      assertTrue(ids.contains(id1));
+      latch.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 1);
+    String id2 = getAsync(h -> writeClient.createSession(h));
+    awaitLatch(latch);
+    runAsync(h -> writeClient.destroySession(id1, h));
+    runAsync(h -> writeClient.destroySession(id2, h));
+  }
+
+  @Test
+  public void sessionInfoBlocking() throws InterruptedException {
+    String id = getAsync(h -> writeClient.createSession(h));
+    Session s1 = getAsync(h -> readClient.infoSession(id, h));
+    CountDownLatch latch = new CountDownLatch(1);
+    readClient.infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()), h -> latch.countDown());
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 1);
+    runAsync(h -> writeClient.destroySession(id, h));
+    awaitLatch(latch);
   }
 
   @Test

@@ -533,6 +533,17 @@ module VertxConsul
       raise ArgumentError, "Invalid arguments when calling info_session(#{id})"
     end
     # @param [String] id 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def info_session_with_options(id=nil,options=nil)
+      if id.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:infoSessionWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(id,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling info_session_with_options(#{id},#{options})"
+    end
+    # @param [String] id 
     # @yield 
     # @return [self]
     def renew_session(id=nil)
@@ -546,20 +557,41 @@ module VertxConsul
     # @return [self]
     def list_sessions
       if block_given?
-        @j_del.java_method(:listSessions, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:listSessions, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_sessions()"
+    end
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def list_sessions_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:listSessionsWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_sessions_with_options(#{options})"
     end
     # @param [String] nodeId 
     # @yield 
     # @return [self]
     def list_node_sessions(nodeId=nil)
       if nodeId.class == String && block_given?
-        @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:listNodeSessions, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_node_sessions(#{nodeId})"
+    end
+    # @param [String] nodeId 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def list_node_sessions_with_options(nodeId=nil,options=nil)
+      if nodeId.class == String && options.class == Hash && block_given?
+        @j_del.java_method(:listNodeSessionsWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(nodeId,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_node_sessions_with_options(#{nodeId},#{options})"
     end
     # @param [String] id 
     # @yield 

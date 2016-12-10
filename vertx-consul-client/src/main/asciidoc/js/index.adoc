@@ -384,7 +384,7 @@ consulClient.listNodeSessions("nodeId", function (res, res_err) {
 
   if (res_err == null) {
 
-    Array.prototype.forEach.call(res, function(session) {
+    Array.prototype.forEach.call(res.list, function(session) {
 
       console.log("Session id: " + session.id);
 

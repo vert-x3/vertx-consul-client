@@ -578,25 +578,49 @@ Set tag for filtering request results
 ^|Name | Type ^| Description
 |[[checks]]`checks`|`Array of String`|
 +++
-Get the list of associated health checks
+Set the list of associated health checks
 +++
 |[[createIndex]]`createIndex`|`Number (long)`|
 +++
-Get the create index of session
+Set the create index of session
 +++
 |[[id]]`id`|`String`|
 +++
-Get the ID of session
+Set the ID of node
++++
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index
 +++
 |[[lockDelay]]`lockDelay`|`Number (long)`|
 +++
-Lock delay is a time duration, between <code>0</code> and <code>60</code> seconds. When a session invalidation
- takes place, Consul prevents any of the previously held locks from being re-acquired
- for the <code>lock-delay</code> interval. The default is <code>15s</code>.
+Set the Lock delay of session
 +++
 |[[node]]`node`|`String`|
 +++
-Get the ID of node
+Set the ID of node
++++
+|===
+
+[[SessionList]]
+== SessionList
+
+++++
+ Holds result of sessions query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested list of sessions
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Session[Session]`|
++++
+Set list of sessions
 +++
 |===
 
