@@ -402,6 +402,26 @@ consulClient.list_node_sessions("nodeId") { |res_err,res|
 
 }
 
+# Blocking query for all active sessions
+
+blockingOpts = {
+  'index' => lastIndex
+}
+
+consulClient.list_sessions_with_options(blockingOpts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Found #{res['list'].length} sessions"
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
 # Destroy session
 
 consulClient.destroy_session(sessionId) { |res_err,res|

@@ -285,7 +285,7 @@ public class Examples {
 
   }
 
-  public void sessions(ConsulClient consulClient, String sessionId) {
+  public void sessions(ConsulClient consulClient, String sessionId, long lastIndex) {
 
     SessionOptions opts = new SessionOptions()
       .setNode("nodeId")
@@ -324,6 +324,25 @@ public class Examples {
           System.out.println("Session create index: " + session.getCreateIndex());
 
         }
+
+      } else {
+
+        res.cause().printStackTrace();
+
+      }
+
+    });
+
+    // Blocking query for all active sessions
+
+    BlockingQueryOptions blockingOpts = new BlockingQueryOptions()
+      .setIndex(lastIndex);
+
+    consulClient.listSessionsWithOptions(blockingOpts, res -> {
+
+      if (res.succeeded()) {
+
+        System.out.println("Found " + res.result().getList().size() + " sessions");
 
       } else {
 

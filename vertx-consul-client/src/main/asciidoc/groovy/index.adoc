@@ -403,6 +403,26 @@ consulClient.listNodeSessions("nodeId", { res ->
 
 })
 
+// Blocking query for all active sessions
+
+def blockingOpts = [
+  index:lastIndex
+]
+
+consulClient.listSessionsWithOptions(blockingOpts, { res ->
+
+  if (res.succeeded()) {
+
+    println("Found ${res.result().list.size()} sessions")
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
 // Destroy session
 
 consulClient.destroySession(sessionId, { res ->

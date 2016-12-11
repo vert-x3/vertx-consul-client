@@ -402,6 +402,26 @@ consulClient.listNodeSessions("nodeId", function (res, res_err) {
 
 });
 
+// Blocking query for all active sessions
+
+var blockingOpts = {
+  "index" : lastIndex
+};
+
+consulClient.listSessionsWithOptions(blockingOpts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Found " + res.list.length + " sessions");
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
 // Destroy session
 
 consulClient.destroySession(sessionId, function (res, res_err) {
