@@ -23,11 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class NodeQueryOptions {
-
-  private static final String NEAR_KEY = "Near";
-  private static final String BLOCK_KEY = "Block";
 
   private String near;
   private BlockingQueryOptions options;
@@ -43,8 +40,7 @@ public class NodeQueryOptions {
    * @param json the JSON
    */
   public NodeQueryOptions(JsonObject json) {
-    near = json.getString(NEAR_KEY);
-    options = json.containsKey(BLOCK_KEY) ? new BlockingQueryOptions(json.getJsonObject(BLOCK_KEY)) : null;
+    NodeQueryOptionsConverter.fromJson(json, this);
   }
 
   /**
@@ -54,12 +50,7 @@ public class NodeQueryOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (near != null) {
-      jsonObject.put(NEAR_KEY, near);
-    }
-    if (options != null) {
-      jsonObject.put(BLOCK_KEY, options.toJson());
-    }
+    NodeQueryOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 

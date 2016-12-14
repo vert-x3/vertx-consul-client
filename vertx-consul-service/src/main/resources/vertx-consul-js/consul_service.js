@@ -25,6 +25,7 @@ var JConsulService = io.vertx.ext.consul.ConsulService;
 var BlockingQueryOptions = io.vertx.ext.consul.BlockingQueryOptions;
 var ServiceQueryOptions = io.vertx.ext.consul.ServiceQueryOptions;
 var Event = io.vertx.ext.consul.Event;
+var SessionList = io.vertx.ext.consul.SessionList;
 var NodeList = io.vertx.ext.consul.NodeList;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
@@ -140,10 +141,10 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.getValueBlocking = function(key, options, resultHandler) {
+  this.getValueWithOptions = function(key, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulService["getValueBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulService["getValueWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -204,10 +205,10 @@ var ConsulService = function(j_val) {
    @param resultHandler {function} 
    @return {ConsulService}
    */
-  this.getValuesBlocking = function(keyPrefix, options, resultHandler) {
+  this.getValuesWithOptions = function(keyPrefix, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulService["getValuesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulService["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
@@ -1085,6 +1086,28 @@ var ConsulService = function(j_val) {
 
    @public
    @param id {string} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.infoSessionWithOptions = function(id, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulService["infoSessionWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](id, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param id {string} 
    @param resultHandler {function} 
    @return {ConsulService}
    */
@@ -1113,7 +1136,28 @@ var ConsulService = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulService["listSessions(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.listSessionsWithOptions = function(options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["listSessionsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -1134,7 +1178,29 @@ var ConsulService = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulService["listNodeSessions(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param nodeId {string} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.listNodeSessionsWithOptions = function(nodeId, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulService["listNodeSessionsWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](nodeId, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

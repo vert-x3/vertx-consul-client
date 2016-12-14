@@ -139,7 +139,7 @@ opts = {
   'index' => modifyIndex
 }
 
-consulClient.get_value_blocking("foo", opts) { |res_err,res|
+consulClient.get_value_with_options("foo", opts) { |res_err,res|
 
   if (res_err == nil)
 
@@ -384,7 +384,7 @@ consulClient.list_node_sessions("nodeId") { |res_err,res|
 
   if (res_err == nil)
 
-    res.each do |session|
+    res['list'].each do |session|
 
       puts "Session id: #{session['id']}"
 
@@ -393,6 +393,26 @@ consulClient.list_node_sessions("nodeId") { |res_err,res|
       puts "Session create index: #{session['createIndex']}"
 
     end
+
+  else
+
+    res_err.print_stack_trace()
+
+  end
+
+}
+
+# Blocking query for all active sessions
+
+blockingOpts = {
+  'index' => lastIndex
+}
+
+consulClient.list_sessions_with_options(blockingOpts) { |res_err,res|
+
+  if (res_err == nil)
+
+    puts "Found #{res['list'].length} sessions"
 
   else
 

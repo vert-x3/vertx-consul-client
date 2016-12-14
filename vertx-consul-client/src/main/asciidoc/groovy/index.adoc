@@ -139,7 +139,7 @@ def opts = [
   index:modifyIndex
 ]
 
-consulClient.getValueBlocking("foo", opts, { res ->
+consulClient.getValueWithOptions("foo", opts, { res ->
 
   if (res.succeeded()) {
 
@@ -385,7 +385,7 @@ consulClient.listNodeSessions("nodeId", { res ->
 
   if (res.succeeded()) {
 
-    res.result().each { session ->
+    res.result().list.each { session ->
 
       println("Session id: ${session.id}")
 
@@ -394,6 +394,26 @@ consulClient.listNodeSessions("nodeId", { res ->
       println("Session create index: ${session.createIndex}")
 
     }
+
+  } else {
+
+    res.cause().printStackTrace()
+
+  }
+
+})
+
+// Blocking query for all active sessions
+
+def blockingOpts = [
+  index:lastIndex
+]
+
+consulClient.listSessionsWithOptions(blockingOpts, { res ->
+
+  if (res.succeeded()) {
+
+    println("Found ${res.result().list.size()} sessions")
 
   } else {
 

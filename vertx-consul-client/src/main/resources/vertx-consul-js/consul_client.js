@@ -24,6 +24,7 @@ var JConsulClient = io.vertx.ext.consul.ConsulClient;
 var BlockingQueryOptions = io.vertx.ext.consul.BlockingQueryOptions;
 var ServiceQueryOptions = io.vertx.ext.consul.ServiceQueryOptions;
 var Event = io.vertx.ext.consul.Event;
+var SessionList = io.vertx.ext.consul.SessionList;
 var NodeList = io.vertx.ext.consul.NodeList;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
@@ -146,10 +147,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with key/value pair 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.getValueBlocking = function(key, options, resultHandler) {
+  this.getValueWithOptions = function(key, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValueBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValueWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -214,10 +215,10 @@ var ConsulClient = function(j_val) {
    @param resultHandler {function} will be provided with list of key/value pairs 
    @return {ConsulClient} reference to this, for fluency
    */
-  this.getValuesBlocking = function(keyPrefix, options, resultHandler) {
+  this.getValuesWithOptions = function(keyPrefix, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValuesBlocking(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
       } else {
@@ -1138,6 +1139,30 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Returns the requested session information
+   This is blocking query unlike {@link ConsulClient#infoSession}
+
+   @public
+   @param id {string} the ID of requested session 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with info of requested session 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.infoSessionWithOptions = function(id, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulClient["infoSessionWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](id, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
    Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
 
    @public
@@ -1171,7 +1196,30 @@ var ConsulClient = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["listSessions(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the active sessions
+   This is blocking query unlike {@link ConsulClient#listSessions}
+
+   @public
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of sessions 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.listSessionsWithOptions = function(options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["listSessionsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -1193,7 +1241,31 @@ var ConsulClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulClient["listNodeSessions(java.lang.String,io.vertx.core.Handler)"](nodeId, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the active sessions for a given node
+   This is blocking query unlike {@link ConsulClient#listNodeSessions}
+
+   @public
+   @param nodeId {string} the ID of node 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of sessions 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.listNodeSessionsWithOptions = function(nodeId, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
+      j_consulClient["listNodeSessionsWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](nodeId, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

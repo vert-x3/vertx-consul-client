@@ -43,8 +43,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getValueBlocking(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
-    consulClient.getValueBlocking(key, options, resultHandler);
+  public ConsulService getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
+    consulClient.getValueWithOptions(key, options, resultHandler);
     return this;
   }
 
@@ -61,8 +61,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getValuesBlocking(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
-    consulClient.getValuesBlocking(keyPrefix, options, resultHandler);
+  public ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+    consulClient.getValuesWithOptions(keyPrefix, options, resultHandler);
     return this;
   }
 
@@ -295,20 +295,38 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler) {
+    consulClient.infoSessionWithOptions(id, options, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
     consulClient.renewSession(id, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService listSessions(Handler<AsyncResult<List<Session>>> resultHandler) {
+  public ConsulService listSessions(Handler<AsyncResult<SessionList>> resultHandler) {
     consulClient.listSessions(resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<List<Session>>> resultHandler) {
+  public ConsulService listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    consulClient.listSessionsWithOptions(options, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler) {
     consulClient.listNodeSessions(nodeId, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler) {
+    consulClient.listNodeSessionsWithOptions(nodeId, options, resultHandler);
     return this;
   }
 

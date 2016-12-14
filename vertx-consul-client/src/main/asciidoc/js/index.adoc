@@ -139,7 +139,7 @@ var opts = {
   "index" : modifyIndex
 };
 
-consulClient.getValueBlocking("foo", opts, function (res, res_err) {
+consulClient.getValueWithOptions("foo", opts, function (res, res_err) {
 
   if (res_err == null) {
 
@@ -384,7 +384,7 @@ consulClient.listNodeSessions("nodeId", function (res, res_err) {
 
   if (res_err == null) {
 
-    Array.prototype.forEach.call(res, function(session) {
+    Array.prototype.forEach.call(res.list, function(session) {
 
       console.log("Session id: " + session.id);
 
@@ -393,6 +393,26 @@ consulClient.listNodeSessions("nodeId", function (res, res_err) {
       console.log("Session create index: " + session.createIndex);
 
     });
+
+  } else {
+
+    res_err.printStackTrace();
+
+  }
+
+});
+
+// Blocking query for all active sessions
+
+var blockingOpts = {
+  "index" : lastIndex
+};
+
+consulClient.listSessionsWithOptions(blockingOpts, function (res, res_err) {
+
+  if (res_err == null) {
+
+    console.log("Found " + res.list.length + " sessions");
 
   } else {
 
