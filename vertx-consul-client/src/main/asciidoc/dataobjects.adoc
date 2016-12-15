@@ -124,9 +124,9 @@ Set checking interval
 +++
 Set check name
 +++
-|[[note]]`note`|`String`|
+|[[notes]]`notes`|`String`|
 +++
-Set check note
+Set check notes
 +++
 |[[script]]`script`|`String`|
 +++
