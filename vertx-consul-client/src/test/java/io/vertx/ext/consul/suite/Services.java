@@ -59,7 +59,9 @@ public class Services extends ChecksBase {
     ServiceOptions service = new ServiceOptions()
       .setName(serviceName)
       .setTags(Arrays.asList("tag1", "tag2"))
-      .setCheckOptions(new CheckOptions().setTtl("10s"))
+      .setCheckOptions(new CheckOptions()
+        .setNotes("checkNotes")
+        .setTtl("10s"))
       .setAddress("10.0.0.1")
       .setPort(8080);
     runAsync(h -> writeClient.registerService(service, h));
@@ -74,6 +76,7 @@ public class Services extends ChecksBase {
     List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     Check c = checks.stream().filter(i -> "serviceName".equals(i.getServiceName())).findFirst().get();
     assertEquals(c.getId(), "service:serviceName");
+    assertEquals(c.getNotes(), "checkNotes");
 
     ServiceList nodeServices = getAsync(h -> writeClient.catalogNodeServices(nodeName, h));
     assertEquals(2, nodeServices.getList().size());

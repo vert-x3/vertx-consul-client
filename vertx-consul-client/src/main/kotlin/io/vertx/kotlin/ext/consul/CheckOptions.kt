@@ -7,7 +7,7 @@ fun CheckOptions(
   id: String? = null,
   interval: String? = null,
   name: String? = null,
-  note: String? = null,
+  notes: String? = null,
   script: String? = null,
   tcp: String? = null,
   ttl: String? = null): CheckOptions = io.vertx.ext.consul.CheckOptions().apply {
@@ -28,8 +28,8 @@ fun CheckOptions(
     this.name = name
   }
 
-  if (note != null) {
-    this.note = note
+  if (notes != null) {
+    this.notes = notes
   }
 
   if (script != null) {

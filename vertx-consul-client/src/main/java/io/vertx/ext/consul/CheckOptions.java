@@ -28,7 +28,7 @@ public class CheckOptions {
 
   private static final String ID_KEY = "ID";
   private static final String NAME_KEY = "Name";
-  private static final String NOTE_KEY = "Note";
+  private static final String NOTES_KEY = "Notes";
   private static final String SCRIPT_KEY = "Script";
   private static final String HTTP_KEY = "HTTP";
   private static final String INTERVAL_KEY = "Interval";
@@ -42,7 +42,7 @@ public class CheckOptions {
   private String ttl;
   private String tcp;
   private String interval;
-  private String note;
+  private String notes;
 
   /**
    * Default constructor
@@ -63,7 +63,7 @@ public class CheckOptions {
     this.ttl = options.ttl;
     this.tcp = options.tcp;
     this.interval = options.interval;
-    this.note = options.note;
+    this.notes = options.notes;
   }
 
   /**
@@ -79,7 +79,7 @@ public class CheckOptions {
     this.ttl = options.getString(TTL_KEY);
     this.tcp = options.getString(TCP_KEY);
     this.interval = options.getString(INTERVAL_KEY);
-    this.note = options.getString(NOTE_KEY);
+    this.notes = options.getString(NOTES_KEY);
   }
 
   /**
@@ -95,8 +95,8 @@ public class CheckOptions {
     if (name != null) {
       jsonObject.put(NAME_KEY, name);
     }
-    if (note != null) {
-      jsonObject.put(NOTE_KEY, note);
+    if (notes != null) {
+      jsonObject.put(NOTES_KEY, notes);
     }
     if (script != null) {
       jsonObject.put(SCRIPT_KEY, script);
@@ -259,22 +259,22 @@ public class CheckOptions {
   }
 
   /**
-   * Get check note
+   * Get check notes
    *
-   * @return check note
+   * @return check notes
    */
-  public String getNote() {
-    return note;
+  public String getNotes() {
+    return notes;
   }
 
   /**
-   * Set check note
+   * Set check notes
    *
-   * @param note check note
+   * @param notes check notes
    * @return reference to this, for fluency
    */
-  public CheckOptions setNote(String note) {
-    this.note = note;
+  public CheckOptions setNotes(String notes) {
+    this.notes = notes;
     return this;
   }
 }
