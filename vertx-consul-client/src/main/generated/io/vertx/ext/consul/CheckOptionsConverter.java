@@ -45,6 +45,12 @@ public class CheckOptionsConverter {
     if (json.getValue("script") instanceof String) {
       obj.setScript((String)json.getValue("script"));
     }
+    if (json.getValue("serviceId") instanceof String) {
+      obj.setServiceId((String)json.getValue("serviceId"));
+    }
+    if (json.getValue("status") instanceof String) {
+      obj.setStatus(io.vertx.ext.consul.CheckStatus.valueOf((String)json.getValue("status")));
+    }
     if (json.getValue("tcp") instanceof String) {
       obj.setTcp((String)json.getValue("tcp"));
     }
@@ -71,6 +77,12 @@ public class CheckOptionsConverter {
     }
     if (obj.getScript() != null) {
       json.put("script", obj.getScript());
+    }
+    if (obj.getServiceId() != null) {
+      json.put("serviceId", obj.getServiceId());
+    }
+    if (obj.getStatus() != null) {
+      json.put("status", obj.getStatus().name());
     }
     if (obj.getTcp() != null) {
       json.put("tcp", obj.getTcp());

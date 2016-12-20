@@ -34,6 +34,8 @@ public class CheckOptions {
   private String tcp;
   private String interval;
   private String notes;
+  private String serviceId;
+  private CheckStatus status;
 
   /**
    * Default constructor
@@ -75,6 +77,46 @@ public class CheckOptions {
     JsonObject jsonObject = new JsonObject();
     CheckOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
+  }
+
+  /**
+   * Get the service ID to associate the registered check with an existing service provided by the agent.
+   *
+   * @return the service ID
+   */
+  public String getServiceId() {
+    return serviceId;
+  }
+
+  /**
+   * Set the service ID to associate the registered check with an existing service provided by the agent.
+   *
+   * @param serviceId the service ID
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setServiceId(String serviceId) {
+    this.serviceId = serviceId;
+    return this;
+  }
+
+  /**
+   * Get the check status to specify the initial state of the health check.
+   *
+   * @return the check status
+   */
+  public CheckStatus getStatus() {
+    return status;
+  }
+
+  /**
+   * Set the check status to specify the initial state of the health check.
+   *
+   * @param status the check status
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setStatus(CheckStatus status) {
+    this.status = status;
+    return this;
   }
 
   /**
@@ -209,7 +251,7 @@ public class CheckOptions {
   }
 
   /**
-   * Set check name
+   * Set check name. This is mandatory field
    *
    * @param name check name
    * @return reference to this, for fluency
