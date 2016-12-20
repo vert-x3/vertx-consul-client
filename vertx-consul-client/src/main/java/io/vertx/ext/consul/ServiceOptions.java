@@ -16,7 +16,6 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -26,15 +25,9 @@ import java.util.List;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class ServiceOptions {
 
-  private static final String SERVICE_ID = "ID";
-  private static final String SERVICE_NAME = "Name";
-  private static final String SERVICE_TAGS = "Tags";
-  private static final String SERVICE_ADDRESS = "Address";
-  private static final String SERVICE_PORT = "Port";
-  private static final String SERVICE_CHECK = "Check";
 
   private String id;
   private String name;
@@ -69,14 +62,7 @@ public class ServiceOptions {
    * @param options the JSON
    */
   public ServiceOptions(JsonObject options) {
-    this.id = options.getString(SERVICE_ID);
-    this.name = options.getString(SERVICE_NAME);
-    JsonArray tagsArr = options.getJsonArray(SERVICE_TAGS);
-    this.tags = tagsArr == null ? null : tagsArr.getList();
-    this.address = options.getString(SERVICE_ADDRESS);
-    this.port = options.getInteger(SERVICE_PORT, 0);
-    JsonObject checkObj = options.getJsonObject(SERVICE_CHECK);
-    this.checkOptions = checkObj == null ? null : new CheckOptions(checkObj);
+    ServiceOptionsConverter.fromJson(options, this);
   }
 
   /**
@@ -86,24 +72,7 @@ public class ServiceOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (id != null) {
-      jsonObject.put(SERVICE_ID, id);
-    }
-    if (name != null) {
-      jsonObject.put(SERVICE_NAME, name);
-    }
-    if (tags != null) {
-      jsonObject.put(SERVICE_TAGS, new JsonArray(tags));
-    }
-    if (address != null) {
-      jsonObject.put(SERVICE_ADDRESS, address);
-    }
-    if (port != 0) {
-      jsonObject.put(SERVICE_PORT, port);
-    }
-    if (checkOptions != null) {
-      jsonObject.put(SERVICE_CHECK, checkOptions.toJson());
-    }
+    ServiceOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 

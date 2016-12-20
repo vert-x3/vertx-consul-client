@@ -23,17 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class CheckOptions {
-
-  private static final String ID_KEY = "ID";
-  private static final String NAME_KEY = "Name";
-  private static final String NOTES_KEY = "Notes";
-  private static final String SCRIPT_KEY = "Script";
-  private static final String HTTP_KEY = "HTTP";
-  private static final String INTERVAL_KEY = "Interval";
-  private static final String TTL_KEY = "TTL";
-  private static final String TCP_KEY = "TCP";
 
   private String id;
   private String name;
@@ -72,14 +63,7 @@ public class CheckOptions {
    * @param options the JSON
    */
   public CheckOptions(JsonObject options) {
-    this.id = options.getString(ID_KEY);
-    this.name = options.getString(NAME_KEY);
-    this.script = options.getString(SCRIPT_KEY);
-    this.http = options.getString(HTTP_KEY);
-    this.ttl = options.getString(TTL_KEY);
-    this.tcp = options.getString(TCP_KEY);
-    this.interval = options.getString(INTERVAL_KEY);
-    this.notes = options.getString(NOTES_KEY);
+    CheckOptionsConverter.fromJson(options, this);
   }
 
   /**
@@ -89,30 +73,7 @@ public class CheckOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (id != null) {
-      jsonObject.put(ID_KEY, id);
-    }
-    if (name != null) {
-      jsonObject.put(NAME_KEY, name);
-    }
-    if (notes != null) {
-      jsonObject.put(NOTES_KEY, notes);
-    }
-    if (script != null) {
-      jsonObject.put(SCRIPT_KEY, script);
-    }
-    if (http != null) {
-      jsonObject.put(HTTP_KEY, http);
-    }
-    if (ttl != null) {
-      jsonObject.put(TTL_KEY, ttl);
-    }
-    if (tcp != null) {
-      jsonObject.put(TCP_KEY, tcp);
-    }
-    if (interval != null) {
-      jsonObject.put(INTERVAL_KEY, interval);
-    }
+    CheckOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
