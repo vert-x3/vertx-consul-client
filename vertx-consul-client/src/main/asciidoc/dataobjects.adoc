@@ -236,6 +236,27 @@ Get version
 +++
 |===
 
+[[EventList]]
+== EventList
+
+++++
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested events
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Event[Event]`|
++++
+Set list of events
++++
+|===
+
 [[EventOptions]]
 == EventOptions
 

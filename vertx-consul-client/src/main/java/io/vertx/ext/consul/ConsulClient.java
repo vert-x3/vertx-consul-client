@@ -273,7 +273,25 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> endpoint
    */
   @Fluent
-  ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
+  ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler);
+
+  /**
+   * Returns the most recent events known by the agent.
+   * This is blocking query unlike {@link ConsulClient#listEvents(Handler)}. However, the semantics of this endpoint
+   * are slightly different. Most blocking queries provide a monotonic index and block until a newer index is available.
+   * This can be supported as a consequence of the total ordering of the consensus protocol. With gossip,
+   * there is no ordering, and instead {@code X-Consul-Index} maps to the newest event that matches the query.
+   *
+   * In practice, this means the index is only useful when used against a single agent and has no meaning globally.
+   * Because Consul defines the index as being opaque, clients should not be expecting a natural ordering either.
+   *
+   * @param resultHandler will be provided with list of events
+   * @param options       the blocking options
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> endpoint
+   */
+  @Fluent
+  ConsulClient listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler);
 
   /**
    * Adds a new service, with an optional health check, to the local agent.

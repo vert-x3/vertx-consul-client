@@ -212,9 +212,17 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/event/list", null, resultHandler, (jsonArray, headers) -> jsonArray.stream()
-      .map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList())).end();
+  public ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler) {
+    listEventsWithOptions(null, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulClient listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/event/list", Query.of(options), resultHandler, (jsonArray, headers) -> {
+      List<Event> list = jsonArray.stream().map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList());
+      return new EventList().setList(list).setIndex(Long.parseUnsignedLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
