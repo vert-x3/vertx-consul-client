@@ -15,14 +15,51 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.*;
+import org.junit.Test;
 
+import java.util.List;
+
+import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.runAsync;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class Checks extends ChecksBase {
+
+  @Test
+  public void bindCheckToService() {
+    String serviceName = "serviceName";
+    ServiceOptions service = new ServiceOptions()
+      .setName(serviceName)
+      .setAddress("10.0.0.1")
+      .setPort(8080);
+    runAsync(h -> writeClient.registerService(service, h));
+
+    List<Service> services = getAsync(h -> writeClient.localServices(h));
+    Service s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
+    String serviceId = s.getId();
+    assertEquals(s.getAddress(), "10.0.0.1");
+    assertEquals(s.getPort(), 8080);
+
+    CheckOptions check = new CheckOptions()
+      .setId("checkId")
+      .setName("checkName")
+      .setNotes("checkNotes")
+      .setServiceId(serviceId)
+      .setStatus(CheckStatus.PASSING)
+      .setTtl("10s");
+    runAsync(h -> writeClient.registerCheck(check, h));
+
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    Check c = checks.stream().filter(i -> "checkId".equals(i.getId())).findFirst().get();
+    assertEquals(c.getServiceId(), serviceId);
+    assertEquals(c.getStatus(), CheckStatus.PASSING);
+    assertEquals(c.getNotes(), "checkNotes");
+
+    runAsync(h -> writeClient.deregisterService(serviceId, h));
+  }
 
   @Override
   String createCheck(CheckOptions opts) {

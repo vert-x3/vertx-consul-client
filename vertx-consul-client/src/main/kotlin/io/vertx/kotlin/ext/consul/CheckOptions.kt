@@ -1,6 +1,7 @@
 package io.vertx.kotlin.ext.consul
 
 import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.CheckStatus
 
 fun CheckOptions(
     http: String? = null,
@@ -9,6 +10,8 @@ fun CheckOptions(
   name: String? = null,
   notes: String? = null,
   script: String? = null,
+  serviceId: String? = null,
+  status: CheckStatus? = null,
   tcp: String? = null,
   ttl: String? = null): CheckOptions = io.vertx.ext.consul.CheckOptions().apply {
 
@@ -34,6 +37,14 @@ fun CheckOptions(
 
   if (script != null) {
     this.script = script
+  }
+
+  if (serviceId != null) {
+    this.serviceId = serviceId
+  }
+
+  if (status != null) {
+    this.status = status
   }
 
   if (tcp != null) {

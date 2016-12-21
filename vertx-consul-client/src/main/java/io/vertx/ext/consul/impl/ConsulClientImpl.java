@@ -228,7 +228,16 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.PUT, "/v1/agent/service/register", null, resultHandler).end(serviceOptions.toJson().encode());
+    JsonObject jsonOpts = new JsonObject()
+      .put("ID", serviceOptions.getId())
+      .put("Name", serviceOptions.getName())
+      .put("Tags", serviceOptions.getTags())
+      .put("Address", serviceOptions.getAddress())
+      .put("Port", serviceOptions.getPort());
+    if (serviceOptions.getCheckOptions() != null){
+      jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), false));
+    }
+    requestVoid(HttpMethod.PUT, "/v1/agent/service/register", null, resultHandler).end(jsonOpts.encode());
     return this;
   }
 
@@ -332,8 +341,29 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/register", null, resultHandler).end(checkOptions.toJson().encode());
+    requestVoid(HttpMethod.GET, "/v1/agent/check/register", null, resultHandler).end(checkOpts(checkOptions, true).encode());
     return this;
+  }
+
+  private static JsonObject checkOpts(CheckOptions checkOptions, boolean extended) {
+    JsonObject json = new JsonObject()
+      .put("ID", checkOptions.getId())
+      .put("Name", checkOptions.getName())
+      .put("Notes", checkOptions.getNotes())
+      .put("Script", checkOptions.getScript())
+      .put("HTTP", checkOptions.getHttp())
+      .put("Interval", checkOptions.getInterval())
+      .put("TTL", checkOptions.getTtl())
+      .put("TCP", checkOptions.getTcp());
+    if (extended) {
+      if (checkOptions.getServiceId() != null) {
+        json.put("ServiceID", checkOptions.getServiceId());
+      }
+      if (checkOptions.getStatus() != null) {
+        json.put("Status", checkOptions.getStatus().key);
+      }
+    }
+    return json;
   }
 
   @Override
