@@ -50,9 +50,7 @@ class Query {
 
   Query put(BlockingQueryOptions options) {
     if (options != null) {
-      if (options.getIndex() > 0) {
-        put("index", options.getIndex());
-      }
+      put("index", Long.toUnsignedString(options.getIndex()));
       if (options.getWait() != null) {
         put("wait", options.getWait());
       }

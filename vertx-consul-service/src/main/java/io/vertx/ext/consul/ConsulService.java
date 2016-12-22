@@ -105,7 +105,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler);
+  ConsulService listEvents(Handler<AsyncResult<EventList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler);
 
   @Override
   @Fluent

@@ -208,31 +208,57 @@ Get list of servers in datacenter
 ^|Name | Type ^| Description
 |[[id]]`id`|`String`|
 +++
-Get ID of event
+Set ID of event
++++
+|[[lTime]]`lTime`|`Number (int)`|
++++
+Set the Lamport clock time
 +++
 |[[name]]`name`|`String`|
 +++
-Get name of event
+Set name of event
 +++
 |[[node]]`node`|`String`|
 +++
-Get regular expression to filter by node name
+Set regular expression to filter by node name
 +++
 |[[payload]]`payload`|`String`|
 +++
-Get payload of event
+Set payload of event
 +++
 |[[service]]`service`|`String`|
 +++
-Get regular expression to filter by service
+Set regular expression to filter by service
 +++
 |[[tag]]`tag`|`String`|
 +++
-Get regular expression to filter by tag
+Set regular expression to filter by tag
 +++
 |[[version]]`version`|`Number (int)`|
 +++
-Get version
+Set version
++++
+|===
+
+[[EventList]]
+== EventList
+
+++++
+ Holds result of events query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested events
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Event[Event]`|
++++
+Set list of events
 +++
 |===
 

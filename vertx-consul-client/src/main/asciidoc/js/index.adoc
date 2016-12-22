@@ -329,7 +329,7 @@ consulClient.listEvents(function (res, res_err) {
 
   if (res_err == null) {
 
-    Array.prototype.forEach.call(res, function(event) {
+    Array.prototype.forEach.call(res.list, function(event) {
 
       console.log("Event id: " + event.id);
 

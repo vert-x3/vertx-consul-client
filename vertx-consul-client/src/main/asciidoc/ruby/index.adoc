@@ -329,7 +329,7 @@ consulClient.list_events() { |res_err,res|
 
   if (res_err == nil)
 
-    res.each do |event|
+    res['list'].each do |event|
 
       puts "Event id: #{event['id']}"
 

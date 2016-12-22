@@ -133,8 +133,14 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
+  public ConsulService listEvents(Handler<AsyncResult<EventList>> resultHandler) {
     consulClient.listEvents(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler) {
+    consulClient.listEventsWithOptions(options, resultHandler);
     return this;
   }
 

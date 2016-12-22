@@ -206,24 +206,24 @@ public class ConsulClientImpl implements ConsulClient {
     if (options != null) {
       query.put("node", options.getNode()).put("service", options.getService()).put("tag", options.getTag());
     }
-    requestObject(HttpMethod.PUT, "/v1/event/fire/" + urlEncode(name), query, resultHandler, (jsonObject, headers) -> new Event(fixEventJson(jsonObject)))
+    requestObject(HttpMethod.PUT, "/v1/event/fire/" + urlEncode(name), query, resultHandler, (jsonObject, headers) -> EventParser.parse(jsonObject))
       .end(options == null || options.getPayload() == null ? "" : options.getPayload());
     return this;
   }
 
   @Override
-  public ConsulClient listEvents(Handler<AsyncResult<List<Event>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/event/list", null, resultHandler, (jsonArray, headers) -> jsonArray.stream()
-      .map(obj -> new Event(fixEventJson(((JsonObject) obj)))).collect(Collectors.toList())).end();
+  public ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler) {
+    listEventsWithOptions(null, resultHandler);
     return this;
   }
 
-  private static JsonObject fixEventJson(JsonObject jsonObject) {
-    String payload = jsonObject.getString("Payload");
-    if (payload != null) {
-      jsonObject.put("Payload", new String(Base64.getDecoder().decode(payload)));
-    }
-    return jsonObject;
+  @Override
+  public ConsulClient listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/event/list", Query.of(options), resultHandler, (jsonArray, headers) -> {
+      List<Event> list = jsonArray.stream().map(obj -> EventParser.parse(((JsonObject) obj))).collect(Collectors.toList());
+      return new EventList().setList(list).setIndex(Long.parseUnsignedLong(headers.get(INDEX_HEADER)));
+    }).end();
+    return this;
   }
 
   @Override

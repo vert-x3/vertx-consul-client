@@ -259,10 +259,28 @@ module VertxConsul
     # @return [self]
     def list_events
       if block_given?
-        @j_del.java_method(:listEvents, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:listEvents, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_events()"
+    end
+    #  Returns the most recent events known by the agent.
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#list_events}. However, the semantics of this endpoint
+    #  are slightly different. Most blocking queries provide a monotonic index and block until a newer index is available.
+    #  This can be supported as a consequence of the total ordering of the consensus protocol. With gossip,
+    #  there is no ordering, and instead <code>X-Consul-Index</code> maps to the newest event that matches the query.
+    # 
+    #  In practice, this means the index is only useful when used against a single agent and has no meaning globally.
+    #  Because Consul defines the index as being opaque, clients should not be expecting a natural ordering either.
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of events
+    # @return [self]
+    def list_events_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:listEventsWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling list_events_with_options(#{options})"
     end
     #  Adds a new service, with an optional health check, to the local agent.
     # @param [Hash] serviceOptions the options of new service

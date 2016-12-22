@@ -329,7 +329,7 @@ consulClient.listEvents({ res ->
 
   if (res.succeeded()) {
 
-    res.result().each { event ->
+    res.result().list.each { event ->
 
       println("Event id: ${event.id}")
 

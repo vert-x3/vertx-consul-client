@@ -265,7 +265,7 @@ public class Examples {
 
       if (res.succeeded()) {
 
-        for(Event event: res.result()) {
+        for(Event event: res.result().getList()) {
 
           System.out.println("Event id: " + event.getId());
 
