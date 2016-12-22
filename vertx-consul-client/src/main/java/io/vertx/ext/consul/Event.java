@@ -23,17 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class Event {
-
-  private static final String ID_KEY = "ID";
-  private static final String NAME_KEY = "Name";
-  private static final String PAYLOAD_KEY = "Payload";
-  private static final String NODE_FILTER_KEY = "NodeFilter";
-  private static final String SERVICE_FILTER_KEY = "ServiceFilter";
-  private static final String TAG_FILTER_KEY = "TagFilter";
-  private static final String VERSION_KEY = "Version";
-  private static final String LTIME_KEY = "LTime";
 
   private String id;
   private String name;
@@ -55,14 +46,7 @@ public class Event {
    * @param json the JSON
    */
   public Event(JsonObject json) {
-    this.id = json.getString(ID_KEY);
-    this.name = json.getString(NAME_KEY);
-    this.payload = json.getString(PAYLOAD_KEY);
-    this.node = json.getString(NODE_FILTER_KEY);
-    this.service = json.getString(SERVICE_FILTER_KEY);
-    this.tag = json.getString(TAG_FILTER_KEY);
-    this.version = json.getInteger(VERSION_KEY, 0);
-    this.lTime = json.getInteger(LTIME_KEY, 0);
+    EventConverter.fromJson(json, this);
   }
 
   /**
@@ -72,30 +56,7 @@ public class Event {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (id != null) {
-      jsonObject.put(ID_KEY, id);
-    }
-    if (name != null) {
-      jsonObject.put(NAME_KEY, name);
-    }
-    if (payload != null) {
-      jsonObject.put(PAYLOAD_KEY, payload);
-    }
-    if (node != null) {
-      jsonObject.put(NODE_FILTER_KEY, node);
-    }
-    if (service != null) {
-      jsonObject.put(SERVICE_FILTER_KEY, service);
-    }
-    if (tag != null) {
-      jsonObject.put(TAG_FILTER_KEY, tag);
-    }
-    if (version != 0) {
-      jsonObject.put(VERSION_KEY, version);
-    }
-    if (lTime != 0) {
-      jsonObject.put(LTIME_KEY, lTime);
-    }
+    EventConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -109,12 +70,34 @@ public class Event {
   }
 
   /**
+   * Set ID of event
+   *
+   * @param id ID of event
+   * @return reference to this, for fluency
+   */
+  public Event setId(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
    * Get name of event
    *
    * @return event name
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Set name of event
+   *
+   * @param name name of event
+   * @return reference to this, for fluency
+   */
+  public Event setName(String name) {
+    this.name = name;
+    return this;
   }
 
   /**
@@ -127,12 +110,34 @@ public class Event {
   }
 
   /**
+   * Set payload of event
+   *
+   * @param payload payload of event
+   * @return reference to this, for fluency
+   */
+  public Event setPayload(String payload) {
+    this.payload = payload;
+    return this;
+  }
+
+  /**
    * Get regular expression to filter by node name
    *
    * @return regular expression to filter by node name
    */
   public String getNode() {
     return node;
+  }
+
+  /**
+   * Set regular expression to filter by node name
+   *
+   * @param node regular expression to filter by node name
+   * @return reference to this, for fluency
+   */
+  public Event setNode(String node) {
+    this.node = node;
+    return this;
   }
 
   /**
@@ -145,12 +150,34 @@ public class Event {
   }
 
   /**
+   * Set regular expression to filter by service
+   *
+   * @param service regular expression to filter by service
+   * @return reference to this, for fluency
+   */
+  public Event setService(String service) {
+    this.service = service;
+    return this;
+  }
+
+  /**
    * Get regular expression to filter by tag
    *
    * @return regular expression to filter by tag
    */
   public String getTag() {
     return tag;
+  }
+
+  /**
+   * Set regular expression to filter by tag
+   *
+   * @param tag regular expression to filter by tag
+   * @return reference to this, for fluency
+   */
+  public Event setTag(String tag) {
+    this.tag = tag;
+    return this;
   }
 
   /**
@@ -163,11 +190,34 @@ public class Event {
   }
 
   /**
-   * Get Lamport clock time
+   * Set version
    *
-   * @return Lamport clock time
+   * @param version version
+   * @return reference to this, for fluency
    */
-  public int getlTime() {
+  public Event setVersion(int version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get the Lamport clock time
+   *
+   * @return the Lamport clock time
+   */
+  public int getLTime() {
     return lTime;
   }
+
+  /**
+   * Set the Lamport clock time
+   *
+   * @param lTime the Lamport clock time
+   * @return reference to this, for fluency
+   */
+  public Event setLTime(int lTime) {
+    this.lTime = lTime;
+    return this;
+  }
+
 }

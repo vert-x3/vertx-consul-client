@@ -23,13 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class EventOptions {
-
-  private static final String NODE_KEY = "node";
-  private static final String SERVICE_KEY = "service";
-  private static final String TAG_KEY = "tag";
-  private static final String PAYLOAD_KEY = "payload";
 
   private String node;
   private String service;
@@ -60,10 +55,7 @@ public class EventOptions {
    * @param options the JSON
    */
   public EventOptions(JsonObject options) {
-    this.node = options.getString(NODE_KEY);
-    this.service = options.getString(SERVICE_KEY);
-    this.tag = options.getString(TAG_KEY);
-    this.payload = options.getString(PAYLOAD_KEY);
+    EventOptionsConverter.fromJson(options, this);
   }
 
   /**
@@ -73,9 +65,7 @@ public class EventOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (payload != null) {
-      jsonObject.put(PAYLOAD_KEY, payload);
-    }
+    EventOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
