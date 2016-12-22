@@ -240,6 +240,7 @@ Get version
 == EventList
 
 ++++
+ Holds result of events query
 ++++
 '''
 
