@@ -128,7 +128,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+  ConsulClient getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   /**
    * Returns the list of key/value pairs that corresponding to the specified key prefix.
@@ -141,7 +141,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+  ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   /**
    * Removes all the key/value pair that corresponding to the specified key prefix

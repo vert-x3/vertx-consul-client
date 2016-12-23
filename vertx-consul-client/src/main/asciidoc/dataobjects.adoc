@@ -334,6 +334,28 @@ Get the value
 +++
 |===
 
+[[KeyValueList]]
+== KeyValueList
+
+++++
+ Holds result of key/value pairs query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index
++++
+|[[list]]`list`|`Array of link:dataobjects.html#KeyValue[KeyValue]`|
++++
+Set list of key/value pairs
++++
+|===
+
 [[KeyValueOptions]]
 == KeyValueOptions
 

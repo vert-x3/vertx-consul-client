@@ -53,11 +53,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+  ConsulService getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   @Override
   @Fluent
-  ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler);
+  ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   @Override
   @Fluent

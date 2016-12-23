@@ -107,17 +107,17 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+  public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler) {
     return getValuesWithOptions(keyPrefix, null, resultHandler);
   }
 
   @Override
-  public ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+  public ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler) {
     Query query = Query.of("recurse", true).put(options);
-    requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, resultHandler, (arr, headers) ->
-      arr.stream()
-        .map(obj -> new KeyValue(fixKeyValueJson((JsonObject) obj)))
-        .collect(Collectors.toList())).end();
+    requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, resultHandler, (arr, headers) -> {
+      List<KeyValue> list = arr.stream().map(obj -> new KeyValue(fixKeyValueJson((JsonObject) obj))).collect(Collectors.toList());
+      return new KeyValueList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 

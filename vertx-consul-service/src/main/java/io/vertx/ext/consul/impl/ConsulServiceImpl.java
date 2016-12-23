@@ -55,13 +55,13 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getValues(String keyPrefix, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+  public ConsulService getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler) {
     consulClient.getValues(keyPrefix, resultHandler);
     return this;
   }
 
   @Override
-  public ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<KeyValue>>> resultHandler) {
+  public ConsulService getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler) {
     consulClient.getValuesWithOptions(keyPrefix, options, resultHandler);
     return this;
   }
