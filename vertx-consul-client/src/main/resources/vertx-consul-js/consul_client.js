@@ -38,6 +38,7 @@ var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
+var KeyValueList = io.vertx.ext.consul.KeyValueList;
 var DcCoordinates = io.vertx.ext.consul.DcCoordinates;
 var ServiceList = io.vertx.ext.consul.ServiceList;
 var Session = io.vertx.ext.consul.Session;
@@ -197,7 +198,7 @@ var ConsulClient = function(j_val) {
     if (__args.length === 2 && typeof __args[0] === 'string' && typeof __args[1] === 'function') {
       j_consulClient["getValues(java.lang.String,io.vertx.core.Handler)"](keyPrefix, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }
@@ -221,7 +222,7 @@ var ConsulClient = function(j_val) {
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_consulClient["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

@@ -104,7 +104,7 @@ module VertxConsul
     # @return [self]
     def get_values(keyPrefix=nil)
       if keyPrefix.class == String && block_given?
-        @j_del.java_method(:getValues, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:getValues, [Java::java.lang.String.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling get_values(#{keyPrefix})"
@@ -115,7 +115,7 @@ module VertxConsul
     # @return [self]
     def get_values_with_options(keyPrefix=nil,options=nil)
       if keyPrefix.class == String && options.class == Hash && block_given?
-        @j_del.java_method(:getValuesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:getValuesWithOptions, [Java::java.lang.String.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(keyPrefix,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling get_values_with_options(#{keyPrefix},#{options})"

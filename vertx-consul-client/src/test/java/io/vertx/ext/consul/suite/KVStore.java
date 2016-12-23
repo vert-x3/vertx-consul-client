@@ -18,12 +18,10 @@ package io.vertx.ext.consul.suite;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
-import static io.vertx.ext.consul.Utils.sleep;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -60,11 +58,11 @@ public class KVStore extends ConsulTestBase {
     String prefix = "foo/bars";
     assertTrue(getAsync(h -> writeClient.putValue(prefix + "1", "value1", h)));
     assertTrue(getAsync(h -> writeClient.putValue(prefix + "2", "value2", h)));
-    List<KeyValue> list = getAsync(h -> readClient.getValues(prefix, h));
-    assertEquals(prefix + "1", list.get(0).getKey());
-    assertEquals("value1", list.get(0).getValue());
-    assertEquals(prefix + "2", list.get(1).getKey());
-    assertEquals("value2", list.get(1).getValue());
+    KeyValueList list = getAsync(h -> readClient.getValues(prefix, h));
+    assertEquals(prefix + "1", list.getList().get(0).getKey());
+    assertEquals("value1", list.getList().get(0).getValue());
+    assertEquals(prefix + "2", list.getList().get(1).getKey());
+    assertEquals("value2", list.getList().get(1).getValue());
     runAsync(h -> writeClient.deleteValues(prefix, h));
   }
 
@@ -73,11 +71,11 @@ public class KVStore extends ConsulTestBase {
     String prefix = "foo/bars";
     assertTrue(getAsync(h -> writeClient.putValue(prefix + "3", "value3", h)));
     assertTrue(getAsync(h -> writeClient.putValue(prefix + "4", "value4", h)));
-    List<KeyValue> list = getAsync(h -> writeClient.getValues(prefix, h));
-    assertEquals(prefix + "3", list.get(0).getKey());
-    assertEquals("value3", list.get(0).getValue());
-    assertEquals(prefix + "4", list.get(1).getKey());
-    assertEquals("value4", list.get(1).getValue());
+    KeyValueList list = getAsync(h -> writeClient.getValues(prefix, h));
+    assertEquals(prefix + "3", list.getList().get(0).getKey());
+    assertEquals("value3", list.getList().get(0).getValue());
+    assertEquals(prefix + "4", list.getList().get(1).getKey());
+    assertEquals("value4", list.getList().get(1).getValue());
     runAsync(h -> writeClient.deleteValues(prefix, h));
   }
 
@@ -114,17 +112,32 @@ public class KVStore extends ConsulTestBase {
 
   @Test
   public void canGetValueBlocking() throws InterruptedException {
+    blockingQuery(() -> {
+      KeyValue pair = getAsync(h -> readClient.getValue("foo/barBlock", h));
+      return pair.getModifyIndex();
+    });
+  }
+
+  @Test
+  public void canGetValuesBlocking() throws InterruptedException {
+    blockingQuery(() -> {
+      KeyValueList list = getAsync(h -> readClient.getValues("foo/barBlock", h));
+      return list.getIndex();
+    });
+  }
+
+  private void blockingQuery(Supplier<Long> indexSupplier) throws InterruptedException {
     assertTrue(getAsync(h -> writeClient.putValue("foo/barBlock", "valueBlock1", h)));
-    KeyValue pair1 = getAsync(h -> readClient.getValue("foo/barBlock", h));
+    long consulIndex = indexSupplier.get();
     CountDownLatch latch = new CountDownLatch(2);
-    readClient.getValueWithOptions(pair1.getKey(), new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
+    readClient.getValueWithOptions("foo/barBlock", new BlockingQueryOptions().setIndex(consulIndex), h -> {
       assertEquals(h.result().getValue(), "valueBlock2");
-      assertTrue(h.result().getModifyIndex() > pair1.getModifyIndex());
+      assertTrue(h.result().getModifyIndex() > consulIndex);
       latch.countDown();
     });
-    readClient.getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(pair1.getModifyIndex()), h -> {
-      assertEquals(h.result().size(), 1);
-      assertTrue(h.result().get(0).getModifyIndex() > pair1.getModifyIndex());
+    readClient.getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(consulIndex), h -> {
+      assertEquals(h.result().getList().size(), 1);
+      assertTrue(h.result().getIndex() > consulIndex);
       latch.countDown();
     });
     sleep(vertx, 2000);
