@@ -25,7 +25,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -88,16 +87,8 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(key), new Query().put(options), resultHandler, (arr, headers) ->
-      new KeyValue(fixKeyValueJson(arr.getJsonObject(0)))).end();
+      KVParser.parse(arr.getJsonObject(0))).end();
     return this;
-  }
-
-  private static JsonObject fixKeyValueJson(JsonObject jsonObject) {
-    String value = jsonObject.getString("Value");
-    if (value != null) {
-      jsonObject.put("Value", new String(Base64.getDecoder().decode(value)));
-    }
-    return jsonObject;
   }
 
   @Override
@@ -115,7 +106,7 @@ public class ConsulClientImpl implements ConsulClient {
   public ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler) {
     Query query = Query.of("recurse", true).put(options);
     requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, resultHandler, (arr, headers) -> {
-      List<KeyValue> list = arr.stream().map(obj -> new KeyValue(fixKeyValueJson((JsonObject) obj))).collect(Collectors.toList());
+      List<KeyValue> list = arr.stream().map(obj -> KVParser.parse((JsonObject) obj)).collect(Collectors.toList());
       return new KeyValueList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
     }).end();
     return this;

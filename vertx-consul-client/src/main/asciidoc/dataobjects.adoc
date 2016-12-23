@@ -306,31 +306,31 @@ Set regular expression to filter by tag
 ^|Name | Type ^| Description
 |[[createIndex]]`createIndex`|`Number (long)`|
 +++
-Get the internal index value that represents when the entry was created.
+Set the internal index value that represents when the entry was created.
 +++
 |[[flags]]`flags`|`Number (long)`|
 +++
-Get the flags attached to this entry. Clients can choose to use this however makes sense for their application.
+Set the flags attached to this entry. Clients can choose to use this however makes sense for their application.
 +++
 |[[key]]`key`|`String`|
 +++
-Get the key
+Set the key
 +++
 |[[lockIndex]]`lockIndex`|`Number (long)`|
 +++
-Get the number of times this key has successfully been acquired in a lock.
+Set the number of times this key has successfully been acquired in a lock.
 +++
 |[[modifyIndex]]`modifyIndex`|`Number (long)`|
 +++
-Get the last index that modified this key.
+Set the last index that modified this key.
 +++
 |[[session]]`session`|`String`|
 +++
-Get the session that owns the lock
+Set the session that owns the lock
 +++
 |[[value]]`value`|`String`|
 +++
-Get the value
+Set the value
 +++
 |===
 

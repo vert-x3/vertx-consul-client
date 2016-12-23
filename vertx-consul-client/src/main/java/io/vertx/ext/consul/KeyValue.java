@@ -24,16 +24,8 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/agent/http/kv.html">Consul key/value store</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class KeyValue {
-
-  private static final String KEY_KEY = "Key";
-  private static final String VALUE_KEY = "Value";
-  private static final String SESSION_KEY = "Session";
-  private static final String FLAGS_KEY = "Flags";
-  private static final String CREATE_KEY = "CreateIndex";
-  private static final String MODIFY_KEY = "ModifyIndex";
-  private static final String LOCK_KEY = "LockIndex";
 
   private String key;
   private String value;
@@ -54,13 +46,7 @@ public class KeyValue {
    * @param json the JSON
    */
   public KeyValue(JsonObject json) {
-    key = json.getString(KEY_KEY);
-    value = json.getString(VALUE_KEY);
-    session = json.getString(SESSION_KEY);
-    flags = json.getLong(FLAGS_KEY, 0L);
-    createIndex = json.getLong(CREATE_KEY, 0L);
-    modifyIndex = json.getLong(MODIFY_KEY, 0L);
-    lockIndex = json.getLong(LOCK_KEY, 0L);
+    KeyValueConverter.fromJson(json, this);
   }
 
   /**
@@ -70,27 +56,7 @@ public class KeyValue {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (key != null) {
-      jsonObject.put(KEY_KEY, key);
-    }
-    if (value != null) {
-      jsonObject.put(VALUE_KEY, value);
-    }
-    if (session != null) {
-      jsonObject.put(SESSION_KEY, session);
-    }
-    if (flags != 0) {
-      jsonObject.put(FLAGS_KEY, flags);
-    }
-    if (createIndex != 0) {
-      jsonObject.put(CREATE_KEY, createIndex);
-    }
-    if (modifyIndex != 0) {
-      jsonObject.put(MODIFY_KEY, modifyIndex);
-    }
-    if (lockIndex != 0) {
-      jsonObject.put(LOCK_KEY, lockIndex);
-    }
+    KeyValueConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -104,12 +70,34 @@ public class KeyValue {
   }
 
   /**
+   * Set the key
+   *
+   * @param key the key
+   * @return reference to this, for fluency
+   */
+  public KeyValue setKey(String key) {
+    this.key = key;
+    return this;
+  }
+
+  /**
    * Get the value
    *
    * @return the value
    */
   public String getValue() {
     return value;
+  }
+
+  /**
+   * Set the value
+   *
+   * @param value the value
+   * @return reference to this, for fluency
+   */
+  public KeyValue setValue(String value) {
+    this.value = value;
+    return this;
   }
 
   /**
@@ -122,12 +110,34 @@ public class KeyValue {
   }
 
   /**
+   * Set the session that owns the lock
+   *
+   * @param session the session that owns the lock
+   * @return reference to this, for fluency
+   */
+  public KeyValue setSession(String session) {
+    this.session = session;
+    return this;
+  }
+
+  /**
    * Get the flags attached to this entry. Clients can choose to use this however makes sense for their application.
    *
    * @return the flags attached to this entry
    */
   public long getFlags() {
     return flags;
+  }
+
+  /**
+   * Set the flags attached to this entry. Clients can choose to use this however makes sense for their application.
+   *
+   * @param flags the flags attached to this entry. Clients can choose to use this however makes sense for their application.
+   * @return reference to this, for fluency
+   */
+  public KeyValue setFlags(long flags) {
+    this.flags = flags;
+    return this;
   }
 
   /**
@@ -140,6 +150,17 @@ public class KeyValue {
   }
 
   /**
+   * Set the internal index value that represents when the entry was created.
+   *
+   * @param createIndex the internal index value that represents when the entry was created.
+   * @return reference to this, for fluency
+   */
+  public KeyValue setCreateIndex(long createIndex) {
+    this.createIndex = createIndex;
+    return this;
+  }
+
+  /**
    * Get the last index that modified this key.
    *
    * @return the last index that modified this key.
@@ -149,11 +170,33 @@ public class KeyValue {
   }
 
   /**
+   * Set the last index that modified this key.
+   *
+   * @param modifyIndex the last index that modified this key.
+   * @return reference to this, for fluency
+   */
+  public KeyValue setModifyIndex(long modifyIndex) {
+    this.modifyIndex = modifyIndex;
+    return this;
+  }
+
+  /**
    * Get the number of times this key has successfully been acquired in a lock.
    *
    * @return the number of times this key has successfully been acquired in a lock.
    */
   public long getLockIndex() {
     return lockIndex;
+  }
+
+  /**
+   * Set the number of times this key has successfully been acquired in a lock.
+   *
+   * @param lockIndex the number of times this key has successfully been acquired in a lock.
+   * @return reference to this, for fluency
+   */
+  public KeyValue setLockIndex(long lockIndex) {
+    this.lockIndex = lockIndex;
+    return this;
   }
 }
