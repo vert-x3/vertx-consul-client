@@ -16,22 +16,17 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Holds result of nodes query
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class NodeList {
-
-  private static final String INDEX_KEY = "Index";
-  private static final String LIST_KEY = "List";
 
   private long index;
   private List<Node> list;
@@ -47,9 +42,7 @@ public class NodeList {
    * @param json the JSON
    */
   public NodeList(JsonObject json) {
-    index = json.getLong(INDEX_KEY, 0L);
-    list = json.getJsonArray(LIST_KEY, new JsonArray()).stream()
-      .map(obj -> new Node((JsonObject) obj)).collect(Collectors.toList());
+    NodeListConverter.fromJson(json, this);
   }
 
   /**
@@ -59,12 +52,7 @@ public class NodeList {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (index > 0) {
-      jsonObject.put(INDEX_KEY, index);
-    }
-    if (list != null) {
-      jsonObject.put(LIST_KEY, list.stream().map(Node::toJson).collect(Collectors.toList()));
-    }
+    NodeListConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 

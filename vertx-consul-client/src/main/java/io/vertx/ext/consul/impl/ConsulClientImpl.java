@@ -275,7 +275,7 @@ public class ConsulClientImpl implements ConsulClient {
   public ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler) {
     Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
     requestArray(HttpMethod.GET, "/v1/catalog/nodes", query, resultHandler, (arr, headers) -> {
-      List<Node> list = arr.stream().map(obj -> new Node((JsonObject) obj)).collect(Collectors.toList());
+      List<Node> list = arr.stream().map(obj -> NodeParser.parse((JsonObject) obj)).collect(Collectors.toList());
       return new NodeList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
     }).end();
     return this;
@@ -298,7 +298,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/agent/checks", null, resultHandler, (json, headers) -> json.stream()
-      .map(obj -> new Check((JsonObject) obj.getValue()))
+      .map(obj -> CheckParser.parse((JsonObject) obj.getValue()))
       .collect(Collectors.toList())).end();
     return this;
   }

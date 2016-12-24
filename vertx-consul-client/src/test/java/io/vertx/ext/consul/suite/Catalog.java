@@ -44,7 +44,7 @@ public class Catalog extends ConsulTestBase {
     List<Node> nodes = Utils.<NodeList>getAsync(h -> readClient.catalogNodes(h)).getList();
     assertEquals(nodes.size(), 1);
     Node node = nodes.get(0);
-    assertEquals(node.getNode(), nodeName);
+    assertEquals(node.getName(), nodeName);
   }
 
   @Test
@@ -53,7 +53,7 @@ public class Catalog extends ConsulTestBase {
     CountDownLatch latch1 = new CountDownLatch(1);
     BlockingQueryOptions blockingQueryOptions1 = new BlockingQueryOptions().setIndex(nodes1.getIndex());
     readClient.catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions1), h -> {
-      List<String> names = h.result().getList().stream().map(Node::getNode).collect(Collectors.toList());
+      List<String> names = h.result().getList().stream().map(Node::getName).collect(Collectors.toList());
       assertEquals(names.size(), 2);
       assertTrue(names.contains("attached_node"));
       latch1.countDown();

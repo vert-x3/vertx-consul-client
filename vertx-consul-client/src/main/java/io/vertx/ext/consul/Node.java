@@ -21,14 +21,8 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class Node {
-
-  private static final String NODE_KEY = "Node";
-  private static final String ADDRESS_KEY = "Address";
-  private static final String TAGGED_ADDRESSES_KEY = "TaggedAddresses";
-  private static final String LAN_KEY = "lan";
-  private static final String WAN_KEY = "wan";
 
   private String node;
   private String address;
@@ -46,13 +40,7 @@ public class Node {
    * @param json the JSON
    */
   public Node(JsonObject json) {
-    this.node = json.getString(NODE_KEY);
-    this.address = json.getString(ADDRESS_KEY);
-    JsonObject tagged = json.getJsonObject(TAGGED_ADDRESSES_KEY);
-    if (tagged != null) {
-      this.lanAddress = tagged.getString(LAN_KEY);
-      this.wanAddress = tagged.getString(WAN_KEY);
-    }
+    NodeConverter.fromJson(json, this);
   }
 
   /**
@@ -62,22 +50,7 @@ public class Node {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (node != null) {
-      jsonObject.put(NODE_KEY, node);
-    }
-    if (address != null) {
-      jsonObject.put(ADDRESS_KEY, address);
-    }
-    if (lanAddress != null || wanAddress != null) {
-      JsonObject tagged = new JsonObject();
-      if (lanAddress != null) {
-        jsonObject.put(LAN_KEY, lanAddress);
-      }
-      if (wanAddress != null) {
-        jsonObject.put(WAN_KEY, wanAddress);
-      }
-      jsonObject.put(TAGGED_ADDRESSES_KEY, tagged);
-    }
+    NodeConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -86,7 +59,7 @@ public class Node {
    *
    * @return node name
    */
-  public String getNode() {
+  public String getName() {
     return node;
   }
 
@@ -115,5 +88,49 @@ public class Node {
    */
   public String getWanAddress() {
     return wanAddress;
+  }
+
+  /**
+   * Set node name
+   *
+   * @param node node name
+   * @return reference to this, for fluency
+   */
+  public Node setName(String node) {
+    this.node = node;
+    return this;
+  }
+
+  /**
+   * Set node address
+   *
+   * @param address node address
+   * @return reference to this, for fluency
+   */
+  public Node setAddress(String address) {
+    this.address = address;
+    return this;
+  }
+
+  /**
+   * Set node lan address
+   *
+   * @param lanAddress node lan address
+   * @return reference to this, for fluency
+   */
+  public Node setLanAddress(String lanAddress) {
+    this.lanAddress = lanAddress;
+    return this;
+  }
+
+  /**
+   * Set node wan address
+   *
+   * @param wanAddress node wan address
+   * @return reference to this, for fluency
+   */
+  public Node setWanAddress(String wanAddress) {
+    this.wanAddress = wanAddress;
+    return this;
   }
 }
