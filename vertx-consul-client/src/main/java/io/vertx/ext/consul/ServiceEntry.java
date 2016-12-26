@@ -21,28 +21,29 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
- * Holds result of nodes query
+ * Holds properties of service, node and related checks
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class NodeList {
+public class ServiceEntry {
 
-  private long index;
-  private List<Node> list;
+  private Node node;
+  private Service service;
+  private List<Check> checks;
 
   /**
    * Default constructor
    */
-  public NodeList() {}
+  public ServiceEntry() {}
 
   /**
    * Constructor from JSON
    *
    * @param json the JSON
    */
-  public NodeList(JsonObject json) {
-    NodeListConverter.fromJson(json, this);
+  public ServiceEntry(JsonObject json) {
+    ServiceEntryConverter.fromJson(json, this);
   }
 
   /**
@@ -52,47 +53,67 @@ public class NodeList {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    NodeListConverter.toJson(this, jsonObject);
+    ServiceEntryConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
   /**
-   * Get Consul index
+   * Get node
    *
-   * @return the consul index
+   * @return node
    */
-  public long getIndex() {
-    return index;
+  public Node getNode() {
+    return node;
   }
 
   /**
-   * Set Consul index, a unique identifier representing the current state of the requested list of nodes
+   * Get service
    *
-   * @param index the consul index
+   * @return service
+   */
+  public Service getService() {
+    return service;
+  }
+
+  /**
+   * Get list of checks
+   *
+   * @return list of checks
+   */
+  public List<Check> getChecks() {
+    return checks;
+  }
+
+  /**
+   * Set node
+   *
+   * @param node node
    * @return reference to this, for fluency
    */
-  public NodeList setIndex(long index) {
-    this.index = index;
+  public ServiceEntry setNode(Node node) {
+    this.node = node;
     return this;
   }
 
   /**
-   * Get list of nodes
+   * Set service
    *
-   * @return the list of nodes
+   * @param service service
+   * @return reference to this, for fluency
    */
-  public List<Node> getList() {
-    return list;
+  public ServiceEntry setService(Service service) {
+    this.service = service;
+    return this;
   }
 
   /**
-   * Set list of nodes
+   * Set list of checks
    *
-   * @param list the list of nodes
+   * @param checks list of checks
    * @return reference to this, for fluency
    */
-  public NodeList setList(List<Node> list) {
-    this.list = list;
+  public ServiceEntry setChecks(List<Check> checks) {
+    this.checks = checks;
     return this;
   }
 }
