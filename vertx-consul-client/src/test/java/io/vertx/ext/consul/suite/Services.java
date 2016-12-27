@@ -96,13 +96,10 @@ public class Services extends ChecksBase {
   public void healthServices() throws InterruptedException {
     runAsync(h -> writeClient.registerService(new ServiceOptions()
       .setName("service").setId("id1")
-      .setCheckOptions(new CheckOptions().setTtl("5s")), h));
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
     runAsync(h -> writeClient.registerService(new ServiceOptions()
       .setName("service").setId("id2")
-      .setCheckOptions(new CheckOptions().setTtl("5s")), h));
-    runAsync(h -> writeClient.passCheck("service:id1", h));
-    runAsync(h -> writeClient.passCheck("service:id2", h));
-    writeClient.passCheck("service:id1", h -> {});
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
     ServiceEntryList list1 = getAsync(h -> readClient.healthServiceNodes("service", true, h));
     assertEquals(list1.getList().size(), 2);
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
@@ -120,7 +117,6 @@ public class Services extends ChecksBase {
     sleep(vertx, 2000);
     assertEquals(latch.getCount(), 2);
     runAsync(h -> writeClient.failCheck("service:id1", h));
-    runAsync(h -> writeClient.passCheck("service:id2", h));
     awaitLatch(latch);
     runAsync(h -> writeClient.deregisterService("id1", h));
     runAsync(h -> writeClient.deregisterService("id2", h));

@@ -361,13 +361,11 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Interval", checkOptions.getInterval())
       .put("TTL", checkOptions.getTtl())
       .put("TCP", checkOptions.getTcp());
-    if (extended) {
-      if (checkOptions.getServiceId() != null) {
-        json.put("ServiceID", checkOptions.getServiceId());
-      }
-      if (checkOptions.getStatus() != null) {
-        json.put("Status", checkOptions.getStatus().key);
-      }
+    if (checkOptions.getStatus() != null) {
+      json.put("Status", checkOptions.getStatus().key);
+    }
+    if (extended && checkOptions.getServiceId() != null) {
+      json.put("ServiceID", checkOptions.getServiceId());
     }
     return json;
   }
