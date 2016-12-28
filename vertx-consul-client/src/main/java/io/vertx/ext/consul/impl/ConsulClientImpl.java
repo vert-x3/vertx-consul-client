@@ -275,8 +275,23 @@ public class ConsulClientImpl implements ConsulClient {
   public ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler) {
     Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
     requestArray(HttpMethod.GET, "/v1/catalog/nodes", query, resultHandler, (arr, headers) -> {
-      List<Node> list = arr.stream().map(obj -> new Node((JsonObject) obj)).collect(Collectors.toList());
+      List<Node> list = arr.stream().map(obj -> NodeParser.parse((JsonObject) obj)).collect(Collectors.toList());
       return new NodeList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
+    return this;
+  }
+
+  @Override
+  public ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
+    return healthServiceNodesWithOptions(service, passing, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
+    Query query = Query.of(options).put("passing", passing ? 1 : null);
+    requestArray(HttpMethod.GET, "/v1/health/service/" + urlEncode(service), query, resultHandler, (arr, headers) -> {
+      List<ServiceEntry> list = arr.stream().map(obj -> ServiceEntryParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new ServiceEntryList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
     }).end();
     return this;
   }
@@ -298,7 +313,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/agent/checks", null, resultHandler, (json, headers) -> json.stream()
-      .map(obj -> new Check((JsonObject) obj.getValue()))
+      .map(obj -> CheckParser.parse((JsonObject) obj.getValue()))
       .collect(Collectors.toList())).end();
     return this;
   }
@@ -332,7 +347,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/register", null, resultHandler).end(checkOpts(checkOptions, true).encode());
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/register", null, resultHandler).end(checkOpts(checkOptions, true).encode());
     return this;
   }
 
@@ -346,13 +361,11 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Interval", checkOptions.getInterval())
       .put("TTL", checkOptions.getTtl())
       .put("TCP", checkOptions.getTcp());
-    if (extended) {
-      if (checkOptions.getServiceId() != null) {
-        json.put("ServiceID", checkOptions.getServiceId());
-      }
-      if (checkOptions.getStatus() != null) {
-        json.put("Status", checkOptions.getStatus().key);
-      }
+    if (checkOptions.getStatus() != null) {
+      json.put("Status", checkOptions.getStatus().key);
+    }
+    if (extended && checkOptions.getServiceId() != null) {
+      json.put("ServiceID", checkOptions.getServiceId());
     }
     return json;
   }

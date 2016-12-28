@@ -33,6 +33,7 @@ var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var EventList = io.vertx.ext.consul.EventList;
 var Coordinate = io.vertx.ext.consul.Coordinate;
+var ServiceEntryList = io.vertx.ext.consul.ServiceEntryList;
 var NodeQueryOptions = io.vertx.ext.consul.NodeQueryOptions;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
@@ -551,6 +552,51 @@ var ConsulService = function(j_val) {
       j_consulService["deregisterService(java.lang.String,io.vertx.core.Handler)"](id, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param service {string} 
+   @param passing {boolean} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.healthServiceNodes = function(service, passing, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && typeof __args[2] === 'function') {
+      j_consulService["healthServiceNodes(java.lang.String,boolean,io.vertx.core.Handler)"](service, passing, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param service {string} 
+   @param passing {boolean} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.healthServiceNodesWithOptions = function(service, passing, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
+      j_consulService["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

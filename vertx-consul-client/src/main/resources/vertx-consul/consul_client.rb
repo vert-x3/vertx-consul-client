@@ -370,6 +370,33 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling catalog_nodes_with_options(#{options})"
     end
+    #  Returns the nodes providing the service. This endpoint is very similar to the {::VertxConsul::ConsulClient#catalog_service_nodes} endpoint;
+    #  however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+    # @param [String] service the service name
+    # @param [true,false] passing if true, filter results to only nodes with all checks in the passing state
+    # @yield will be provided with list of services
+    # @return [self]
+    def health_service_nodes(service=nil,passing=nil)
+      if service.class == String && (passing.class == TrueClass || passing.class == FalseClass) && block_given?
+        @j_del.java_method(:healthServiceNodes, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling health_service_nodes(#{service},#{passing})"
+    end
+    #  Returns the nodes providing the service. This endpoint is very similar to the {::VertxConsul::ConsulClient#catalog_service_nodes_with_options} endpoint;
+    #  however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+    # @param [String] service the service name
+    # @param [true,false] passing if true, filter results to only nodes with all checks in the passing state
+    # @param [Hash] options the blocking options
+    # @yield will be provided with list of services
+    # @return [self]
+    def health_service_nodes_with_options(service=nil,passing=nil,options=nil)
+      if service.class == String && (passing.class == TrueClass || passing.class == FalseClass) && options.class == Hash && block_given?
+        @j_del.java_method(:healthServiceNodesWithOptions, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling health_service_nodes_with_options(#{service},#{passing},#{options})"
+    end
     #  Returns the services registered in a datacenter
     # @yield will be provided with list of services
     # @return [self]

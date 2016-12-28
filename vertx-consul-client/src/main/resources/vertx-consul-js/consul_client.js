@@ -33,6 +33,7 @@ var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var EventList = io.vertx.ext.consul.EventList;
 var Coordinate = io.vertx.ext.consul.Coordinate;
 var NodeQueryOptions = io.vertx.ext.consul.NodeQueryOptions;
+var ServiceEntryList = io.vertx.ext.consul.ServiceEntryList;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
@@ -691,6 +692,55 @@ var ConsulClient = function(j_val) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
       j_consulClient["catalogNodesWithOptions(io.vertx.ext.consul.NodeQueryOptions,io.vertx.core.Handler)"](options != null ? new NodeQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodes} endpoint;
+   however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+
+   @public
+   @param service {string} the service name 
+   @param passing {boolean} if true, filter results to only nodes with all checks in the passing state 
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.healthServiceNodes = function(service, passing, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 3 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && typeof __args[2] === 'function') {
+      j_consulClient["healthServiceNodes(java.lang.String,boolean,io.vertx.core.Handler)"](service, passing, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodesWithOptions} endpoint;
+   however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+
+   @public
+   @param service {string} the service name 
+   @param passing {boolean} if true, filter results to only nodes with all checks in the passing state 
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with list of services 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.healthServiceNodesWithOptions = function(service, passing, options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
+      j_consulClient["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {

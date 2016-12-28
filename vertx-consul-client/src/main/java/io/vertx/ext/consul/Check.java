@@ -23,16 +23,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class Check {
-
-  private static final String SERVICE_ID_KEY = "ServiceID";
-  private static final String SERVICE_NAME_KEY = "ServiceName";
-  private static final String ID_KEY = "CheckID";
-  private static final String NAME_KEY = "Name";
-  private static final String STATUS_KEY = "Status";
-  private static final String NOTES_KEY = "Notes";
-  private static final String OUTPUT_KEY = "Output";
 
   private String id;
   private String name;
@@ -41,6 +33,7 @@ public class Check {
   private String output;
   private String serviceId;
   private String serviceName;
+  private String nodeName;
 
   /**
    * Default constructor
@@ -53,13 +46,7 @@ public class Check {
    * @param check the JSON
    */
   public Check(JsonObject check) {
-    this.id = check.getString(ID_KEY);
-    this.name = check.getString(NAME_KEY);
-    this.status = CheckStatus.of(check.getString(STATUS_KEY));
-    this.notes = check.getString(NOTES_KEY);
-    this.output = check.getString(OUTPUT_KEY);
-    this.serviceId = check.getString(SERVICE_ID_KEY);
-    this.serviceName = check.getString(SERVICE_NAME_KEY);
+    CheckConverter.fromJson(check, this);
   }
 
   /**
@@ -69,27 +56,7 @@ public class Check {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (id != null) {
-      jsonObject.put(ID_KEY, id);
-    }
-    if (name != null) {
-      jsonObject.put(NAME_KEY, name);
-    }
-    if (status != null) {
-      jsonObject.put(STATUS_KEY, status.key);
-    }
-    if (notes != null) {
-      jsonObject.put(NOTES_KEY, notes);
-    }
-    if (output != null) {
-      jsonObject.put(OUTPUT_KEY, output);
-    }
-    if (serviceId != null) {
-      jsonObject.put(SERVICE_ID_KEY, serviceId);
-    }
-    if (serviceName != null) {
-      jsonObject.put(SERVICE_NAME_KEY, serviceName);
-    }
+    CheckConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -109,6 +76,15 @@ public class Check {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Get the name of node
+   *
+   * @return name of node
+   */
+  public String getNodeName() {
+    return nodeName;
   }
 
   /**
@@ -154,5 +130,93 @@ public class Check {
    */
   public String getServiceName() {
     return serviceName;
+  }
+
+  /**
+   * Set the ID of check
+   *
+   * @param id the ID of check
+   * @return reference to this, for fluency
+   */
+  public Check setId(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Set the name of check
+   *
+   * @param name the name of check
+   * @return reference to this, for fluency
+   */
+  public Check setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Set the status of check
+   *
+   * @param status the status of check
+   * @return reference to this, for fluency
+   */
+  public Check setStatus(CheckStatus status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Set the human-readable note of check
+   *
+   * @param notes the human-readable note of check
+   * @return reference to this, for fluency
+   */
+  public Check setNotes(String notes) {
+    this.notes = notes;
+    return this;
+  }
+
+  /**
+   * Set the output of check
+   *
+   * @param output the output of check
+   * @return reference to this, for fluency
+   */
+  public Check setOutput(String output) {
+    this.output = output;
+    return this;
+  }
+
+  /**
+   * Set the ID of service with which this check associated
+   *
+   * @param serviceId the ID of service with which this check associated
+   * @return reference to this, for fluency
+   */
+  public Check setServiceId(String serviceId) {
+    this.serviceId = serviceId;
+    return this;
+  }
+
+  /**
+   * Set the name of service with which this check associated
+   *
+   * @param serviceName the name of service with which this check associated
+   * @return reference to this, for fluency
+   */
+  public Check setServiceName(String serviceName) {
+    this.serviceName = serviceName;
+    return this;
+  }
+
+  /**
+   * Set the name of node
+   *
+   * @param nodeName the name of node
+   * @return reference to this, for fluency
+   */
+  public Check setNodeName(String nodeName) {
+    this.nodeName = nodeName;
+    return this;
   }
 }

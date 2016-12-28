@@ -18,29 +18,32 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.List;
+
 /**
+ * Holds properties of service, node and related checks
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class Node {
+public class ServiceEntry {
 
-  private String node;
-  private String address;
-  private String lanAddress;
-  private String wanAddress;
+  private Node node;
+  private Service service;
+  private List<Check> checks;
 
   /**
    * Default constructor
    */
-  public Node() {}
+  public ServiceEntry() {}
 
   /**
    * Constructor from JSON
    *
    * @param json the JSON
    */
-  public Node(JsonObject json) {
-    NodeConverter.fromJson(json, this);
+  public ServiceEntry(JsonObject json) {
+    ServiceEntryConverter.fromJson(json, this);
   }
 
   /**
@@ -50,87 +53,67 @@ public class Node {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    NodeConverter.toJson(this, jsonObject);
+    ServiceEntryConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
   /**
-   * Get node name
+   * Get node
    *
-   * @return node name
+   * @return node
    */
-  public String getName() {
+  public Node getNode() {
     return node;
   }
 
   /**
-   * Get node address
+   * Get service
    *
-   * @return node address
+   * @return service
    */
-  public String getAddress() {
-    return address;
+  public Service getService() {
+    return service;
   }
 
   /**
-   * Get node lan address
+   * Get list of checks
    *
-   * @return node lan address
+   * @return list of checks
    */
-  public String getLanAddress() {
-    return lanAddress;
+  public List<Check> getChecks() {
+    return checks;
   }
 
   /**
-   * Get node wan address
+   * Set node
    *
-   * @return node wan address
-   */
-  public String getWanAddress() {
-    return wanAddress;
-  }
-
-  /**
-   * Set node name
-   *
-   * @param node node name
+   * @param node node
    * @return reference to this, for fluency
    */
-  public Node setName(String node) {
+  public ServiceEntry setNode(Node node) {
     this.node = node;
     return this;
   }
 
   /**
-   * Set node address
+   * Set service
    *
-   * @param address node address
+   * @param service service
    * @return reference to this, for fluency
    */
-  public Node setAddress(String address) {
-    this.address = address;
+  public ServiceEntry setService(Service service) {
+    this.service = service;
     return this;
   }
 
   /**
-   * Set node lan address
+   * Set list of checks
    *
-   * @param lanAddress node lan address
+   * @param checks list of checks
    * @return reference to this, for fluency
    */
-  public Node setLanAddress(String lanAddress) {
-    this.lanAddress = lanAddress;
-    return this;
-  }
-
-  /**
-   * Set node wan address
-   *
-   * @param wanAddress node wan address
-   * @return reference to this, for fluency
-   */
-  public Node setWanAddress(String wanAddress) {
-    this.wanAddress = wanAddress;
+  public ServiceEntry setChecks(List<Check> checks) {
+    this.checks = checks;
     return this;
   }
 }

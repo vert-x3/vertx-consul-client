@@ -384,6 +384,33 @@ public interface ConsulClient {
   ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
 
   /**
+   * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodes} endpoint;
+   * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+   *
+   * @param service the service name
+   * @param passing if true, filter results to only nodes with all checks in the passing state
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+
+  /**
+   * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodesWithOptions} endpoint;
+   * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
+   *
+   * @param service the service name
+   * @param passing if true, filter results to only nodes with all checks in the passing state
+   * @param options the blocking options
+   * @param resultHandler will be provided with list of services
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+
+  /**
    * Returns the services registered in a datacenter
    *
    * @param resultHandler will be provided with list of services

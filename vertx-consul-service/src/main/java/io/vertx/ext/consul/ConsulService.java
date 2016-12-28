@@ -123,6 +123,12 @@ public interface ConsulService extends ConsulClient {
   @Fluent
   ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
+  @Fluent
+  ConsulService healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+
+  @Fluent
+  ConsulService healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+
   @Override
   @Fluent
   ConsulService catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler);

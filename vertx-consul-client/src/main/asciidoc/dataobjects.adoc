@@ -68,31 +68,35 @@ Specifying a maximum duration for the blocking request. This is limited to 10 mi
 ^|Name | Type ^| Description
 |[[id]]`id`|`String`|
 +++
-Get the ID of check
+Set the ID of check
 +++
 |[[name]]`name`|`String`|
 +++
-Get the name of check
+Set the name of check
++++
+|[[nodeName]]`nodeName`|`String`|
++++
+Set the name of node
 +++
 |[[notes]]`notes`|`String`|
 +++
-Get the human-readable note of check
+Set the human-readable note of check
 +++
 |[[output]]`output`|`String`|
 +++
-Get the output of check
+Set the output of check
 +++
 |[[serviceId]]`serviceId`|`String`|
 +++
-Get the ID of service with which this check associated
+Set the ID of service with which this check associated
 +++
 |[[serviceName]]`serviceName`|`String`|
 +++
-Get the name of service with which this check associated
+Set the name of service with which this check associated
 +++
 |[[status]]`status`|`link:enums.html#CheckStatus[CheckStatus]`|
 +++
-Get the status of check
+Set the status of check
 +++
 |===
 
@@ -432,19 +436,19 @@ Set the reason message. If provided, its value should be a text string explainin
 ^|Name | Type ^| Description
 |[[address]]`address`|`String`|
 +++
-Get node address
+Set node address
 +++
 |[[lanAddress]]`lanAddress`|`String`|
 +++
-Get node lan address
+Set node lan address
 +++
-|[[node]]`node`|`String`|
+|[[name]]`name`|`String`|
 +++
-Get node name
+Set node name
 +++
 |[[wanAddress]]`wanAddress`|`String`|
 +++
-Get node wan address
+Set node wan address
 +++
 |===
 
@@ -462,7 +466,7 @@ Get node wan address
 ^|Name | Type ^| Description
 |[[index]]`index`|`Number (long)`|
 +++
-Set Consul index, a unique identifier representing the current state of the requested list of services
+Set Consul index, a unique identifier representing the current state of the requested list of nodes
 +++
 |[[list]]`list`|`Array of link:dataobjects.html#Node[Node]`|
 +++
@@ -531,6 +535,54 @@ Set service port
 |[[tags]]`tags`|`Array of String`|
 +++
 Set list of service tags
++++
+|===
+
+[[ServiceEntry]]
+== ServiceEntry
+
+++++
+ Holds properties of service, node and related checks
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[checks]]`checks`|`Array of link:dataobjects.html#Check[Check]`|
++++
+Set list of checks
++++
+|[[node]]`node`|`link:dataobjects.html#Node[Node]`|
++++
+Set node
++++
+|[[service]]`service`|`link:dataobjects.html#Service[Service]`|
++++
+Set service
++++
+|===
+
+[[ServiceEntryList]]
+== ServiceEntryList
+
+++++
+ Holds list of services, nodes and related checks
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested list of services
++++
+|[[list]]`list`|`Array of link:dataobjects.html#ServiceEntry[ServiceEntry]`|
++++
+Set list of services
 +++
 |===
 

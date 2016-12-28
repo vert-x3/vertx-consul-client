@@ -283,6 +283,29 @@ module VertxConsul
       raise ArgumentError, "Invalid arguments when calling deregister_service(#{id})"
     end
     # @param [String] service 
+    # @param [true,false] passing 
+    # @yield 
+    # @return [self]
+    def health_service_nodes(service=nil,passing=nil)
+      if service.class == String && (passing.class == TrueClass || passing.class == FalseClass) && block_given?
+        @j_del.java_method(:healthServiceNodes, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling health_service_nodes(#{service},#{passing})"
+    end
+    # @param [String] service 
+    # @param [true,false] passing 
+    # @param [Hash] options 
+    # @yield 
+    # @return [self]
+    def health_service_nodes_with_options(service=nil,passing=nil,options=nil)
+      if service.class == String && (passing.class == TrueClass || passing.class == FalseClass) && options.class == Hash && block_given?
+        @j_del.java_method(:healthServiceNodesWithOptions, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling health_service_nodes_with_options(#{service},#{passing},#{options})"
+    end
+    # @param [String] service 
     # @yield 
     # @return [self]
     def catalog_service_nodes(service=nil)

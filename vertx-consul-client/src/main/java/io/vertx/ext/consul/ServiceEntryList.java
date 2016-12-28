@@ -21,28 +21,28 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
- * Holds result of nodes query
+ * Holds list of services, nodes and related checks
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class NodeList {
+public class ServiceEntryList {
 
   private long index;
-  private List<Node> list;
+  private List<ServiceEntry> list;
 
   /**
    * Default constructor
    */
-  public NodeList() {}
+  public ServiceEntryList() {}
 
   /**
    * Constructor from JSON
    *
    * @param json the JSON
    */
-  public NodeList(JsonObject json) {
-    NodeListConverter.fromJson(json, this);
+  public ServiceEntryList(JsonObject json) {
+    ServiceEntryListConverter.fromJson(json, this);
   }
 
   /**
@@ -52,7 +52,7 @@ public class NodeList {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    NodeListConverter.toJson(this, jsonObject);
+    ServiceEntryListConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -66,32 +66,32 @@ public class NodeList {
   }
 
   /**
-   * Set Consul index, a unique identifier representing the current state of the requested list of nodes
+   * Set Consul index, a unique identifier representing the current state of the requested list of services
    *
    * @param index the consul index
    * @return reference to this, for fluency
    */
-  public NodeList setIndex(long index) {
+  public ServiceEntryList setIndex(long index) {
     this.index = index;
     return this;
   }
 
   /**
-   * Get list of nodes
+   * Get list of services
    *
-   * @return the list of nodes
+   * @return list of services
    */
-  public List<Node> getList() {
+  public List<ServiceEntry> getList() {
     return list;
   }
 
   /**
-   * Set list of nodes
+   * Set list of services
    *
-   * @param list the list of nodes
+   * @param list list of services
    * @return reference to this, for fluency
    */
-  public NodeList setList(List<Node> list) {
+  public ServiceEntryList setList(List<ServiceEntry> list) {
     this.list = list;
     return this;
   }

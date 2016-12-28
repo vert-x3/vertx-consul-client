@@ -93,6 +93,36 @@ public class Services extends ChecksBase {
   }
 
   @Test
+  public void healthServices() throws InterruptedException {
+    runAsync(h -> writeClient.registerService(new ServiceOptions()
+      .setName("service").setId("id1")
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
+    runAsync(h -> writeClient.registerService(new ServiceOptions()
+      .setName("service").setId("id2")
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
+    ServiceEntryList list1 = getAsync(h -> readClient.healthServiceNodes("service", true, h));
+    assertEquals(list1.getList().size(), 2);
+    List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
+    assertTrue(ids.contains("id1"));
+    assertTrue(ids.contains("id2"));
+    CountDownLatch latch = new CountDownLatch(2);
+    readClient.healthServiceNodesWithOptions("service", true, new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      assertEquals(h.result().getList().size(), 1);
+      latch.countDown();
+    });
+    readClient.healthServiceNodesWithOptions("service", false, new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      assertEquals(h.result().getList().size(), 2);
+      latch.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 2);
+    runAsync(h -> writeClient.failCheck("service:id1", h));
+    awaitLatch(latch);
+    runAsync(h -> writeClient.deregisterService("id1", h));
+    runAsync(h -> writeClient.deregisterService("id2", h));
+  }
+
+  @Test
   public void findConsul() {
     ServiceList localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
     assertEquals(localConsulList.getList().size(), 1);
