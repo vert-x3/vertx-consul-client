@@ -66,7 +66,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/coordinate/nodes", null, resultHandler, (arr, headers) ->
-      arr.stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())
+      arr.stream().map(obj -> CoordinateParser.parse((JsonObject) obj)).collect(Collectors.toList())
     ).end();
     return this;
   }
@@ -74,7 +74,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/coordinate/datacenters", null, resultHandler, (arr, headers) ->
-      arr.stream().map(obj -> new DcCoordinates((JsonObject) obj)).collect(Collectors.toList())
+      arr.stream().map(obj -> CoordinateParser.parseDc((JsonObject) obj)).collect(Collectors.toList())
     ).end();
     return this;
   }

@@ -166,14 +166,26 @@ Set Time to Live of check.
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[adj]]`adj`|`Number (float)`|-
-|[[err]]`err`|`Number (float)`|-
-|[[height]]`height`|`Number (float)`|-
+|[[adj]]`adj`|`Number (float)`|
++++
+Set adjustment
++++
+|[[err]]`err`|`Number (float)`|
++++
+Set error
++++
+|[[height]]`height`|`Number (float)`|
++++
+Set height
++++
 |[[node]]`node`|`String`|
 +++
-Get name of node
+Set name of node
 +++
-|[[vec]]`vec`|`Array of Number (Float)`|-
+|[[vec]]`vec`|`Array of Number (Float)`|
++++
+Set vector
++++
 |===
 
 [[DcCoordinates]]
@@ -190,11 +202,11 @@ Get name of node
 ^|Name | Type ^| Description
 |[[datacenter]]`datacenter`|`String`|
 +++
-Get datacenter
+Set datacenter
 +++
 |[[servers]]`servers`|`Array of link:dataobjects.html#Coordinate[Coordinate]`|
 +++
-Get list of servers in datacenter
+Set list of servers in datacenter
 +++
 |===
 
