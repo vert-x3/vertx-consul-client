@@ -72,7 +72,19 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/coordinate.html#coordinate_nodes">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
-  ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler);
+  ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler);
+
+  /**
+   * Returns the LAN network coordinates for all nodes in a given DC
+   * This is blocking query unlike {@link ConsulClient#coordinateNodes(Handler)}
+   *
+   * @param options       the blocking options
+   * @param resultHandler will be provided with network coordinates of nodes in datacenter
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/coordinate.html#coordinate_nodes">/v1/coordinate/nodes</a> endpoint
+   */
+  @Fluent
+  ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler);
 
   /**
    * Returns the WAN network coordinates for all Consul servers, organized by DCs

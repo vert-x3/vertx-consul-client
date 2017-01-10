@@ -31,11 +31,11 @@ var Check = io.vertx.ext.consul.Check;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var EventList = io.vertx.ext.consul.EventList;
-var Coordinate = io.vertx.ext.consul.Coordinate;
 var NodeQueryOptions = io.vertx.ext.consul.NodeQueryOptions;
 var ServiceEntryList = io.vertx.ext.consul.ServiceEntryList;
 var KeyValue = io.vertx.ext.consul.KeyValue;
 var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
+var CoordinateList = io.vertx.ext.consul.CoordinateList;
 var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
 var AclToken = io.vertx.ext.consul.AclToken;
 var SessionOptions = io.vertx.ext.consul.SessionOptions;
@@ -88,7 +88,30 @@ var ConsulClient = function(j_val) {
     if (__args.length === 1 && typeof __args[0] === 'function') {
       j_consulClient["coordinateNodes(io.vertx.core.Handler)"](function(ar) {
       if (ar.succeeded()) {
-        resultHandler(utils.convReturnListSetDataObject(ar.result()), null);
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+   Returns the LAN network coordinates for all nodes in a given DC
+   This is blocking query unlike {@link ConsulClient#coordinateNodes}
+
+   @public
+   @param options {Object} the blocking options 
+   @param resultHandler {function} will be provided with network coordinates of nodes in datacenter 
+   @return {ConsulClient} reference to this, for fluency
+   */
+  this.coordinateNodesWithOptions = function(options, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulClient["coordinateNodesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

@@ -64,10 +64,16 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/coordinate/nodes", null, resultHandler, (arr, headers) ->
-      arr.stream().map(obj -> CoordinateParser.parse((JsonObject) obj)).collect(Collectors.toList())
-    ).end();
+  public ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler) {
+    return coordinateNodesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/coordinate/nodes", new Query().put(options), resultHandler, (arr, headers) -> {
+      List<Coordinate> list = arr.stream().map(obj -> CoordinateParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new CoordinateList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 

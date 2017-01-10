@@ -15,12 +15,14 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.Coordinate;
-import io.vertx.ext.consul.DcCoordinates;
+import com.pszymczyk.consul.ConsulProcess;
+import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.sleep;
@@ -33,23 +35,65 @@ public class Coordinates extends ConsulTestBase {
   private static final int MAX_REQUESTS = 100;
 
   @Test
-  public void nodes() {
-    List<Coordinate> nodes = null;
+  public void nodes() throws InterruptedException {
+    CoordinateList nodes1 = getCoordinates(1);
+    if(nodes1 == null || nodes1.getList().size() != 1) {
+      fail();
+      return;
+    }
+    Coordinate coordinate = nodes1.getList().get(0);
+    assertEquals(coordinate.getNode(), nodeName);
+
+    BlockingQueryOptions blockingQueryOptions1 = new BlockingQueryOptions().setIndex(nodes1.getIndex());
+    CountDownLatch latch1 = new CountDownLatch(1);
+    readClient.coordinateNodesWithOptions(blockingQueryOptions1, h -> {
+      // with first update we can obtain changed coordinates only, without second node
+      assertTrue(h.result().getIndex() > blockingQueryOptions1.getIndex());
+      latch1.countDown();
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch1.getCount(), 1);
+    ConsulProcess attached = attachConsul("new_node");
+    latch1.await(2, TimeUnit.MINUTES);
+    assertEquals(latch1.getCount(), 0);
+
+    // wait until second consul start
+    CoordinateList nodes0 = getCoordinates(2);
+    if(nodes0 == null || nodes0.getList().size() != 2) {
+      fail();
+      return;
+    }
+
+    // wait until second consul closes
+    CountDownLatch latch2 = new CountDownLatch(1);
+    CoordinateList nodes2 = getAsync(h -> readClient.coordinateNodes(h));
+    BlockingQueryOptions blockingQueryOptions2 = new BlockingQueryOptions().setIndex(nodes2.getIndex());
+    readClient.coordinateNodesWithOptions(blockingQueryOptions2, h -> {
+      latch2.countDown();
+    });
+    attached.close();
+    latch2.await(2, TimeUnit.MINUTES);
+    assertEquals(latch2.getCount(), 0);
+
+    nodes0 = getCoordinates(1);
+    if(nodes0 == null || nodes0.getList().size() != 1) {
+      fail();
+      return;
+    }
+  }
+
+  private CoordinateList getCoordinates(int expected) {
+    CoordinateList nodes = null;
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
       nodes = getAsync(h -> readClient.coordinateNodes(h));
-      if (nodes.size() > 0) {
+      if (nodes.getList().size() == expected) {
         break;
       }
       sleep(vertx, 1000);
       System.out.println("waiting for node coordinates...");
     }
-    if(nodes == null || nodes.size() == 0) {
-      fail();
-      return;
-    }
-    Coordinate coordinate = nodes.get(0);
-    assertEquals(coordinate.getNode(), nodeName);
+    return nodes;
   }
 
   @Test

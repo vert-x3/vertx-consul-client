@@ -33,7 +33,11 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler);
+  ConsulService coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler);
 
   @Override
   @Fluent
