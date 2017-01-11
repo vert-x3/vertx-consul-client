@@ -141,7 +141,7 @@ public class ConsulClientImpl implements ConsulClient {
         query.put("cas", cas);
       }
     }
-    request(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString())).end(value);
+    request(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString().trim())).end(value);
     return this;
   }
 
@@ -434,7 +434,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
     request(HttpMethod.GET, "/v1/status/leader", null, resultHandler, (buffer, headers) -> {
-      String leader = buffer.toString();
+      String leader = buffer.toString().trim();
       return leader.substring(1, leader.length() - 2);
     }).end();
     return this;
