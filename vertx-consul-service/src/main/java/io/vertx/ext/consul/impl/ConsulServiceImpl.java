@@ -25,8 +25,14 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
+  public ConsulService coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler) {
     consulClient.coordinateNodes(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler) {
+    consulClient.coordinateNodesWithOptions(options, resultHandler);
     return this;
   }
 

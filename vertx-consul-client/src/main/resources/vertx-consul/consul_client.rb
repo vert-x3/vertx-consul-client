@@ -57,10 +57,22 @@ module VertxConsul
     # @return [self]
     def coordinate_nodes
       if block_given?
-        @j_del.java_method(:coordinateNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result.to_a.map { |elt| elt != nil ? JSON.parse(elt.toJson.encode) : nil } : nil) }))
+        @j_del.java_method(:coordinateNodes, [Java::IoVertxCore::Handler.java_class]).call((Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling coordinate_nodes()"
+    end
+    #  Returns the LAN network coordinates for all nodes in a given DC
+    #  This is blocking query unlike {::VertxConsul::ConsulClient#coordinate_nodes}
+    # @param [Hash] options the blocking options
+    # @yield will be provided with network coordinates of nodes in datacenter
+    # @return [self]
+    def coordinate_nodes_with_options(options=nil)
+      if options.class == Hash && block_given?
+        @j_del.java_method(:coordinateNodesWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling coordinate_nodes_with_options(#{options})"
     end
     #  Returns the WAN network coordinates for all Consul servers, organized by DCs
     # @yield will be provided with network coordinates for all Consul servers

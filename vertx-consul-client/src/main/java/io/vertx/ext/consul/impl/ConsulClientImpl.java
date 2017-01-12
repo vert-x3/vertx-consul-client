@@ -64,17 +64,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient coordinateNodes(Handler<AsyncResult<List<Coordinate>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/coordinate/nodes", null, resultHandler, (arr, headers) ->
-      arr.stream().map(obj -> new Coordinate((JsonObject) obj)).collect(Collectors.toList())
-    ).end();
+  public ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler) {
+    return coordinateNodesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/coordinate/nodes", new Query().put(options), resultHandler, (arr, headers) -> {
+      List<Coordinate> list = arr.stream().map(obj -> CoordinateParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new CoordinateList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    }).end();
     return this;
   }
 
   @Override
   public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/coordinate/datacenters", null, resultHandler, (arr, headers) ->
-      arr.stream().map(obj -> new DcCoordinates((JsonObject) obj)).collect(Collectors.toList())
+      arr.stream().map(obj -> CoordinateParser.parseDc((JsonObject) obj)).collect(Collectors.toList())
     ).end();
     return this;
   }
@@ -135,7 +141,7 @@ public class ConsulClientImpl implements ConsulClient {
         query.put("cas", cas);
       }
     }
-    request(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString())).end(value);
+    request(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString().trim())).end(value);
     return this;
   }
 
@@ -428,7 +434,7 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
     request(HttpMethod.GET, "/v1/status/leader", null, resultHandler, (buffer, headers) -> {
-      String leader = buffer.toString();
+      String leader = buffer.toString().trim();
       return leader.substring(1, leader.length() - 2);
     }).end();
     return this;

@@ -16,7 +16,6 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -27,15 +26,8 @@ import java.util.List;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/internals/coordinates.html">Network coordinates</a>
  */
-@DataObject
+@DataObject(generateConverter = true)
 public class Coordinate {
-
-  private static final String NODE_KEY = "Node";
-  private static final String COORD_KEY = "Coord";
-  private static final String ADJ_KEY = "Adjustment";
-  private static final String ERR_KEY = "Error";
-  private static final String HEIGHT_KEY = "Height";
-  private static final String VEC_KEY = "Vec";
 
   private String node;
   private float adj;
@@ -67,15 +59,7 @@ public class Coordinate {
    * @param coordinate the JSON
    */
   public Coordinate(JsonObject coordinate) {
-    this.node = coordinate.getString(NODE_KEY);
-    JsonObject coord = coordinate.getJsonObject(COORD_KEY);
-    if (coord != null) {
-      this.adj = coord.getFloat(ADJ_KEY, 0f);
-      this.err = coord.getFloat(ERR_KEY, 0f);
-      this.height = coord.getFloat(HEIGHT_KEY, 0f);
-      JsonArray arr = coord.getJsonArray(VEC_KEY);
-      this.vec = arr == null ? null : arr.getList();
-    }
+    CoordinateConverter.fromJson(coordinate, this);
   }
 
   /**
@@ -85,25 +69,7 @@ public class Coordinate {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (node != null) {
-      jsonObject.put(NODE_KEY, node);
-    }
-    JsonObject coord = new JsonObject();
-    if (adj != 0) {
-      coord.put(ADJ_KEY, adj);
-    }
-    if (err != 0) {
-      coord.put(ERR_KEY, err);
-    }
-    if (height != 0) {
-      coord.put(HEIGHT_KEY, height);
-    }
-    if (vec != null) {
-      coord.put(VEC_KEY, vec);
-    }
-    if (!coord.isEmpty()) {
-      jsonObject.put(COORD_KEY, coord);
-    }
+    CoordinateConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -116,19 +82,94 @@ public class Coordinate {
     return node;
   }
 
+  /**
+   * Get adjustment
+   *
+   * @return adjustment
+   */
   public float getAdj() {
     return adj;
   }
 
+  /**
+   * Get error
+   *
+   * @return error
+   */
   public float getErr() {
     return err;
   }
 
+  /**
+   * Get height
+   *
+   * @return height
+   */
   public float getHeight() {
     return height;
   }
 
+  /**
+   * Get vector
+   *
+   * @return vector
+   */
   public List<Float> getVec() {
     return vec;
+  }
+
+  /**
+   * Set name of node
+   *
+   * @param node name of node
+   * @return reference to this, for fluency
+   */
+  public Coordinate setNode(String node) {
+    this.node = node;
+    return this;
+  }
+
+  /**
+   * Set adjustment
+   *
+   * @param adj adjustment
+   * @return reference to this, for fluency
+   */
+  public Coordinate setAdj(float adj) {
+    this.adj = adj;
+    return this;
+  }
+
+  /**
+   * Set error
+   *
+   * @param err error
+   * @return reference to this, for fluency
+   */
+  public Coordinate setErr(float err) {
+    this.err = err;
+    return this;
+  }
+
+  /**
+   * Set height
+   *
+   * @param height height
+   * @return reference to this, for fluency
+   */
+  public Coordinate setHeight(float height) {
+    this.height = height;
+    return this;
+  }
+
+  /**
+   * Set vector
+   *
+   * @param vec vector
+   * @return reference to this, for fluency
+   */
+  public Coordinate setVec(List<Float> vec) {
+    this.vec = vec;
+    return this;
   }
 }

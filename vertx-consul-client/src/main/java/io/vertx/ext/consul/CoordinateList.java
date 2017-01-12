@@ -21,28 +21,28 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
- * Holds coordinates of servers in datacenter
+ * Holds result of network coordinates query
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class DcCoordinates {
+public class CoordinateList {
 
-  private String dc;
-  private List<Coordinate> servers;
+  private long index;
+  private List<Coordinate> list;
 
   /**
    * Default constructor
    */
-  public DcCoordinates() {}
+  public CoordinateList() {}
 
   /**
    * Constructor from JSON
    *
-   * @param coords the JSON
+   * @param json the JSON
    */
-  public DcCoordinates(JsonObject coords) {
-    DcCoordinatesConverter.fromJson(coords, this);
+  public CoordinateList(JsonObject json) {
+    CoordinateListConverter.fromJson(json, this);
   }
 
   /**
@@ -52,47 +52,47 @@ public class DcCoordinates {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    DcCoordinatesConverter.toJson(this, jsonObject);
+    CoordinateListConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
   /**
-   * Get datacenter
+   * Get Consul index
    *
-   * @return datacenter
+   * @return the consul index
    */
-  public String getDatacenter() {
-    return dc;
+  public long getIndex() {
+    return index;
   }
 
   /**
-   * Get list of servers in datacenter
+   * Get list of coordinates
    *
-   * @return list of servers in datacenter
+   * @return the list of coordinates
    */
-  public List<Coordinate> getServers() {
-    return servers;
+  public List<Coordinate> getList() {
+    return list;
   }
 
   /**
-   * Set datacenter
+   * Set Consul index, a unique identifier representing the current state of the requested coordinates
    *
-   * @param dc the datacenter
+   * @param index the consul index
    * @return reference to this, for fluency
    */
-  public DcCoordinates setDatacenter(String dc) {
-    this.dc = dc;
+  public CoordinateList setIndex(long index) {
+    this.index = index;
     return this;
   }
 
   /**
-   * Set list of servers in datacenter
+   * Set list of coordinates
    *
-   * @param servers list of servers in datacenter
+   * @param list the list of coordinates
    * @return reference to this, for fluency
    */
-  public DcCoordinates setServers(List<Coordinate> servers) {
-    this.servers = servers;
+  public CoordinateList setList(List<Coordinate> list) {
+    this.list = list;
     return this;
   }
 }
