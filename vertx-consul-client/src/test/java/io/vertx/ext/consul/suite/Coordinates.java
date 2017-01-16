@@ -34,7 +34,7 @@ public class Coordinates extends ConsulTestBase {
 
   private static final int MAX_REQUESTS = 100;
 
-  @Test
+  //@Test
   public void nodes() throws InterruptedException {
     CoordinateList nodes1 = getCoordinates(1);
     if(nodes1 == null || nodes1.getList().size() != 1) {
