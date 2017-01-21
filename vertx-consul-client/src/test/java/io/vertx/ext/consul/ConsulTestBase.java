@@ -17,7 +17,6 @@ package io.vertx.ext.consul;
 
 import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 
 import java.util.function.BiFunction;
@@ -28,7 +27,7 @@ import java.util.function.Consumer;
  */
 public class ConsulTestBase extends VertxTestBase {
 
-  protected static BiFunction<Vertx, JsonObject, ConsulClient> clientCreator;
+  protected static BiFunction<Vertx, ConsulClientOptions, ConsulClient> clientCreator;
   protected static Consumer<ConsulClient> clientCloser;
 
   protected ConsulClient masterClient;
@@ -59,12 +58,12 @@ public class ConsulTestBase extends VertxTestBase {
     return ConsulCluster.attach(nodeName);
   }
 
-  private JsonObject config(String token) {
-    return new JsonObject()
-      .put("acl_token", token)
-      .put("dc", ConsulCluster.dc())
-      .put("host", "localhost")
-      .put("port", ConsulCluster.consul().getHttpPort());
+  private ConsulClientOptions config(String token) {
+    return new ConsulClientOptions()
+      .setAclToken(token)
+      .setDc(ConsulCluster.dc())
+      .setHost("localhost")
+      .setPort(ConsulCluster.consul().getHttpPort());
   }
 
 }

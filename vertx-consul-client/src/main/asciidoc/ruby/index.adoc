@@ -39,17 +39,17 @@ client = VertxConsul::ConsulClient.create(vertx)
 
 ----
 
-Also the client can be configured with a json object.
+Also the client can be configured with an options.
 
 [source,ruby]
 ----
 require 'vertx-consul/consul_client'
 
-config = {
+options = {
   'host' => "consul.example.com"
 }
 
-client = VertxConsul::ConsulClient.create(vertx, config)
+client = VertxConsul::ConsulClient.create(vertx, options)
 
 
 ----

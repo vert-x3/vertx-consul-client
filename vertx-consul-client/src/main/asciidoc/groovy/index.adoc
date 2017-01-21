@@ -39,17 +39,17 @@ def client = ConsulClient.create(vertx)
 
 ----
 
-Also the client can be configured with a json object.
+Also the client can be configured with an options.
 
 [source,groovy]
 ----
 import io.vertx.ext.consul.ConsulClient
 
-def config = [
+def options = [
   host:"consul.example.com"
 ]
 
-def client = ConsulClient.create(vertx, config)
+def client = ConsulClient.create(vertx, options)
 
 
 ----

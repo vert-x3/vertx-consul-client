@@ -16,7 +16,7 @@ public class ConsulServiceTest extends ConsulTestSuite {
   public static void initClient() {
     ConsulTestBase.clientCreator = (vertx, config) -> {
       String addr = "vertx.consul." + cnt.incrementAndGet();
-      DeploymentOptions options = new DeploymentOptions().setConfig(config.put("address", addr));
+      DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson().put("address", addr));
       Utils.<String>getAsync(h -> vertx.deployVerticle("service:io.vertx.consul-service", options, h));
       return ConsulService.createEventBusProxy(vertx, addr);
     };

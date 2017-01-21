@@ -35,7 +35,7 @@
  * {@link examples.Examples#exampleCreateDefault}
  * ----
  *
- * Also the client can be configured with a json object.
+ * Also the client can be configured with an options.
  *
  * [source,$lang]
  * ----

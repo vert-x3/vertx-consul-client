@@ -20,8 +20,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Utils;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class BrokenConsul extends ConsulTestBase {
   @Test
   public void timeout() {
     SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
-    ConsulClient client = clientCreator.apply(vertx, new JsonObject().put("port", slowConsul.port()).put("timeout", 2000));
+    ConsulClient client = clientCreator.apply(vertx, new ConsulClientOptions().setPort(slowConsul.port()).setTimeoutMs(2000));
     client.agentInfo(h -> {
       if (h.failed() && h.cause().getMessage().contains("The timeout period of 2000ms")) {
         testComplete();
@@ -51,7 +51,7 @@ public class BrokenConsul extends ConsulTestBase {
   @Test
   public void closedConnection() {
     BrokenHttpServer brokenConsul = new BrokenHttpServer(vertx);
-    ConsulClient client = clientCreator.apply(vertx, new JsonObject().put("port", brokenConsul.port()));
+    ConsulClient client = clientCreator.apply(vertx, new ConsulClientOptions().setPort(brokenConsul.port()));
     client.agentInfo(h -> {
       if (h.failed() && h.cause().getMessage().contains("Connection was closed")) {
         testComplete();

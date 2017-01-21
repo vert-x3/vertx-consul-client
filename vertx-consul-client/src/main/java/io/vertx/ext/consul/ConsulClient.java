@@ -34,24 +34,24 @@ import java.util.List;
 public interface ConsulClient {
 
   /**
-   * Create a Consul client with default configuration.
+   * Create a Consul client with default options.
    *
    * @param vertx  the Vert.x instance
    * @return the client
    */
   static ConsulClient create(Vertx vertx) {
-    return new ConsulClientImpl(vertx, new JsonObject());
+    return new ConsulClientImpl(vertx, new ConsulClientOptions());
   }
 
   /**
    * Create a Consul client.
    *
    * @param vertx  the Vert.x instance
-   * @param config the configuration
+   * @param options the options
    * @return the client
    */
-  static ConsulClient create(Vertx vertx, JsonObject config) {
-    return new ConsulClientImpl(vertx, config);
+  static ConsulClient create(Vertx vertx, ConsulClientOptions options) {
+    return new ConsulClientImpl(vertx, options);
   }
 
   /**

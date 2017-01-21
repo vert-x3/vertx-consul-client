@@ -16,7 +16,7 @@ public class ConsulServiceVerticle extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
-    service = new ConsulServiceImpl(ConsulClient.create(vertx, config()));
+    service = new ConsulServiceImpl(ConsulClient.create(vertx, new ConsulClientOptions(config())));
     String address = config().getString("address");
     if (address == null) {
       throw new IllegalStateException("address field must be specified in config for client verticle");
