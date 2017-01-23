@@ -50,10 +50,15 @@ public class ConsulClientImpl implements ConsulClient {
   public ConsulClientImpl(Vertx vertx, ConsulClientOptions options) {
     Objects.requireNonNull(vertx);
     Objects.requireNonNull(options);
-    httpClient = vertx.createHttpClient(new HttpClientOptions()
+    HttpClientOptions opts = new HttpClientOptions()
       .setDefaultHost(options.getHost() == null ? DEFAULT_HOST : options.getHost())
       .setDefaultPort(options.getPort() == 0 ? DEFAULT_PORT : options.getPort())
-    );
+      .setSsl(options.isSsl())
+      .setTrustAll(options.isTrustAll());
+    if (options.getPemTrustOptions() != null) {
+      opts.setTrustOptions(options.getPemTrustOptions());
+    }
+    httpClient = vertx.createHttpClient(opts);
     aclToken = options.getAclToken();
     dc = options.getDc();
     timeoutMs = options.getTimeoutMs();

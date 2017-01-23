@@ -17,6 +17,8 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.PemTrustOptions;
+import io.vertx.core.net.PemTrustOptionsConverter;
 
 /**
  * Options used to create Consul client.
@@ -31,6 +33,9 @@ public class ConsulClientOptions {
   private String aclToken;
   private String dc;
   private long timeoutMs;
+  private boolean ssl;
+  private boolean trustAll;
+  private PemTrustOptions pemTrustOptions;
 
   /**
    * Default constructor
@@ -49,6 +54,8 @@ public class ConsulClientOptions {
     this.aclToken = options.aclToken;
     this.dc = options.dc;
     this.timeoutMs = options.timeoutMs;
+    this.ssl = options.ssl;
+    this.pemTrustOptions = options.pemTrustOptions;
   }
 
   /**
@@ -68,6 +75,11 @@ public class ConsulClientOptions {
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
     ConsulClientOptionsConverter.toJson(this, jsonObject);
+    if (pemTrustOptions != null) {
+      JsonObject pem = new JsonObject();
+      PemTrustOptionsConverter.toJson(pemTrustOptions, pem);
+      jsonObject.put("pemTrustOptions", pem);
+    }
     return jsonObject;
   }
 
@@ -114,6 +126,33 @@ public class ConsulClientOptions {
    */
   public long getTimeoutMs() {
     return timeoutMs;
+  }
+
+  /**
+   * Return true if SSL/TLS enabled
+   *
+   * @return true if SSL/TLS enabled
+   */
+  public boolean isSsl() {
+    return ssl;
+  }
+
+  /**
+   * Return true if all server certificates should be trusted
+   *
+   * @return true if all server certificates should be trusted
+   */
+  public boolean isTrustAll() {
+    return trustAll;
+  }
+
+  /**
+   * Get the trust options.
+   *
+   * @return the trust options.
+   */
+  public PemTrustOptions getPemTrustOptions() {
+    return pemTrustOptions;
   }
 
   /**
@@ -172,6 +211,39 @@ public class ConsulClientOptions {
    */
   public ConsulClientOptions setTimeoutMs(long timeoutMs) {
     this.timeoutMs = timeoutMs;
+    return this;
+  }
+
+  /**
+   * Set whether SSL/TLS is enabled
+   *
+   * @param ssl  true if enabled
+   * @return reference to this, for fluency
+   */
+  public ConsulClientOptions setSsl(boolean ssl) {
+    this.ssl = ssl;
+    return this;
+  }
+
+  /**
+   * Set whether all server certificates should be trusted
+   *
+   * @param trustAll true if all should be trusted
+   * @return reference to this, for fluency
+   */
+  public ConsulClientOptions setTrustAll(boolean trustAll) {
+    this.trustAll = trustAll;
+    return this;
+  }
+
+  /**
+   * Set the trust options.
+   *
+   * @param pemTrustOptions the trust options
+   * @return reference to this, for fluency
+   */
+  public ConsulClientOptions setPemTrustOptions(PemTrustOptions pemTrustOptions) {
+    this.pemTrustOptions = pemTrustOptions;
     return this;
   }
 }

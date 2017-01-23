@@ -36,11 +36,20 @@ public class ConsulClientOptionsConverter {
     if (json.getValue("host") instanceof String) {
       obj.setHost((String)json.getValue("host"));
     }
+    if (json.getValue("pemTrustOptions") instanceof JsonObject) {
+      obj.setPemTrustOptions(new io.vertx.core.net.PemTrustOptions((JsonObject)json.getValue("pemTrustOptions")));
+    }
     if (json.getValue("port") instanceof Number) {
       obj.setPort(((Number)json.getValue("port")).intValue());
     }
+    if (json.getValue("ssl") instanceof Boolean) {
+      obj.setSsl((Boolean)json.getValue("ssl"));
+    }
     if (json.getValue("timeoutMs") instanceof Number) {
       obj.setTimeoutMs(((Number)json.getValue("timeoutMs")).longValue());
+    }
+    if (json.getValue("trustAll") instanceof Boolean) {
+      obj.setTrustAll((Boolean)json.getValue("trustAll"));
     }
   }
 
@@ -55,6 +64,8 @@ public class ConsulClientOptionsConverter {
       json.put("host", obj.getHost());
     }
     json.put("port", obj.getPort());
+    json.put("ssl", obj.isSsl());
     json.put("timeoutMs", obj.getTimeoutMs());
+    json.put("trustAll", obj.isTrustAll());
   }
 }

@@ -18,7 +18,6 @@ package examples;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
 import java.util.Arrays;
