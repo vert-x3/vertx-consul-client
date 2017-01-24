@@ -25,6 +25,8 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -75,6 +77,10 @@ class ConsulCluster {
     return instance().readToken;
   }
 
+  static int httpsPort() {
+    return instance().httpsPort;
+  }
+
   static String nodeName() {
     return NODE_NAME;
   }
@@ -82,6 +88,7 @@ class ConsulCluster {
   private ConsulProcess consul;
   private String writeToken;
   private String readToken;
+  private int httpsPort;
 
   private ConsulCluster() {
     try {
@@ -92,7 +99,7 @@ class ConsulCluster {
   }
 
   static ConsulProcess attach(String nodeName) {
-    JsonObject config = instance().consulConfig(nodeName)
+    JsonObject config = instance().consulConfig(nodeName, Utils.getFreePort())
       .put("leave_on_terminate", true)
       .put("start_join", new JsonArray().add("127.0.0.1:" + instance().consul.getSerfLanPort()));;
     return ConsulStarterBuilder.consulStarter()
@@ -103,9 +110,14 @@ class ConsulCluster {
       .start();
   }
 
-  private JsonObject consulConfig(String nodeName) {
+  private JsonObject consulConfig(String nodeName, int httpsPort) {
     return new JsonObject()
       .put("server", true)
+      .put("key_file", copyFileFromResources("client-key.pem", "client-key"))
+      .put("cert_file", copyFileFromResources("client-cert.pem", "client-cert"))
+      .put("ca_file", copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"))
+      .put("ports", new JsonObject().put("https", httpsPort))
+      .put("addresses", new JsonObject().put("https", "0.0.0.0"))
       .put("datacenter", DC)
       .put("node_name", nodeName)
       .put("acl_default_policy", "deny")
@@ -114,7 +126,8 @@ class ConsulCluster {
   }
 
   private void create() throws Exception {
-    JsonObject config = consulConfig(NODE_NAME);
+    httpsPort = Utils.getFreePort();
+    JsonObject config = consulConfig(NODE_NAME, httpsPort);
     consul = ConsulStarterBuilder.consulStarter()
       .withLogLevel(LogLevel.ERR)
       .withConsulVersion(CONSUL_VERSION)
@@ -164,5 +177,19 @@ class ConsulCluster {
         tokenHandler.handle(null);
       }
     }).end(request);
+  }
+
+  private static String copyFileFromResources(String fName, String toName) {
+    try {
+      String body = Utils.readResource(fName);
+      File temp = File.createTempFile(toName, ".pem");
+      PrintWriter out = new PrintWriter(temp.getAbsoluteFile());
+      out.print(body);
+      out.close();
+      return temp.getAbsolutePath();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
   }
 }

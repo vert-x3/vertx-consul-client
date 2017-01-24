@@ -39,22 +39,29 @@ public class ConsulClientImpl implements ConsulClient {
 
   private static final String TOKEN_HEADER = "X-Consul-Token";
   private static final String INDEX_HEADER = "X-Consul-Index";
+  private static final String DEFAULT_HOST = "localhost";
+  private static final int DEFAULT_PORT = 8500;
 
   private final HttpClient httpClient;
   private final String aclToken;
   private final String dc;
   private final long timeoutMs;
 
-  public ConsulClientImpl(Vertx vertx, JsonObject config) {
+  public ConsulClientImpl(Vertx vertx, ConsulClientOptions options) {
     Objects.requireNonNull(vertx);
-    Objects.requireNonNull(config);
-    httpClient = vertx.createHttpClient(new HttpClientOptions()
-      .setDefaultHost(config.getString("host", "localhost"))
-      .setDefaultPort(config.getInteger("port", 8500))
-    );
-    aclToken = config.getString("acl_token");
-    dc = config.getString("dc");
-    timeoutMs = config.getLong("timeout", 0L);
+    Objects.requireNonNull(options);
+    HttpClientOptions opts = new HttpClientOptions()
+      .setDefaultHost(options.getHost() == null ? DEFAULT_HOST : options.getHost())
+      .setDefaultPort(options.getPort() == 0 ? DEFAULT_PORT : options.getPort())
+      .setSsl(options.isSsl())
+      .setTrustAll(options.isTrustAll());
+    if (options.getPemTrustOptions() != null) {
+      opts.setTrustOptions(options.getPemTrustOptions());
+    }
+    httpClient = vertx.createHttpClient(opts);
+    aclToken = options.getAclToken();
+    dc = options.getDc();
+    timeoutMs = options.getTimeoutMs();
   }
 
   @Override

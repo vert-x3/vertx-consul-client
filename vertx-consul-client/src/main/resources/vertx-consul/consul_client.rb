@@ -32,15 +32,15 @@ module VertxConsul
     end
     #  Create a Consul client.
     # @param [::Vertx::Vertx] vertx the Vert.x instance
-    # @param [Hash{String => Object}] config the configuration
+    # @param [Hash] options the options
     # @return [::VertxConsul::ConsulClient] the client
-    def self.create(vertx=nil,config=nil)
-      if vertx.class.method_defined?(:j_del) && !block_given? && config == nil
+    def self.create(vertx=nil,options=nil)
+      if vertx.class.method_defined?(:j_del) && !block_given? && options == nil
         return ::Vertx::Util::Utils.safe_create(Java::IoVertxExtConsul::ConsulClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class]).call(vertx.j_del),::VertxConsul::ConsulClient)
-      elsif vertx.class.method_defined?(:j_del) && config.class == Hash && !block_given?
-        return ::Vertx::Util::Utils.safe_create(Java::IoVertxExtConsul::ConsulClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxCoreJson::JsonObject.java_class]).call(vertx.j_del,::Vertx::Util::Utils.to_json_object(config)),::VertxConsul::ConsulClient)
+      elsif vertx.class.method_defined?(:j_del) && options.class == Hash && !block_given?
+        return ::Vertx::Util::Utils.safe_create(Java::IoVertxExtConsul::ConsulClient.java_method(:create, [Java::IoVertxCore::Vertx.java_class,Java::IoVertxExtConsul::ConsulClientOptions.java_class]).call(vertx.j_del,Java::IoVertxExtConsul::ConsulClientOptions.new(::Vertx::Util::Utils.to_json_object(options))),::VertxConsul::ConsulClient)
       end
-      raise ArgumentError, "Invalid arguments when calling create(#{vertx},#{config})"
+      raise ArgumentError, "Invalid arguments when calling create(#{vertx},#{options})"
     end
     #  Returns the configuration and member information of the local agent
     # @yield will be provided with the configuration and member information of the local agent

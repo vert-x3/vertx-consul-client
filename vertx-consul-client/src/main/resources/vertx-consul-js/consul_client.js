@@ -28,6 +28,7 @@ var SessionList = io.vertx.ext.consul.SessionList;
 var NodeList = io.vertx.ext.consul.NodeList;
 var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
 var Check = io.vertx.ext.consul.Check;
+var ConsulClientOptions = io.vertx.ext.consul.ConsulClientOptions;
 var Service = io.vertx.ext.consul.Service;
 var CheckOptions = io.vertx.ext.consul.CheckOptions;
 var EventList = io.vertx.ext.consul.EventList;
@@ -1443,7 +1444,7 @@ ConsulClient._create = function(jdel) {
 
  @memberof module:vertx-consul-js/consul_client
  @param vertx {Vertx} the Vert.x instance 
- @param config {Object} the configuration 
+ @param options {Object} the options 
  @return {ConsulClient} the client
  */
 ConsulClient.create = function() {
@@ -1451,7 +1452,7 @@ ConsulClient.create = function() {
   if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
     return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx)"](__args[0]._jdel));
   }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
-    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx,io.vertx.core.json.JsonObject)"](__args[0]._jdel, utils.convParamJsonObject(__args[1])));
+    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx,io.vertx.ext.consul.ConsulClientOptions)"](__args[0]._jdel, __args[1] != null ? new ConsulClientOptions(new JsonObject(JSON.stringify(__args[1]))) : null));
   } else throw new TypeError('function invoked with invalid arguments');
 };
 

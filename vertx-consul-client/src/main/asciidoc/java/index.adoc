@@ -35,13 +35,14 @@ Just use factory method:
 ConsulClient client = ConsulClient.create(vertx);
 ----
 
-Also the client can be configured with a json object.
+Also the client can be configured with an options.
 
 [source,java]
 ----
-JsonObject config = new JsonObject().put("host", "consul.example.com");
+ConsulClientOptions options = new ConsulClientOptions()
+  .setHost("consul.example.com");
 
-ConsulClient client = ConsulClient.create(vertx, config);
+ConsulClient client = ConsulClient.create(vertx, options);
 ----
 
 The following configuration is supported by the consul client:

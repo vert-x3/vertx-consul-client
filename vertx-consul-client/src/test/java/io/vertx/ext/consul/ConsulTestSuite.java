@@ -37,7 +37,8 @@ import org.junit.runners.Suite;
   KVStore.class,
   Services.class,
   Sessions.class,
-  Status.class
+  Status.class,
+  SecureClient.class
 })
 public class ConsulTestSuite {
 

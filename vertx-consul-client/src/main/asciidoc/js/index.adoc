@@ -39,17 +39,17 @@ var client = ConsulClient.create(vertx);
 
 ----
 
-Also the client can be configured with a json object.
+Also the client can be configured with an options.
 
 [source,js]
 ----
 var ConsulClient = require("vertx-consul-js/consul_client");
 
-var config = {
+var options = {
   "host" : "consul.example.com"
 };
 
-var client = ConsulClient.create(vertx, config);
+var client = ConsulClient.create(vertx, options);
 
 
 ----

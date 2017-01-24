@@ -17,7 +17,7 @@ package io.vertx.ext.consul;
 
 import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.PemTrustOptions;
 import io.vertx.test.core.VertxTestBase;
 
 import java.util.function.BiFunction;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 public class ConsulTestBase extends VertxTestBase {
 
-  protected static BiFunction<Vertx, JsonObject, ConsulClient> clientCreator;
+  protected static BiFunction<Vertx, ConsulClientOptions, ConsulClient> clientCreator;
   protected static Consumer<ConsulClient> clientCloser;
 
   protected ConsulClient masterClient;
@@ -40,9 +40,9 @@ public class ConsulTestBase extends VertxTestBase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    masterClient = clientCreator.apply(vertx, config(ConsulCluster.masterToken()));
-    writeClient = clientCreator.apply(vertx, config(ConsulCluster.writeToken()));
-    readClient = clientCreator.apply(vertx, config(ConsulCluster.readToken()));
+    masterClient = clientCreator.apply(vertx, config(ConsulCluster.masterToken(), false));
+    writeClient = clientCreator.apply(vertx, config(ConsulCluster.writeToken(), false));
+    readClient = clientCreator.apply(vertx, config(ConsulCluster.readToken(), false));
     nodeName = ConsulCluster.nodeName();
     dc = ConsulCluster.dc();
   }
@@ -55,16 +55,24 @@ public class ConsulTestBase extends VertxTestBase {
     super.tearDown();
   }
 
+  protected ConsulClient createSecureClient(boolean trustAll, PemTrustOptions trustOptions) {
+    ConsulClientOptions options = config(ConsulCluster.writeToken(), true)
+      .setTrustAll(trustAll)
+      .setPemTrustOptions(trustOptions);
+    return clientCreator.apply(vertx, options);
+  }
+
   protected ConsulProcess attachConsul(String nodeName) {
     return ConsulCluster.attach(nodeName);
   }
 
-  private JsonObject config(String token) {
-    return new JsonObject()
-      .put("acl_token", token)
-      .put("dc", ConsulCluster.dc())
-      .put("host", "localhost")
-      .put("port", ConsulCluster.consul().getHttpPort());
+  private ConsulClientOptions config(String token, boolean secure) {
+    return new ConsulClientOptions()
+      .setAclToken(token)
+      .setDc(ConsulCluster.dc())
+      .setHost("localhost")
+      .setPort(secure ? ConsulCluster.httpsPort() : ConsulCluster.consul().getHttpPort())
+      .setSsl(secure);
   }
 
 }

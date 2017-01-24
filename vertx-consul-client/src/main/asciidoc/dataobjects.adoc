@@ -154,6 +154,56 @@ Set Time to Live of check.
 +++
 |===
 
+[[ConsulClientOptions]]
+== ConsulClientOptions
+
+++++
+ Options used to create Consul client.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[aclToken]]`aclToken`|`String`|
++++
+Set the ACL token. When provided, the client will use this token when making requests to the Consul
+ by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
+ ACL policy, is used.
++++
+|[[dc]]`dc`|`String`|
++++
+Set the datacenter name. When provided, the client will use it when making requests to the Consul
+ by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
++++
+|[[host]]`host`|`String`|
++++
+Set Consul host. Defaults to `localhost`
++++
+|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
++++
+Set the trust options.
++++
+|[[port]]`port`|`Number (int)`|
++++
+Set Consul HTTP API port. Defaults to `8500`
++++
+|[[ssl]]`ssl`|`Boolean`|
++++
+Set whether SSL/TLS is enabled
++++
+|[[timeoutMs]]`timeoutMs`|`Number (long)`|
++++
+Sets the amount of time (in milliseconds) after which if the request does not return any data
+ within the timeout period an failure will be passed to the handler and the request will be closed.
++++
+|[[trustAll]]`trustAll`|`Boolean`|
++++
+Set whether all server certificates should be trusted
++++
+|===
+
 [[Coordinate]]
 == Coordinate
 

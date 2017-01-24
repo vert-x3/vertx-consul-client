@@ -18,7 +18,6 @@ package examples;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
 import java.util.Arrays;
@@ -36,9 +35,10 @@ public class Examples {
 
   public void exampleCreateWithOptions(Vertx vertx) {
 
-    JsonObject config = new JsonObject().put("host", "consul.example.com");
+    ConsulClientOptions options = new ConsulClientOptions()
+      .setHost("consul.example.com");
 
-    ConsulClient client = ConsulClient.create(vertx, config);
+    ConsulClient client = ConsulClient.create(vertx, options);
 
   }
 
