@@ -36,7 +36,7 @@ class KVParser {
   static KeyValue parse(JsonObject json) {
     return new KeyValue()
       .setKey(json.getString(KEY_KEY))
-      .setValue(new String(Base64.getDecoder().decode(json.getString(VALUE_KEY))))
+      .setValue(Utils.decode64(json.getString(VALUE_KEY)))
       .setSession(json.getString(SESSION_KEY))
       .setFlags(json.getLong(FLAGS_KEY, 0L))
       .setCreateIndex(json.getLong(CREATE_KEY, 0L))

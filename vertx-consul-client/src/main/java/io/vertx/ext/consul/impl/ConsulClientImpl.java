@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.impl.Query.urlEncode;
+import static io.vertx.ext.consul.impl.Utils.urlEncode;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>

@@ -68,16 +68,8 @@ class Query {
       if (sb.length() > 1) {
         sb.append('&');
       }
-      sb.append(e.getKey()).append('=').append(urlEncode(e.getValue()));
+      sb.append(e.getKey()).append('=').append(Utils.urlEncode(e.getValue()));
     });
     return sb.toString();
-  }
-
-  static String urlEncode(String str) {
-    try {
-      return URLEncoder.encode(str, "UTF-8");
-    } catch (UnsupportedEncodingException ignore) {
-    }
-    return "";
   }
 }

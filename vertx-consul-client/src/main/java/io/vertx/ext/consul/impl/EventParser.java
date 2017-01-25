@@ -45,7 +45,7 @@ class EventParser {
       .setLTime(json.getInteger(LTIME_KEY, 0));
     String payload = json.getString(PAYLOAD_KEY);
     if (payload != null) {
-      ev.setPayload(new String(Base64.getDecoder().decode(payload)));
+      ev.setPayload(Utils.decode64(payload));
     }
     return ev;
   }
