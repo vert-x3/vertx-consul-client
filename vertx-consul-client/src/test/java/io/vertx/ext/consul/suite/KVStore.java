@@ -34,6 +34,15 @@ public class KVStore extends ConsulTestBase {
   }
 
   @Test
+  public void readClientEmptyValue() {
+    assertTrue(getAsync(h -> writeClient.putValue("foo/bar/empty", "", h)));
+    KeyValue pair = getAsync(h -> readClient.getValue("foo/bar/empty", h));
+    assertEquals("foo/bar/empty", pair.getKey());
+    assertEquals("", pair.getValue());
+    runAsync(h -> writeClient.deleteValue("foo/bar/empty", h));
+  }
+
+  @Test
   public void readClientCanReadOneValue() {
     assertTrue(getAsync(h -> writeClient.putValue("foo/bar/?воля", "इच्छाशक्ति", h)));
     KeyValue pair = getAsync(h -> readClient.getValue("foo/bar/?воля", h));
