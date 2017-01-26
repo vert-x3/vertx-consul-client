@@ -20,31 +20,31 @@ var Vertx = require('vertx-js/vertx');
 
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
-var JConsulClient = io.vertx.ext.consul.ConsulClient;
-var BlockingQueryOptions = io.vertx.ext.consul.BlockingQueryOptions;
-var ServiceQueryOptions = io.vertx.ext.consul.ServiceQueryOptions;
-var Event = io.vertx.ext.consul.Event;
-var SessionList = io.vertx.ext.consul.SessionList;
-var NodeList = io.vertx.ext.consul.NodeList;
-var MaintenanceOptions = io.vertx.ext.consul.MaintenanceOptions;
-var Check = io.vertx.ext.consul.Check;
-var ConsulClientOptions = io.vertx.ext.consul.ConsulClientOptions;
-var Service = io.vertx.ext.consul.Service;
-var CheckOptions = io.vertx.ext.consul.CheckOptions;
-var EventList = io.vertx.ext.consul.EventList;
-var NodeQueryOptions = io.vertx.ext.consul.NodeQueryOptions;
-var ServiceEntryList = io.vertx.ext.consul.ServiceEntryList;
-var KeyValue = io.vertx.ext.consul.KeyValue;
-var ServiceOptions = io.vertx.ext.consul.ServiceOptions;
-var CoordinateList = io.vertx.ext.consul.CoordinateList;
-var KeyValueOptions = io.vertx.ext.consul.KeyValueOptions;
-var AclToken = io.vertx.ext.consul.AclToken;
-var SessionOptions = io.vertx.ext.consul.SessionOptions;
-var KeyValueList = io.vertx.ext.consul.KeyValueList;
-var DcCoordinates = io.vertx.ext.consul.DcCoordinates;
-var ServiceList = io.vertx.ext.consul.ServiceList;
-var Session = io.vertx.ext.consul.Session;
-var EventOptions = io.vertx.ext.consul.EventOptions;
+var JConsulClient = Java.type('io.vertx.ext.consul.ConsulClient');
+var BlockingQueryOptions = Java.type('io.vertx.ext.consul.BlockingQueryOptions');
+var ServiceQueryOptions = Java.type('io.vertx.ext.consul.ServiceQueryOptions');
+var Event = Java.type('io.vertx.ext.consul.Event');
+var SessionList = Java.type('io.vertx.ext.consul.SessionList');
+var NodeList = Java.type('io.vertx.ext.consul.NodeList');
+var MaintenanceOptions = Java.type('io.vertx.ext.consul.MaintenanceOptions');
+var Check = Java.type('io.vertx.ext.consul.Check');
+var ConsulClientOptions = Java.type('io.vertx.ext.consul.ConsulClientOptions');
+var Service = Java.type('io.vertx.ext.consul.Service');
+var CheckOptions = Java.type('io.vertx.ext.consul.CheckOptions');
+var EventList = Java.type('io.vertx.ext.consul.EventList');
+var NodeQueryOptions = Java.type('io.vertx.ext.consul.NodeQueryOptions');
+var ServiceEntryList = Java.type('io.vertx.ext.consul.ServiceEntryList');
+var KeyValue = Java.type('io.vertx.ext.consul.KeyValue');
+var ServiceOptions = Java.type('io.vertx.ext.consul.ServiceOptions');
+var CoordinateList = Java.type('io.vertx.ext.consul.CoordinateList');
+var KeyValueOptions = Java.type('io.vertx.ext.consul.KeyValueOptions');
+var AclToken = Java.type('io.vertx.ext.consul.AclToken');
+var SessionOptions = Java.type('io.vertx.ext.consul.SessionOptions');
+var KeyValueList = Java.type('io.vertx.ext.consul.KeyValueList');
+var DcCoordinates = Java.type('io.vertx.ext.consul.DcCoordinates');
+var ServiceList = Java.type('io.vertx.ext.consul.ServiceList');
+var Session = Java.type('io.vertx.ext.consul.Session');
+var EventOptions = Java.type('io.vertx.ext.consul.EventOptions');
 
 /**
  A Vert.x service used to interact with Consul.
@@ -110,7 +110,7 @@ var ConsulClient = function(j_val) {
   this.coordinateNodesWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["coordinateNodesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["coordinateNodesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -177,7 +177,7 @@ var ConsulClient = function(j_val) {
   this.getValueWithOptions = function(key, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValueWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValueWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](key, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -245,7 +245,7 @@ var ConsulClient = function(j_val) {
   this.getValuesWithOptions = function(keyPrefix, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["getValuesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](keyPrefix, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -313,7 +313,7 @@ var ConsulClient = function(j_val) {
   this.putValueWithOptions = function(key, value, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] === 'string' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
-      j_consulClient["putValueWithOptions(java.lang.String,java.lang.String,io.vertx.ext.consul.KeyValueOptions,io.vertx.core.Handler)"](key, value, options != null ? new KeyValueOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["putValueWithOptions(java.lang.String,java.lang.String,io.vertx.ext.consul.KeyValueOptions,io.vertx.core.Handler)"](key, value, options != null ? new KeyValueOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(ar.result(), null);
       } else {
@@ -335,7 +335,7 @@ var ConsulClient = function(j_val) {
   this.createAclToken = function(token, idHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["createAclToken(io.vertx.ext.consul.AclToken,io.vertx.core.Handler)"](token != null ? new AclToken(new JsonObject(JSON.stringify(token))) : null, function(ar) {
+      j_consulClient["createAclToken(io.vertx.ext.consul.AclToken,io.vertx.core.Handler)"](token != null ? new AclToken(new JsonObject(Java.asJSONCompatible(token))) : null, function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
@@ -357,7 +357,7 @@ var ConsulClient = function(j_val) {
   this.updateAclToken = function(token, idHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["updateAclToken(io.vertx.ext.consul.AclToken,io.vertx.core.Handler)"](token != null ? new AclToken(new JsonObject(JSON.stringify(token))) : null, function(ar) {
+      j_consulClient["updateAclToken(io.vertx.ext.consul.AclToken,io.vertx.core.Handler)"](token != null ? new AclToken(new JsonObject(Java.asJSONCompatible(token))) : null, function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
@@ -489,7 +489,7 @@ var ConsulClient = function(j_val) {
   this.fireEventWithOptions = function(name, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["fireEventWithOptions(java.lang.String,io.vertx.ext.consul.EventOptions,io.vertx.core.Handler)"](name, options != null ? new EventOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["fireEventWithOptions(java.lang.String,io.vertx.ext.consul.EventOptions,io.vertx.core.Handler)"](name, options != null ? new EventOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -539,7 +539,7 @@ var ConsulClient = function(j_val) {
   this.listEventsWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["listEventsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["listEventsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -561,7 +561,7 @@ var ConsulClient = function(j_val) {
   this.registerService = function(serviceOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](serviceOptions != null ? new ServiceOptions(new JsonObject(JSON.stringify(serviceOptions))) : null, function(ar) {
+      j_consulClient["registerService(io.vertx.ext.consul.ServiceOptions,io.vertx.core.Handler)"](serviceOptions != null ? new ServiceOptions(new JsonObject(Java.asJSONCompatible(serviceOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -583,7 +583,7 @@ var ConsulClient = function(j_val) {
   this.maintenanceService = function(maintenanceOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["maintenanceService(io.vertx.ext.consul.MaintenanceOptions,io.vertx.core.Handler)"](maintenanceOptions != null ? new MaintenanceOptions(new JsonObject(JSON.stringify(maintenanceOptions))) : null, function(ar) {
+      j_consulClient["maintenanceService(io.vertx.ext.consul.MaintenanceOptions,io.vertx.core.Handler)"](maintenanceOptions != null ? new MaintenanceOptions(new JsonObject(Java.asJSONCompatible(maintenanceOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -651,7 +651,7 @@ var ConsulClient = function(j_val) {
   this.catalogServiceNodesWithOptions = function(service, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["catalogServiceNodesWithOptions(java.lang.String,io.vertx.ext.consul.ServiceQueryOptions,io.vertx.core.Handler)"](service, options != null ? new ServiceQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogServiceNodesWithOptions(java.lang.String,io.vertx.ext.consul.ServiceQueryOptions,io.vertx.core.Handler)"](service, options != null ? new ServiceQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -715,7 +715,7 @@ var ConsulClient = function(j_val) {
   this.catalogNodesWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["catalogNodesWithOptions(io.vertx.ext.consul.NodeQueryOptions,io.vertx.core.Handler)"](options != null ? new NodeQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogNodesWithOptions(io.vertx.ext.consul.NodeQueryOptions,io.vertx.core.Handler)"](options != null ? new NodeQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -764,7 +764,7 @@ var ConsulClient = function(j_val) {
   this.healthServiceNodesWithOptions = function(service, passing, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
-      j_consulClient["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -808,7 +808,7 @@ var ConsulClient = function(j_val) {
   this.catalogServicesWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["catalogServicesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogServicesWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -854,7 +854,7 @@ var ConsulClient = function(j_val) {
   this.catalogNodeServicesWithOptions = function(node, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["catalogNodeServicesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["catalogNodeServicesWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](node, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -919,7 +919,7 @@ var ConsulClient = function(j_val) {
   this.registerCheck = function(checkOptions, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](checkOptions != null ? new CheckOptions(new JsonObject(JSON.stringify(checkOptions))) : null, function(ar) {
+      j_consulClient["registerCheck(io.vertx.ext.consul.CheckOptions,io.vertx.core.Handler)"](checkOptions != null ? new CheckOptions(new JsonObject(Java.asJSONCompatible(checkOptions))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(null, null);
       } else {
@@ -1210,7 +1210,7 @@ var ConsulClient = function(j_val) {
   this.createSessionWithOptions = function(options, idHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["createSessionWithOptions(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["createSessionWithOptions(io.vertx.ext.consul.SessionOptions,io.vertx.core.Handler)"](options != null ? new SessionOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         idHandler(ar.result(), null);
       } else {
@@ -1256,7 +1256,7 @@ var ConsulClient = function(j_val) {
   this.infoSessionWithOptions = function(id, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["infoSessionWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](id, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["infoSessionWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](id, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -1322,7 +1322,7 @@ var ConsulClient = function(j_val) {
   this.listSessionsWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulClient["listSessionsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["listSessionsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -1368,7 +1368,7 @@ var ConsulClient = function(j_val) {
   this.listNodeSessionsWithOptions = function(nodeId, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'string' && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
-      j_consulClient["listNodeSessionsWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](nodeId, options != null ? new BlockingQueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
+      j_consulClient["listNodeSessionsWithOptions(java.lang.String,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](nodeId, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
@@ -1452,7 +1452,7 @@ ConsulClient.create = function() {
   if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
     return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx)"](__args[0]._jdel));
   }else if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && (typeof __args[1] === 'object' && __args[1] != null)) {
-    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx,io.vertx.ext.consul.ConsulClientOptions)"](__args[0]._jdel, __args[1] != null ? new ConsulClientOptions(new JsonObject(JSON.stringify(__args[1]))) : null));
+    return utils.convReturnVertxGen(ConsulClient, JConsulClient["create(io.vertx.core.Vertx,io.vertx.ext.consul.ConsulClientOptions)"](__args[0]._jdel, __args[1] != null ? new ConsulClientOptions(new JsonObject(Java.asJSONCompatible(__args[1]))) : null));
   } else throw new TypeError('function invoked with invalid arguments');
 };
 

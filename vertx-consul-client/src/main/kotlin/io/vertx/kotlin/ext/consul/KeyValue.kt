@@ -2,8 +2,24 @@ package io.vertx.kotlin.ext.consul
 
 import io.vertx.ext.consul.KeyValue
 
+/**
+ * A function providing a DSL for building [io.vertx.ext.consul.KeyValue] objects.
+ *
+ * Represents key/value pair stored in Consul
+ *
+ * @param createIndex  Set the internal index value that represents when the entry was created.
+ * @param flags  Set the flags attached to this entry. Clients can choose to use this however makes sense for their application.
+ * @param key  Set the key
+ * @param lockIndex  Set the number of times this key has successfully been acquired in a lock.
+ * @param modifyIndex  Set the last index that modified this key.
+ * @param session  Set the session that owns the lock
+ * @param value  Set the value
+ *
+ * <p/>
+ * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.KeyValue original] using Vert.x codegen.
+ */
 fun KeyValue(
-    createIndex: Long? = null,
+  createIndex: Long? = null,
   flags: Long? = null,
   key: String? = null,
   lockIndex: Long? = null,
@@ -12,32 +28,25 @@ fun KeyValue(
   value: String? = null): KeyValue = io.vertx.ext.consul.KeyValue().apply {
 
   if (createIndex != null) {
-    this.createIndex = createIndex
+    this.setCreateIndex(createIndex)
   }
-
   if (flags != null) {
-    this.flags = flags
+    this.setFlags(flags)
   }
-
   if (key != null) {
-    this.key = key
+    this.setKey(key)
   }
-
   if (lockIndex != null) {
-    this.lockIndex = lockIndex
+    this.setLockIndex(lockIndex)
   }
-
   if (modifyIndex != null) {
-    this.modifyIndex = modifyIndex
+    this.setModifyIndex(modifyIndex)
   }
-
   if (session != null) {
-    this.session = session
+    this.setSession(session)
   }
-
   if (value != null) {
-    this.value = value
+    this.setValue(value)
   }
-
 }
 

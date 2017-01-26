@@ -2,8 +2,23 @@ package io.vertx.kotlin.ext.consul
 
 import io.vertx.ext.consul.Session
 
+/**
+ * A function providing a DSL for building [io.vertx.ext.consul.Session] objects.
+ *
+ * Holds properties of Consul sessions
+ *
+ * @param checks  Set the list of associated health checks
+ * @param createIndex  Set the create index of session
+ * @param id  Set the ID of node
+ * @param index  Set Consul index
+ * @param lockDelay  Set the Lock delay of session
+ * @param node  Set the ID of node
+ *
+ * <p/>
+ * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.Session original] using Vert.x codegen.
+ */
 fun Session(
-    checks: List<String>? = null,
+  checks: List<String>? = null,
   createIndex: Long? = null,
   id: String? = null,
   index: Long? = null,
@@ -11,28 +26,22 @@ fun Session(
   node: String? = null): Session = io.vertx.ext.consul.Session().apply {
 
   if (checks != null) {
-    this.checks = checks
+    this.setChecks(checks)
   }
-
   if (createIndex != null) {
-    this.createIndex = createIndex
+    this.setCreateIndex(createIndex)
   }
-
   if (id != null) {
-    this.id = id
+    this.setId(id)
   }
-
   if (index != null) {
-    this.index = index
+    this.setIndex(index)
   }
-
   if (lockDelay != null) {
-    this.lockDelay = lockDelay
+    this.setLockDelay(lockDelay)
   }
-
   if (node != null) {
-    this.node = node
+    this.setNode(node)
   }
-
 }
 
