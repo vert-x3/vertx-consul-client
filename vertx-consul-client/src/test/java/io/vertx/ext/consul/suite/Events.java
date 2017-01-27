@@ -16,6 +16,7 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.*;
+import io.vertx.test.core.TestUtils;
 import org.junit.Test;
 
 import java.util.List;
@@ -33,8 +34,17 @@ public class Events extends ConsulTestBase {
 
   @Test
   public void events() throws InterruptedException {
-    String name1 = "custom-event1";
-    String name2 = "custom-event2";
+    runTest(false);
+  }
+
+  @Test
+  public void timeout() throws InterruptedException {
+    runTest(true);
+  }
+
+  private void runTest(boolean timeout) throws InterruptedException {
+    String name1 = "custom-event-1-" + TestUtils.randomAlphaString(10);
+    String name2 = "custom-event-2-" + TestUtils.randomAlphaString(10);
     EventOptions opts = new EventOptions().setPayload("content");
     Event event = getAsync(h -> writeClient.fireEventWithOptions(name1, opts, h));
     assertEquals(name1, event.getName());
@@ -45,16 +55,27 @@ public class Events extends ConsulTestBase {
     assertEquals(cnt, 1);
 
     CountDownLatch latch = new CountDownLatch(1);
-    writeClient.listEventsWithOptions(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+    BlockingQueryOptions blockingQueryOptions = new BlockingQueryOptions()
+      .setIndex(list1.getIndex());
+    if (timeout) {
+      blockingQueryOptions.setWait("2s");
+    }
+    writeClient.listEventsWithOptions(blockingQueryOptions, h -> {
       List<String> names = h.result().getList().stream().map(Event::getName).collect(Collectors.toList());
-      assertTrue(names.contains(name2));
+      if (timeout) {
+        assertTrue(names.contains(name1));
+        assertFalse(names.contains(name2));
+      } else {
+        assertTrue(names.contains(name1));
+        assertTrue(names.contains(name2));
+      }
       latch.countDown();
     });
-    sleep(vertx, 2000);
     assertEquals(latch.getCount(), 1);
+    sleep(vertx, 4000);
+    assertEquals(latch.getCount(), timeout ? 0 : 1);
     Utils.<Event>getAsync(h -> writeClient.fireEvent(name2, h));
     awaitLatch(latch);
-
   }
 
 }

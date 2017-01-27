@@ -22,7 +22,6 @@ import org.junit.Test;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.sleep;
@@ -34,9 +33,18 @@ public class Coordinates extends ConsulTestBase {
 
   private static final int MAX_REQUESTS = 100;
 
-  //@Test
+  @Test
   public void nodes() throws InterruptedException {
-    CoordinateList nodes1 = getCoordinates(1);
+    CoordinateList nodes1 = null;
+    int requests = MAX_REQUESTS;
+    while (requests --> 0) {
+      nodes1 = getAsync(h -> readClient.coordinateNodes(h));
+      if (nodes1.getList().size() == 1) {
+        break;
+      }
+      sleep(vertx, 1000);
+      System.out.println("waiting for node coordinates...");
+    }
     if(nodes1 == null || nodes1.getList().size() != 1) {
       fail();
       return;
@@ -57,43 +65,27 @@ public class Coordinates extends ConsulTestBase {
     latch1.await(2, TimeUnit.MINUTES);
     assertEquals(latch1.getCount(), 0);
 
-    // wait until second consul start
-    CoordinateList nodes0 = getCoordinates(2);
-    if(nodes0 == null || nodes0.getList().size() != 2) {
-      fail();
-      return;
-    }
+    // wait until the second consul will attached
+    assertTrue(waitPeers(2));
 
-    // wait until second consul closes
-    CountDownLatch latch2 = new CountDownLatch(1);
-    CoordinateList nodes2 = getAsync(h -> readClient.coordinateNodes(h));
-    BlockingQueryOptions blockingQueryOptions2 = new BlockingQueryOptions().setIndex(nodes2.getIndex());
-    readClient.coordinateNodesWithOptions(blockingQueryOptions2, h -> {
-      latch2.countDown();
-    });
     attached.close();
-    latch2.await(2, TimeUnit.MINUTES);
-    assertEquals(latch2.getCount(), 0);
 
-    nodes0 = getCoordinates(1);
-    if(nodes0 == null || nodes0.getList().size() != 1) {
-      fail();
-      return;
-    }
+    // wait until the second consul will leave
+    assertTrue(waitPeers(1));
   }
 
-  private CoordinateList getCoordinates(int expected) {
-    CoordinateList nodes = null;
+  private boolean waitPeers(int expected) {
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      nodes = getAsync(h -> readClient.coordinateNodes(h));
-      if (nodes.getList().size() == expected) {
-        break;
+      List<String> peers = getAsync(h -> readClient.peersStatus(h));
+      if (peers.size() == expected) {
+        System.out.println("Number of peers: " + expected);
+        return true;
       }
       sleep(vertx, 1000);
-      System.out.println("waiting for node coordinates...");
+      System.out.println("waiting for peers...");
     }
-    return nodes;
+    return false;
   }
 
   @Test
