@@ -75,11 +75,6 @@ public class ConsulClientOptions {
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
     ConsulClientOptionsConverter.toJson(this, jsonObject);
-    if (pemTrustOptions != null) {
-      JsonObject pem = new JsonObject();
-      PemTrustOptionsConverter.toJson(pemTrustOptions, pem);
-      jsonObject.put("pemTrustOptions", pem);
-    }
     return jsonObject;
   }
 

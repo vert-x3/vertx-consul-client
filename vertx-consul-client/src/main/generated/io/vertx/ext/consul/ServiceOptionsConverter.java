@@ -67,11 +67,9 @@ public class ServiceOptionsConverter {
     }
     json.put("port", obj.getPort());
     if (obj.getTags() != null) {
-      json.put("tags", new JsonArray(
-          obj.getTags().
-              stream().
-              map(item -> item).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getTags().forEach(item -> array.add(item));
+      json.put("tags", array);
     }
   }
 }

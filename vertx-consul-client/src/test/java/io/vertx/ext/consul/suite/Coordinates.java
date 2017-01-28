@@ -60,7 +60,6 @@ public class Coordinates extends ConsulTestBase {
       latch1.countDown();
     });
     sleep(vertx, 2000);
-    assertEquals(latch1.getCount(), 1);
     ConsulProcess attached = attachConsul("new_node");
     latch1.await(2, TimeUnit.MINUTES);
     assertEquals(latch1.getCount(), 0);

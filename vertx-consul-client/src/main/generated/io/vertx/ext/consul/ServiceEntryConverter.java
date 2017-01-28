@@ -45,11 +45,9 @@ public class ServiceEntryConverter {
 
   public static void toJson(ServiceEntry obj, JsonObject json) {
     if (obj.getChecks() != null) {
-      json.put("checks", new JsonArray(
-          obj.getChecks().
-              stream().
-              map(item -> item.toJson()).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getChecks().forEach(item -> array.add(item.toJson()));
+      json.put("checks", array);
     }
     if (obj.getNode() != null) {
       json.put("node", obj.getNode().toJson());

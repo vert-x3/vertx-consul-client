@@ -45,11 +45,9 @@ public class DcCoordinatesConverter {
       json.put("datacenter", obj.getDatacenter());
     }
     if (obj.getServers() != null) {
-      json.put("servers", new JsonArray(
-          obj.getServers().
-              stream().
-              map(item -> item.toJson()).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getServers().forEach(item -> array.add(item.toJson()));
+      json.put("servers", array);
     }
   }
 }

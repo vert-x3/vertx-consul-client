@@ -54,11 +54,9 @@ public class SessionConverter {
 
   public static void toJson(Session obj, JsonObject json) {
     if (obj.getChecks() != null) {
-      json.put("checks", new JsonArray(
-          obj.getChecks().
-              stream().
-              map(item -> item).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getChecks().forEach(item -> array.add(item));
+      json.put("checks", array);
     }
     json.put("createIndex", obj.getCreateIndex());
     if (obj.getId() != null) {
