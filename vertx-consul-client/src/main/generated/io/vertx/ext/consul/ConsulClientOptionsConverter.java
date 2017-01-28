@@ -63,6 +63,9 @@ public class ConsulClientOptionsConverter {
     if (obj.getHost() != null) {
       json.put("host", obj.getHost());
     }
+    if (obj.getPemTrustOptions() != null) {
+      json.put("pemTrustOptions", obj.getPemTrustOptions().toJson());
+    }
     json.put("port", obj.getPort());
     json.put("ssl", obj.isSsl());
     json.put("timeoutMs", obj.getTimeoutMs());

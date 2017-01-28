@@ -57,11 +57,9 @@ public class CoordinateConverter {
       json.put("node", obj.getNode());
     }
     if (obj.getVec() != null) {
-      json.put("vec", new JsonArray(
-          obj.getVec().
-              stream().
-              map(item -> item).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getVec().forEach(item -> array.add(item));
+      json.put("vec", array);
     }
   }
 }

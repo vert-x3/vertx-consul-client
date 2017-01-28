@@ -43,11 +43,9 @@ public class EventListConverter {
   public static void toJson(EventList obj, JsonObject json) {
     json.put("index", obj.getIndex());
     if (obj.getList() != null) {
-      json.put("list", new JsonArray(
-          obj.getList().
-              stream().
-              map(item -> item.toJson()).
-              collect(java.util.stream.Collectors.toList())));
+      JsonArray array = new JsonArray();
+      obj.getList().forEach(item -> array.add(item.toJson()));
+      json.put("list", array);
     }
   }
 }
