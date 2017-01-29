@@ -163,6 +163,16 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling put_value_with_options(#{key},#{value},#{options})"
     end
+    # @param [Hash] request 
+    # @yield 
+    # @return [self]
+    def transaction(request=nil)
+      if request.class == Hash && block_given?
+        @j_del.java_method(:transaction, [Java::IoVertxExtConsul::TxnRequest.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::TxnRequest.new(::Vertx::Util::Utils.to_json_object(request)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling transaction(#{request})"
+    end
     # @param [Hash] token 
     # @yield 
     # @return [self]

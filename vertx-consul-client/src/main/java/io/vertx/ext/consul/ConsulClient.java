@@ -189,6 +189,9 @@ public interface ConsulClient {
   @Fluent
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
+  @Fluent
+  ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler);
+
   /**
    * Create new Acl token
    *

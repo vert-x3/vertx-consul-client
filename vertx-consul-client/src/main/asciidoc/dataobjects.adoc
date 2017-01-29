@@ -856,3 +856,107 @@ Set the TTL interval. When TTL interval expires without being renewed, the sessi
 +++
 |===
 
+[[TxnError]]
+== TxnError
+
+++++
+ Holds entry describing which operations failed if the transaction was rolled back.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[opIndex]]`opIndex`|`Number (int)`|
++++
+Set the index of the failed operation in the transaction
++++
+|[[what]]`what`|`String`|
++++
+Set error message about why that operation failed.
++++
+|===
+
+[[TxnKV]]
+== TxnKV
+
+++++
+ Holds operation to apply to the key/value store inside a transaction
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[flags]]`flags`|`Number (long)`|
++++
+Set the flags attached to this entry. Clients can choose to use this however makes sense for their application.
++++
+|[[index]]`index`|`Number (long)`|
++++
+Set the index used for locking, unlocking, and check-and-set operations.
++++
+|[[key]]`key`|`String`|
++++
+Set the key
++++
+|[[session]]`session`|`String`|
++++
+Set the session used for locking, unlocking, and check-and-set operations.
++++
+|[[type]]`type`|`link:enums.html#TxnKVType[TxnKVType]`|
++++
+Set the type of operation to perform
++++
+|[[value]]`value`|`String`|
++++
+Set the value
++++
+|===
+
+[[TxnRequest]]
+== TxnRequest
+
+++++
+ Holds list of operations in transaction
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[operationsSize]]`operationsSize`|`Number (int)`|
++++
+Returns the number of operations in this request
++++
+|===
+
+[[TxnResponse]]
+== TxnResponse
+
+++++
+ Holds results of transaction
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[errors]]`errors`|`Array of link:dataobjects.html#TxnError[TxnError]`|
++++
+
++++
+|[[errorsSize]]`errorsSize`|`Number (int)`|
++++
+Returns the number of errors in this response
++++
+|[[resultsSize]]`resultsSize`|`Number (int)`|
++++
+Returns the number of results in this response
++++
+|===
+

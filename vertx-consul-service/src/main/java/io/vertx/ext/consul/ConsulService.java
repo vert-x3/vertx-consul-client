@@ -77,6 +77,10 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   @Override

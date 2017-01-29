@@ -25,7 +25,7 @@ import io.vertx.core.json.JsonObject;
  * @see <a href="https://www.consul.io/docs/agent/http/kv.html">Consul key/value store</a>
  */
 @DataObject(generateConverter = true)
-public class KeyValue {
+public class KeyValue implements TxnResult {
 
   private String key;
   private String value;

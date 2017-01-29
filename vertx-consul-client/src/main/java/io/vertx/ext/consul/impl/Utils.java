@@ -22,9 +22,9 @@ import java.util.Base64;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-class Utils {
+public class Utils {
 
-  static String urlEncode(String str) {
+  public static String urlEncode(String str) {
     try {
       return URLEncoder.encode(str, "UTF-8");
     } catch (UnsupportedEncodingException ignore) {
@@ -32,7 +32,15 @@ class Utils {
     return "";
   }
 
-  static String decode64(String src) {
+  public static String encode64(String src) {
+    if (src == null || src.isEmpty()) {
+      return "";
+    } else {
+      return new String(Base64.getEncoder().encode(src.getBytes()));
+    }
+  }
+
+  public static String decode64(String src) {
     if (src == null || src.isEmpty()) {
       return "";
     } else {

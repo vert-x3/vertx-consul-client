@@ -153,6 +153,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler) {
+    requestObject(HttpMethod.PUT, "/v1/txn", null, resultHandler, (obj, headers) -> TxnResponseParser.parse(obj))
+      .end(request.toJson().getJsonArray("operations").encode());
+    return this;
+  }
+
+  @Override
   public ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
     requestObject(HttpMethod.PUT, "/v1/acl/create", null, idHandler, (obj, headers) ->
       obj.getString("ID")).end(token.toJson().encode());
