@@ -36,7 +36,12 @@ class TxnResponseParser {
       });
     }
     if (json.getValue("Errors") instanceof JsonArray) {
-      json.getJsonArray("Errors").forEach(entry -> response.addError(new TxnError((JsonObject) entry)));
+      json.getJsonArray("Errors").forEach(entry -> {
+        JsonObject obj = (JsonObject) entry;
+        response.addError(new TxnError()
+          .setOpIndex(obj.getInteger("OpIndex"))
+          .setWhat(obj.getString("What")));
+      });
     }
     return response;
   }
