@@ -5,7 +5,7 @@ import io.vertx.ext.consul.TxnError
 /**
  * A function providing a DSL for building [io.vertx.ext.consul.TxnError] objects.
  *
- * Holds entry describing which operations failed if the transaction was rolled back.
+ * Holds information describing which operations failed if the transaction was rolled back.
  *
  * @param opIndex  Set the index of the failed operation in the transaction
  * @param what  Set error message about why that operation failed.

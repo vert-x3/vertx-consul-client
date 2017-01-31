@@ -1,10 +1,10 @@
 package io.vertx.kotlin.ext.consul
 
-import io.vertx.ext.consul.TxnKV
-import io.vertx.ext.consul.TxnKVType
+import io.vertx.ext.consul.TxnKVOperation
+import io.vertx.ext.consul.TxnKVVerb
 
 /**
- * A function providing a DSL for building [io.vertx.ext.consul.TxnKV] objects.
+ * A function providing a DSL for building [io.vertx.ext.consul.TxnKVOperation] objects.
  *
  * Holds operation to apply to the key/value store inside a transaction
  *
@@ -16,15 +16,15 @@ import io.vertx.ext.consul.TxnKVType
  * @param value  Set the value
  *
  * <p/>
- * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.TxnKV original] using Vert.x codegen.
+ * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.TxnKVOperation original] using Vert.x codegen.
  */
-fun TxnKV(
+fun TxnKVOperation(
   flags: Long? = null,
   index: Long? = null,
   key: String? = null,
   session: String? = null,
-  type: TxnKVType? = null,
-  value: String? = null): TxnKV = io.vertx.ext.consul.TxnKV().apply {
+  type: TxnKVVerb? = null,
+  value: String? = null): TxnKVOperation = io.vertx.ext.consul.TxnKVOperation().apply {
 
   if (flags != null) {
     this.setFlags(flags)

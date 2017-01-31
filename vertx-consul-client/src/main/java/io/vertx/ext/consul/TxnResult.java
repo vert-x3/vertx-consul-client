@@ -16,6 +16,9 @@
 package io.vertx.ext.consul;
 
 /**
+ * Represents result of operation. Key/Value is the only available result type,
+ * though other types of results may be added in future versions of Consul to be mixed with key/value operations
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public interface TxnResult {

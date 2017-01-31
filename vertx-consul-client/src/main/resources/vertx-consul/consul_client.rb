@@ -178,8 +178,9 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling put_value_with_options(#{key},#{value},#{options})"
     end
-    # @param [Hash] request 
-    # @yield 
+    #  Manages multiple operations inside a single, atomic transaction.
+    # @param [Hash] request transaction request
+    # @yield will be provided with result of transaction
     # @return [self]
     def transaction(request=nil)
       if request.class == Hash && block_given?

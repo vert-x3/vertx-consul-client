@@ -20,13 +20,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 /**
- * Converter for {@link io.vertx.ext.consul.TxnKV}.
+ * Converter for {@link io.vertx.ext.consul.TxnKVOperation}.
  *
- * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.TxnKV} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.TxnKVOperation} original class using Vert.x codegen.
  */
-public class TxnKVConverter {
+public class TxnKVOperationConverter {
 
-  public static void fromJson(JsonObject json, TxnKV obj) {
+  public static void fromJson(JsonObject json, TxnKVOperation obj) {
     if (json.getValue("flags") instanceof Number) {
       obj.setFlags(((Number)json.getValue("flags")).longValue());
     }
@@ -40,14 +40,14 @@ public class TxnKVConverter {
       obj.setSession((String)json.getValue("session"));
     }
     if (json.getValue("type") instanceof String) {
-      obj.setType(io.vertx.ext.consul.TxnKVType.valueOf((String)json.getValue("type")));
+      obj.setType(io.vertx.ext.consul.TxnKVVerb.valueOf((String)json.getValue("type")));
     }
     if (json.getValue("value") instanceof String) {
       obj.setValue((String)json.getValue("value"));
     }
   }
 
-  public static void toJson(TxnKV obj, JsonObject json) {
+  public static void toJson(TxnKVOperation obj, JsonObject json) {
     json.put("flags", obj.getFlags());
     json.put("index", obj.getIndex());
     if (obj.getKey() != null) {

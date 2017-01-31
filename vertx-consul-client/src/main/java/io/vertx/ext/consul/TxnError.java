@@ -19,7 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 /**
- * Holds entry describing which operations failed if the transaction was rolled back.
+ * Holds information describing which operations failed if the transaction was rolled back.
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */

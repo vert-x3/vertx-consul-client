@@ -860,7 +860,7 @@ Set the TTL interval. When TTL interval expires without being renewed, the sessi
 == TxnError
 
 ++++
- Holds entry describing which operations failed if the transaction was rolled back.
+ Holds information describing which operations failed if the transaction was rolled back.
 ++++
 '''
 
@@ -878,8 +878,8 @@ Set error message about why that operation failed.
 +++
 |===
 
-[[TxnKV]]
-== TxnKV
+[[TxnKVOperation]]
+== TxnKVOperation
 
 ++++
  Holds operation to apply to the key/value store inside a transaction
@@ -906,7 +906,7 @@ Set the key
 +++
 Set the session used for locking, unlocking, and check-and-set operations.
 +++
-|[[type]]`type`|`link:enums.html#TxnKVType[TxnKVType]`|
+|[[type]]`type`|`link:enums.html#TxnKVVerb[TxnKVVerb]`|
 +++
 Set the type of operation to perform
 +++
@@ -948,7 +948,7 @@ Returns the number of operations in this request
 ^|Name | Type ^| Description
 |[[errors]]`errors`|`Array of link:dataobjects.html#TxnError[TxnError]`|
 +++
-
+Adds error to this response
 +++
 |[[errorsSize]]`errorsSize`|`Number (int)`|
 +++

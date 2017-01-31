@@ -8,7 +8,7 @@ import io.vertx.ext.consul.TxnError
  *
  * Holds results of transaction
  *
- * @param errors 
+ * @param errors  Adds error to this response
  *
  * <p/>
  * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.TxnResponse original] using Vert.x codegen.

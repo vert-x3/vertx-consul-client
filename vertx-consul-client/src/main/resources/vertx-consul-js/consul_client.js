@@ -327,11 +327,12 @@ var ConsulClient = function(j_val) {
   };
 
   /**
+   Manages multiple operations inside a single, atomic transaction.
 
    @public
-   @param request {Object} 
-   @param resultHandler {function} 
-   @return {ConsulClient}
+   @param request {Object} transaction request 
+   @param resultHandler {function} will be provided with result of transaction 
+   @return {ConsulClient} reference to this, for fluency
    */
   this.transaction = function(request, resultHandler) {
     var __args = arguments;

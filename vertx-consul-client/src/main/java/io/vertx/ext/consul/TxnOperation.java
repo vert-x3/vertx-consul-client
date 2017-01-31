@@ -16,6 +16,9 @@
 package io.vertx.ext.consul;
 
 /**
+ * Represents operation in transaction. Key/Value is the only available operation type,
+ * though other types of operations may be added in future versions of Consul to be mixed with key/value operations
+ *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public interface TxnOperation {

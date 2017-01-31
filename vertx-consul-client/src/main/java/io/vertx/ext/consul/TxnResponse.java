@@ -104,9 +104,10 @@ public class TxnResponse {
   }
 
   /**
+   * Adds result to this response
    *
-   * @param result
-   * @return
+   * @param result the result
+   * @return reference to this, for fluency
    */
   public TxnResponse addResult(TxnResult result) {
     results.add(result);
@@ -142,9 +143,10 @@ public class TxnResponse {
   }
 
   /**
+   * Adds error to this response
    *
-   * @param error
-   * @return
+   * @param error the error
+   * @return reference to this, for fluency
    */
   public TxnResponse addError(TxnError error) {
     errors.add(error);

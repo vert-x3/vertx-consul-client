@@ -24,9 +24,9 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class TxnKV implements TxnOperation {
+public class TxnKVOperation implements TxnOperation {
 
-  private TxnKVType type;
+  private TxnKVVerb type;
   private String key;
   private String value;
   private long flags;
@@ -36,7 +36,7 @@ public class TxnKV implements TxnOperation {
   /**
    * Default constructor
    */
-  public TxnKV() {
+  public TxnKVOperation() {
   }
 
   /**
@@ -44,8 +44,8 @@ public class TxnKV implements TxnOperation {
    *
    * @param json the JSON
    */
-  public TxnKV(JsonObject json) {
-    TxnKVConverter.fromJson(json, this);
+  public TxnKVOperation(JsonObject json) {
+    TxnKVOperationConverter.fromJson(json, this);
   }
 
   /**
@@ -55,7 +55,7 @@ public class TxnKV implements TxnOperation {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    TxnKVConverter.toJson(this, jsonObject);
+    TxnKVOperationConverter.toJson(this, jsonObject);
     return jsonObject;
   }
 
@@ -64,7 +64,7 @@ public class TxnKV implements TxnOperation {
    *
    * @return the type of operation to perform
    */
-  public TxnKVType getType() {
+  public TxnKVVerb getType() {
     return type;
   }
 
@@ -121,7 +121,7 @@ public class TxnKV implements TxnOperation {
    * @param type the type of operation to perform
    * @return reference to this, for fluency
    */
-  public TxnKV setType(TxnKVType type) {
+  public TxnKVOperation setType(TxnKVVerb type) {
     this.type = type;
     return this;
   }
@@ -132,7 +132,7 @@ public class TxnKV implements TxnOperation {
    * @param key the key
    * @return reference to this, for fluency
    */
-  public TxnKV setKey(String key) {
+  public TxnKVOperation setKey(String key) {
     this.key = key;
     return this;
   }
@@ -143,7 +143,7 @@ public class TxnKV implements TxnOperation {
    * @param value the value
    * @return reference to this, for fluency
    */
-  public TxnKV setValue(String value) {
+  public TxnKVOperation setValue(String value) {
     this.value = value;
     return this;
   }
@@ -154,7 +154,7 @@ public class TxnKV implements TxnOperation {
    * @param flags the flags attached to this entry. Clients can choose to use this however makes sense for their application.
    * @return reference to this, for fluency
    */
-  public TxnKV setFlags(long flags) {
+  public TxnKVOperation setFlags(long flags) {
     this.flags = flags;
     return this;
   }
@@ -166,7 +166,7 @@ public class TxnKV implements TxnOperation {
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
    */
-  public TxnKV setIndex(long index) {
+  public TxnKVOperation setIndex(long index) {
     this.index = index;
     return this;
   }
@@ -178,7 +178,7 @@ public class TxnKV implements TxnOperation {
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
    */
-  public TxnKV setSession(String session) {
+  public TxnKVOperation setSession(String session) {
     this.session = session;
     return this;
   }

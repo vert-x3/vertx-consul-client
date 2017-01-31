@@ -52,13 +52,13 @@ public class TxnRequest {
         JsonObject obj = (JsonObject) entry;
         if (obj.containsKey("KV")) {
           JsonObject txn = obj.getJsonObject("KV");
-          operations.add(new TxnKV()
+          operations.add(new TxnKVOperation()
             .setKey(txn.getString("Key"))
             .setValue(decode64(txn.getString("Value")))
             .setFlags(txn.getLong("Flags"))
             .setIndex(txn.getLong("Index"))
             .setSession(txn.getString("Session"))
-            .setType(TxnKVType.ofVerb(txn.getString("Verb"))));
+            .setType(TxnKVVerb.ofVerb(txn.getString("Verb"))));
         }
       });
     }
@@ -72,8 +72,8 @@ public class TxnRequest {
   public JsonObject toJson() {
     JsonArray arr = new JsonArray();
     operations.forEach(op -> {
-      if (op instanceof TxnKV) {
-        TxnKV kvOp = (TxnKV) op;
+      if (op instanceof TxnKVOperation) {
+        TxnKVOperation kvOp = (TxnKVOperation) op;
         JsonObject obj = new JsonObject()
           .put("Verb", kvOp.getType().getVerb())
           .put("Key", kvOp.getKey())

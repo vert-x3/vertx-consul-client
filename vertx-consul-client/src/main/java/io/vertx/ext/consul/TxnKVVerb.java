@@ -21,7 +21,7 @@ package io.vertx.ext.consul;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
  */
-public enum TxnKVType {
+public enum TxnKVVerb {
 
   /**
    * Sets the Key to the given Value
@@ -84,8 +84,8 @@ public enum TxnKVType {
    */
   DELETE_CAS("delete-cas");
 
-  public static TxnKVType ofVerb(String verb) {
-    for (TxnKVType type : values()) {
+  public static TxnKVVerb ofVerb(String verb) {
+    for (TxnKVVerb type : values()) {
       if (type.getVerb().equals(verb)) {
         return type;
       }
@@ -95,7 +95,7 @@ public enum TxnKVType {
 
   private final String verb;
 
-  TxnKVType(String verb) {
+  TxnKVVerb(String verb) {
     this.verb = verb;
   }
 

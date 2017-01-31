@@ -81,7 +81,7 @@ public class KeyValue implements TxnResult {
   }
 
   /**
-   * Get the value
+   * Get the value. In case if KeyValue is result of transaction, value can be empty
    *
    * @return the value
    */
