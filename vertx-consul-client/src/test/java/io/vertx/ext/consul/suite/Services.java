@@ -189,7 +189,7 @@ public class Services extends ChecksBase {
       assertTrue(names.contains("service2"));
       latch.countDown();
     });
-    sleep(vertx, 2000);
+    sleep(vertx, 4000);
     assertEquals(latch.getCount(), 1);
     runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service2").setId("id2"), h));
     awaitLatch(latch);

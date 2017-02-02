@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -198,5 +199,11 @@ public class KeyValue implements TxnResult {
   public KeyValue setLockIndex(long lockIndex) {
     this.lockIndex = lockIndex;
     return this;
+  }
+
+  @GenIgnore
+  @Override
+  public TxnOperationType getOperationType() {
+    return TxnOperationType.KV;
   }
 }

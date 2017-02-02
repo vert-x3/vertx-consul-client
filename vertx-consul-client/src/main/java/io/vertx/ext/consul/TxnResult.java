@@ -22,4 +22,7 @@ package io.vertx.ext.consul;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public interface TxnResult {
+
+  TxnOperationType getOperationType();
+
 }

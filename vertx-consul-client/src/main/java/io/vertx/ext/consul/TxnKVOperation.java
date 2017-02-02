@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -181,5 +182,11 @@ public class TxnKVOperation implements TxnOperation {
   public TxnKVOperation setSession(String session) {
     this.session = session;
     return this;
+  }
+
+  @GenIgnore
+  @Override
+  public TxnOperationType getOperationType() {
+    return TxnOperationType.KV;
   }
 }

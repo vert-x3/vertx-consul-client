@@ -22,4 +22,12 @@ package io.vertx.ext.consul;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public interface TxnOperation {
+
+  /**
+   * Returns the type of operation in a transaction
+   *
+   * @return the type of operation in a transaction
+   */
+  TxnOperationType getOperationType();
+
 }

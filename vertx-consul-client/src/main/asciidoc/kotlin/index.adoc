@@ -32,8 +32,8 @@ Just use factory method:
 
 [source,kotlin]
 ----
+import io.vertx.ext.consul.ConsulClient
 import io.vertx.kotlin.common.json.*
-import io.vertx.kotlin.ext.consul.ConsulClient
 
 
 var client = ConsulClient.create(vertx)
@@ -45,8 +45,8 @@ Also the client can be configured with an options.
 
 [source,kotlin]
 ----
+import io.vertx.ext.consul.ConsulClient
 import io.vertx.kotlin.common.json.*
-import io.vertx.kotlin.ext.consul.ConsulClient
 
 
 var options = io.vertx.ext.consul.ConsulClientOptions(
