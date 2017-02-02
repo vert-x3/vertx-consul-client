@@ -178,6 +178,17 @@ module VertxConsul
       end
       raise ArgumentError, "Invalid arguments when calling put_value_with_options(#{key},#{value},#{options})"
     end
+    #  Manages multiple operations inside a single, atomic transaction.
+    # @param [Hash] request transaction request
+    # @yield will be provided with result of transaction
+    # @return [self]
+    def transaction(request=nil)
+      if request.class == Hash && block_given?
+        @j_del.java_method(:transaction, [Java::IoVertxExtConsul::TxnRequest.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::TxnRequest.new(::Vertx::Util::Utils.to_json_object(request)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        return self
+      end
+      raise ArgumentError, "Invalid arguments when calling transaction(#{request})"
+    end
     #  Create new Acl token
     # @param [Hash] token properties of the token
     # @yield will be provided with ID of created token

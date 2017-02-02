@@ -91,6 +91,12 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler) {
+    consulClient.transaction(request, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService createAclToken(AclToken aclToken, Handler<AsyncResult<String>> idHandler) {
     consulClient.createAclToken(aclToken, idHandler);
     return this;

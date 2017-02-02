@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -25,7 +26,7 @@ import io.vertx.core.json.JsonObject;
  * @see <a href="https://www.consul.io/docs/agent/http/kv.html">Consul key/value store</a>
  */
 @DataObject(generateConverter = true)
-public class KeyValue {
+public class KeyValue implements TxnResult {
 
   private String key;
   private String value;
@@ -81,7 +82,7 @@ public class KeyValue {
   }
 
   /**
-   * Get the value
+   * Get the value. In case if KeyValue is result of transaction, value can be empty
    *
    * @return the value
    */
@@ -198,5 +199,11 @@ public class KeyValue {
   public KeyValue setLockIndex(long lockIndex) {
     this.lockIndex = lockIndex;
     return this;
+  }
+
+  @GenIgnore
+  @Override
+  public TxnOperationType getOperationType() {
+    return TxnOperationType.KV;
   }
 }

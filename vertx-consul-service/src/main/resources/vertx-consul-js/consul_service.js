@@ -22,27 +22,29 @@ var ConsulClient = require('vertx-consul-js/consul_client');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulService = Java.type('io.vertx.ext.consul.ConsulService');
-var BlockingQueryOptions = Java.type('io.vertx.ext.consul.BlockingQueryOptions');
 var ServiceQueryOptions = Java.type('io.vertx.ext.consul.ServiceQueryOptions');
 var Event = Java.type('io.vertx.ext.consul.Event');
 var SessionList = Java.type('io.vertx.ext.consul.SessionList');
-var NodeList = Java.type('io.vertx.ext.consul.NodeList');
 var MaintenanceOptions = Java.type('io.vertx.ext.consul.MaintenanceOptions');
 var Check = Java.type('io.vertx.ext.consul.Check');
 var Service = Java.type('io.vertx.ext.consul.Service');
 var CheckOptions = Java.type('io.vertx.ext.consul.CheckOptions');
-var EventList = Java.type('io.vertx.ext.consul.EventList');
 var ServiceEntryList = Java.type('io.vertx.ext.consul.ServiceEntryList');
 var NodeQueryOptions = Java.type('io.vertx.ext.consul.NodeQueryOptions');
 var KeyValue = Java.type('io.vertx.ext.consul.KeyValue');
 var ServiceOptions = Java.type('io.vertx.ext.consul.ServiceOptions');
+var TxnRequest = Java.type('io.vertx.ext.consul.TxnRequest');
+var ServiceList = Java.type('io.vertx.ext.consul.ServiceList');
+var BlockingQueryOptions = Java.type('io.vertx.ext.consul.BlockingQueryOptions');
+var NodeList = Java.type('io.vertx.ext.consul.NodeList');
+var TxnResponse = Java.type('io.vertx.ext.consul.TxnResponse');
+var EventList = Java.type('io.vertx.ext.consul.EventList');
 var CoordinateList = Java.type('io.vertx.ext.consul.CoordinateList');
 var KeyValueOptions = Java.type('io.vertx.ext.consul.KeyValueOptions');
 var AclToken = Java.type('io.vertx.ext.consul.AclToken');
 var SessionOptions = Java.type('io.vertx.ext.consul.SessionOptions');
 var KeyValueList = Java.type('io.vertx.ext.consul.KeyValueList');
 var DcCoordinates = Java.type('io.vertx.ext.consul.DcCoordinates');
-var ServiceList = Java.type('io.vertx.ext.consul.ServiceList');
 var Session = Java.type('io.vertx.ext.consul.Session');
 var EventOptions = Java.type('io.vertx.ext.consul.EventOptions');
 
@@ -301,6 +303,27 @@ var ConsulService = function(j_val) {
       j_consulService["putValueWithOptions(java.lang.String,java.lang.String,io.vertx.ext.consul.KeyValueOptions,io.vertx.core.Handler)"](key, value, options != null ? new KeyValueOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(ar.result(), null);
+      } else {
+        resultHandler(null, ar.cause());
+      }
+    });
+      return that;
+    } else throw new TypeError('function invoked with invalid arguments');
+  };
+
+  /**
+
+   @public
+   @param request {Object} 
+   @param resultHandler {function} 
+   @return {ConsulService}
+   */
+  this.transaction = function(request, resultHandler) {
+    var __args = arguments;
+    if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
+      j_consulService["transaction(io.vertx.ext.consul.TxnRequest,io.vertx.core.Handler)"](request != null ? new TxnRequest(new JsonObject(Java.asJSONCompatible(request))) : null, function(ar) {
+      if (ar.succeeded()) {
+        resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {
         resultHandler(null, ar.cause());
       }

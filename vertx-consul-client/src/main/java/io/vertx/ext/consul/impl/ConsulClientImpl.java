@@ -25,6 +25,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -41,6 +43,9 @@ public class ConsulClientImpl implements ConsulClient {
   private static final String INDEX_HEADER = "X-Consul-Index";
   private static final String DEFAULT_HOST = "localhost";
   private static final int DEFAULT_PORT = 8500;
+
+  private static final List<Integer> DEFAULT_VALID_CODES = Collections.singletonList(200);
+  private static final List<Integer> TXN_VALID_CODES = Arrays.asList(200, 409);
 
   private final HttpClient httpClient;
   private final String aclToken;
@@ -148,7 +153,15 @@ public class ConsulClientImpl implements ConsulClient {
         query.put("cas", cas);
       }
     }
-    request(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler, (buffer, headers) -> Boolean.valueOf(buffer.toString().trim())).end(value);
+    requestString(HttpMethod.PUT, "/v1/kv/" + urlEncode(key), query, resultHandler,
+      (bool, headers) -> Boolean.valueOf(bool)).end(value);
+    return this;
+  }
+
+  @Override
+  public ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler) {
+    request(TXN_VALID_CODES, HttpMethod.PUT, "/v1/txn", null, resultHandler, (buff, headers) -> TxnResponseParser.parse(buff.toJsonObject()))
+      .end(request.toJson().getJsonArray("operations").encode());
     return this;
   }
 
@@ -440,10 +453,9 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
-    request(HttpMethod.GET, "/v1/status/leader", null, resultHandler, (buffer, headers) -> {
-      String leader = buffer.toString().trim();
-      return leader.substring(1, leader.length() - 2);
-    }).end();
+    requestString(HttpMethod.GET, "/v1/status/leader", null, resultHandler, (leader, headers) ->
+      leader.substring(1, leader.length() - 2))
+      .end();
     return this;
   }
 
@@ -538,21 +550,27 @@ public class ConsulClientImpl implements ConsulClient {
   private <T> HttpClientRequest requestArray(HttpMethod method, String path, Query query,
                                              Handler<AsyncResult<T>> resultHandler,
                                              BiFunction<JsonArray, MultiMap, T> mapper) {
-    return request(method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonArray(), headers));
+    return request(DEFAULT_VALID_CODES, method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonArray(), headers));
   }
 
   private <T> HttpClientRequest requestObject(HttpMethod method, String path, Query query,
-                                             Handler<AsyncResult<T>> resultHandler,
-                                             BiFunction<JsonObject, MultiMap, T> mapper) {
-    return request(method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonObject(), headers));
+                                              Handler<AsyncResult<T>> resultHandler,
+                                              BiFunction<JsonObject, MultiMap, T> mapper) {
+    return request(DEFAULT_VALID_CODES, method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toJsonObject(), headers));
+  }
+
+  private <T> HttpClientRequest requestString(HttpMethod method, String path, Query query,
+                                              Handler<AsyncResult<T>> resultHandler,
+                                              BiFunction<String, MultiMap, T> mapper) {
+    return request(DEFAULT_VALID_CODES, method, path, query, resultHandler, (buffer, headers) -> mapper.apply(buffer.toString().trim(), headers));
   }
 
   private <T> HttpClientRequest requestVoid(HttpMethod method, String path, Query query,
-                                        Handler<AsyncResult<T>> resultHandler) {
-    return request(method, path, query, resultHandler, (buffer, headers) -> null);
+                                            Handler<AsyncResult<T>> resultHandler) {
+    return request(DEFAULT_VALID_CODES, method, path, query, resultHandler, (buffer, headers) -> null);
   }
 
-  private <T> HttpClientRequest request(HttpMethod method, String path, Query query,
+  private <T> HttpClientRequest request(List<Integer> validCodes, HttpMethod method, String path, Query query,
                                         Handler<AsyncResult<T>> resultHandler,
                                         BiFunction<Buffer, MultiMap, T> mapper) {
     if (query == null) {
@@ -562,7 +580,7 @@ public class ConsulClientImpl implements ConsulClient {
       query.put("dc", dc);
     }
     HttpClientRequest rq = httpClient.request(method, path + query, h -> {
-      if (h.statusCode() == 200) {
+      if (validCodes.contains(h.statusCode())) {
         h.bodyHandler(bh -> {
           try {
             resultHandler.handle(Future.succeededFuture(mapper.apply(bh, h.headers())));

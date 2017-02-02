@@ -190,6 +190,17 @@ public interface ConsulClient {
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
   /**
+   * Manages multiple operations inside a single, atomic transaction.
+   *
+   * @param request transaction request
+   * @param resultHandler will be provided with result of transaction
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
+   */
+  @Fluent
+  ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler);
+
+  /**
    * Create new Acl token
    *
    * @param token     properties of the token

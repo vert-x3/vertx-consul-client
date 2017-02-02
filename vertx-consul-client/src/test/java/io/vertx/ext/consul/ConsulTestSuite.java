@@ -38,7 +38,8 @@ import org.junit.runners.Suite;
   Services.class,
   Sessions.class,
   Status.class,
-  SecureClient.class
+  SecureClient.class,
+  Transactions.class
 })
 public class ConsulTestSuite {
 
