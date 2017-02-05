@@ -16,13 +16,13 @@ import io.vertx.ext.consul.Service
  */
 fun ServiceList(
   index: Long? = null,
-  list: List<io.vertx.ext.consul.Service>? = null): ServiceList = io.vertx.ext.consul.ServiceList().apply {
+  list: Iterable<io.vertx.ext.consul.Service>? = null): ServiceList = io.vertx.ext.consul.ServiceList().apply {
 
   if (index != null) {
     this.setIndex(index)
   }
   if (list != null) {
-    this.setList(list)
+    this.setList(list.toList())
   }
 }
 

@@ -24,7 +24,7 @@ fun ServiceOptions(
   id: String? = null,
   name: String? = null,
   port: Int? = null,
-  tags: List<String>? = null): ServiceOptions = io.vertx.ext.consul.ServiceOptions().apply {
+  tags: Iterable<String>? = null): ServiceOptions = io.vertx.ext.consul.ServiceOptions().apply {
 
   if (address != null) {
     this.setAddress(address)
@@ -42,7 +42,7 @@ fun ServiceOptions(
     this.setPort(port)
   }
   if (tags != null) {
-    this.setTags(tags)
+    this.setTags(tags.toList())
   }
 }
 

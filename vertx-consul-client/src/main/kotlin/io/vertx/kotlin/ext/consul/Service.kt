@@ -25,7 +25,7 @@ fun Service(
   node: String? = null,
   nodeAddress: String? = null,
   port: Int? = null,
-  tags: List<String>? = null): Service = io.vertx.ext.consul.Service().apply {
+  tags: Iterable<String>? = null): Service = io.vertx.ext.consul.Service().apply {
 
   if (address != null) {
     this.setAddress(address)
@@ -46,7 +46,7 @@ fun Service(
     this.setPort(port)
   }
   if (tags != null) {
-    this.setTags(tags)
+    this.setTags(tags.toList())
   }
 }
 

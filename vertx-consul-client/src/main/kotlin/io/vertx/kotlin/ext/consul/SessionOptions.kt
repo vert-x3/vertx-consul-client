@@ -20,7 +20,7 @@ import io.vertx.ext.consul.SessionBehavior
  */
 fun SessionOptions(
   behavior: SessionBehavior? = null,
-  checks: List<String>? = null,
+  checks: Iterable<String>? = null,
   lockDelay: Long? = null,
   name: String? = null,
   node: String? = null,
@@ -30,7 +30,7 @@ fun SessionOptions(
     this.setBehavior(behavior)
   }
   if (checks != null) {
-    this.setChecks(checks)
+    this.setChecks(checks.toList())
   }
   if (lockDelay != null) {
     this.setLockDelay(lockDelay)

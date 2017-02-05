@@ -33,7 +33,6 @@ Just use factory method:
 [source,kotlin]
 ----
 import io.vertx.ext.consul.ConsulClient
-import io.vertx.kotlin.common.json.*
 
 
 var client = ConsulClient.create(vertx)
@@ -46,10 +45,11 @@ Also the client can be configured with an options.
 [source,kotlin]
 ----
 import io.vertx.ext.consul.ConsulClient
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.ConsulClientOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var options = io.vertx.ext.consul.ConsulClientOptions(
+var options = ConsulClientOptions(
   host = "consul.example.com")
 
 var client = ConsulClient.create(vertx, options)
@@ -85,10 +85,11 @@ the current state of the requested resource. The following configuration is used
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var opts = io.vertx.ext.consul.BlockingQueryOptions(
+var opts = BlockingQueryOptions(
   index = lastIndex,
   wait = "1m")
 
@@ -99,7 +100,6 @@ var opts = io.vertx.ext.consul.BlockingQueryOptions(
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
 
 
 // put Key/Value pair to Consul Store
@@ -140,10 +140,11 @@ The modify index can be used for blocking requests:
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var opts = io.vertx.ext.consul.BlockingQueryOptions(
+var opts = BlockingQueryOptions(
   index = modifyIndex)
 
 consulClient.getValueWithOptions("foo", opts, { res ->
@@ -166,7 +167,8 @@ consulClient.getValueWithOptions("foo", opts, { res ->
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.CheckOptions
+import io.vertx.kotlin.ext.consul.*
 
 
 var alwaysGood = { h ->
@@ -179,7 +181,7 @@ vertx.createHttpServer().requestHandler(alwaysGood).listen(4848)
 
 // check health via TCP port every 1 sec
 
-var opts = io.vertx.ext.consul.CheckOptions(
+var opts = CheckOptions(
   tcp = "localhost:4848",
   interval = "1s")
 
@@ -205,14 +207,18 @@ consulClient.registerCheck(opts, { res ->
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.ServiceOptions
+import io.vertx.ext.consul.ServiceQueryOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var opts = io.vertx.ext.consul.ServiceOptions(
+var opts = ServiceOptions(
   id = "serviceId",
   name = "serviceName",
   tags = listOf("tag1", "tag2"),
-  checkOptions = io.vertx.ext.consul.CheckOptions(
+  checkOptions = CheckOptions(
     ttl = "10s"),
   address = "10.0.0.1",
   port = 8080)
@@ -263,9 +269,9 @@ consulClient.catalogServiceNodes("serviceName", { res ->
 
 // Blocking request for nodes that provide given service, sorted by distance from agent
 
-var queryOpts = io.vertx.ext.consul.ServiceQueryOptions(
+var queryOpts = ServiceQueryOptions(
   near = "_agent",
-  blockingOptions = io.vertx.ext.consul.BlockingQueryOptions(
+  blockingOptions = BlockingQueryOptions(
     index = lastIndex))
 
 consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
@@ -305,10 +311,11 @@ consulClient.deregisterService("serviceId", { res ->
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.EventOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var opts = io.vertx.ext.consul.EventOptions(
+var opts = EventOptions(
   tag = "tag",
   payload = "message")
 
@@ -361,13 +368,15 @@ consulClient.listEvents({ res ->
 
 [source,kotlin]
 ----
+import io.vertx.ext.consul.BlockingQueryOptions
 import io.vertx.ext.consul.SessionBehavior
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.SessionOptions
+import io.vertx.kotlin.ext.consul.*
 
 
-var opts = io.vertx.ext.consul.SessionOptions(
+var opts = SessionOptions(
   node = "nodeId",
-  behavior = "RELEASE")
+  behavior = SessionBehavior.RELEASE)
 
 // Create session
 
@@ -413,7 +422,7 @@ consulClient.listNodeSessions("nodeId", { res ->
 
 // Blocking query for all active sessions
 
-var blockingOpts = io.vertx.ext.consul.BlockingQueryOptions(
+var blockingOpts = BlockingQueryOptions(
   index = lastIndex)
 
 consulClient.listSessionsWithOptions(blockingOpts, { res ->
@@ -453,7 +462,9 @@ consulClient.destroySession(sessionId, { res ->
 
 [source,kotlin]
 ----
-import io.vertx.kotlin.common.json.*
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.ext.consul.NodeQueryOptions
+import io.vertx.kotlin.ext.consul.*
 
 
 consulClient.catalogNodes({ res ->
@@ -474,9 +485,9 @@ consulClient.catalogNodes({ res ->
 
 // blocking request to catalog for nodes, sorted by distance from agent
 
-var opts = io.vertx.ext.consul.NodeQueryOptions(
+var opts = NodeQueryOptions(
   near = "_agent",
-  blockingOptions = io.vertx.ext.consul.BlockingQueryOptions(
+  blockingOptions = BlockingQueryOptions(
     index = lastIndex))
 
 consulClient.catalogNodesWithOptions(opts, { res ->

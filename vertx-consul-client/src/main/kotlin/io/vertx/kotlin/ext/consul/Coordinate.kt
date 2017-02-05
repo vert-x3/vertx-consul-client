@@ -21,7 +21,7 @@ fun Coordinate(
   err: Float? = null,
   height: Float? = null,
   node: String? = null,
-  vec: List<Float>? = null): Coordinate = io.vertx.ext.consul.Coordinate().apply {
+  vec: Iterable<Float>? = null): Coordinate = io.vertx.ext.consul.Coordinate().apply {
 
   if (adj != null) {
     this.setAdj(adj)
@@ -36,7 +36,7 @@ fun Coordinate(
     this.setNode(node)
   }
   if (vec != null) {
-    this.setVec(vec)
+    this.setVec(vec.toList())
   }
 }
 

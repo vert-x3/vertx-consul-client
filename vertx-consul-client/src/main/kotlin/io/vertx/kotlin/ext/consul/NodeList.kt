@@ -16,13 +16,13 @@ import io.vertx.ext.consul.Node
  */
 fun NodeList(
   index: Long? = null,
-  list: List<io.vertx.ext.consul.Node>? = null): NodeList = io.vertx.ext.consul.NodeList().apply {
+  list: Iterable<io.vertx.ext.consul.Node>? = null): NodeList = io.vertx.ext.consul.NodeList().apply {
 
   if (index != null) {
     this.setIndex(index)
   }
   if (list != null) {
-    this.setList(list)
+    this.setList(list.toList())
   }
 }
 

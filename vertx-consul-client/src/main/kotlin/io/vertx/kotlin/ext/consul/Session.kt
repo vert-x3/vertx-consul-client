@@ -18,7 +18,7 @@ import io.vertx.ext.consul.Session
  * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.Session original] using Vert.x codegen.
  */
 fun Session(
-  checks: List<String>? = null,
+  checks: Iterable<String>? = null,
   createIndex: Long? = null,
   id: String? = null,
   index: Long? = null,
@@ -26,7 +26,7 @@ fun Session(
   node: String? = null): Session = io.vertx.ext.consul.Session().apply {
 
   if (checks != null) {
-    this.setChecks(checks)
+    this.setChecks(checks.toList())
   }
   if (createIndex != null) {
     this.setCreateIndex(createIndex)
