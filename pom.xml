@@ -16,13 +16,13 @@
   </modules>
 
   <artifactId>vertx-consul</artifactId>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>3.4.0.Beta1</version>
   <packaging>pom</packaging>
 
   <name>Vert.x Consul</name>
 
   <properties>
-    <stack.version>3.4.0-SNAPSHOT</stack.version>
+    <stack.version>3.4.0.Beta1</stack.version>
     <embedded.consul.version>0.2.2</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.12</junit.version>
