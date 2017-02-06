@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.*;
@@ -172,19 +173,24 @@ public class Services extends ChecksBase {
 
   @Test
   public void catalogServicesBlocking() throws InterruptedException {
-    testServicesBlocking((opts, h) -> readClient.catalogServicesWithOptions(opts, h));
+    testServicesBlocking(h -> readClient.catalogServices(h),
+      (opts, h) -> readClient.catalogServicesWithOptions(opts, h));
   }
 
   @Test
   public void catalogNodeServicesBlocking() throws InterruptedException {
-    testServicesBlocking((opts, h) -> readClient.catalogNodeServicesWithOptions(nodeName, opts, h));
+    testServicesBlocking(h -> readClient.catalogNodeServices(nodeName, h),
+      (opts, h) -> readClient.catalogNodeServicesWithOptions(nodeName, opts, h));
   }
 
-  private void testServicesBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request) throws InterruptedException {
+  private void testServicesBlocking(Consumer<Handler<AsyncResult<ServiceList>>> runner,
+                                    BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request) throws InterruptedException {
     runAsync(h -> writeClient.registerService(new ServiceOptions().setName("service1").setId("id1"), h));
-    ServiceList list1 = getAsync(h -> readClient.catalogServices(h));
+    ServiceList list1 = getAsync(runner);
+    list1.getList().forEach(s -> System.out.println("--- " + s.toJson().encode()));
     CountDownLatch latch = new CountDownLatch(1);
     request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+      h.result().getList().forEach(s -> System.out.println("-+- " + s.toJson().encode()));
       List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
       assertTrue(names.contains("service2"));
       latch.countDown();
