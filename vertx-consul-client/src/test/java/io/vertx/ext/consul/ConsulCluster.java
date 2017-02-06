@@ -38,7 +38,7 @@ class ConsulCluster {
   private static final String MASTER_TOKEN = "topSecret";
   private static final String DC = "test-dc";
   private static final String NODE_NAME = "nodeName";
-  private static final String CONSUL_VERSION = "0.7.2";
+  private static final String CONSUL_VERSION = "0.7.4";
 
   private static ConsulCluster instance;
 
@@ -59,6 +59,7 @@ class ConsulCluster {
 
   static void close() {
     instance().consul.close();
+    instance = null;
   }
 
   static String dc() {
@@ -99,7 +100,7 @@ class ConsulCluster {
   }
 
   static ConsulProcess attach(String nodeName) {
-    JsonObject config = instance().consulConfig(nodeName, Utils.getFreePort())
+    JsonObject config = consulConfig(nodeName, Utils.getFreePort())
       .put("leave_on_terminate", true)
       .put("start_join", new JsonArray().add("127.0.0.1:" + instance().consul.getSerfLanPort()));;
     return ConsulStarterBuilder.consulStarter()
@@ -110,7 +111,7 @@ class ConsulCluster {
       .start();
   }
 
-  private JsonObject consulConfig(String nodeName, int httpsPort) {
+  private static JsonObject consulConfig(String nodeName, int httpsPort) {
     return new JsonObject()
       .put("server", true)
       .put("key_file", copyFileFromResources("client-key.pem", "client-key"))
