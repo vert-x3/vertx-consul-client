@@ -91,72 +91,217 @@ def opts = [
 
 ----
 
-=== Key/Value Store
+== Key/Value Store
+
+The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+The following endpoints are supported:
+
+* To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+* To manage updates or fetches of multiple keys inside a single, atomic transaction
+
+=== Get key-value pair from store
+
+Consul client can return the value for certain key
 
 [source,groovy]
 ----
 
-// put Key/Value pair to Consul Store
-consulClient.putValue("foo", "bar", { res ->
-
+consulClient.getValue("key", { res ->
   if (res.succeeded()) {
-
-    println("result of the operation: ${(res.result() ? "success" : "fail")}")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-//  get Key/Value pair from Consul Store
-consulClient.getValue("foo", { res ->
-
-  if (res.succeeded()) {
-
     println("retrieved value: ${res.result().value}")
-
     println("modify index: ${res.result().modifyIndex}")
-
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
 
 
 ----
-The modify index can be used for blocking requests:
+
+...or it can return all key-value pairs with the given prefix
+
+[source,groovy]
+----
+
+consulClient.getValues("prefix", { res ->
+  if (res.succeeded()) {
+    println("modify index: ${res.result().index}")
+    res.result().list.each { kv ->
+      println("retrieved value: ${kv.value}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+
+`createIndex`:: the internal index value that represents when the entry was created.
+`modifyIndex`:: the last index that modified this key
+`lockIndex`:: the number of times this key has successfully been acquired in a lock
+`key`:: the key
+`flags`:: the flags attached to this entry. Clients can choose to use this however makes
+sense for their application
+`value`:: the value
+`session`:: the session that owns the lock
+
+The modify index can be used for blocking queries:
 
 [source,groovy]
 ----
 
 def opts = [
-  index:modifyIndex
+  index:modifyIndex,
+  wait:"1m"
 ]
 
-consulClient.getValueWithOptions("foo", opts, { res ->
-
+consulClient.getValueWithOptions("key", opts, { res ->
   if (res.succeeded()) {
-
     println("retrieved value: ${res.result().value}")
-
+    println("new modify index: ${res.result().modifyIndex}")
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
 
 
 ----
-=== Health Checks
 
+=== Put key-value pair to store
+
+[source,groovy]
+----
+
+consulClient.putValue("key", "value", { res ->
+  if (res.succeeded()) {
+    def opResult = res.result() ? "success" : "fail"
+    println("result of the operation: ${opResult}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+Put request with options also accepted
+
+[source,groovy]
+----
+
+def opts = [
+  flags:42,
+  casIndex:modifyIndex,
+  acquireSession:"acquireSessionID",
+  releaseSession:"releaseSessionID"
+]
+
+consulClient.putValueWithOptions("key", "value", opts, { res ->
+  if (res.succeeded()) {
+    def opResult = res.result() ? "success" : "fail"
+    println("result of the operation: ${opResult}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+The list of the query options that can be used with a `PUT` request:
+
+`flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+Clients can choose to use this however makes sense for their application.
+`casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+`acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+without having to give up the lock and reacquire it.
+`releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+the associated Session of the key. The key must be held by this session to be unlocked.
+
+=== Transactions
+
+When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+may be added in future versions of Consul to be mixed with key/value operations
+(see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+
+[source,groovy]
+----
+import io.vertx.ext.consul.TxnKVVerb
+
+def request = [
+  operations:[
+    [
+      key:"key1",
+      value:"value1",
+      type:"SET"
+    ],
+    [
+      key:"key2",
+      value:"value2",
+      type:"SET"
+    ]
+  ]
+]
+
+consulClient.transaction(request, { res ->
+  if (res.succeeded()) {
+    println("succeeded results: ${res.result().results.size()}")
+    println("errors: ${res.result().errors.size()}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+----
+
+=== Delete key-value pair
+
+At last, Consul client allows to delete key-value pair from store:
+
+[source,groovy]
+----
+
+consulClient.deleteValue("key", { res ->
+  if (res.succeeded()) {
+    println("complete")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+...or all key-value pairs with corresponding key prefix
+
+[source,groovy]
+----
+
+consulClient.deleteValues("prefix", { res ->
+  if (res.succeeded()) {
+    println("complete")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+== Health Checks
+
+TBD
 [source,groovy]
 ----
 
@@ -193,8 +338,9 @@ consulClient.registerCheck(opts, { res ->
 
 ----
 
-=== Services
+== Services
 
+TBD
 [source,groovy]
 ----
 
@@ -295,8 +441,9 @@ consulClient.deregisterService("serviceId", { res ->
 
 ----
 
-=== Events
+== Events
 
+TBD
 [source,groovy]
 ----
 
@@ -350,8 +497,9 @@ consulClient.listEvents({ res ->
 
 ----
 
-=== Sessions
+== Sessions
 
+TBD
 [source,groovy]
 ----
 import io.vertx.ext.consul.SessionBehavior
@@ -442,8 +590,9 @@ consulClient.destroySession(sessionId, { res ->
 
 ----
 
-=== Nodes in cluster
+== Nodes in cluster
 
+TBD
 [source,groovy]
 ----
 

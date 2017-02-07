@@ -87,62 +87,6 @@ public class Examples {
     });
   }
 
-  public void kv(ConsulClient consulClient) {
-
-    // put Key/Value pair to Consul Store
-    consulClient.putValue("foo", "bar", res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("result of the operation: " + (res.result() ? "success" : "fail"));
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    //  get Key/Value pair from Consul Store
-    consulClient.getValue("foo", res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("retrieved value: " + res.result().getValue());
-
-        System.out.println("modify index: " + res.result().getModifyIndex());
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-  }
-
-  public void kvBlocking(ConsulClient consulClient, long modifyIndex) {
-
-    BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
-
-    consulClient.getValueWithOptions("foo", opts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("retrieved value: " + res.result().getValue());
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-  }
-
   public void services(ConsulClient consulClient, long lastIndex) {
 
     ServiceOptions opts = new ServiceOptions()
