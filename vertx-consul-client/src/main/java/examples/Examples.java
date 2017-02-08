@@ -20,8 +20,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.consul.*;
 
-import java.util.Arrays;
-
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -85,98 +83,6 @@ public class Examples {
       }
 
     });
-  }
-
-  public void services(ConsulClient consulClient, long lastIndex) {
-
-    ServiceOptions opts = new ServiceOptions()
-      .setId("serviceId")
-      .setName("serviceName")
-      .setTags(Arrays.asList("tag1", "tag2"))
-      .setCheckOptions(new CheckOptions().setTtl("10s"))
-      .setAddress("10.0.0.1")
-      .setPort(8080);
-
-    // Service registration
-
-    consulClient.registerService(opts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("Service successfully registered");
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    // Discovery registered service
-
-    consulClient.catalogServiceNodes("serviceName", res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("found " + res.result().getList().size() + " services");
-
-        System.out.println("consul state index: " + res.result().getIndex());
-
-        for (Service service : res.result().getList()) {
-
-          System.out.println("Service node: " + service.getNode());
-
-          System.out.println("Service address: " + service.getAddress());
-
-          System.out.println("Service port: " + service.getPort());
-
-        }
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    // Blocking request for nodes that provide given service, sorted by distance from agent
-
-    ServiceQueryOptions queryOpts = new ServiceQueryOptions()
-      .setNear("_agent")
-      .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
-
-    consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("found " + res.result().getList().size() + " services");
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    // Service deregistration
-
-    consulClient.deregisterService("serviceId", res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("Service successfully deregistered");
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
   }
 
   public void events(ConsulClient consulClient) {

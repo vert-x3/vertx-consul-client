@@ -174,20 +174,91 @@
  * {@link examples.KV#deleteValues}
  * ----
  *
+ * == Services
+ *
+ * One of the main goals of service discovery is to provide a catalog of available services.
+ * To that end, the agent provides a simple service definition format to declare the availability of a service
+ * and to potentially associate it with a health check.
+ *
+ * === Service registering
+ *
+ * A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#servicesOpts}
+ * ----
+ *
+ * `name`:: the name of service
+ * `id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+ * so if names might conflict then unique IDs should be provided.
+ * `tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+ * different versions, or any other service level labels.
+ * `address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+ * and this does not need to be provided.
+ * `port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+ * the address and port of a service can be discovered.
+ * `checks`:: associated health checks
+ *
+ * These options used to register service in catalog:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#register}
+ * ----
+ *
+ * === Service discovery
+ *
+ * Consul client allows to obtain actual list of the nodes providing a service
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#discovery}
+ * ----
+ *
+ * It is possible to obtain this list with the statuses of the associated health checks.
+ * The result can be filtered by check status.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#health}
+ * ----
+ *
+ * There are additional parameters for services queries
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#queryOpts}
+ * ----
+ *
+ * `tag`:: by default, all nodes matching the service are returned.
+ * The list can be filtered by tag using the `tag` query parameter
+ * `near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+ * based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+ * `blockingOptions`:: the blocking qyery options
+ *
+ * Then the request should look like
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#queryWithOptions}
+ * ----
+ *
+ * === Deregister service
+ *
+ * Service can be deregistered by its ID:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#deregister}
+ * ----
+ *
  * == Health Checks
  *
  * TBD
  * [source,$lang]
  * ----
  * {@link examples.Examples#tcpHealth}
- * ----
- *
- * == Services
- *
- * TBD
- * [source,$lang]
- * ----
- * {@link examples.Examples#services}
  * ----
  *
  * == Events

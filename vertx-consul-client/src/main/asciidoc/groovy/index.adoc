@@ -299,6 +299,164 @@ consulClient.deleteValues("prefix", { res ->
 
 ----
 
+== Services
+
+One of the main goals of service discovery is to provide a catalog of available services.
+To that end, the agent provides a simple service definition format to declare the availability of a service
+and to potentially associate it with a health check.
+
+=== Service registering
+
+A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+
+[source,groovy]
+----
+
+def opts = [
+  name:"serviceName",
+  id:"serviceId",
+  tags:["tag1", "tag2"],
+  checkOptions:[
+    ttl:"10s"
+  ],
+  address:"10.0.0.1",
+  port:8048
+]
+
+
+----
+
+`name`:: the name of service
+`id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+so if names might conflict then unique IDs should be provided.
+`tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+different versions, or any other service level labels.
+`address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+and this does not need to be provided.
+`port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+the address and port of a service can be discovered.
+`checks`:: associated health checks
+
+These options used to register service in catalog:
+
+[source,groovy]
+----
+
+consulClient.registerService(opts, { res ->
+  if (res.succeeded()) {
+    println("Service successfully registered")
+  } else {
+    res.cause().printStackTrace()
+  }
+
+})
+
+
+----
+
+=== Service discovery
+
+Consul client allows to obtain actual list of the nodes providing a service
+
+[source,groovy]
+----
+
+consulClient.catalogServiceNodes("serviceName", { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size()} services")
+    println("consul state index: ${res.result().index}")
+    res.result().list.each { service ->
+      println("Service node: ${service.node}")
+      println("Service address: ${service.address}")
+      println("Service port: ${service.port}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+It is possible to obtain this list with the statuses of the associated health checks.
+The result can be filtered by check status.
+
+[source,groovy]
+----
+
+consulClient.healthServiceNodes("serviceName", passingOnly, { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size()} services")
+    println("consul state index: ${res.result().index}")
+    res.result().list.each { entry ->
+      println("Service node: ${entry.node}")
+      println("Service address: ${entry.service.address}")
+      println("Service port: ${entry.service.port}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+There are additional parameters for services queries
+
+[source,groovy]
+----
+
+def queryOpts = [
+  tag:"tag1",
+  near:"_agent",
+  blockingOptions:[
+    index:lastIndex
+  ]
+]
+
+
+----
+
+`tag`:: by default, all nodes matching the service are returned.
+The list can be filtered by tag using the `tag` query parameter
+`near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+`blockingOptions`:: the blocking qyery options
+
+Then the request should look like
+
+[source,groovy]
+----
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size()} services")
+  } else {
+    res.cause().printStackTrace()
+  }
+
+})
+
+----
+
+=== Deregister service
+
+Service can be deregistered by its ID:
+
+[source,groovy]
+----
+
+consulClient.deregisterService("serviceId", { res ->
+  if (res.succeeded()) {
+    println("Service successfully deregistered")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
 == Health Checks
 
 TBD
@@ -335,109 +493,6 @@ consulClient.registerCheck(opts, { res ->
   }
 
 })
-
-----
-
-== Services
-
-TBD
-[source,groovy]
-----
-
-def opts = [
-  id:"serviceId",
-  name:"serviceName",
-  tags:["tag1", "tag2"],
-  checkOptions:[
-    ttl:"10s"
-  ],
-  address:"10.0.0.1",
-  port:8080
-]
-
-// Service registration
-
-consulClient.registerService(opts, { res ->
-
-  if (res.succeeded()) {
-
-    println("Service successfully registered")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Discovery registered service
-
-consulClient.catalogServiceNodes("serviceName", { res ->
-
-  if (res.succeeded()) {
-
-    println("found ${res.result().list.size()} services")
-
-    println("consul state index: ${res.result().index}")
-
-    res.result().list.each { service ->
-
-      println("Service node: ${service.node}")
-
-      println("Service address: ${service.address}")
-
-      println("Service port: ${service.port}")
-
-    }
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Blocking request for nodes that provide given service, sorted by distance from agent
-
-def queryOpts = [
-  near:"_agent",
-  blockingOptions:[
-    index:lastIndex
-  ]
-]
-
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
-
-  if (res.succeeded()) {
-
-    println("found ${res.result().list.size()} services")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Service deregistration
-
-consulClient.deregisterService("serviceId", { res ->
-
-  if (res.succeeded()) {
-
-    println("Service successfully deregistered")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
 
 ----
 
