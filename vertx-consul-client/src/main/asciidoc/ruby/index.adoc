@@ -91,72 +91,374 @@ opts = {
 
 ----
 
-=== Key/Value Store
+== Key/Value Store
+
+The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+The following endpoints are supported:
+
+* To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+* To manage updates or fetches of multiple keys inside a single, atomic transaction
+
+=== Get key-value pair from store
+
+Consul client can return the value for certain key
 
 [source,ruby]
 ----
 
-# put Key/Value pair to Consul Store
-consulClient.put_value("foo", "bar") { |res_err,res|
-
+consulClient.get_value("key") { |res_err,res|
   if (res_err == nil)
-
-    puts "result of the operation: #{(res ? "success" : "fail")}"
-
-  else
-
-    res_err.print_stack_trace()
-
-  end
-
-}
-
-#  get Key/Value pair from Consul Store
-consulClient.get_value("foo") { |res_err,res|
-
-  if (res_err == nil)
-
     puts "retrieved value: #{res['value']}"
-
     puts "modify index: #{res['modifyIndex']}"
-
   else
-
     res_err.print_stack_trace()
-
   end
-
 }
 
 
 ----
-The modify index can be used for blocking requests:
+
+...or it can return all key-value pairs with the given prefix
+
+[source,ruby]
+----
+
+consulClient.get_values("prefix") { |res_err,res|
+  if (res_err == nil)
+    puts "modify index: #{res['index']}"
+    res['list'].each do |kv|
+      puts "retrieved value: #{kv['value']}"
+    end
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+
+`createIndex`:: the internal index value that represents when the entry was created.
+`modifyIndex`:: the last index that modified this key
+`lockIndex`:: the number of times this key has successfully been acquired in a lock
+`key`:: the key
+`flags`:: the flags attached to this entry. Clients can choose to use this however makes
+sense for their application
+`value`:: the value
+`session`:: the session that owns the lock
+
+The modify index can be used for blocking queries:
 
 [source,ruby]
 ----
 
 opts = {
-  'index' => modifyIndex
+  'index' => modifyIndex,
+  'wait' => "1m"
 }
 
-consulClient.get_value_with_options("foo", opts) { |res_err,res|
-
+consulClient.get_value_with_options("key", opts) { |res_err,res|
   if (res_err == nil)
-
     puts "retrieved value: #{res['value']}"
-
+    puts "new modify index: #{res['modifyIndex']}"
   else
-
     res_err.print_stack_trace()
+  end
+}
 
+
+----
+
+=== Put key-value pair to store
+
+[source,ruby]
+----
+
+consulClient.put_value("key", "value") { |res_err,res|
+  if (res_err == nil)
+    opResult = res ? "success" : "fail"
+    puts "result of the operation: #{opResult}"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+Put request with options also accepted
+
+[source,ruby]
+----
+
+opts = {
+  'flags' => 42,
+  'casIndex' => modifyIndex,
+  'acquireSession' => "acquireSessionID",
+  'releaseSession' => "releaseSessionID"
+}
+
+consulClient.put_value_with_options("key", "value", opts) { |res_err,res|
+  if (res_err == nil)
+    opResult = res ? "success" : "fail"
+    puts "result of the operation: #{opResult}"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+The list of the query options that can be used with a `PUT` request:
+
+`flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+Clients can choose to use this however makes sense for their application.
+`casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+`acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+without having to give up the lock and reacquire it.
+`releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+the associated Session of the key. The key must be held by this session to be unlocked.
+
+=== Transactions
+
+When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+may be added in future versions of Consul to be mixed with key/value operations
+(see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+
+[source,ruby]
+----
+
+request = {
+  'operations' => [
+    {
+      'key' => "key1",
+      'value' => "value1",
+      'type' => "SET"
+    },
+    {
+      'key' => "key2",
+      'value' => "value2",
+      'type' => "SET"
+    }
+  ]
+}
+
+consulClient.transaction(request) { |res_err,res|
+  if (res_err == nil)
+    puts "succeeded results: #{res['results'].length}"
+    puts "errors: #{res['errors'].length}"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+----
+
+=== Delete key-value pair
+
+At last, Consul client allows to delete key-value pair from store:
+
+[source,ruby]
+----
+
+consulClient.delete_value("key") { |res_err,res|
+  if (res_err == nil)
+    puts "complete"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+...or all key-value pairs with corresponding key prefix
+
+[source,ruby]
+----
+
+consulClient.delete_values("prefix") { |res_err,res|
+  if (res_err == nil)
+    puts "complete"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+== Services
+
+One of the main goals of service discovery is to provide a catalog of available services.
+To that end, the agent provides a simple service definition format to declare the availability of a service
+and to potentially associate it with a health check.
+
+=== Service registering
+
+A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+
+[source,ruby]
+----
+
+opts = {
+  'name' => "serviceName",
+  'id' => "serviceId",
+  'tags' => ["tag1", "tag2"],
+  'checkOptions' => {
+    'ttl' => "10s"
+  },
+  'address' => "10.0.0.1",
+  'port' => 8048
+}
+
+
+----
+
+`name`:: the name of service
+`id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+so if names might conflict then unique IDs should be provided.
+`tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+different versions, or any other service level labels.
+`address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+and this does not need to be provided.
+`port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+the address and port of a service can be discovered.
+`checks`:: associated health checks
+
+These options used to register service in catalog:
+
+[source,ruby]
+----
+
+consulClient.register_service(opts) { |res_err,res|
+  if (res_err == nil)
+    puts "Service successfully registered"
+  else
+    res_err.print_stack_trace()
   end
 
 }
 
 
 ----
-=== Health Checks
 
+=== Service discovery
+
+Consul client allows to obtain actual list of the nodes providing a service
+
+[source,ruby]
+----
+
+consulClient.catalog_service_nodes("serviceName") { |res_err,res|
+  if (res_err == nil)
+    puts "found #{res['list'].length} services"
+    puts "consul state index: #{res['index']}"
+    res['list'].each do |service|
+      puts "Service node: #{service['node']}"
+      puts "Service address: #{service['address']}"
+      puts "Service port: #{service['port']}"
+    end
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+It is possible to obtain this list with the statuses of the associated health checks.
+The result can be filtered by check status.
+
+[source,ruby]
+----
+
+consulClient.health_service_nodes("serviceName", passingOnly) { |res_err,res|
+  if (res_err == nil)
+    puts "found #{res['list'].length} services"
+    puts "consul state index: #{res['index']}"
+    res['list'].each do |entry|
+      puts "Service node: #{entry['node']}"
+      puts "Service address: #{entry['service']['address']}"
+      puts "Service port: #{entry['service']['port']}"
+    end
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+There are additional parameters for services queries
+
+[source,ruby]
+----
+
+queryOpts = {
+  'tag' => "tag1",
+  'near' => "_agent",
+  'blockingOptions' => {
+    'index' => lastIndex
+  }
+}
+
+
+----
+
+`tag`:: by default, all nodes matching the service are returned.
+The list can be filtered by tag using the `tag` query parameter
+`near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+`blockingOptions`:: the blocking qyery options
+
+Then the request should look like
+
+[source,ruby]
+----
+
+consulClient.catalog_service_nodes_with_options("serviceName", queryOpts) { |res_err,res|
+  if (res_err == nil)
+    puts "found #{res['list'].length} services"
+  else
+    res_err.print_stack_trace()
+  end
+
+}
+
+----
+
+=== Deregister service
+
+Service can be deregistered by its ID:
+
+[source,ruby]
+----
+
+consulClient.deregister_service("serviceId") { |res_err,res|
+  if (res_err == nil)
+    puts "Service successfully deregistered"
+  else
+    res_err.print_stack_trace()
+  end
+}
+
+
+----
+
+== Health Checks
+
+TBD
 [source,ruby]
 ----
 
@@ -193,110 +495,9 @@ consulClient.register_check(opts) { |res_err,res|
 
 ----
 
-=== Services
+== Events
 
-[source,ruby]
-----
-
-opts = {
-  'id' => "serviceId",
-  'name' => "serviceName",
-  'tags' => ["tag1", "tag2"],
-  'checkOptions' => {
-    'ttl' => "10s"
-  },
-  'address' => "10.0.0.1",
-  'port' => 8080
-}
-
-# Service registration
-
-consulClient.register_service(opts) { |res_err,res|
-
-  if (res_err == nil)
-
-    puts "Service successfully registered"
-
-  else
-
-    res_err.print_stack_trace()
-
-  end
-
-}
-
-# Discovery registered service
-
-consulClient.catalog_service_nodes("serviceName") { |res_err,res|
-
-  if (res_err == nil)
-
-    puts "found #{res['list'].length} services"
-
-    puts "consul state index: #{res['index']}"
-
-    res['list'].each do |service|
-
-      puts "Service node: #{service['node']}"
-
-      puts "Service address: #{service['address']}"
-
-      puts "Service port: #{service['port']}"
-
-    end
-
-  else
-
-    res_err.print_stack_trace()
-
-  end
-
-}
-
-# Blocking request for nodes that provide given service, sorted by distance from agent
-
-queryOpts = {
-  'near' => "_agent",
-  'blockingOptions' => {
-    'index' => lastIndex
-  }
-}
-
-consulClient.catalog_service_nodes_with_options("serviceName", queryOpts) { |res_err,res|
-
-  if (res_err == nil)
-
-    puts "found #{res['list'].length} services"
-
-  else
-
-    res_err.print_stack_trace()
-
-  end
-
-}
-
-# Service deregistration
-
-consulClient.deregister_service("serviceId") { |res_err,res|
-
-  if (res_err == nil)
-
-    puts "Service successfully deregistered"
-
-  else
-
-    res_err.print_stack_trace()
-
-  end
-
-}
-
-
-----
-
-=== Events
-
+TBD
 [source,ruby]
 ----
 
@@ -350,8 +551,9 @@ consulClient.list_events() { |res_err,res|
 
 ----
 
-=== Sessions
+== Sessions
 
+TBD
 [source,ruby]
 ----
 
@@ -441,8 +643,9 @@ consulClient.destroy_session(sessionId) { |res_err,res|
 
 ----
 
-=== Nodes in cluster
+== Nodes in cluster
 
+TBD
 [source,ruby]
 ----
 

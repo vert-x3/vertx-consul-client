@@ -78,63 +78,312 @@ BlockingQueryOptions opts = new BlockingQueryOptions()
   .setWait("1m");
 ----
 
-=== Key/Value Store
+== Key/Value Store
+
+The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+The following endpoints are supported:
+
+* To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+* To manage updates or fetches of multiple keys inside a single, atomic transaction
+
+=== Get key-value pair from store
+
+Consul client can return the value for certain key
 
 [source,java]
 ----
-consulClient.putValue("foo", "bar", res -> {
-
+consulClient.getValue("key", res -> {
   if (res.succeeded()) {
-
-    System.out.println("result of the operation: " + (res.result() ? "success" : "fail"));
-
-  } else {
-
-    res.cause().printStackTrace();
-
-  }
-
-});
-
-//  get Key/Value pair from Consul Store
-consulClient.getValue("foo", res -> {
-
-  if (res.succeeded()) {
-
     System.out.println("retrieved value: " + res.result().getValue());
-
     System.out.println("modify index: " + res.result().getModifyIndex());
-
   } else {
-
     res.cause().printStackTrace();
-
   }
-
 });
 ----
-The modify index can be used for blocking requests:
+
+...or it can return all key-value pairs with the given prefix
 
 [source,java]
 ----
-BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(modifyIndex);
-
-consulClient.getValueWithOptions("foo", opts, res -> {
-
+consulClient.getValues("prefix", res -> {
   if (res.succeeded()) {
-
-    System.out.println("retrieved value: " + res.result().getValue());
-
+    System.out.println("modify index: " + res.result().getIndex());
+    for (KeyValue kv : res.result().getList()) {
+      System.out.println("retrieved value: " + kv.getValue());
+    }
   } else {
-
     res.cause().printStackTrace();
+  }
+});
+----
 
+The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+
+`createIndex`:: the internal index value that represents when the entry was created.
+`modifyIndex`:: the last index that modified this key
+`lockIndex`:: the number of times this key has successfully been acquired in a lock
+`key`:: the key
+`flags`:: the flags attached to this entry. Clients can choose to use this however makes
+sense for their application
+`value`:: the value
+`session`:: the session that owns the lock
+
+The modify index can be used for blocking queries:
+
+[source,java]
+----
+BlockingQueryOptions opts = new BlockingQueryOptions()
+  .setIndex(modifyIndex)
+  .setWait("1m");
+
+consulClient.getValueWithOptions("key", opts, res -> {
+  if (res.succeeded()) {
+    System.out.println("retrieved value: " + res.result().getValue());
+    System.out.println("new modify index: " + res.result().getModifyIndex());
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+=== Put key-value pair to store
+
+[source,java]
+----
+consulClient.putValue("key", "value", res -> {
+  if (res.succeeded()) {
+    String opResult = res.result() ? "success" : "fail";
+    System.out.println("result of the operation: " + opResult);
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+Put request with options also accepted
+
+[source,java]
+----
+KeyValueOptions opts = new KeyValueOptions()
+  .setFlags(42)
+  .setCasIndex(modifyIndex)
+  .setAcquireSession("acquireSessionID")
+  .setReleaseSession("releaseSessionID");
+
+consulClient.putValueWithOptions("key", "value", opts, res -> {
+  if (res.succeeded()) {
+    String opResult = res.result() ? "success" : "fail";
+    System.out.println("result of the operation: " + opResult);
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+The list of the query options that can be used with a `PUT` request:
+
+`flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+Clients can choose to use this however makes sense for their application.
+`casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+`acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+without having to give up the lock and reacquire it.
+`releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+the associated Session of the key. The key must be held by this session to be unlocked.
+
+=== Transactions
+
+When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+may be added in future versions of Consul to be mixed with key/value operations
+(see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+
+[source,java]
+----
+TxnRequest request = new TxnRequest()
+  .addOperation(new TxnKVOperation().setKey("key1").setValue("value1").setType(TxnKVVerb.SET))
+  .addOperation(new TxnKVOperation().setKey("key2").setValue("value2").setType(TxnKVVerb.SET));
+
+consulClient.transaction(request, res -> {
+  if (res.succeeded()) {
+    System.out.println("succeeded results: " + res.result().getResults().size());
+    System.out.println("errors: " + res.result().getErrors().size());
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+=== Delete key-value pair
+
+At last, Consul client allows to delete key-value pair from store:
+
+[source,java]
+----
+consulClient.deleteValue("key", res -> {
+  if (res.succeeded()) {
+    System.out.println("complete");
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+...or all key-value pairs with corresponding key prefix
+
+[source,java]
+----
+consulClient.deleteValues("prefix", res -> {
+  if (res.succeeded()) {
+    System.out.println("complete");
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+== Services
+
+One of the main goals of service discovery is to provide a catalog of available services.
+To that end, the agent provides a simple service definition format to declare the availability of a service
+and to potentially associate it with a health check.
+
+=== Service registering
+
+A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+
+[source,java]
+----
+ServiceOptions opts = new ServiceOptions()
+  .setName("serviceName")
+  .setId("serviceId")
+  .setTags(Arrays.asList("tag1", "tag2"))
+  .setCheckOptions(new CheckOptions().setTtl("10s"))
+  .setAddress("10.0.0.1")
+  .setPort(8048);
+----
+
+`name`:: the name of service
+`id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+so if names might conflict then unique IDs should be provided.
+`tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+different versions, or any other service level labels.
+`address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+and this does not need to be provided.
+`port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+the address and port of a service can be discovered.
+`checks`:: associated health checks
+
+These options used to register service in catalog:
+
+[source,java]
+----
+consulClient.registerService(opts, res -> {
+  if (res.succeeded()) {
+    System.out.println("Service successfully registered");
+  } else {
+    res.cause().printStackTrace();
   }
 
 });
 ----
-=== Health Checks
 
+=== Service discovery
+
+Consul client allows to obtain actual list of the nodes providing a service
+
+[source,java]
+----
+consulClient.catalogServiceNodes("serviceName", res -> {
+  if (res.succeeded()) {
+    System.out.println("found " + res.result().getList().size() + " services");
+    System.out.println("consul state index: " + res.result().getIndex());
+    for (Service service : res.result().getList()) {
+      System.out.println("Service node: " + service.getNode());
+      System.out.println("Service address: " + service.getAddress());
+      System.out.println("Service port: " + service.getPort());
+    }
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+It is possible to obtain this list with the statuses of the associated health checks.
+The result can be filtered by check status.
+
+[source,java]
+----
+consulClient.healthServiceNodes("serviceName", passingOnly, res -> {
+  if (res.succeeded()) {
+    System.out.println("found " + res.result().getList().size() + " services");
+    System.out.println("consul state index: " + res.result().getIndex());
+    for (ServiceEntry entry : res.result().getList()) {
+      System.out.println("Service node: " + entry.getNode());
+      System.out.println("Service address: " + entry.getService().getAddress());
+      System.out.println("Service port: " + entry.getService().getPort());
+    }
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+There are additional parameters for services queries
+
+[source,java]
+----
+ServiceQueryOptions queryOpts = new ServiceQueryOptions()
+  .setTag("tag1")
+  .setNear("_agent")
+  .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
+----
+
+`tag`:: by default, all nodes matching the service are returned.
+The list can be filtered by tag using the `tag` query parameter
+`near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+`blockingOptions`:: the blocking qyery options
+
+Then the request should look like
+
+[source,java]
+----
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
+  if (res.succeeded()) {
+    System.out.println("found " + res.result().getList().size() + " services");
+  } else {
+    res.cause().printStackTrace();
+  }
+
+});
+----
+
+=== Deregister service
+
+Service can be deregistered by its ID:
+
+[source,java]
+----
+consulClient.deregisterService("serviceId", res -> {
+  if (res.succeeded()) {
+    System.out.println("Service successfully deregistered");
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+== Health Checks
+
+TBD
 [source,java]
 ----
 Handler<HttpServerRequest> alwaysGood = h -> h.response()
@@ -172,101 +421,9 @@ consulClient.registerCheck(opts, res -> {
 });
 ----
 
-=== Services
+== Events
 
-[source,java]
-----
-ServiceOptions opts = new ServiceOptions()
-  .setId("serviceId")
-  .setName("serviceName")
-  .setTags(Arrays.asList("tag1", "tag2"))
-  .setCheckOptions(new CheckOptions().setTtl("10s"))
-  .setAddress("10.0.0.1")
-  .setPort(8080);
-
-// Service registration
-
-consulClient.registerService(opts, res -> {
-
-  if (res.succeeded()) {
-
-    System.out.println("Service successfully registered");
-
-  } else {
-
-    res.cause().printStackTrace();
-
-  }
-
-});
-
-// Discovery registered service
-
-consulClient.catalogServiceNodes("serviceName", res -> {
-
-  if (res.succeeded()) {
-
-    System.out.println("found " + res.result().getList().size() + " services");
-
-    System.out.println("consul state index: " + res.result().getIndex());
-
-    for (Service service : res.result().getList()) {
-
-      System.out.println("Service node: " + service.getNode());
-
-      System.out.println("Service address: " + service.getAddress());
-
-      System.out.println("Service port: " + service.getPort());
-
-    }
-
-  } else {
-
-    res.cause().printStackTrace();
-
-  }
-
-});
-
-// Blocking request for nodes that provide given service, sorted by distance from agent
-
-ServiceQueryOptions queryOpts = new ServiceQueryOptions()
-  .setNear("_agent")
-  .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
-
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
-
-  if (res.succeeded()) {
-
-    System.out.println("found " + res.result().getList().size() + " services");
-
-  } else {
-
-    res.cause().printStackTrace();
-
-  }
-
-});
-
-// Service deregistration
-
-consulClient.deregisterService("serviceId", res -> {
-
-  if (res.succeeded()) {
-
-    System.out.println("Service successfully deregistered");
-
-  } else {
-
-    res.cause().printStackTrace();
-
-  }
-
-});
-----
-
-=== Events
-
+TBD
 [source,java]
 ----
 EventOptions opts = new EventOptions()
@@ -316,8 +473,9 @@ consulClient.listEvents(res -> {
 });
 ----
 
-=== Sessions
+== Sessions
 
+TBD
 [source,java]
 ----
 SessionOptions opts = new SessionOptions()
@@ -402,8 +560,9 @@ consulClient.destroySession(sessionId, res -> {
 });
 ----
 
-=== Nodes in cluster
+== Nodes in cluster
 
+TBD
 [source,java]
 ----
 consulClient.catalogNodes(res -> {

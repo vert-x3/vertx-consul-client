@@ -91,72 +91,374 @@ var opts = {
 
 ----
 
-=== Key/Value Store
+== Key/Value Store
+
+The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+The following endpoints are supported:
+
+* To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+* To manage updates or fetches of multiple keys inside a single, atomic transaction
+
+=== Get key-value pair from store
+
+Consul client can return the value for certain key
 
 [source,js]
 ----
 
-// put Key/Value pair to Consul Store
-consulClient.putValue("foo", "bar", function (res, res_err) {
-
+consulClient.getValue("key", function (res, res_err) {
   if (res_err == null) {
-
-    console.log("result of the operation: " + (res ? "success" : "fail"));
-
-  } else {
-
-    res_err.printStackTrace();
-
-  }
-
-});
-
-//  get Key/Value pair from Consul Store
-consulClient.getValue("foo", function (res, res_err) {
-
-  if (res_err == null) {
-
     console.log("retrieved value: " + res.value);
-
     console.log("modify index: " + res.modifyIndex);
-
   } else {
-
     res_err.printStackTrace();
-
   }
-
 });
 
 
 ----
-The modify index can be used for blocking requests:
+
+...or it can return all key-value pairs with the given prefix
+
+[source,js]
+----
+
+consulClient.getValues("prefix", function (res, res_err) {
+  if (res_err == null) {
+    console.log("modify index: " + res.index);
+    Array.prototype.forEach.call(res.list, function(kv) {
+      console.log("retrieved value: " + kv.value);
+    });
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+
+`createIndex`:: the internal index value that represents when the entry was created.
+`modifyIndex`:: the last index that modified this key
+`lockIndex`:: the number of times this key has successfully been acquired in a lock
+`key`:: the key
+`flags`:: the flags attached to this entry. Clients can choose to use this however makes
+sense for their application
+`value`:: the value
+`session`:: the session that owns the lock
+
+The modify index can be used for blocking queries:
 
 [source,js]
 ----
 
 var opts = {
-  "index" : modifyIndex
+  "index" : modifyIndex,
+  "wait" : "1m"
 };
 
-consulClient.getValueWithOptions("foo", opts, function (res, res_err) {
-
+consulClient.getValueWithOptions("key", opts, function (res, res_err) {
   if (res_err == null) {
-
     console.log("retrieved value: " + res.value);
-
+    console.log("new modify index: " + res.modifyIndex);
   } else {
-
     res_err.printStackTrace();
+  }
+});
 
+
+----
+
+=== Put key-value pair to store
+
+[source,js]
+----
+
+consulClient.putValue("key", "value", function (res, res_err) {
+  if (res_err == null) {
+    var opResult = res ? "success" : "fail";
+    console.log("result of the operation: " + opResult);
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+Put request with options also accepted
+
+[source,js]
+----
+
+var opts = {
+  "flags" : 42,
+  "casIndex" : modifyIndex,
+  "acquireSession" : "acquireSessionID",
+  "releaseSession" : "releaseSessionID"
+};
+
+consulClient.putValueWithOptions("key", "value", opts, function (res, res_err) {
+  if (res_err == null) {
+    var opResult = res ? "success" : "fail";
+    console.log("result of the operation: " + opResult);
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+The list of the query options that can be used with a `PUT` request:
+
+`flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+Clients can choose to use this however makes sense for their application.
+`casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+`acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+without having to give up the lock and reacquire it.
+`releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+the associated Session of the key. The key must be held by this session to be unlocked.
+
+=== Transactions
+
+When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+may be added in future versions of Consul to be mixed with key/value operations
+(see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+
+[source,js]
+----
+
+var request = {
+  "operations" : [
+    {
+      "key" : "key1",
+      "value" : "value1",
+      "type" : "SET"
+    },
+    {
+      "key" : "key2",
+      "value" : "value2",
+      "type" : "SET"
+    }
+  ]
+};
+
+consulClient.transaction(request, function (res, res_err) {
+  if (res_err == null) {
+    console.log("succeeded results: " + res.results.length);
+    console.log("errors: " + res.errors.length);
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+----
+
+=== Delete key-value pair
+
+At last, Consul client allows to delete key-value pair from store:
+
+[source,js]
+----
+
+consulClient.deleteValue("key", function (res, res_err) {
+  if (res_err == null) {
+    console.log("complete");
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+...or all key-value pairs with corresponding key prefix
+
+[source,js]
+----
+
+consulClient.deleteValues("prefix", function (res, res_err) {
+  if (res_err == null) {
+    console.log("complete");
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+== Services
+
+One of the main goals of service discovery is to provide a catalog of available services.
+To that end, the agent provides a simple service definition format to declare the availability of a service
+and to potentially associate it with a health check.
+
+=== Service registering
+
+A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+
+[source,js]
+----
+
+var opts = {
+  "name" : "serviceName",
+  "id" : "serviceId",
+  "tags" : ["tag1", "tag2"],
+  "checkOptions" : {
+    "ttl" : "10s"
+  },
+  "address" : "10.0.0.1",
+  "port" : 8048
+};
+
+
+----
+
+`name`:: the name of service
+`id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+so if names might conflict then unique IDs should be provided.
+`tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+different versions, or any other service level labels.
+`address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+and this does not need to be provided.
+`port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+the address and port of a service can be discovered.
+`checks`:: associated health checks
+
+These options used to register service in catalog:
+
+[source,js]
+----
+
+consulClient.registerService(opts, function (res, res_err) {
+  if (res_err == null) {
+    console.log("Service successfully registered");
+  } else {
+    res_err.printStackTrace();
   }
 
 });
 
 
 ----
-=== Health Checks
 
+=== Service discovery
+
+Consul client allows to obtain actual list of the nodes providing a service
+
+[source,js]
+----
+
+consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
+  if (res_err == null) {
+    console.log("found " + res.list.length + " services");
+    console.log("consul state index: " + res.index);
+    Array.prototype.forEach.call(res.list, function(service) {
+      console.log("Service node: " + service.node);
+      console.log("Service address: " + service.address);
+      console.log("Service port: " + service.port);
+    });
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+It is possible to obtain this list with the statuses of the associated health checks.
+The result can be filtered by check status.
+
+[source,js]
+----
+
+consulClient.healthServiceNodes("serviceName", passingOnly, function (res, res_err) {
+  if (res_err == null) {
+    console.log("found " + res.list.length + " services");
+    console.log("consul state index: " + res.index);
+    Array.prototype.forEach.call(res.list, function(entry) {
+      console.log("Service node: " + entry.node);
+      console.log("Service address: " + entry.service.address);
+      console.log("Service port: " + entry.service.port);
+    });
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+There are additional parameters for services queries
+
+[source,js]
+----
+
+var queryOpts = {
+  "tag" : "tag1",
+  "near" : "_agent",
+  "blockingOptions" : {
+    "index" : lastIndex
+  }
+};
+
+
+----
+
+`tag`:: by default, all nodes matching the service are returned.
+The list can be filtered by tag using the `tag` query parameter
+`near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+`blockingOptions`:: the blocking qyery options
+
+Then the request should look like
+
+[source,js]
+----
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, function (res, res_err) {
+  if (res_err == null) {
+    console.log("found " + res.list.length + " services");
+  } else {
+    res_err.printStackTrace();
+  }
+
+});
+
+----
+
+=== Deregister service
+
+Service can be deregistered by its ID:
+
+[source,js]
+----
+
+consulClient.deregisterService("serviceId", function (res, res_err) {
+  if (res_err == null) {
+    console.log("Service successfully deregistered");
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+== Health Checks
+
+TBD
 [source,js]
 ----
 
@@ -193,110 +495,9 @@ consulClient.registerCheck(opts, function (res, res_err) {
 
 ----
 
-=== Services
+== Events
 
-[source,js]
-----
-
-var opts = {
-  "id" : "serviceId",
-  "name" : "serviceName",
-  "tags" : ["tag1", "tag2"],
-  "checkOptions" : {
-    "ttl" : "10s"
-  },
-  "address" : "10.0.0.1",
-  "port" : 8080
-};
-
-// Service registration
-
-consulClient.registerService(opts, function (res, res_err) {
-
-  if (res_err == null) {
-
-    console.log("Service successfully registered");
-
-  } else {
-
-    res_err.printStackTrace();
-
-  }
-
-});
-
-// Discovery registered service
-
-consulClient.catalogServiceNodes("serviceName", function (res, res_err) {
-
-  if (res_err == null) {
-
-    console.log("found " + res.list.length + " services");
-
-    console.log("consul state index: " + res.index);
-
-    Array.prototype.forEach.call(res.list, function(service) {
-
-      console.log("Service node: " + service.node);
-
-      console.log("Service address: " + service.address);
-
-      console.log("Service port: " + service.port);
-
-    });
-
-  } else {
-
-    res_err.printStackTrace();
-
-  }
-
-});
-
-// Blocking request for nodes that provide given service, sorted by distance from agent
-
-var queryOpts = {
-  "near" : "_agent",
-  "blockingOptions" : {
-    "index" : lastIndex
-  }
-};
-
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, function (res, res_err) {
-
-  if (res_err == null) {
-
-    console.log("found " + res.list.length + " services");
-
-  } else {
-
-    res_err.printStackTrace();
-
-  }
-
-});
-
-// Service deregistration
-
-consulClient.deregisterService("serviceId", function (res, res_err) {
-
-  if (res_err == null) {
-
-    console.log("Service successfully deregistered");
-
-  } else {
-
-    res_err.printStackTrace();
-
-  }
-
-});
-
-
-----
-
-=== Events
-
+TBD
 [source,js]
 ----
 
@@ -350,8 +551,9 @@ consulClient.listEvents(function (res, res_err) {
 
 ----
 
-=== Sessions
+== Sessions
 
+TBD
 [source,js]
 ----
 
@@ -441,8 +643,9 @@ consulClient.destroySession(sessionId, function (res, res_err) {
 
 ----
 
-=== Nodes in cluster
+== Nodes in cluster
 
+TBD
 [source,js]
 ----
 

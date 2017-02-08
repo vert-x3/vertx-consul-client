@@ -96,47 +96,66 @@ var opts = BlockingQueryOptions(
 
 ----
 
-=== Key/Value Store
+== Key/Value Store
+
+The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+The following endpoints are supported:
+
+* To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+* To manage updates or fetches of multiple keys inside a single, atomic transaction
+
+=== Get key-value pair from store
+
+Consul client can return the value for certain key
 
 [source,kotlin]
 ----
 
 
-// put Key/Value pair to Consul Store
-consulClient.putValue("foo", "bar", { res ->
-
+consulClient.getValue("key", { res ->
   if (res.succeeded()) {
-
-    println("result of the operation: ${(res.result() ? "success" : "fail")}")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-//  get Key/Value pair from Consul Store
-consulClient.getValue("foo", { res ->
-
-  if (res.succeeded()) {
-
     println("retrieved value: ${res.result().value}")
-
     println("modify index: ${res.result().modifyIndex}")
-
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
 
 
 ----
-The modify index can be used for blocking requests:
+
+...or it can return all key-value pairs with the given prefix
+
+[source,kotlin]
+----
+
+
+consulClient.getValues("prefix", { res ->
+  if (res.succeeded()) {
+    println("modify index: ${res.result().index}")
+    for (kv in res.result().list) {
+      println("retrieved value: ${kv.value}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+
+`createIndex`:: the internal index value that represents when the entry was created.
+`modifyIndex`:: the last index that modified this key
+`lockIndex`:: the number of times this key has successfully been acquired in a lock
+`key`:: the key
+`flags`:: the flags attached to this entry. Clients can choose to use this however makes
+sense for their application
+`value`:: the value
+`session`:: the session that owns the lock
+
+The modify index can be used for blocking queries:
 
 [source,kotlin]
 ----
@@ -145,26 +164,323 @@ import io.vertx.kotlin.ext.consul.*
 
 
 var opts = BlockingQueryOptions(
-  index = modifyIndex)
+  index = modifyIndex,
+  wait = "1m")
 
-consulClient.getValueWithOptions("foo", opts, { res ->
-
+consulClient.getValueWithOptions("key", opts, { res ->
   if (res.succeeded()) {
-
     println("retrieved value: ${res.result().value}")
-
+    println("new modify index: ${res.result().modifyIndex}")
   } else {
-
     res.cause().printStackTrace()
+  }
+})
 
+
+----
+
+=== Put key-value pair to store
+
+[source,kotlin]
+----
+
+
+consulClient.putValue("key", "value", { res ->
+  if (res.succeeded()) {
+    var opResult = res.result() ? "success" : "fail"
+    println("result of the operation: ${opResult}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+Put request with options also accepted
+
+[source,kotlin]
+----
+import io.vertx.ext.consul.KeyValueOptions
+import io.vertx.kotlin.ext.consul.*
+
+
+var opts = KeyValueOptions(
+  flags = 42,
+  casIndex = modifyIndex,
+  acquireSession = "acquireSessionID",
+  releaseSession = "releaseSessionID")
+
+consulClient.putValueWithOptions("key", "value", opts, { res ->
+  if (res.succeeded()) {
+    var opResult = res.result() ? "success" : "fail"
+    println("result of the operation: ${opResult}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+The list of the query options that can be used with a `PUT` request:
+
+`flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+Clients can choose to use this however makes sense for their application.
+`casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+`acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+without having to give up the lock and reacquire it.
+`releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+the associated Session of the key. The key must be held by this session to be unlocked.
+
+=== Transactions
+
+When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+may be added in future versions of Consul to be mixed with key/value operations
+(see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+
+[source,kotlin]
+----
+import io.vertx.ext.consul.TxnKVOperation
+import io.vertx.ext.consul.TxnKVVerb
+import io.vertx.ext.consul.TxnRequest
+import io.vertx.kotlin.ext.consul.*
+
+
+var request = TxnRequest(
+  operations = listOf(TxnKVOperation(
+    key = "key1",
+    value = "value1",
+    type = TxnKVVerb.SET), TxnKVOperation(
+    key = "key2",
+    value = "value2",
+    type = TxnKVVerb.SET)))
+
+consulClient.transaction(request, { res ->
+  if (res.succeeded()) {
+    println("succeeded results: ${res.result().results.size}")
+    println("errors: ${res.result().errors.size}")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+----
+
+=== Delete key-value pair
+
+At last, Consul client allows to delete key-value pair from store:
+
+[source,kotlin]
+----
+
+
+consulClient.deleteValue("key", { res ->
+  if (res.succeeded()) {
+    println("complete")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+...or all key-value pairs with corresponding key prefix
+
+[source,kotlin]
+----
+
+
+consulClient.deleteValues("prefix", { res ->
+  if (res.succeeded()) {
+    println("complete")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+== Services
+
+One of the main goals of service discovery is to provide a catalog of available services.
+To that end, the agent provides a simple service definition format to declare the availability of a service
+and to potentially associate it with a health check.
+
+=== Service registering
+
+A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+
+[source,kotlin]
+----
+import io.vertx.ext.consul.CheckOptions
+import io.vertx.ext.consul.ServiceOptions
+import io.vertx.kotlin.ext.consul.*
+
+
+var opts = ServiceOptions(
+  name = "serviceName",
+  id = "serviceId",
+  tags = listOf("tag1", "tag2"),
+  checkOptions = CheckOptions(
+    ttl = "10s"),
+  address = "10.0.0.1",
+  port = 8048)
+
+
+----
+
+`name`:: the name of service
+`id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+so if names might conflict then unique IDs should be provided.
+`tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+different versions, or any other service level labels.
+`address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+and this does not need to be provided.
+`port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+the address and port of a service can be discovered.
+`checks`:: associated health checks
+
+These options used to register service in catalog:
+
+[source,kotlin]
+----
+
+
+consulClient.registerService(opts, { res ->
+  if (res.succeeded()) {
+    println("Service successfully registered")
+  } else {
+    res.cause().printStackTrace()
   }
 
 })
 
 
 ----
-=== Health Checks
 
+=== Service discovery
+
+Consul client allows to obtain actual list of the nodes providing a service
+
+[source,kotlin]
+----
+
+
+consulClient.catalogServiceNodes("serviceName", { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size} services")
+    println("consul state index: ${res.result().index}")
+    for (service in res.result().list) {
+      println("Service node: ${service.node}")
+      println("Service address: ${service.address}")
+      println("Service port: ${service.port}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+It is possible to obtain this list with the statuses of the associated health checks.
+The result can be filtered by check status.
+
+[source,kotlin]
+----
+
+
+consulClient.healthServiceNodes("serviceName", passingOnly, { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size} services")
+    println("consul state index: ${res.result().index}")
+    for (entry in res.result().list) {
+      println("Service node: ${entry.node}")
+      println("Service address: ${entry.service.address}")
+      println("Service port: ${entry.service.port}")
+    }
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+There are additional parameters for services queries
+
+[source,kotlin]
+----
+import io.vertx.ext.consul.BlockingQueryOptions
+import io.vertx.ext.consul.ServiceQueryOptions
+import io.vertx.kotlin.ext.consul.*
+
+
+var queryOpts = ServiceQueryOptions(
+  tag = "tag1",
+  near = "_agent",
+  blockingOptions = BlockingQueryOptions(
+    index = lastIndex))
+
+
+----
+
+`tag`:: by default, all nodes matching the service are returned.
+The list can be filtered by tag using the `tag` query parameter
+`near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+`blockingOptions`:: the blocking qyery options
+
+Then the request should look like
+
+[source,kotlin]
+----
+
+
+consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
+  if (res.succeeded()) {
+    println("found ${res.result().list.size} services")
+  } else {
+    res.cause().printStackTrace()
+  }
+
+})
+
+----
+
+=== Deregister service
+
+Service can be deregistered by its ID:
+
+[source,kotlin]
+----
+
+
+consulClient.deregisterService("serviceId", { res ->
+  if (res.succeeded()) {
+    println("Service successfully deregistered")
+  } else {
+    res.cause().printStackTrace()
+  }
+})
+
+
+----
+
+== Health Checks
+
+TBD
 [source,kotlin]
 ----
 import io.vertx.ext.consul.CheckOptions
@@ -203,112 +519,9 @@ consulClient.registerCheck(opts, { res ->
 
 ----
 
-=== Services
+== Events
 
-[source,kotlin]
-----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.CheckOptions
-import io.vertx.ext.consul.ServiceOptions
-import io.vertx.ext.consul.ServiceQueryOptions
-import io.vertx.kotlin.ext.consul.*
-
-
-var opts = ServiceOptions(
-  id = "serviceId",
-  name = "serviceName",
-  tags = listOf("tag1", "tag2"),
-  checkOptions = CheckOptions(
-    ttl = "10s"),
-  address = "10.0.0.1",
-  port = 8080)
-
-// Service registration
-
-consulClient.registerService(opts, { res ->
-
-  if (res.succeeded()) {
-
-    println("Service successfully registered")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Discovery registered service
-
-consulClient.catalogServiceNodes("serviceName", { res ->
-
-  if (res.succeeded()) {
-
-    println("found ${res.result().list.size} services")
-
-    println("consul state index: ${res.result().index}")
-
-    for (service in res.result().list) {
-
-      println("Service node: ${service.node}")
-
-      println("Service address: ${service.address}")
-
-      println("Service port: ${service.port}")
-
-    }
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Blocking request for nodes that provide given service, sorted by distance from agent
-
-var queryOpts = ServiceQueryOptions(
-  near = "_agent",
-  blockingOptions = BlockingQueryOptions(
-    index = lastIndex))
-
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
-
-  if (res.succeeded()) {
-
-    println("found ${res.result().list.size} services")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-// Service deregistration
-
-consulClient.deregisterService("serviceId", { res ->
-
-  if (res.succeeded()) {
-
-    println("Service successfully deregistered")
-
-  } else {
-
-    res.cause().printStackTrace()
-
-  }
-
-})
-
-
-----
-
-=== Events
-
+TBD
 [source,kotlin]
 ----
 import io.vertx.ext.consul.EventOptions
@@ -364,8 +577,9 @@ consulClient.listEvents({ res ->
 
 ----
 
-=== Sessions
+== Sessions
 
+TBD
 [source,kotlin]
 ----
 import io.vertx.ext.consul.BlockingQueryOptions
@@ -458,8 +672,9 @@ consulClient.destroySession(sessionId, { res ->
 
 ----
 
-=== Nodes in cluster
+== Nodes in cluster
 
+TBD
 [source,kotlin]
 ----
 import io.vertx.ext.consul.BlockingQueryOptions

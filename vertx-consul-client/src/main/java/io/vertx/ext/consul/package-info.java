@@ -73,48 +73,213 @@
  * {@link examples.Examples#blockingOptions}
  * ----
  *
- * === Key/Value Store
+ * == Key/Value Store
+ *
+ * The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.
+ * The following endpoints are supported:
+ *
+ * * To manage updates of individual keys, deletes of individual keys or key prefixes, and fetches of individual keys or key prefixes
+ * * To manage updates or fetches of multiple keys inside a single, atomic transaction
+ *
+ * === Get key-value pair from store
+ *
+ * Consul client can return the value for certain key
  *
  * [source,$lang]
  * ----
- * {@link examples.Examples#kv}
+ * {@link examples.KV#getValue}
  * ----
- * The modify index can be used for blocking requests:
+ *
+ * ...or it can return all key-value pairs with the given prefix
  *
  * [source,$lang]
  * ----
- * {@link examples.Examples#kvBlocking}
+ * {@link examples.KV#getValues}
  * ----
- * === Health Checks
  *
+ * The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
+ *
+ * `createIndex`:: the internal index value that represents when the entry was created.
+ * `modifyIndex`:: the last index that modified this key
+ * `lockIndex`:: the number of times this key has successfully been acquired in a lock
+ * `key`:: the key
+ * `flags`:: the flags attached to this entry. Clients can choose to use this however makes
+ * sense for their application
+ * `value`:: the value
+ * `session`:: the session that owns the lock
+ *
+ * The modify index can be used for blocking queries:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#blocking}
+ * ----
+ *
+ * === Put key-value pair to store
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#put}
+ * ----
+ *
+ * Put request with options also accepted
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#putWithOptions}
+ * ----
+ *
+ * The list of the query options that can be used with a `PUT` request:
+ *
+ * `flags`:: This can be used to specify an unsigned value between `0` and `2^64^-1`.
+ * Clients can choose to use this however makes sense for their application.
+ * `casIndex`:: This flag is used to turn the PUT into a Check-And-Set operation. This is very useful as a building
+ * block for more complex synchronization primitives. If the index is `0`, Consul will only put the key if it does
+ * not already exist. If the index is non-zero, the key is only set if the index matches the ModifyIndex of that key.
+ * `acquireSession`:: This flag is used to turn the PUT into a lock acquisition operation. This is useful
+ * as it allows leader election to be built on top of Consul. If the lock is not held and the session is valid,
+ * this increments the LockIndex and sets the Session value of the key in addition to updating the key contents.
+ * A key does not need to exist to be acquired. If the lock is already held by the given session, then the LockIndex
+ * is not incremented but the key contents are updated. This lets the current lock holder update the key contents
+ * without having to give up the lock and reacquire it.
+ * `releaseSession`:: This flag is used to turn the PUT into a lock release operation. This is useful when paired
+ * with `acquireSession` as it allows clients to yield a lock. This will leave the LockIndex unmodified but will clear
+ * the associated Session of the key. The key must be held by this session to be unlocked.
+ *
+ * === Transactions
+ *
+ * When connected to Consul 0.7 and later, client allows to manage updates or fetches of multiple keys
+ * inside a single, atomic transaction. KV is the only available operation type, though other types of operations
+ * may be added in future versions of Consul to be mixed with key/value operations
+ * (see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#transaction}
+ * ----
+ *
+ * === Delete key-value pair
+ *
+ * At last, Consul client allows to delete key-value pair from store:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#deleteValue}
+ * ----
+ *
+ * ...or all key-value pairs with corresponding key prefix
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.KV#deleteValues}
+ * ----
+ *
+ * == Services
+ *
+ * One of the main goals of service discovery is to provide a catalog of available services.
+ * To that end, the agent provides a simple service definition format to declare the availability of a service
+ * and to potentially associate it with a health check.
+ *
+ * === Service registering
+ *
+ * A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#servicesOpts}
+ * ----
+ *
+ * `name`:: the name of service
+ * `id`:: the `id` is set to the `name` if not provided. It is required that all services have a unique ID per node,
+ * so if names might conflict then unique IDs should be provided.
+ * `tags`:: list of values that are opaque to Consul but can be used to distinguish between primary or secondary nodes,
+ * different versions, or any other service level labels.
+ * `address`:: used to specify a service-specific IP address. By default, the IP address of the agent is used,
+ * and this does not need to be provided.
+ * `port`:: used as well to make a service-oriented architecture simpler to configure; this way,
+ * the address and port of a service can be discovered.
+ * `checks`:: associated health checks
+ *
+ * These options used to register service in catalog:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#register}
+ * ----
+ *
+ * === Service discovery
+ *
+ * Consul client allows to obtain actual list of the nodes providing a service
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#discovery}
+ * ----
+ *
+ * It is possible to obtain this list with the statuses of the associated health checks.
+ * The result can be filtered by check status.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#health}
+ * ----
+ *
+ * There are additional parameters for services queries
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#queryOpts}
+ * ----
+ *
+ * `tag`:: by default, all nodes matching the service are returned.
+ * The list can be filtered by tag using the `tag` query parameter
+ * `near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
+ * based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
+ * `blockingOptions`:: the blocking qyery options
+ *
+ * Then the request should look like
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#queryWithOptions}
+ * ----
+ *
+ * === Deregister service
+ *
+ * Service can be deregistered by its ID:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Services#deregister}
+ * ----
+ *
+ * == Health Checks
+ *
+ * TBD
  * [source,$lang]
  * ----
  * {@link examples.Examples#tcpHealth}
  * ----
  *
- * === Services
+ * == Events
  *
- * [source,$lang]
- * ----
- * {@link examples.Examples#services}
- * ----
- *
- * === Events
- *
+ * TBD
  * [source,$lang]
  * ----
  * {@link examples.Examples#events}
  * ----
  *
- * === Sessions
+ * == Sessions
  *
+ * TBD
  * [source,$lang]
  * ----
  * {@link examples.Examples#sessions}
  * ----
  *
- * === Nodes in cluster
+ * == Nodes in cluster
  *
+ * TBD
  * [source,$lang]
  * ----
  * {@link examples.Examples#nodes}
