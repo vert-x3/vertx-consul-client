@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.sleep;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -52,33 +51,32 @@ public class Coordinates extends ConsulTestBase {
     Coordinate coordinate = nodes1.getList().get(0);
     assertEquals(coordinate.getNode(), nodeName);
 
-    BlockingQueryOptions blockingQueryOptions1 = new BlockingQueryOptions().setIndex(nodes1.getIndex());
-    CountDownLatch latch1 = new CountDownLatch(1);
-    readClient.coordinateNodesWithOptions(blockingQueryOptions1, h -> {
-      // with first update we can obtain changed coordinates only, without second node
-      assertTrue(h.result().getIndex() > blockingQueryOptions1.getIndex());
-      latch1.countDown();
+    CountDownLatch latch = new CountDownLatch(1);
+
+    waitBlockingQuery(latch, 10, nodes1.getIndex(), (idx, fut) -> {
+      BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(idx);
+      readClient.coordinateNodesWithOptions(opts, h -> {
+        boolean success = h.result().getList().size() == 2;
+        waitComplete(vertx, fut, h.result().getIndex(), success);
+      });
     });
+
     sleep(vertx, 2000);
     ConsulProcess attached = attachConsul("new_node");
-    latch1.await(2, TimeUnit.MINUTES);
-    assertEquals(latch1.getCount(), 0);
-
-    // wait until the second consul will attached
-    assertTrue(waitPeers(2));
+    latch.await(2, TimeUnit.MINUTES);
+    assertEquals(latch.getCount(), 0);
 
     attached.close();
 
     // wait until the second consul will leave
-    assertTrue(waitPeers(1));
+    assertTrue(waitPeers());
   }
 
-  private boolean waitPeers(int expected) {
+  private boolean waitPeers() {
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
       List<String> peers = getAsync(h -> readClient.peersStatus(h));
-      if (peers.size() == expected) {
-        System.out.println("Number of peers: " + expected);
+      if (peers.size() == 1) {
         return true;
       }
       sleep(vertx, 1000);

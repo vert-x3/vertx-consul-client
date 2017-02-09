@@ -91,6 +91,9 @@ opts = {
 
 ----
 
+A critical note is that the return of a blocking request is *no guarantee* of a change.
+It is possible that the timeout was reached or that there was an idempotent write that does not affect the result of the query.
+
 == Key/Value Store
 
 The KV endpoints are used to access Consul's simple key/value store, useful for storing service configuration or other metadata.

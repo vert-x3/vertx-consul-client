@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,49 @@ public class Utils {
     final InputStream is = Utils.class.getClassLoader().getResourceAsStream(fileName);
     try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
       return buffer.lines().collect(Collectors.joining("\n"));
+    }
+  }
+
+  /**
+   * A critical note is that the return of a blocking request is no guarantee of a change.
+   * It is possible that the timeout was reached or that there was an idempotent write that does not affect
+   * the result of the query.
+   *
+   * @param latch will be count down if success
+   * @param maxAttempts maxinum attemps number
+   * @param startIndex consul index
+   * @param runner blocking query parameters consumer. First parameter is consul index,
+   *               second one is the future to collect next consul index for next try if query will be unsuccessful
+   */
+  public static void waitBlockingQuery(CountDownLatch latch, int maxAttempts, long startIndex, BiConsumer<Long, Future<Long>> runner) {
+    if (maxAttempts > 0) {
+      Future<Long> future = Future.future();
+      runner.accept(startIndex, future);
+      future.setHandler(h -> {
+        if (h.succeeded()) {
+          long nextIndex = h.result();
+          if (nextIndex >= 0) {
+            int att = maxAttempts - 1;
+            System.out.println("... rounds left: " + att);
+            waitBlockingQuery(latch, att, nextIndex, runner);
+          } else {
+            latch.countDown();
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Completes future with next consul index in case of unsuccessful result, -1 else.
+   * See {@link #waitBlockingQuery(CountDownLatch, int, long, BiConsumer)}
+   */
+  public static void waitComplete(Vertx vertx, Future<Long> fut, long idx, boolean result) {
+    if (result) {
+      fut.complete(-1L);
+    } else {
+      sleep(vertx, 1000);
+      fut.complete(idx);
     }
   }
 

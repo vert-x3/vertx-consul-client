@@ -106,17 +106,14 @@ public class Services extends ChecksBase {
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
     assertTrue(ids.contains("id1"));
     assertTrue(ids.contains("id2"));
-    CountDownLatch latch = new CountDownLatch(2);
-    readClient.healthServiceNodesWithOptions("service", true, new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
-      assertEquals(h.result().getList().size(), 1);
-      latch.countDown();
-    });
-    readClient.healthServiceNodesWithOptions("service", false, new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
-      assertEquals(h.result().getList().size(), 2);
-      latch.countDown();
+    CountDownLatch latch = new CountDownLatch(1);
+    waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
+      readClient.healthServiceNodesWithOptions("service", true, new BlockingQueryOptions().setIndex(idx), h -> {
+        waitComplete(vertx, fut, h.result().getIndex(), h.result().getList().size() == 1);
+      });
     });
     sleep(vertx, 2000);
-    assertEquals(latch.getCount(), 2);
+    assertEquals(latch.getCount(), 1);
     runAsync(h -> writeClient.failCheck("service:id1", h));
     awaitLatch(latch);
     runAsync(h -> writeClient.deregisterService("id1", h));
@@ -189,11 +186,12 @@ public class Services extends ChecksBase {
     ServiceList list1 = getAsync(runner);
     list1.getList().forEach(s -> System.out.println("--- " + s.toJson().encode()));
     CountDownLatch latch = new CountDownLatch(1);
-    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
-      h.result().getList().forEach(s -> System.out.println("-+- " + s.toJson().encode()));
-      List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
-      assertTrue(names.contains("service2"));
-      latch.countDown();
+    waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
+      request.accept(new BlockingQueryOptions().setIndex(idx), h -> {
+        h.result().getList().forEach(s -> System.out.println("-+- " + s.toJson().encode()));
+        List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
+        waitComplete(vertx, fut, h.result().getIndex(), names.contains("service2"));
+      });
     });
     sleep(vertx, 4000);
     assertEquals(latch.getCount(), 1);
