@@ -52,6 +52,7 @@
             Import-Package: \
               groovy.lang.*;resolution:=optional,\
               org.codehaus.groovy.*;resolution:=optional,\
+              kotlin.*;resolution:=optional,\
               io.vertx.groovy.*;resolution:=optional,\
               io.vertx.lang.groovy.*;resolution:=optional,\
               io.vertx.codegen.annotations;resolution:=optional,\
