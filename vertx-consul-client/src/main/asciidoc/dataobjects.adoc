@@ -112,6 +112,16 @@ Set the status of check
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[deregisterAfter]]`deregisterAfter`|`String`|
++++
+Set deregister timeout. This is optional field, which is a timeout in the same time format as Interval and TTL.
+ If a check is associated with a service and has the critical state for more than this configured value,
+ then its associated service (and all of its associated checks) will automatically be deregistered.
+ The minimum timeout is 1 minute, and the process that reaps critical services runs every 30 seconds,
+ so it may take slightly longer than the configured timeout to trigger the deregistration.
+ This should generally be configured with a timeout that's much, much longer than any expected recoverable outage
+ for the given service.
++++
 |[[http]]`http`|`String`|
 +++
 Set HTTP address to check. Also you should set checking interval

@@ -94,6 +94,35 @@ public class Services extends ChecksBase {
   }
 
   @Test
+  public void deregisterAfter() {
+    if (System.getProperty("skipDeregisterAfter") != null) {
+      System.out.println("skip");
+      return;
+    }
+    CheckOptions opts = new CheckOptions()
+      .setDeregisterAfter("1m")
+      .setStatus(CheckStatus.PASSING)
+      .setTtl("10s")
+      .setName("checkName");
+    String checkId = createCheck(opts);
+
+    Check check;
+
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.PASSING, check.getStatus());
+
+    sleep(vertx, 30000);
+
+    check = getCheckInfo(checkId);
+    assertEquals(CheckStatus.CRITICAL, check.getStatus());
+
+    sleep(vertx, 90000);
+
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    assertEquals(checks.stream().filter(c -> c.getName().equals("checkName")).count(), 0);
+  }
+
+  @Test
   public void healthServices() throws InterruptedException {
     runAsync(h -> writeClient.registerService(new ServiceOptions()
       .setName("service").setId("id1")

@@ -386,41 +386,51 @@ consulClient.deregisterService("serviceId", res -> {
 
 == Health Checks
 
-TBD
+One of the primary roles of the agent is management of system-level and application-level health checks.
+A health check is considered to be application-level if it is associated with a service.
+If not associated with a service, the check monitors the health of the entire node.
+
 [source,java]
 ----
-Handler<HttpServerRequest> alwaysGood = h -> h.response()
+CheckOptions opts = new CheckOptions()
+  .setTcp("localhost:4848")
+  .setInterval("1s");
+----
 
-  .setStatusCode(200)
+The list of check options that supported by Consul client is:
 
-  .end();
+`id`:: the check ID
+`name`:: check name
+`script`:: local path to checking script. Also you should set checking interval
+`http`:: HTTP address to check. Also you should set checking interval
+`ttl`:: Time to Live of check
+`tcp`:: TCP address to check. Also you should set checking interval
+`interval`:: checking interval in Go's time format which is sequence of decimal numbers,
+each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
+`notes`:: the check notes
+`serviceId`:: the service ID to associate the registered check with an existing service provided by the agent.
+`deregisterAfter`:: deregister timeout. This is optional field, which is a timeout in the same time format as Interval and TTL.
+If a check is associated with a service and has the critical state for more than this configured value,
+then its associated service (and all of its associated checks) will automatically be deregistered.
+The minimum timeout is 1 minute, and the process that reaps critical services runs every 30 seconds,
+so it may take slightly longer than the configured timeout to trigger the deregistration.
+This should generally be configured with a timeout that's much, much longer than any expected recoverable outage
+for the given service.
+`status`:: the check status to specify the initial state of the health check
 
-// create HTTP server to responce health check
+The `Name` field is mandatory, as is one of `Script`, `HTTP`, `TCP` or `TTL`. `Script`, `TCP` and `HTTP`
+also require that `Interval` be set. If an `ID` is not provided, it is set to `Name`.
+You cannot have duplicate ID entries per agent, so it may be necessary to provide an ID.
 
-vertx.createHttpServer()
-
-  .requestHandler(alwaysGood)
-
-  .listen(4848);
-
-// check health via TCP port every 1 sec
-
-CheckOptions opts = new CheckOptions().setTcp("localhost:4848").setInterval("1s");
-
-// register TCP check
-
+[source,java]
+----
 consulClient.registerCheck(opts, res -> {
-
   if (res.succeeded()) {
-
     System.out.println("check successfully registered");
-
   } else {
-
     res.cause().printStackTrace();
-
   }
-
 });
 ----
 

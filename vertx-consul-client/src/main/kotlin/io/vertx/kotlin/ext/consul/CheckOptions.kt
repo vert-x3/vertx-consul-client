@@ -8,6 +8,7 @@ import io.vertx.ext.consul.CheckStatus
  *
  * Options used to register checks in Consul.
  *
+ * @param deregisterAfter  Set deregister timeout. This is optional field, which is a timeout in the same time format as Interval and TTL. If a check is associated with a service and has the critical state for more than this configured value, then its associated service (and all of its associated checks) will automatically be deregistered. The minimum timeout is 1 minute, and the process that reaps critical services runs every 30 seconds, so it may take slightly longer than the configured timeout to trigger the deregistration. This should generally be configured with a timeout that's much, much longer than any expected recoverable outage for the given service.
  * @param http  Set HTTP address to check. Also you should set checking interval
  * @param id  Set check ID
  * @param interval  Set checking interval
@@ -23,6 +24,7 @@ import io.vertx.ext.consul.CheckStatus
  * NOTE: This function has been automatically generated from the [io.vertx.ext.consul.CheckOptions original] using Vert.x codegen.
  */
 fun CheckOptions(
+  deregisterAfter: String? = null,
   http: String? = null,
   id: String? = null,
   interval: String? = null,
@@ -34,6 +36,9 @@ fun CheckOptions(
   tcp: String? = null,
   ttl: String? = null): CheckOptions = io.vertx.ext.consul.CheckOptions().apply {
 
+  if (deregisterAfter != null) {
+    this.setDeregisterAfter(deregisterAfter)
+  }
   if (http != null) {
     this.setHttp(http)
   }

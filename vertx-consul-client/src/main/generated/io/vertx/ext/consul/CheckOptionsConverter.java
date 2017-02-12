@@ -27,6 +27,9 @@ import io.vertx.core.json.JsonArray;
 public class CheckOptionsConverter {
 
   public static void fromJson(JsonObject json, CheckOptions obj) {
+    if (json.getValue("deregisterAfter") instanceof String) {
+      obj.setDeregisterAfter((String)json.getValue("deregisterAfter"));
+    }
     if (json.getValue("http") instanceof String) {
       obj.setHttp((String)json.getValue("http"));
     }
@@ -60,6 +63,9 @@ public class CheckOptionsConverter {
   }
 
   public static void toJson(CheckOptions obj, JsonObject json) {
+    if (obj.getDeregisterAfter() != null) {
+      json.put("deregisterAfter", obj.getDeregisterAfter());
+    }
     if (obj.getHttp() != null) {
       json.put("http", obj.getHttp());
     }

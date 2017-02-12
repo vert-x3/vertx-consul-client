@@ -387,6 +387,9 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Interval", checkOptions.getInterval())
       .put("TTL", checkOptions.getTtl())
       .put("TCP", checkOptions.getTcp());
+    if (checkOptions.getDeregisterAfter() != null) {
+      json.put("DeregisterCriticalServiceAfter", checkOptions.getDeregisterAfter());
+    }
     if (checkOptions.getStatus() != null) {
       json.put("Status", checkOptions.getStatus().key);
     }

@@ -32,8 +32,6 @@ Just use factory method:
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.ConsulClient
-
 
 var client = ConsulClient.create(vertx)
 
@@ -44,10 +42,6 @@ Also the client can be configured with an options.
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.ConsulClient
-import io.vertx.ext.consul.ConsulClientOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var options = ConsulClientOptions(
   host = "consul.example.com")
@@ -85,9 +79,6 @@ the current state of the requested resource. The following configuration is used
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = BlockingQueryOptions(
   index = lastIndex,
@@ -114,7 +105,6 @@ Consul client can return the value for certain key
 [source,kotlin]
 ----
 
-
 consulClient.getValue("key", { res ->
   if (res.succeeded()) {
     println("retrieved value: ${res.result().value}")
@@ -131,7 +121,6 @@ consulClient.getValue("key", { res ->
 
 [source,kotlin]
 ----
-
 
 consulClient.getValues("prefix", { res ->
   if (res.succeeded()) {
@@ -162,9 +151,6 @@ The modify index can be used for blocking queries:
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = BlockingQueryOptions(
   index = modifyIndex,
@@ -187,7 +173,6 @@ consulClient.getValueWithOptions("key", opts, { res ->
 [source,kotlin]
 ----
 
-
 consulClient.putValue("key", "value", { res ->
   if (res.succeeded()) {
     var opResult = res.result() ? "success" : "fail"
@@ -204,9 +189,6 @@ Put request with options also accepted
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.KeyValueOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = KeyValueOptions(
   flags = 42,
@@ -252,11 +234,6 @@ may be added in future versions of Consul to be mixed with key/value operations
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.TxnKVOperation
-import io.vertx.ext.consul.TxnKVVerb
-import io.vertx.ext.consul.TxnRequest
-import io.vertx.kotlin.ext.consul.*
-
 
 var request = TxnRequest(
   operations = listOf(TxnKVOperation(
@@ -285,7 +262,6 @@ At last, Consul client allows to delete key-value pair from store:
 [source,kotlin]
 ----
 
-
 consulClient.deleteValue("key", { res ->
   if (res.succeeded()) {
     println("complete")
@@ -301,7 +277,6 @@ consulClient.deleteValue("key", { res ->
 
 [source,kotlin]
 ----
-
 
 consulClient.deleteValues("prefix", { res ->
   if (res.succeeded()) {
@@ -326,10 +301,6 @@ A service definition must include a `name` and may optionally provide an `id`, `
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.CheckOptions
-import io.vertx.ext.consul.ServiceOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = ServiceOptions(
   name = "serviceName",
@@ -359,7 +330,6 @@ These options used to register service in catalog:
 [source,kotlin]
 ----
 
-
 consulClient.registerService(opts, { res ->
   if (res.succeeded()) {
     println("Service successfully registered")
@@ -378,7 +348,6 @@ Consul client allows to obtain actual list of the nodes providing a service
 
 [source,kotlin]
 ----
-
 
 consulClient.catalogServiceNodes("serviceName", { res ->
   if (res.succeeded()) {
@@ -403,7 +372,6 @@ The result can be filtered by check status.
 [source,kotlin]
 ----
 
-
 consulClient.healthServiceNodes("serviceName", passingOnly, { res ->
   if (res.succeeded()) {
     println("found ${res.result().list.size} services")
@@ -425,10 +393,6 @@ There are additional parameters for services queries
 
 [source,kotlin]
 ----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.ServiceQueryOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var queryOpts = ServiceQueryOptions(
   tag = "tag1",
@@ -450,7 +414,6 @@ Then the request should look like
 [source,kotlin]
 ----
 
-
 consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
   if (res.succeeded()) {
     println("found ${res.result().list.size} services")
@@ -469,7 +432,6 @@ Service can be deregistered by its ID:
 [source,kotlin]
 ----
 
-
 consulClient.deregisterService("serviceId", { res ->
   if (res.succeeded()) {
     println("Service successfully deregistered")
@@ -483,42 +445,57 @@ consulClient.deregisterService("serviceId", { res ->
 
 == Health Checks
 
-TBD
+One of the primary roles of the agent is management of system-level and application-level health checks.
+A health check is considered to be application-level if it is associated with a service.
+If not associated with a service, the check monitors the health of the entire node.
+
 [source,kotlin]
 ----
-import io.vertx.ext.consul.CheckOptions
-import io.vertx.kotlin.ext.consul.*
-
-
-var alwaysGood = { h ->
-  h.response().setStatusCode(200).end()
-}
-
-// create HTTP server to responce health check
-
-vertx.createHttpServer().requestHandler(alwaysGood).listen(4848)
-
-// check health via TCP port every 1 sec
 
 var opts = CheckOptions(
   tcp = "localhost:4848",
   interval = "1s")
 
-// register TCP check
+
+----
+
+The list of check options that supported by Consul client is:
+
+`id`:: the check ID
+`name`:: check name
+`script`:: local path to checking script. Also you should set checking interval
+`http`:: HTTP address to check. Also you should set checking interval
+`ttl`:: Time to Live of check
+`tcp`:: TCP address to check. Also you should set checking interval
+`interval`:: checking interval in Go's time format which is sequence of decimal numbers,
+each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
+`notes`:: the check notes
+`serviceId`:: the service ID to associate the registered check with an existing service provided by the agent.
+`deregisterAfter`:: deregister timeout. This is optional field, which is a timeout in the same time format as Interval and TTL.
+If a check is associated with a service and has the critical state for more than this configured value,
+then its associated service (and all of its associated checks) will automatically be deregistered.
+The minimum timeout is 1 minute, and the process that reaps critical services runs every 30 seconds,
+so it may take slightly longer than the configured timeout to trigger the deregistration.
+This should generally be configured with a timeout that's much, much longer than any expected recoverable outage
+for the given service.
+`status`:: the check status to specify the initial state of the health check
+
+The `Name` field is mandatory, as is one of `Script`, `HTTP`, `TCP` or `TTL`. `Script`, `TCP` and `HTTP`
+also require that `Interval` be set. If an `ID` is not provided, it is set to `Name`.
+You cannot have duplicate ID entries per agent, so it may be necessary to provide an ID.
+
+[source,kotlin]
+----
 
 consulClient.registerCheck(opts, { res ->
-
   if (res.succeeded()) {
-
     println("check successfully registered")
-
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
+
 
 ----
 
@@ -527,9 +504,6 @@ consulClient.registerCheck(opts, { res ->
 TBD
 [source,kotlin]
 ----
-import io.vertx.ext.consul.EventOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = EventOptions(
   tag = "tag",
@@ -585,11 +559,6 @@ consulClient.listEvents({ res ->
 TBD
 [source,kotlin]
 ----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.SessionBehavior
-import io.vertx.ext.consul.SessionOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 var opts = SessionOptions(
   node = "nodeId",
@@ -680,10 +649,6 @@ consulClient.destroySession(sessionId, { res ->
 TBD
 [source,kotlin]
 ----
-import io.vertx.ext.consul.BlockingQueryOptions
-import io.vertx.ext.consul.NodeQueryOptions
-import io.vertx.kotlin.ext.consul.*
-
 
 consulClient.catalogNodes({ res ->
 
