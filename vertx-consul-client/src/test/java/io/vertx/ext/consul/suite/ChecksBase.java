@@ -22,18 +22,14 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
-import static io.vertx.ext.consul.Utils.sleep;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -152,7 +148,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
-  private Check getCheckInfo(String id) {
+  Check getCheckInfo(String id) {
     List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     return checks.stream()
       .filter(check -> check.getId().equals(id))

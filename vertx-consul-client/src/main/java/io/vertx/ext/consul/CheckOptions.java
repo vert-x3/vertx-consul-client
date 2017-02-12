@@ -35,6 +35,7 @@ public class CheckOptions {
   private String interval;
   private String notes;
   private String serviceId;
+  private String deregisterAfter;
   private CheckStatus status;
 
   /**
@@ -278,6 +279,32 @@ public class CheckOptions {
    */
   public CheckOptions setNotes(String notes) {
     this.notes = notes;
+    return this;
+  }
+
+  /**
+   * Get deregister timeout
+   *
+   * @return timeout
+   */
+  public String getDeregisterAfter() {
+    return deregisterAfter;
+  }
+
+  /**
+   * Set deregister timeout. This is optional field, which is a timeout in the same time format as Interval and TTL.
+   * If a check is associated with a service and has the critical state for more than this configured value,
+   * then its associated service (and all of its associated checks) will automatically be deregistered.
+   * The minimum timeout is 1 minute, and the process that reaps critical services runs every 30 seconds,
+   * so it may take slightly longer than the configured timeout to trigger the deregistration.
+   * This should generally be configured with a timeout that's much, much longer than any expected recoverable outage
+   * for the given service.
+   *
+   * @param deregisterAfter timeout
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setDeregisterAfter(String deregisterAfter) {
+    this.deregisterAfter = deregisterAfter;
     return this;
   }
 }

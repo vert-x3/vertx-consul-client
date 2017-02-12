@@ -15,9 +15,7 @@
  */
 package examples;
 
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.consul.*;
 
 /**
@@ -46,43 +44,6 @@ public class Examples {
       .setIndex(lastIndex)
       .setWait("1m");
 
-  }
-
-  public void tcpHealth(ConsulClient consulClient, Vertx vertx) {
-
-    Handler<HttpServerRequest> alwaysGood = h -> h.response()
-
-      .setStatusCode(200)
-
-      .end();
-
-    // create HTTP server to responce health check
-
-    vertx.createHttpServer()
-
-      .requestHandler(alwaysGood)
-
-      .listen(4848);
-
-    // check health via TCP port every 1 sec
-
-    CheckOptions opts = new CheckOptions().setTcp("localhost:4848").setInterval("1s");
-
-    // register TCP check
-
-    consulClient.registerCheck(opts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("check successfully registered");
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
   }
 
   public void events(ConsulClient consulClient) {
