@@ -300,10 +300,44 @@
  *
  * == Events
  *
- * TBD
+ * The Consul provides a mechanism to fire a custom user event to an entire datacenter.
+ * These events are opaque to Consul, but they can be used to build scripting infrastructure to do automated deploys,
+ * restart services, or perform any other orchestration action.
+ *
+ * To send user event only its name is required
+ *
  * [source,$lang]
  * ----
- * {@link examples.Examples#events}
+ * {@link examples.Events#sendWithName}
+ * ----
+ *
+ * Also additional options can be specified.
+ *
+ * `node`:: regular expression to filter recipients by node name
+ * `service`:: regular expression to filter recipients by service
+ * `tag`:: regular expression to filter recipients by tag
+ * `payload`:: an optional body of the event.
+ * The body contents are opaque to Consul and become the "payload" of the event
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Events#sendWithOptions}
+ * ----
+ *
+ * The Consul Client supports queries for obtain the most recent events known by the agent. Events are broadcast using
+ * the gossip protocol, so they have no global ordering nor do they make a promise of delivery. Agents only buffer
+ * the most recent entries. The current buffer size is 256, but this value could change in the future.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Events#list}
+ * ----
+ *
+ * The Consul Index can be used to prepare blocking requests:
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Events#listWithOptions}
  * ----
  *
  * == Sessions

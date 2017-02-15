@@ -436,53 +436,84 @@ consulClient.registerCheck(opts, res -> {
 
 == Events
 
-TBD
+The Consul provides a mechanism to fire a custom user event to an entire datacenter.
+These events are opaque to Consul, but they can be used to build scripting infrastructure to do automated deploys,
+restart services, or perform any other orchestration action.
+
+To send user event only its name is required
+
+[source,java]
+----
+consulClient.fireEvent("eventName", res -> {
+  if (res.succeeded()) {
+    System.out.println("Event sent");
+    System.out.println("id: " + res.result().getId());
+  } else {
+    res.cause().printStackTrace();
+  }
+});
+----
+
+Also additional options can be specified.
+
+`node`:: regular expression to filter recipients by node name
+`service`:: regular expression to filter recipients by service
+`tag`:: regular expression to filter recipients by tag
+`payload`:: an optional body of the event.
+The body contents are opaque to Consul and become the "payload" of the event
+
 [source,java]
 ----
 EventOptions opts = new EventOptions()
   .setTag("tag")
   .setPayload("message");
 
-// trigger a new user event
-
 consulClient.fireEventWithOptions("eventName", opts, res -> {
-
   if (res.succeeded()) {
-
     System.out.println("Event sent");
-
     System.out.println("id: " + res.result().getId());
-
   } else {
-
     res.cause().printStackTrace();
-
   }
-
 });
+----
 
-// most recent events known by the agent
+The Consul Client supports queries for obtain the most recent events known by the agent. Events are broadcast using
+the gossip protocol, so they have no global ordering nor do they make a promise of delivery. Agents only buffer
+the most recent entries. The current buffer size is 256, but this value could change in the future.
 
+[source,java]
+----
 consulClient.listEvents(res -> {
-
   if (res.succeeded()) {
-
+    System.out.println("Consul index: " + res.result().getIndex());
     for(Event event: res.result().getList()) {
-
       System.out.println("Event id: " + event.getId());
-
       System.out.println("Event name: " + event.getName());
-
       System.out.println("Event payload: " + event.getPayload());
-
     }
-
   } else {
-
     res.cause().printStackTrace();
-
   }
+});
+----
 
+The Consul Index can be used to prepare blocking requests:
+
+[source,java]
+----
+BlockingQueryOptions opts = new BlockingQueryOptions()
+  .setIndex(lastIndex);
+
+consulClient.listEventsWithOptions(opts, res -> {
+  if (res.succeeded()) {
+    System.out.println("Consul index: " + res.result().getIndex());
+    for(Event event: res.result().getList()) {
+      System.out.println("Event id: " + event.getId());
+    }
+  } else {
+    res.cause().printStackTrace();
+  }
 });
 ----
 
