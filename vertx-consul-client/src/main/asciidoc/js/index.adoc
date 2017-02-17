@@ -66,6 +66,9 @@ ACL policy, is used.
 `dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
 by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
 
+ConsulClient options extends HttpClientOptions from Vertx core, therefore a lot of settings are available.
+Please see core documentation
+
 == Using the API
 
 The client API is represented by `link:../../jsdoc/module-vertx-consul-js_consul_client-ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
@@ -518,7 +521,35 @@ consulClient.registerCheck(opts, function (res, res_err) {
 
 == Events
 
-TBD
+The Consul provides a mechanism to fire a custom user event to an entire datacenter.
+These events are opaque to Consul, but they can be used to build scripting infrastructure to do automated deploys,
+restart services, or perform any other orchestration action.
+
+To send user event only its name is required
+
+[source,js]
+----
+
+consulClient.fireEvent("eventName", function (res, res_err) {
+  if (res_err == null) {
+    console.log("Event sent");
+    console.log("id: " + res.id);
+  } else {
+    res_err.printStackTrace();
+  }
+});
+
+
+----
+
+Also additional options can be specified.
+
+`node`:: regular expression to filter recipients by node name
+`service`:: regular expression to filter recipients by service
+`tag`:: regular expression to filter recipients by tag
+`payload`:: an optional body of the event.
+The body contents are opaque to Consul and become the "payload" of the event
+
 [source,js]
 ----
 
@@ -527,46 +558,59 @@ var opts = {
   "payload" : "message"
 };
 
-// trigger a new user event
-
 consulClient.fireEventWithOptions("eventName", opts, function (res, res_err) {
-
   if (res_err == null) {
-
     console.log("Event sent");
-
     console.log("id: " + res.id);
-
   } else {
-
     res_err.printStackTrace();
-
   }
-
 });
 
-// most recent events known by the agent
+
+----
+
+The Consul Client supports queries for obtain the most recent events known by the agent. Events are broadcast using
+the gossip protocol, so they have no global ordering nor do they make a promise of delivery. Agents only buffer
+the most recent entries. The current buffer size is 256, but this value could change in the future.
+
+[source,js]
+----
 
 consulClient.listEvents(function (res, res_err) {
-
   if (res_err == null) {
-
+    console.log("Consul index: " + res.index);
     Array.prototype.forEach.call(res.list, function(event) {
-
       console.log("Event id: " + event.id);
-
       console.log("Event name: " + event.name);
-
       console.log("Event payload: " + event.payload);
-
     });
-
   } else {
-
     res_err.printStackTrace();
-
   }
+});
 
+
+----
+
+The Consul Index can be used to prepare blocking requests:
+
+[source,js]
+----
+
+var opts = {
+  "index" : lastIndex
+};
+
+consulClient.listEventsWithOptions(opts, function (res, res_err) {
+  if (res_err == null) {
+    console.log("Consul index: " + res.index);
+    Array.prototype.forEach.call(res.list, function(event) {
+      console.log("Event id: " + event.id);
+    });
+  } else {
+    res_err.printStackTrace();
+  }
 });
 
 

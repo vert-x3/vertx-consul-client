@@ -182,35 +182,223 @@ Set the ACL token. When provided, the client will use this token when making req
  by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
  ACL policy, is used.
 +++
+|[[alpnVersions]]`alpnVersions`|`Array of link:enums.html#HttpVersion[HttpVersion]`|
++++
+Set the list of protocol versions to provide to the server during the Application-Layer Protocol Negotiation.
+ When the list is empty, the client provides a best effort list according to link:
+
+ <ul>
+   <li>: [ "h2", "http/1.1" ]</li>
+   <li>otherwise: [link]</li>
+ </ul>
++++
+|[[connectTimeout]]`connectTimeout`|`Number (int)`|
++++
+Set the connect timeout
++++
+|[[crlPaths]]`crlPaths`|`Array of String`|-
+|[[crlValues]]`crlValues`|`Array of Buffer`|-
 |[[dc]]`dc`|`String`|
 +++
 Set the datacenter name. When provided, the client will use it when making requests to the Consul
  by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
 +++
-|[[host]]`host`|`String`|
+|[[defaultHost]]`defaultHost`|`String`|
 +++
-Set Consul host. Defaults to `localhost`
+Set the default host name to be used by this client in requests if none is provided when making the request.
++++
+|[[defaultPort]]`defaultPort`|`Number (int)`|
++++
+Set the default port to be used by this client in requests if none is provided when making the request.
++++
+|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|-
+|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|-
+|[[http2ClearTextUpgrade]]`http2ClearTextUpgrade`|`Boolean`|
++++
+Set to <code>true</code> when an <i>h2c</i> connection is established using an HTTP/1.1 upgrade request, and <code>false</code>
+ when an <i>h2c</i> connection is established directly (with prior knowledge).
++++
+|[[http2ConnectionWindowSize]]`http2ConnectionWindowSize`|`Number (int)`|
++++
+Set the default HTTP/2 connection window size. It overrides the initial window
+ size set by , so the connection window size
+ is greater than for its streams, in order the data throughput.
+ <p/>
+ A value of <code>-1</code> reuses the initial window size setting.
++++
+|[[http2MaxPoolSize]]`http2MaxPoolSize`|`Number (int)`|
++++
+Set the maximum pool size for HTTP/2 connections
++++
+|[[http2MultiplexingLimit]]`http2MultiplexingLimit`|`Number (int)`|
++++
+Set a client limit of the number concurrent streams for each HTTP/2 connection, this limits the number
+ of streams the client can create for a connection. The effective number of streams for a
+ connection is the min of this value and the server's initial settings.
+ <p/>
+ Setting the value to <code>-1</code> means to use the value sent by the server's initial settings.
+ <code>-1</code> is the default value.
++++
+|[[idleTimeout]]`idleTimeout`|`Number (int)`|
++++
+Set the idle timeout, in seconds. zero means don't timeout.
+ This determines if a connection will timeout and be closed if no data is received within the timeout.
++++
+|[[initialSettings]]`initialSettings`|`link:dataobjects.html#Http2Settings[Http2Settings]`|
++++
+Set the HTTP/2 connection settings immediately sent by to the server when the client connects.
++++
+|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
+|[[keepAlive]]`keepAlive`|`Boolean`|
++++
+Set whether keep alive is enabled on the client
++++
+|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
++++
+Set the key/cert options in jks format, aka Java keystore.
++++
+|[[localAddress]]`localAddress`|`String`|
++++
+Set the local interface to bind for network connections. When the local address is null,
+ it will pick any local address, the default local address is null.
++++
+|[[logActivity]]`logActivity`|`Boolean`|
++++
+Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
++++
+|[[maxChunkSize]]`maxChunkSize`|`Number (int)`|
++++
+Set the maximum HTTP chunk size
++++
+|[[maxHeaderSize]]`maxHeaderSize`|`Number (int)`|
++++
+Set the maximum length of all headers for HTTP/1.x .
++++
+|[[maxInitialLineLength]]`maxInitialLineLength`|`Number (int)`|
++++
+Set the maximum length of the initial line for HTTP/1.x (e.g. <code>"HTTP/1.1 200 OK"</code>)
++++
+|[[maxPoolSize]]`maxPoolSize`|`Number (int)`|
++++
+Set the maximum pool size for connections
++++
+|[[maxRedirects]]`maxRedirects`|`Number (int)`|
++++
+Set to <code>maxRedirects</code> the maximum number of redirection a request can follow.
++++
+|[[maxWaitQueueSize]]`maxWaitQueueSize`|`Number (int)`|
++++
+Set the maximum requests allowed in the wait queue, any requests beyond the max size will result in
+ a ConnectionPoolTooBusyException.  If the value is set to a negative number then the queue will be unbounded.
++++
+|[[maxWebsocketFrameSize]]`maxWebsocketFrameSize`|`Number (int)`|
++++
+Set the max websocket frame size
++++
+|[[metricsName]]`metricsName`|`String`|
++++
+Set the metrics name identifying the reported metrics, useful for grouping metrics
+ with the same name.
++++
+|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
+|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
++++
+Set the key/cert store options in pem format.
 +++
 |[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
 +++
 Set the trust options.
 +++
-|[[port]]`port`|`Number (int)`|
+|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
 +++
-Set Consul HTTP API port. Defaults to `8500`
+Set the key/cert options in pfx format.
++++
+|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
++++
+Set the trust options in pfx format
++++
+|[[pipelining]]`pipelining`|`Boolean`|
++++
+Set whether pipe-lining is enabled on the client
++++
+|[[pipeliningLimit]]`pipeliningLimit`|`Number (int)`|
++++
+Set the limit of pending requests a pipe-lined HTTP/1 connection can send.
++++
+|[[protocolVersion]]`protocolVersion`|`link:enums.html#HttpVersion[HttpVersion]`|
++++
+Set the protocol version.
++++
+|[[proxyOptions]]`proxyOptions`|`link:dataobjects.html#ProxyOptions[ProxyOptions]`|
++++
+Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
++++
+|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
++++
+Set the TCP receive buffer size
++++
+|[[reuseAddress]]`reuseAddress`|`Boolean`|
++++
+Set the value of reuse address
++++
+|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
++++
+Set the TCP send buffer size
++++
+|[[sendUnmaskedFrames]]`sendUnmaskedFrames`|`Boolean`|
++++
+Set true when the client wants to skip frame masking.
+ You may want to set it true on server by server websocket communication: In this case you are by passing RFC6455 protocol.
+ It's false as default.
++++
+|[[soLinger]]`soLinger`|`Number (int)`|
++++
+Set whether SO_linger keep alive is enabled
 +++
 |[[ssl]]`ssl`|`Boolean`|
 +++
 Set whether SSL/TLS is enabled
++++
+|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
++++
+Set whether TCP keep alive is enabled
++++
+|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
++++
+Set whether TCP no delay is enabled
 +++
 |[[timeoutMs]]`timeoutMs`|`Number (long)`|
 +++
 Sets the amount of time (in milliseconds) after which if the request does not return any data
  within the timeout period an failure will be passed to the handler and the request will be closed.
 +++
+|[[trafficClass]]`trafficClass`|`Number (int)`|
++++
+Set the value of traffic class
++++
 |[[trustAll]]`trustAll`|`Boolean`|
 +++
 Set whether all server certificates should be trusted
++++
+|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
++++
+Set the trust options in jks format, aka Java truststore
++++
+|[[tryUseCompression]]`tryUseCompression`|`Boolean`|
++++
+Set whether compression is enabled
++++
+|[[useAlpn]]`useAlpn`|`Boolean`|
++++
+Set the ALPN usage.
++++
+|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
++++
+Set whether Netty pooled buffers are enabled
++++
+|[[verifyHost]]`verifyHost`|`Boolean`|
++++
+Set whether hostname verification is enabled
 +++
 |===
 

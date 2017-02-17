@@ -46,56 +46,6 @@ public class Examples {
 
   }
 
-  public void events(ConsulClient consulClient) {
-
-    EventOptions opts = new EventOptions()
-      .setTag("tag")
-      .setPayload("message");
-
-    // trigger a new user event
-
-    consulClient.fireEventWithOptions("eventName", opts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("Event sent");
-
-        System.out.println("id: " + res.result().getId());
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    // most recent events known by the agent
-
-    consulClient.listEvents(res -> {
-
-      if (res.succeeded()) {
-
-        for(Event event: res.result().getList()) {
-
-          System.out.println("Event id: " + event.getId());
-
-          System.out.println("Event name: " + event.getName());
-
-          System.out.println("Event payload: " + event.getPayload());
-
-        }
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-  }
-
   public void sessions(ConsulClient consulClient, String sessionId, long lastIndex) {
 
     SessionOptions opts = new SessionOptions()
