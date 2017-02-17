@@ -41,8 +41,6 @@ public class ConsulClientImpl implements ConsulClient {
 
   private static final String TOKEN_HEADER = "X-Consul-Token";
   private static final String INDEX_HEADER = "X-Consul-Index";
-  private static final String DEFAULT_HOST = "localhost";
-  private static final int DEFAULT_PORT = 8500;
 
   private static final List<Integer> DEFAULT_VALID_CODES = Collections.singletonList(200);
   private static final List<Integer> TXN_VALID_CODES = Arrays.asList(200, 409);
@@ -55,15 +53,7 @@ public class ConsulClientImpl implements ConsulClient {
   public ConsulClientImpl(Vertx vertx, ConsulClientOptions options) {
     Objects.requireNonNull(vertx);
     Objects.requireNonNull(options);
-    HttpClientOptions opts = new HttpClientOptions()
-      .setDefaultHost(options.getHost() == null ? DEFAULT_HOST : options.getHost())
-      .setDefaultPort(options.getPort() == 0 ? DEFAULT_PORT : options.getPort())
-      .setSsl(options.isSsl())
-      .setTrustAll(options.isTrustAll());
-    if (options.getPemTrustOptions() != null) {
-      opts.setTrustOptions(options.getPemTrustOptions());
-    }
-    httpClient = vertx.createHttpClient(opts);
+    httpClient = vertx.createHttpClient(options);
     aclToken = options.getAclToken();
     dc = options.getDc();
     timeoutMs = options.getTimeoutMs();

@@ -16,9 +16,14 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.core.http.Http2Settings;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.PemTrustOptions;
-import io.vertx.core.net.PemTrustOptionsConverter;
+import io.vertx.core.net.*;
+
+import java.util.List;
 
 /**
  * Options used to create Consul client.
@@ -26,21 +31,22 @@ import io.vertx.core.net.PemTrustOptionsConverter;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class ConsulClientOptions {
+public class ConsulClientOptions extends HttpClientOptions {
 
-  private String host;
-  private int port;
+  private static final String CONSUL_DEFAULT_HOST = "localhost";
+  private static final int CONSUL_DEFAULT_PORT = 8500;
+
   private String aclToken;
   private String dc;
   private long timeoutMs;
-  private boolean ssl;
-  private boolean trustAll;
-  private PemTrustOptions pemTrustOptions;
 
   /**
    * Default constructor
    */
   public ConsulClientOptions() {
+    super();
+    setDefaultHost(CONSUL_DEFAULT_HOST);
+    setDefaultPort(CONSUL_DEFAULT_PORT);
   }
 
   /**
@@ -49,13 +55,10 @@ public class ConsulClientOptions {
    * @param options the one to copy
    */
   public ConsulClientOptions(ConsulClientOptions options) {
-    this.host = options.host;
-    this.port = options.port;
+    super(options);
     this.aclToken = options.aclToken;
     this.dc = options.dc;
     this.timeoutMs = options.timeoutMs;
-    this.ssl = options.ssl;
-    this.pemTrustOptions = options.pemTrustOptions;
   }
 
   /**
@@ -64,6 +67,7 @@ public class ConsulClientOptions {
    * @param options the JSON
    */
   public ConsulClientOptions(JsonObject options) {
+    super(options);
     ConsulClientOptionsConverter.fromJson(options, this);
   }
 
@@ -73,7 +77,7 @@ public class ConsulClientOptions {
    * @return the JSON
    */
   public JsonObject toJson() {
-    JsonObject jsonObject = new JsonObject();
+    JsonObject jsonObject = super.toJson();
     ConsulClientOptionsConverter.toJson(this, jsonObject);
     return jsonObject;
   }
@@ -83,8 +87,9 @@ public class ConsulClientOptions {
    *
    * @return consul host
    */
+  @GenIgnore
   public String getHost() {
-    return host;
+    return getDefaultHost();
   }
 
   /**
@@ -92,8 +97,9 @@ public class ConsulClientOptions {
    *
    * @return consul port
    */
+  @GenIgnore
   public int getPort() {
-    return port;
+    return getDefaultPort();
   }
 
   /**
@@ -124,40 +130,14 @@ public class ConsulClientOptions {
   }
 
   /**
-   * Return true if SSL/TLS enabled
-   *
-   * @return true if SSL/TLS enabled
-   */
-  public boolean isSsl() {
-    return ssl;
-  }
-
-  /**
-   * Return true if all server certificates should be trusted
-   *
-   * @return true if all server certificates should be trusted
-   */
-  public boolean isTrustAll() {
-    return trustAll;
-  }
-
-  /**
-   * Get the trust options.
-   *
-   * @return the trust options.
-   */
-  public PemTrustOptions getPemTrustOptions() {
-    return pemTrustOptions;
-  }
-
-  /**
    * Set Consul host. Defaults to `localhost`
    *
    * @param host consul host
    * @return reference to this, for fluency
    */
+  @GenIgnore
   public ConsulClientOptions setHost(String host) {
-    this.host = host;
+    setDefaultHost(host);
     return this;
   }
 
@@ -167,8 +147,9 @@ public class ConsulClientOptions {
    * @param port Consul HTTP API port
    * @return reference to this, for fluency
    */
+  @GenIgnore
   public ConsulClientOptions setPort(int port) {
-    this.port = port;
+    setDefaultPort(port);
     return this;
   }
 
@@ -210,14 +191,184 @@ public class ConsulClientOptions {
   }
 
   /**
+   * Set the TCP send buffer size
+   *
+   * @param sendBufferSize  the buffers size, in bytes
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setSendBufferSize(int sendBufferSize) {
+    return (ConsulClientOptions) super.setSendBufferSize(sendBufferSize);
+  }
+
+  /**
+   * Set the TCP receive buffer size
+   *
+   * @param receiveBufferSize  the buffers size, in bytes
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setReceiveBufferSize(int receiveBufferSize) {
+    return (ConsulClientOptions) super.setReceiveBufferSize(receiveBufferSize);
+  }
+
+  /**
+   * Set the value of reuse address
+   * @param reuseAddress  the value of reuse address
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setReuseAddress(boolean reuseAddress) {
+    return (ConsulClientOptions) super.setReuseAddress(reuseAddress);
+  }
+
+  /**
+   * Set the value of traffic class
+   *
+   * @param trafficClass  the value of traffic class
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTrafficClass(int trafficClass) {
+    return (ConsulClientOptions) super.setTrafficClass(trafficClass);
+  }
+
+  /**
+   * Set whether TCP no delay is enabled
+   *
+   * @param tcpNoDelay true if TCP no delay is enabled (Nagle disabled)
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTcpNoDelay(boolean tcpNoDelay) {
+    return (ConsulClientOptions) super.setTcpNoDelay(tcpNoDelay);
+  }
+
+  /**
+   * Set whether TCP keep alive is enabled
+   *
+   * @param tcpKeepAlive true if TCP keep alive is enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTcpKeepAlive(boolean tcpKeepAlive) {
+    return (ConsulClientOptions) super.setTcpKeepAlive(tcpKeepAlive);
+  }
+
+  /**
+   * Set whether SO_linger keep alive is enabled
+   *
+   * @param soLinger true if SO_linger is enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setSoLinger(int soLinger) {
+    return (ConsulClientOptions) super.setSoLinger(soLinger);
+  }
+
+  /**
+   * Set whether Netty pooled buffers are enabled
+   *
+   * @param usePooledBuffers true if pooled buffers enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setUsePooledBuffers(boolean usePooledBuffers) {
+    return (ConsulClientOptions) super.setUsePooledBuffers(usePooledBuffers);
+  }
+
+  /**
+   * Set the idle timeout, in seconds. zero means don't timeout.
+   * This determines if a connection will timeout and be closed if no data is received within the timeout.
+   *
+   * @param idleTimeout  the timeout, in seconds
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setIdleTimeout(int idleTimeout) {
+    return (ConsulClientOptions) super.setIdleTimeout(idleTimeout);
+  }
+
+  /**
    * Set whether SSL/TLS is enabled
    *
    * @param ssl  true if enabled
    * @return reference to this, for fluency
    */
   public ConsulClientOptions setSsl(boolean ssl) {
-    this.ssl = ssl;
+    super.setSsl(ssl);
     return this;
+  }
+
+  /**
+   * Set the key/cert options.
+   *
+   * @param options the key store options
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setKeyCertOptions(KeyCertOptions options) {
+    return (ConsulClientOptions) super.setKeyCertOptions(options);
+  }
+
+  /**
+   * Set the key/cert options in jks format, aka Java keystore.
+   * @param options the key store in jks format
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setKeyStoreOptions(JksOptions options) {
+    return (ConsulClientOptions) super.setKeyStoreOptions(options);
+  }
+
+  /**
+   * Set the key/cert options in pfx format.
+   * @param options the key cert options in pfx format
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setPfxKeyCertOptions(PfxOptions options) {
+    return (ConsulClientOptions) super.setPfxKeyCertOptions(options);
+  }
+
+  /**
+   * Set the trust options.
+   * @param options the trust options
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTrustOptions(TrustOptions options) {
+    return (ConsulClientOptions) super.setTrustOptions(options);
+  }
+
+  /**
+   * Set the key/cert store options in pem format.
+   * @param options the options in pem format
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setPemKeyCertOptions(PemKeyCertOptions options) {
+    return (ConsulClientOptions) super.setPemKeyCertOptions(options);
+  }
+
+  /**
+   * Set the trust options in jks format, aka Java truststore
+   * @param options the trust options in jks format
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTrustStoreOptions(JksOptions options) {
+    return (ConsulClientOptions) super.setTrustStoreOptions(options);
+  }
+
+  /**
+   * Set the trust options in pfx format
+   * @param options the trust options in pfx format
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setPfxTrustOptions(PfxOptions options) {
+    return (ConsulClientOptions) super.setPfxTrustOptions(options);
   }
 
   /**
@@ -227,7 +378,7 @@ public class ConsulClientOptions {
    * @return reference to this, for fluency
    */
   public ConsulClientOptions setTrustAll(boolean trustAll) {
-    this.trustAll = trustAll;
+    super.setTrustAll(trustAll);
     return this;
   }
 
@@ -238,7 +389,352 @@ public class ConsulClientOptions {
    * @return reference to this, for fluency
    */
   public ConsulClientOptions setPemTrustOptions(PemTrustOptions pemTrustOptions) {
-    this.pemTrustOptions = pemTrustOptions;
+    super.setPemTrustOptions(pemTrustOptions);
     return this;
+  }
+
+  /**
+   * Set the connect timeout
+   *
+   * @param connectTimeout  connect timeout, in ms
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setConnectTimeout(int connectTimeout) {
+    return (ConsulClientOptions) super.setConnectTimeout(connectTimeout);
+  }
+
+  /**
+   * Set the maximum pool size for connections
+   *
+   * @param maxPoolSize  the maximum pool size
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxPoolSize(int maxPoolSize) {
+    return (ConsulClientOptions) super.setMaxPoolSize(maxPoolSize);
+  }
+
+  /**
+   * Set a client limit of the number concurrent streams for each HTTP/2 connection, this limits the number
+   * of streams the client can create for a connection. The effective number of streams for a
+   * connection is the min of this value and the server's initial settings.
+   * <p/>
+   * Setting the value to {@code -1} means to use the value sent by the server's initial settings.
+   * {@code -1} is the default value.
+   *
+   * @param limit the maximum concurrent for an HTTP/2 connection
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setHttp2MultiplexingLimit(int limit) {
+    return (ConsulClientOptions) super.setHttp2MultiplexingLimit(limit);
+  }
+
+  /**
+   * Set the maximum pool size for HTTP/2 connections
+   *
+   * @param max  the maximum pool size
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setHttp2MaxPoolSize(int max) {
+    return (ConsulClientOptions) super.setHttp2MaxPoolSize(max);
+  }
+
+  /**
+   * Set the default HTTP/2 connection window size. It overrides the initial window
+   * size set by {@link Http2Settings#getInitialWindowSize}, so the connection window size
+   * is greater than for its streams, in order the data throughput.
+   * <p/>
+   * A value of {@code -1} reuses the initial window size setting.
+   *
+   * @param http2ConnectionWindowSize the window size applied to the connection
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setHttp2ConnectionWindowSize(int http2ConnectionWindowSize) {
+    return (ConsulClientOptions) super.setHttp2ConnectionWindowSize(http2ConnectionWindowSize);
+  }
+
+  /**
+   * Set whether keep alive is enabled on the client
+   *
+   * @param keepAlive  true if enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setKeepAlive(boolean keepAlive) {
+    return (ConsulClientOptions) super.setKeepAlive(keepAlive);
+  }
+
+  /**
+   * Set whether pipe-lining is enabled on the client
+   *
+   * @param pipelining  true if enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setPipelining(boolean pipelining) {
+    return (ConsulClientOptions) super.setPipelining(pipelining);
+  }
+
+  /**
+   * Set the limit of pending requests a pipe-lined HTTP/1 connection can send.
+   *
+   * @param limit the limit of pending requests
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setPipeliningLimit(int limit) {
+    return (ConsulClientOptions) super.setPipeliningLimit(limit);
+  }
+
+  /**
+   * Set whether hostname verification is enabled
+   *
+   * @param verifyHost  true if enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setVerifyHost(boolean verifyHost) {
+    return (ConsulClientOptions) super.setVerifyHost(verifyHost);
+  }
+
+  /**
+   * Set whether compression is enabled
+   *
+   * @param tryUseCompression  true if enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setTryUseCompression(boolean tryUseCompression) {
+    return (ConsulClientOptions) super.setTryUseCompression(tryUseCompression);
+  }
+
+  /**
+   * Set true when the client wants to skip frame masking.
+   * You may want to set it true on server by server websocket communication: In this case you are by passing RFC6455 protocol.
+   * It's false as default.
+   *
+   * @param sendUnmaskedFrames  true if enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setSendUnmaskedFrames(boolean sendUnmaskedFrames) {
+    return (ConsulClientOptions) super.setSendUnmaskedFrames(sendUnmaskedFrames);
+  }
+
+  /**
+   * Set the max websocket frame size
+   *
+   * @param maxWebsocketFrameSize  the max frame size, in bytes
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxWebsocketFrameSize(int maxWebsocketFrameSize) {
+    return (ConsulClientOptions) super.setMaxWebsocketFrameSize(maxWebsocketFrameSize);
+  }
+
+  /**
+   * Set the default host name to be used by this client in requests if none is provided when making the request.
+   *
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setDefaultHost(String defaultHost) {
+    return (ConsulClientOptions) super.setDefaultHost(defaultHost);
+  }
+
+  /**
+   * Set the default port to be used by this client in requests if none is provided when making the request.
+   *
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setDefaultPort(int defaultPort) {
+    return (ConsulClientOptions) super.setDefaultPort(defaultPort);
+  }
+
+  /**
+   * Set the protocol version.
+   *
+   * @param protocolVersion the protocol version
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setProtocolVersion(HttpVersion protocolVersion) {
+    return (ConsulClientOptions) super.setProtocolVersion(protocolVersion);
+  }
+
+  /**
+   * Set the maximum HTTP chunk size
+   * @param maxChunkSize the maximum chunk size
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxChunkSize(int maxChunkSize) {
+    return (ConsulClientOptions) super.setMaxChunkSize(maxChunkSize);
+  }
+
+  /**
+   * Set the maximum length of the initial line for HTTP/1.x (e.g. {@code "HTTP/1.1 200 OK"})
+   *
+   * @param maxInitialLineLength the new maximum initial length
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxInitialLineLength(int maxInitialLineLength) {
+    return (ConsulClientOptions) super.setMaxInitialLineLength(maxInitialLineLength);
+  }
+
+  /**
+   * Set the maximum length of all headers for HTTP/1.x .
+   *
+   * @param maxHeaderSize the new maximum length
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxHeaderSize(int maxHeaderSize) {
+    return (ConsulClientOptions) super.setMaxHeaderSize(maxHeaderSize);
+  }
+
+  /**
+   * Set the maximum requests allowed in the wait queue, any requests beyond the max size will result in
+   * a ConnectionPoolTooBusyException.  If the value is set to a negative number then the queue will be unbounded.
+   * @param maxWaitQueueSize the maximum number of waiting requests
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxWaitQueueSize(int maxWaitQueueSize) {
+    return (ConsulClientOptions) super.setMaxWaitQueueSize(maxWaitQueueSize);
+  }
+
+  /**
+   * Set the HTTP/2 connection settings immediately sent by to the server when the client connects.
+   *
+   * @param settings the settings value
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setInitialSettings(Http2Settings settings) {
+    return (ConsulClientOptions) super.setInitialSettings(settings);
+  }
+
+  /**
+   * Set the ALPN usage.
+   *
+   * @param useAlpn true when Application-Layer Protocol Negotiation should be used
+   */
+  @Override
+  public ConsulClientOptions setUseAlpn(boolean useAlpn) {
+    return (ConsulClientOptions) super.setUseAlpn(useAlpn);
+  }
+
+  /**
+   * Set to use SSL engine implementation to use.
+   *
+   * @param sslEngineOptions the ssl engine to use
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setSslEngineOptions(SSLEngineOptions sslEngineOptions) {
+    return (ConsulClientOptions) super.setSslEngineOptions(sslEngineOptions);
+  }
+
+  @Override
+  public ConsulClientOptions setJdkSslEngineOptions(JdkSSLEngineOptions sslEngineOptions) {
+    return (ConsulClientOptions) super.setJdkSslEngineOptions(sslEngineOptions);
+  }
+
+  @Override
+  public ConsulClientOptions setOpenSslEngineOptions(OpenSSLEngineOptions sslEngineOptions) {
+    return (ConsulClientOptions) super.setOpenSslEngineOptions(sslEngineOptions);
+  }
+
+  /**
+   * Set the list of protocol versions to provide to the server during the Application-Layer Protocol Negotiation.
+   * When the list is empty, the client provides a best effort list according to {@link #setProtocolVersion}:
+   *
+   * <ul>
+   *   <li>{@link HttpVersion#HTTP_2}: [ "h2", "http/1.1" ]</li>
+   *   <li>otherwise: [{@link #getProtocolVersion()}]</li>
+   * </ul>
+   *
+   * @param alpnVersions the versions
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setAlpnVersions(List<HttpVersion> alpnVersions) {
+    return (ConsulClientOptions) super.setAlpnVersions(alpnVersions);
+  }
+
+  /**
+   * Set to {@code true} when an <i>h2c</i> connection is established using an HTTP/1.1 upgrade request, and {@code false}
+   * when an <i>h2c</i> connection is established directly (with prior knowledge).
+   *
+   * @param value the upgrade value
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setHttp2ClearTextUpgrade(boolean value) {
+    return (ConsulClientOptions) super.setHttp2ClearTextUpgrade(value);
+  }
+
+  /**
+   * Set to {@code maxRedirects} the maximum number of redirection a request can follow.
+   *
+   * @param maxRedirects the maximum number of redirection
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxRedirects(int maxRedirects) {
+    return (ConsulClientOptions) super.setMaxRedirects(maxRedirects);
+  }
+
+  /**
+   * Set the metrics name identifying the reported metrics, useful for grouping metrics
+   * with the same name.
+   *
+   * @param metricsName the metrics name
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMetricsName(String metricsName) {
+    return (ConsulClientOptions) super.setMetricsName(metricsName);
+  }
+
+  /**
+   * Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
+   *
+   * @param proxyOptions proxy options object
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setProxyOptions(ProxyOptions proxyOptions) {
+    return (ConsulClientOptions) super.setProxyOptions(proxyOptions);
+  }
+
+  /**
+   * Set the local interface to bind for network connections. When the local address is null,
+   * it will pick any local address, the default local address is null.
+   *
+   * @param localAddress the local address
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setLocalAddress(String localAddress) {
+    return (ConsulClientOptions) super.setLocalAddress(localAddress);
+  }
+
+  /**
+   * Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
+   *
+   * @param logActivity true for logging the network activity
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setLogActivity(boolean logActivity) {
+    return (ConsulClientOptions) super.setLogActivity(logActivity);
   }
 }
