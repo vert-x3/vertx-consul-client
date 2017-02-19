@@ -1,4 +1,0 @@
-moduleName = io.vertx.ext.consul.ConsulService-module
-moduleVersion = 1.0
-extensionClasses = io.vertx.groovy.ext.consul.ConsulService_GroovyExtension
-staticExtensionClasses = 
