@@ -410,12 +410,12 @@ module VertxConsul
     #  however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
     # @param [String] service the service name
     # @param [true,false] passing if true, filter results to only nodes with all checks in the passing state
-    # @param [Hash] options the blocking options
+    # @param [Hash] options options used to request services
     # @yield will be provided with list of services
     # @return [self]
     def health_service_nodes_with_options(service=nil,passing=nil,options=nil)
       if service.class == String && (passing.class == TrueClass || passing.class == FalseClass) && options.class == Hash && block_given?
-        @j_del.java_method(:healthServiceNodesWithOptions, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        @j_del.java_method(:healthServiceNodesWithOptions, [Java::java.lang.String.java_class,Java::boolean.java_class,Java::IoVertxExtConsul::ServiceQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(service,passing,Java::IoVertxExtConsul::ServiceQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling health_service_nodes_with_options(#{service},#{passing},#{options})"

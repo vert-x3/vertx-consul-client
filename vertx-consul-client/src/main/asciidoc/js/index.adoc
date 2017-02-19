@@ -433,7 +433,7 @@ Then the request should look like
 [source,js]
 ----
 
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, function (res, res_err) {
+consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, function (res, res_err) {
   if (res_err == null) {
     console.log("found " + res.list.length + " services");
   } else {

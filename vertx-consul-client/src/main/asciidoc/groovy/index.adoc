@@ -431,7 +431,7 @@ Then the request should look like
 [source,groovy]
 ----
 
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, { res ->
+consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, { res ->
   if (res.succeeded()) {
     println("found ${res.result().list.size()} services")
   } else {

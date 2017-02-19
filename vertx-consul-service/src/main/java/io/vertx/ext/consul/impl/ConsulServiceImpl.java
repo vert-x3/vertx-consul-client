@@ -181,7 +181,7 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
+  public ConsulService healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
     consulClient.healthServiceNodesWithOptions(service, passing, options, resultHandler);
     return this;
   }

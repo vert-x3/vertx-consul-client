@@ -21,6 +21,7 @@ import io.vertx.ext.consul.*;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
@@ -125,19 +126,28 @@ public class Services extends ChecksBase {
   @Test
   public void healthServices() throws InterruptedException {
     runAsync(h -> writeClient.registerService(new ServiceOptions()
-      .setName("service").setId("id1")
+      .setName("service").setId("id1").setTags(Collections.singletonList("tag1"))
       .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
     runAsync(h -> writeClient.registerService(new ServiceOptions()
-      .setName("service").setId("id2")
+      .setName("service").setId("id2").setTags(Collections.singletonList("tag2"))
       .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
+
     ServiceEntryList list1 = getAsync(h -> readClient.healthServiceNodes("service", true, h));
     assertEquals(list1.getList().size(), 2);
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
     assertTrue(ids.contains("id1"));
     assertTrue(ids.contains("id2"));
+
+    ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
+    ServiceEntryList list2 = getAsync(h -> readClient.healthServiceNodesWithOptions("service", true, opts2, h));
+    assertEquals(list2.getList().size(), 1);
+    assertEquals(list2.getList().get(0).getService().getId(), "id2");
+
     CountDownLatch latch = new CountDownLatch(1);
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
-      readClient.healthServiceNodesWithOptions("service", true, new BlockingQueryOptions().setIndex(idx), h -> {
+      ServiceQueryOptions options = new ServiceQueryOptions()
+        .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
+      readClient.healthServiceNodesWithOptions("service", true, options, h -> {
         waitComplete(vertx, fut, h.result().getIndex(), h.result().getList().size() == 1);
       });
     });

@@ -638,7 +638,7 @@ var ConsulService = function(j_val) {
   this.healthServiceNodesWithOptions = function(service, passing, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 4 && typeof __args[0] === 'string' && typeof __args[1] ==='boolean' && (typeof __args[2] === 'object' && __args[2] != null) && typeof __args[3] === 'function') {
-      j_consulService["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
+      j_consulService["healthServiceNodesWithOptions(java.lang.String,boolean,io.vertx.ext.consul.ServiceQueryOptions,io.vertx.core.Handler)"](service, passing, options != null ? new ServiceQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {

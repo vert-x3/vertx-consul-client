@@ -433,7 +433,7 @@ Then the request should look like
 [source,ruby]
 ----
 
-consulClient.catalog_service_nodes_with_options("serviceName", queryOpts) { |res_err,res|
+consulClient.health_service_nodes_with_options("serviceName", passingOnly, queryOpts) { |res_err,res|
   if (res_err == nil)
     puts "found #{res['list'].length} services"
   else

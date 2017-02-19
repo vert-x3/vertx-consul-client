@@ -303,8 +303,11 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
-    Query query = Query.of(options).put("passing", passing ? 1 : null);
+  public ConsulClient healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
+    Query query = new Query().put("passing", passing ? 1 : null);
+    if (options != null) {
+      query.put(options.getBlockingOptions()).put("near", options.getNear()).put("tag", options.getTag());
+    }
     requestArray(HttpMethod.GET, "/v1/health/service/" + urlEncode(service), query, resultHandler, (arr, headers) -> {
       List<ServiceEntry> list = arr.stream().map(obj -> ServiceEntryParser.parse((JsonObject) obj)).collect(Collectors.toList());
       return new ServiceEntryList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
