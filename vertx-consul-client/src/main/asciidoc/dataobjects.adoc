@@ -548,6 +548,28 @@ Set list of events
 +++
 |===
 
+[[EventListOptions]]
+== EventListOptions
+
+++++
+ Holds options for events list request
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockingOptions]]`blockingOptions`|`link:dataobjects.html#BlockingQueryOptions[BlockingQueryOptions]`|
++++
+Set options for blocking query
++++
+|[[name]]`name`|`String`|
++++
+Set event name for filtering on events
++++
+|===
+
 [[EventOptions]]
 == EventOptions
 

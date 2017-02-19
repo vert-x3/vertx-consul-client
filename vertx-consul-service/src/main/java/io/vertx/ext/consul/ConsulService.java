@@ -117,7 +117,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler);
+  ConsulService listEventsWithOptions(EventListOptions options, Handler<AsyncResult<EventList>> resultHandler);
 
   @Override
   @Fluent
@@ -131,9 +131,11 @@ public interface ConsulService extends ConsulClient {
   @Fluent
   ConsulService deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
+  @Override
   @Fluent
   ConsulService healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
+  @Override
   @Fluent
   ConsulService healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 

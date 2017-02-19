@@ -15,10 +15,7 @@
  */
 package examples;
 
-import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.Event;
-import io.vertx.ext.consul.EventOptions;
+import io.vertx.ext.consul.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -74,8 +71,9 @@ public class Events {
 
   public void listWithOptions(ConsulClient consulClient, long lastIndex) {
 
-    BlockingQueryOptions opts = new BlockingQueryOptions()
-      .setIndex(lastIndex);
+    EventListOptions opts = new EventListOptions()
+      .setName("eventName")
+      .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
 
     consulClient.listEventsWithOptions(opts, res -> {
       if (res.succeeded()) {

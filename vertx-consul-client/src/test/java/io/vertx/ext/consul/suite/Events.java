@@ -51,8 +51,11 @@ public class Events extends ConsulTestBase {
     assertEquals(opts.getPayload(), event.getPayload());
     String evId1 = event.getId();
     EventList list1 = getAsync(h -> writeClient.listEvents(h));
-    long cnt = list1.getList().stream().map(Event::getId).filter(id -> id.equals(evId1)).count();
-    assertEquals(cnt, 1);
+    long cnt1 = list1.getList().stream().map(Event::getId).filter(id -> id.equals(evId1)).count();
+    assertEquals(cnt1, 1);
+
+    EventList list2 = getAsync(h -> writeClient.listEventsWithOptions(new EventListOptions().setName(name2), h));
+    assertEquals(list2.getList().size(), 0);
 
     CountDownLatch latch = new CountDownLatch(1);
     BlockingQueryOptions blockingQueryOptions = new BlockingQueryOptions()
@@ -60,7 +63,7 @@ public class Events extends ConsulTestBase {
     if (timeout) {
       blockingQueryOptions.setWait("2s");
     }
-    writeClient.listEventsWithOptions(blockingQueryOptions, h -> {
+    writeClient.listEventsWithOptions(new EventListOptions().setBlockingOptions(blockingQueryOptions), h -> {
       List<String> names = h.result().getList().stream().map(Event::getName).collect(Collectors.toList());
       if (timeout) {
         assertTrue(names.contains(name1));
@@ -76,6 +79,11 @@ public class Events extends ConsulTestBase {
     assertEquals(latch.getCount(), timeout ? 0 : 1);
     Utils.<Event>getAsync(h -> writeClient.fireEvent(name2, h));
     awaitLatch(latch);
+
+
+    EventList list3 = getAsync(h -> writeClient.listEventsWithOptions(new EventListOptions().setName(name2), h));
+    assertEquals(list3.getList().size(), 1);
+
   }
 
 }

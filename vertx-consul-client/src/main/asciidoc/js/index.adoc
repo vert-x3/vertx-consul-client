@@ -599,7 +599,10 @@ The Consul Index can be used to prepare blocking requests:
 ----
 
 var opts = {
-  "index" : lastIndex
+  "name" : "eventName",
+  "blockingOptions" : {
+    "index" : lastIndex
+  }
 };
 
 consulClient.listEventsWithOptions(opts, function (res, res_err) {

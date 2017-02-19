@@ -597,7 +597,10 @@ The Consul Index can be used to prepare blocking requests:
 ----
 
 def opts = [
-  index:lastIndex
+  name:"eventName",
+  blockingOptions:[
+    index:lastIndex
+  ]
 ]
 
 consulClient.listEventsWithOptions(opts, { res ->
