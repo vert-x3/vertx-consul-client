@@ -580,8 +580,10 @@ The Consul Index can be used to prepare blocking requests:
 [source,kotlin]
 ----
 
-var opts = BlockingQueryOptions(
-  index = lastIndex)
+var opts = EventListOptions(
+  name = "eventName",
+  blockingOptions = BlockingQueryOptions(
+    index = lastIndex))
 
 consulClient.listEventsWithOptions(opts, { res ->
   if (res.succeeded()) {

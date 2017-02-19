@@ -300,7 +300,7 @@ module VertxConsul
     # @return [self]
     def list_events_with_options(options=nil)
       if options.class == Hash && block_given?
-        @j_del.java_method(:listEventsWithOptions, [Java::IoVertxExtConsul::BlockingQueryOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::BlockingQueryOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
+        @j_del.java_method(:listEventsWithOptions, [Java::IoVertxExtConsul::EventListOptions.java_class,Java::IoVertxCore::Handler.java_class]).call(Java::IoVertxExtConsul::EventListOptions.new(::Vertx::Util::Utils.to_json_object(options)),(Proc.new { |ar| yield(ar.failed ? ar.cause : nil, ar.succeeded ? ar.result != nil ? JSON.parse(ar.result.toJson.encode) : nil : nil) }))
         return self
       end
       raise ArgumentError, "Invalid arguments when calling list_events_with_options(#{options})"

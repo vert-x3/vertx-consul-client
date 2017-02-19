@@ -24,6 +24,7 @@ var JsonObject = io.vertx.core.json.JsonObject;
 var JConsulService = Java.type('io.vertx.ext.consul.ConsulService');
 var ServiceQueryOptions = Java.type('io.vertx.ext.consul.ServiceQueryOptions');
 var Event = Java.type('io.vertx.ext.consul.Event');
+var EventListOptions = Java.type('io.vertx.ext.consul.EventListOptions');
 var SessionList = Java.type('io.vertx.ext.consul.SessionList');
 var MaintenanceOptions = Java.type('io.vertx.ext.consul.MaintenanceOptions');
 var Check = Java.type('io.vertx.ext.consul.Check');
@@ -530,7 +531,7 @@ var ConsulService = function(j_val) {
   this.listEventsWithOptions = function(options, resultHandler) {
     var __args = arguments;
     if (__args.length === 2 && (typeof __args[0] === 'object' && __args[0] != null) && typeof __args[1] === 'function') {
-      j_consulService["listEventsWithOptions(io.vertx.ext.consul.BlockingQueryOptions,io.vertx.core.Handler)"](options != null ? new BlockingQueryOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
+      j_consulService["listEventsWithOptions(io.vertx.ext.consul.EventListOptions,io.vertx.core.Handler)"](options != null ? new EventListOptions(new JsonObject(Java.asJSONCompatible(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnDataObject(ar.result()), null);
       } else {

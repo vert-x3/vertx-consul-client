@@ -314,7 +314,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> endpoint
    */
   @Fluent
-  ConsulClient listEventsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<EventList>> resultHandler);
+  ConsulClient listEventsWithOptions(EventListOptions options, Handler<AsyncResult<EventList>> resultHandler);
 
   /**
    * Adds a new service, with an optional health check, to the local agent.

@@ -505,8 +505,9 @@ The Consul Index can be used to prepare blocking requests:
 
 [source,java]
 ----
-BlockingQueryOptions opts = new BlockingQueryOptions()
-  .setIndex(lastIndex);
+EventListOptions opts = new EventListOptions()
+  .setName("eventName")
+  .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
 
 consulClient.listEventsWithOptions(opts, res -> {
   if (res.succeeded()) {
