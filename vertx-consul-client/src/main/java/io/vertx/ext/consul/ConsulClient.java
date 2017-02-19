@@ -425,13 +425,13 @@ public interface ConsulClient {
    *
    * @param service the service name
    * @param passing if true, filter results to only nodes with all checks in the passing state
-   * @param options the blocking options
+   * @param options options used to request services
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
    */
   @Fluent
-  ConsulClient healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+  ConsulClient healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   /**
    * Returns the services registered in a datacenter

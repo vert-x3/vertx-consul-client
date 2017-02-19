@@ -94,9 +94,9 @@ public class Services {
 
   }
 
-  public void queryWithOptions(ConsulClient consulClient, ServiceQueryOptions queryOpts) {
+  public void queryWithOptions(ConsulClient consulClient, boolean passingOnly, ServiceQueryOptions queryOpts) {
 
-    consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
+    consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " services");
       } else {

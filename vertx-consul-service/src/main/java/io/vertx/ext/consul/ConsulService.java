@@ -135,7 +135,7 @@ public interface ConsulService extends ConsulClient {
   ConsulService healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   @Fluent
-  ConsulService healthServiceNodesWithOptions(String service, boolean passing, BlockingQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+  ConsulService healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   @Override
   @Fluent

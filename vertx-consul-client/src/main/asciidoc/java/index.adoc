@@ -362,7 +362,7 @@ Then the request should look like
 
 [source,java]
 ----
-consulClient.catalogServiceNodesWithOptions("serviceName", queryOpts, res -> {
+consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, res -> {
   if (res.succeeded()) {
     System.out.println("found " + res.result().getList().size() + " services");
   } else {
