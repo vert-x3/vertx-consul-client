@@ -17,11 +17,13 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
+import io.vertx.ext.web.client.WebClientOptions;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ import java.util.List;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject(generateConverter = true)
-public class ConsulClientOptions extends HttpClientOptions {
+public class ConsulClientOptions extends WebClientOptions {
 
   private static final String CONSUL_DEFAULT_HOST = "localhost";
   private static final int CONSUL_DEFAULT_PORT = 8500;
@@ -736,5 +738,94 @@ public class ConsulClientOptions extends HttpClientOptions {
   @Override
   public ConsulClientOptions setLogActivity(boolean logActivity) {
     return (ConsulClientOptions) super.setLogActivity(logActivity);
+  }
+
+  /**
+   * Sets whether the Web Client should send a user agent header. Defaults to true.
+   *
+   * @param userAgentEnabled true to send a user agent header, false otherwise
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setUserAgentEnabled(boolean userAgentEnabled) {
+    return (ConsulClientOptions) super.setUserAgentEnabled(userAgentEnabled);
+  }
+
+  /**
+   * Sets the Web Client user agent header. Defaults to Vert.x-WebClient/&lt;version&gt;.
+   *
+   * @param userAgent user agent header value
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setUserAgent(String userAgent) {
+    return (ConsulClientOptions) super.setUserAgent(userAgent);
+  }
+
+  /**
+   * Configure the default behavior of the client to follow HTTP {@code 30x} redirections.
+   *
+   * @param followRedirects true when a redirect is followed
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setFollowRedirects(boolean followRedirects) {
+    return (ConsulClientOptions) super.setFollowRedirects(followRedirects);
+  }
+
+  /**
+   * Set the max websocket message size
+   *
+   * @param maxWebsocketMessageSize  the max message size, in bytes
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setMaxWebsocketMessageSize(int maxWebsocketMessageSize) {
+    return (ConsulClientOptions) super.setMaxWebsocketMessageSize(maxWebsocketMessageSize);
+  }
+
+  /**
+   * Add an enabled cipher suite, appended to the ordered suites.
+   *
+   * @param suite  the suite
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions addEnabledCipherSuite(String suite) {
+    return (ConsulClientOptions) super.addEnabledCipherSuite(suite);
+  }
+
+  /**
+   * Add an enabled SSL/TLS protocols, appended to the ordered protocols.
+   *
+   * @param protocol  the SSL/TLS protocol do enabled
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions addEnabledSecureTransportProtocol(String protocol) {
+    return (ConsulClientOptions) super.addEnabledSecureTransportProtocol(protocol);
+  }
+
+  /**
+   * Add a CRL path
+   * @param crlPath  the path
+   * @return a reference to this, so the API can be used fluently
+   * @throws NullPointerException
+   */
+  @Override
+  public ConsulClientOptions addCrlPath(String crlPath) throws NullPointerException {
+    return (ConsulClientOptions) super.addCrlPath(crlPath);
+  }
+
+  /**
+   * Add a CRL value
+   *
+   * @param crlValue  the value
+   * @return a reference to this, so the API can be used fluently
+   * @throws NullPointerException
+   */
+  @Override
+  public ConsulClientOptions addCrlValue(Buffer crlValue) throws NullPointerException {
+    return (ConsulClientOptions) super.addCrlValue(crlValue);
   }
 }

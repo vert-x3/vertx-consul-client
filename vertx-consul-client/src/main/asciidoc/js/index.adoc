@@ -66,8 +66,8 @@ ACL policy, is used.
 `dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul
 by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
 
-ConsulClient options extends HttpClientOptions from Vertx core, therefore a lot of settings are available.
-Please see core documentation
+ConsulClient options extends WebClientOptions from `vertx-web-client` module,
+therefore a lot of settings are available. Please see the documentation.
 
 == Using the API
 

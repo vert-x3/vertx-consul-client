@@ -19,13 +19,14 @@ import io.vertx.core.net.ProxyOptions
  * @param aclToken  Set the ACL token. When provided, the client will use this token when making requests to the Consul by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous' ACL policy, is used.
  * @param alpnVersions  Set the list of protocol versions to provide to the server during the Application-Layer Protocol Negotiation. When the list is empty, the client provides a best effort list according to [io.vertx.ext.consul.ConsulClientOptions]: <ul>   <li>: [ "h2", "http/1.1" ]</li>   <li>otherwise: [[io.vertx.core.http.HttpClientOptions]]</li> </ul>
  * @param connectTimeout  Set the connect timeout
- * @param crlPaths 
- * @param crlValues 
+ * @param crlPaths  Add a CRL path
+ * @param crlValues  Add a CRL value
  * @param dc  Set the datacenter name. When provided, the client will use it when making requests to the Consul by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
  * @param defaultHost  Set the default host name to be used by this client in requests if none is provided when making the request.
  * @param defaultPort  Set the default port to be used by this client in requests if none is provided when making the request.
- * @param enabledCipherSuites 
- * @param enabledSecureTransportProtocols 
+ * @param enabledCipherSuites  Add an enabled cipher suite, appended to the ordered suites.
+ * @param enabledSecureTransportProtocols  Add an enabled SSL/TLS protocols, appended to the ordered protocols.
+ * @param followRedirects  Configure the default behavior of the client to follow HTTP <code>30x</code> redirections.
  * @param http2ClearTextUpgrade  Set to <code>true</code> when an <i>h2c</i> connection is established using an HTTP/1.1 upgrade request, and <code>false</code> when an <i>h2c</i> connection is established directly (with prior knowledge).
  * @param http2ConnectionWindowSize  Set the default HTTP/2 connection window size. It overrides the initial window size set by , so the connection window size is greater than for its streams, in order the data throughput. <p/> A value of <code>-1</code> reuses the initial window size setting.
  * @param http2MaxPoolSize  Set the maximum pool size for HTTP/2 connections
@@ -44,6 +45,7 @@ import io.vertx.core.net.ProxyOptions
  * @param maxRedirects  Set to <code>maxRedirects</code> the maximum number of redirection a request can follow.
  * @param maxWaitQueueSize  Set the maximum requests allowed in the wait queue, any requests beyond the max size will result in a ConnectionPoolTooBusyException.  If the value is set to a negative number then the queue will be unbounded.
  * @param maxWebsocketFrameSize  Set the max websocket frame size
+ * @param maxWebsocketMessageSize  Set the max websocket message size
  * @param metricsName  Set the metrics name identifying the reported metrics, useful for grouping metrics with the same name.
  * @param openSslEngineOptions 
  * @param pemKeyCertOptions  Set the key/cert store options in pem format.
@@ -69,6 +71,8 @@ import io.vertx.core.net.ProxyOptions
  * @param tryUseCompression  Set whether compression is enabled
  * @param useAlpn  Set the ALPN usage.
  * @param usePooledBuffers  Set whether Netty pooled buffers are enabled
+ * @param userAgent  Sets the Web Client user agent header. Defaults to Vert.x-WebClient/&lt;version&gt;.
+ * @param userAgentEnabled  Sets whether the Web Client should send a user agent header. Defaults to true.
  * @param verifyHost  Set whether hostname verification is enabled
  *
  * <p/>
@@ -85,6 +89,7 @@ fun ConsulClientOptions(
   defaultPort: Int? = null,
   enabledCipherSuites: Iterable<String>? = null,
   enabledSecureTransportProtocols: Iterable<String>? = null,
+  followRedirects: Boolean? = null,
   http2ClearTextUpgrade: Boolean? = null,
   http2ConnectionWindowSize: Int? = null,
   http2MaxPoolSize: Int? = null,
@@ -103,6 +108,7 @@ fun ConsulClientOptions(
   maxRedirects: Int? = null,
   maxWaitQueueSize: Int? = null,
   maxWebsocketFrameSize: Int? = null,
+  maxWebsocketMessageSize: Int? = null,
   metricsName: String? = null,
   openSslEngineOptions: io.vertx.core.net.OpenSSLEngineOptions? = null,
   pemKeyCertOptions: io.vertx.core.net.PemKeyCertOptions? = null,
@@ -128,6 +134,8 @@ fun ConsulClientOptions(
   tryUseCompression: Boolean? = null,
   useAlpn: Boolean? = null,
   usePooledBuffers: Boolean? = null,
+  userAgent: String? = null,
+  userAgentEnabled: Boolean? = null,
   verifyHost: Boolean? = null): ConsulClientOptions = io.vertx.ext.consul.ConsulClientOptions().apply {
 
   if (aclToken != null) {
@@ -167,6 +175,9 @@ fun ConsulClientOptions(
     for (item in enabledSecureTransportProtocols) {
       this.addEnabledSecureTransportProtocol(item)
     }
+  }
+  if (followRedirects != null) {
+    this.setFollowRedirects(followRedirects)
   }
   if (http2ClearTextUpgrade != null) {
     this.setHttp2ClearTextUpgrade(http2ClearTextUpgrade)
@@ -221,6 +232,9 @@ fun ConsulClientOptions(
   }
   if (maxWebsocketFrameSize != null) {
     this.setMaxWebsocketFrameSize(maxWebsocketFrameSize)
+  }
+  if (maxWebsocketMessageSize != null) {
+    this.setMaxWebsocketMessageSize(maxWebsocketMessageSize)
   }
   if (metricsName != null) {
     this.setMetricsName(metricsName)
@@ -296,6 +310,12 @@ fun ConsulClientOptions(
   }
   if (usePooledBuffers != null) {
     this.setUsePooledBuffers(usePooledBuffers)
+  }
+  if (userAgent != null) {
+    this.setUserAgent(userAgent)
+  }
+  if (userAgentEnabled != null) {
+    this.setUserAgentEnabled(userAgentEnabled)
   }
   if (verifyHost != null) {
     this.setVerifyHost(verifyHost)
