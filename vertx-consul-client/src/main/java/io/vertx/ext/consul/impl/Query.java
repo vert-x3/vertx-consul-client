@@ -15,12 +15,13 @@
  */
 package io.vertx.ext.consul.impl;
 
+import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.BlockingQueryOptions;
+import io.vertx.ext.web.client.HttpRequest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -58,18 +59,7 @@ class Query {
     return this;
   }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    if (!map.isEmpty()) {
-      sb.append('?');
-    }
-    map.entrySet().forEach(e -> {
-      if (sb.length() > 1) {
-        sb.append('&');
-      }
-      sb.append(e.getKey()).append('=').append(Utils.urlEncode(e.getValue()));
-    });
-    return sb.toString();
+  Set<Map.Entry<String, String>> entrySet() {
+    return map.entrySet();
   }
 }
