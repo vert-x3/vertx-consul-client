@@ -100,6 +100,28 @@ Set the status of check
 +++
 |===
 
+[[CheckList]]
+== CheckList
+
+++++
+ Holds result of checks query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Number (long)`|
++++
+Set Consul index, a unique identifier representing the current state of the requested list of checks
++++
+|[[list]]`list`|`Array of link:dataobjects.html#Check[Check]`|
++++
+Set list of checks
++++
+|===
+
 [[CheckOptions]]
 == CheckOptions
 
@@ -161,6 +183,28 @@ Set TCP address to check. Also you should set checking interval
 |[[ttl]]`ttl`|`String`|
 +++
 Set Time to Live of check.
++++
+|===
+
+[[CheckQueryOptions]]
+== CheckQueryOptions
+
+++++
+ Options used to requesting list of checks
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockingOptions]]`blockingOptions`|`link:dataobjects.html#BlockingQueryOptions[BlockingQueryOptions]`|
++++
+Set options for blocking query
++++
+|[[near]]`near`|`String`|
++++
+Set node name for sorting the list in ascending order based on the estimated round trip time from that node.
 +++
 |===
 
