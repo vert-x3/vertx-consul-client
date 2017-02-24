@@ -133,6 +133,14 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService healthChecks(String service, Handler<AsyncResult<CheckList>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService healthChecksWithOptions(String service, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   @Override

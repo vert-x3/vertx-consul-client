@@ -407,6 +407,29 @@ public interface ConsulClient {
   ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
 
   /**
+   * Returns the checks associated with the service
+   *
+   * @param service the service name
+   * @param resultHandler will be provided with list of checks
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_checks">/v1/health/checks/&lt;service&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient healthChecks(String service, Handler<AsyncResult<CheckList>> resultHandler);
+
+  /**
+   * Returns the checks associated with the service
+   *
+   * @param service the service name
+   * @param options       options used to request checks
+   * @param resultHandler will be provided with list of checks
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_checks">/v1/health/checks/&lt;service&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient healthChecksWithOptions(String service, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
+
+  /**
    * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodes} endpoint;
    * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
    *

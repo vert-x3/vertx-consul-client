@@ -18,10 +18,13 @@ package io.vertx.ext.consul.suite;
 import io.vertx.ext.consul.*;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
+import static io.vertx.ext.consul.Utils.*;
+import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -59,6 +62,51 @@ public class Checks extends ChecksBase {
     assertEquals(c.getNotes(), "checkNotes");
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
+  }
+
+  @Test
+  public void healthChecks() throws InterruptedException {
+    ServiceOptions opts = new ServiceOptions()
+      .setName("serviceName")
+      .setId("serviceId")
+      .setTags(Collections.singletonList("tag1"));
+    runAsync(h -> writeClient.registerService(opts, h));
+    runAsync(h -> writeClient.registerCheck(new CheckOptions()
+      .setTtl("10s")
+      .setServiceId("serviceId")
+      .setId("checkId1")
+      .setName("checkName1"), h));
+
+    CheckList list1 = getAsync(h -> readClient.healthChecks("serviceName", h));
+    assertEquals(list1.getList().size(), 1);
+    assertEquals(list1.getList().get(0).getId(), "checkId1");
+
+    CountDownLatch latch = new CountDownLatch(1);
+    waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
+      CheckQueryOptions options = new CheckQueryOptions()
+        .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
+      readClient.healthChecksWithOptions("serviceName", options, h -> {
+        List<String> ids = h.result().getList().stream().map(Check::getId).collect(Collectors.toList());
+        boolean success = h.result().getList().size() == 2;
+        success &= ids.contains("checkId1");
+        success &= ids.contains("checkId2");
+        waitComplete(vertx, fut, h.result().getIndex(), success);
+      });
+    });
+    sleep(vertx, 2000);
+    assertEquals(latch.getCount(), 1);
+
+    runAsync(h -> writeClient.registerCheck(new CheckOptions()
+      .setTtl("10s")
+      .setServiceId("serviceId")
+      .setId("checkId2")
+      .setName("checkName2"), h));
+
+    awaitLatch(latch);
+
+    runAsync(h -> writeClient.deregisterCheck("checkId1", h));
+    runAsync(h -> writeClient.deregisterCheck("checkId2", h));
+    runAsync(h -> writeClient.deregisterService("serviceId", h));
   }
 
   @Override
