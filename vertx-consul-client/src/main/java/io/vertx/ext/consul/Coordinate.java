@@ -172,4 +172,28 @@ public class Coordinate {
     this.vec = vec;
     return this;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Coordinate that = (Coordinate) o;
+
+    if (Float.compare(that.adj, adj) != 0) return false;
+    if (Float.compare(that.err, err) != 0) return false;
+    if (Float.compare(that.height, height) != 0) return false;
+    if (node != null ? !node.equals(that.node) : that.node != null) return false;
+    return vec != null ? vec.equals(that.vec) : that.vec == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = node != null ? node.hashCode() : 0;
+    result = 31 * result + (adj != +0.0f ? Float.floatToIntBits(adj) : 0);
+    result = 31 * result + (err != +0.0f ? Float.floatToIntBits(err) : 0);
+    result = 31 * result + (height != +0.0f ? Float.floatToIntBits(height) : 0);
+    result = 31 * result + (vec != null ? vec.hashCode() : 0);
+    return result;
+  }
 }

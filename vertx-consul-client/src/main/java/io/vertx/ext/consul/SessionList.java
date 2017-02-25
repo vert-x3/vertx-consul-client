@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,6 +37,16 @@ public class SessionList {
    * Default constructor
    */
   public SessionList() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public SessionList(SessionList other) {
+    this.index = other.index;
+    this.list = other.list;
+  }
 
   /**
    * Constructor from JSON
@@ -94,5 +106,32 @@ public class SessionList {
   public SessionList setList(List<Session> list) {
     this.list = list;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SessionList that = (SessionList) o;
+
+    if (index != that.index) return false;
+    return list != null ? sorted().equals(that.sorted()) : that.list == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (index ^ (index >>> 32));
+    result = 31 * result + (list != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<Session> sorted() {
+    List<Session> sorted = null;
+    if (list != null) {
+      sorted = new ArrayList<>(list);
+      sorted.sort(Comparator.comparing(Session::getId));
+    }
+    return sorted;
   }
 }

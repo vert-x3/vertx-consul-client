@@ -42,6 +42,21 @@ public class KeyValue implements TxnResult {
   public KeyValue() {}
 
   /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public KeyValue(KeyValue other) {
+    this.key = other.key;
+    this.value = other.value;
+    this.session = other.session;
+    this.flags = other.flags;
+    this.createIndex = other.createIndex;
+    this.modifyIndex = other.modifyIndex;
+    this.lockIndex = other.lockIndex;
+  }
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON
@@ -205,5 +220,33 @@ public class KeyValue implements TxnResult {
   @Override
   public TxnOperationType getOperationType() {
     return TxnOperationType.KV;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    KeyValue keyValue = (KeyValue) o;
+
+    if (flags != keyValue.flags) return false;
+    if (createIndex != keyValue.createIndex) return false;
+    if (modifyIndex != keyValue.modifyIndex) return false;
+    if (lockIndex != keyValue.lockIndex) return false;
+    if (key != null ? !key.equals(keyValue.key) : keyValue.key != null) return false;
+    if (value != null ? !value.equals(keyValue.value) : keyValue.value != null) return false;
+    return session != null ? session.equals(keyValue.session) : keyValue.session == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = key != null ? key.hashCode() : 0;
+    result = 31 * result + (value != null ? value.hashCode() : 0);
+    result = 31 * result + (session != null ? session.hashCode() : 0);
+    result = 31 * result + (int) (flags ^ (flags >>> 32));
+    result = 31 * result + (int) (createIndex ^ (createIndex >>> 32));
+    result = 31 * result + (int) (modifyIndex ^ (modifyIndex >>> 32));
+    result = 31 * result + (int) (lockIndex ^ (lockIndex >>> 32));
+    return result;
   }
 }

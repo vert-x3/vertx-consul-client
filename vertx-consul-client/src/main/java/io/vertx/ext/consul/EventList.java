@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,6 +37,16 @@ public class EventList {
    * Default constructor
    */
   public EventList() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public EventList(EventList other) {
+    this.index = other.index;
+    this.list = other.list;
+  }
 
   /**
    * Constructor from JSON
@@ -94,5 +106,32 @@ public class EventList {
   public EventList setList(List<Event> list) {
     this.list = list;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    EventList eventList = (EventList) o;
+
+    if (index != eventList.index) return false;
+    return list != null ? sorted().equals(eventList.sorted()) : eventList.list == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (index ^ (index >>> 32));
+    result = 31 * result + (list != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<Event> sorted() {
+    List<Event> sorted = null;
+    if (list != null) {
+      sorted = new ArrayList<>(list);
+      sorted.sort(Comparator.comparing(Event::getId));
+    }
+    return sorted;
   }
 }

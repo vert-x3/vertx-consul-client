@@ -41,6 +41,22 @@ public class Check {
   public Check() {}
 
   /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public Check(Check other) {
+    this.id = other.id;
+    this.name = other.name;
+    this.status = other.status;
+    this.notes = other.notes;
+    this.output = other.output;
+    this.serviceId = other.serviceId;
+    this.serviceName = other.serviceName;
+    this.nodeName = other.nodeName;
+  }
+
+  /**
    * Constructor from JSON
    *
    * @param check the JSON
@@ -218,5 +234,35 @@ public class Check {
   public Check setNodeName(String nodeName) {
     this.nodeName = nodeName;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Check check = (Check) o;
+
+    if (id != null ? !id.equals(check.id) : check.id != null) return false;
+    if (name != null ? !name.equals(check.name) : check.name != null) return false;
+    if (status != check.status) return false;
+    if (notes != null ? !notes.equals(check.notes) : check.notes != null) return false;
+    if (output != null ? !output.equals(check.output) : check.output != null) return false;
+    if (serviceId != null ? !serviceId.equals(check.serviceId) : check.serviceId != null) return false;
+    if (serviceName != null ? !serviceName.equals(check.serviceName) : check.serviceName != null) return false;
+    return nodeName != null ? nodeName.equals(check.nodeName) : check.nodeName == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (status != null ? status.hashCode() : 0);
+    result = 31 * result + (notes != null ? notes.hashCode() : 0);
+    result = 31 * result + (output != null ? output.hashCode() : 0);
+    result = 31 * result + (serviceId != null ? serviceId.hashCode() : 0);
+    result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
+    result = 31 * result + (nodeName != null ? nodeName.hashCode() : 0);
+    return result;
   }
 }

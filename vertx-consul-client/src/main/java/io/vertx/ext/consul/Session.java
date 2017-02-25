@@ -18,6 +18,7 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +40,20 @@ public class Session {
    * Default constructor
    */
   public Session() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public Session(Session other) {
+    this.lockDelay = other.lockDelay;
+    this.node = other.node;
+    this.checks = other.checks;
+    this.createIndex = other.createIndex;
+    this.index = other.index;
+    this.id = other.id;
+  }
 
   /**
    * Constructor from JSON
@@ -180,5 +195,40 @@ public class Session {
   public Session setIndex(long index) {
     this.index = index;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Session session = (Session) o;
+
+    if (lockDelay != session.lockDelay) return false;
+    if (createIndex != session.createIndex) return false;
+    if (index != session.index) return false;
+    if (node != null ? !node.equals(session.node) : session.node != null) return false;
+    if (checks != null ? !sorted().equals(session.sorted()) : session.checks != null) return false;
+    return id != null ? id.equals(session.id) : session.id == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (lockDelay ^ (lockDelay >>> 32));
+    result = 31 * result + (node != null ? node.hashCode() : 0);
+    result = 31 * result + (checks != null ? sorted().hashCode() : 0);
+    result = 31 * result + (int) (createIndex ^ (createIndex >>> 32));
+    result = 31 * result + (int) (index ^ (index >>> 32));
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    return result;
+  }
+
+  private List<String> sorted() {
+    List<String> sorted = null;
+    if (checks != null) {
+      sorted = new ArrayList<>(checks);
+      sorted.sort(String::compareTo);
+    }
+    return sorted;
   }
 }

@@ -35,6 +35,18 @@ public class Node {
   public Node() {}
 
   /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public Node(Node other) {
+    this.node = other.node;
+    this.address = other.address;
+    this.lanAddress = other.lanAddress;
+    this.wanAddress = other.wanAddress;
+  }
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON
@@ -132,5 +144,27 @@ public class Node {
   public Node setWanAddress(String wanAddress) {
     this.wanAddress = wanAddress;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Node node1 = (Node) o;
+
+    if (node != null ? !node.equals(node1.node) : node1.node != null) return false;
+    if (address != null ? !address.equals(node1.address) : node1.address != null) return false;
+    if (lanAddress != null ? !lanAddress.equals(node1.lanAddress) : node1.lanAddress != null) return false;
+    return wanAddress != null ? wanAddress.equals(node1.wanAddress) : node1.wanAddress == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = node != null ? node.hashCode() : 0;
+    result = 31 * result + (address != null ? address.hashCode() : 0);
+    result = 31 * result + (lanAddress != null ? lanAddress.hashCode() : 0);
+    result = 31 * result + (wanAddress != null ? wanAddress.hashCode() : 0);
+    return result;
   }
 }
