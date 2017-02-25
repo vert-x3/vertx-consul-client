@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,6 +37,16 @@ public class NodeList {
    * Default constructor
    */
   public NodeList() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public NodeList(NodeList other) {
+    this.index = other.index;
+    this.list = other.list;
+  }
 
   /**
    * Constructor from JSON
@@ -94,5 +106,32 @@ public class NodeList {
   public NodeList setList(List<Node> list) {
     this.list = list;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    NodeList nodeList = (NodeList) o;
+
+    if (index != nodeList.index) return false;
+    return list != null ? sorted().equals(nodeList.sorted()) : nodeList.list == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (index ^ (index >>> 32));
+    result = 31 * result + (list != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<Node> sorted() {
+    List<Node> sorted = null;
+    if (list != null) {
+      sorted = new ArrayList<>(list);
+      sorted.sort(Comparator.comparing(Node::getName));
+    }
+    return sorted;
   }
 }

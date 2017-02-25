@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,6 +37,16 @@ public class CheckList {
    * Default constructor
    */
   public CheckList() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public CheckList(CheckList other) {
+    this.index = other.index;
+    this.list = other.list;
+  }
 
   /**
    * Constructor from JSON
@@ -94,5 +106,32 @@ public class CheckList {
   public CheckList setList(List<Check> list) {
     this.list = list;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    CheckList checkList = (CheckList) o;
+
+    if (index != checkList.index) return false;
+    return list != null ? sorted().equals(checkList.sorted()) : checkList.list == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (index ^ (index >>> 32));
+    result = 31 * result + (list != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<Check> sorted() {
+    List<Check> sorted = null;
+    if (list != null) {
+      sorted = new ArrayList<>(list);
+      sorted.sort(Comparator.comparing(Check::getId));
+    }
+    return sorted;
   }
 }

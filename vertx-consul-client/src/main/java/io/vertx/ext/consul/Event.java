@@ -41,6 +41,22 @@ public class Event {
   public Event() {}
 
   /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public Event(Event other) {
+    this.id = other.id;
+    this.name = other.name;
+    this.payload = other.payload;
+    this.node = other.node;
+    this.service = other.service;
+    this.tag = other.tag;
+    this.version = other.version;
+    this.lTime = other.lTime;
+  }
+
+  /**
    * Constructor from JSON
    *
    * @param json the JSON
@@ -220,4 +236,33 @@ public class Event {
     return this;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Event event = (Event) o;
+
+    if (version != event.version) return false;
+    if (lTime != event.lTime) return false;
+    if (id != null ? !id.equals(event.id) : event.id != null) return false;
+    if (name != null ? !name.equals(event.name) : event.name != null) return false;
+    if (payload != null ? !payload.equals(event.payload) : event.payload != null) return false;
+    if (node != null ? !node.equals(event.node) : event.node != null) return false;
+    if (service != null ? !service.equals(event.service) : event.service != null) return false;
+    return tag != null ? tag.equals(event.tag) : event.tag == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (payload != null ? payload.hashCode() : 0);
+    result = 31 * result + (node != null ? node.hashCode() : 0);
+    result = 31 * result + (service != null ? service.hashCode() : 0);
+    result = 31 * result + (tag != null ? tag.hashCode() : 0);
+    result = 31 * result + version;
+    result = 31 * result + lTime;
+    return result;
+  }
 }

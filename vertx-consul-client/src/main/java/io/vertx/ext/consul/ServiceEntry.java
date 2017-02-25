@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -36,6 +38,17 @@ public class ServiceEntry {
    * Default constructor
    */
   public ServiceEntry() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public ServiceEntry(ServiceEntry other) {
+    this.node = other.node;
+    this.service = other.service;
+    this.checks = other.checks;
+  }
 
   /**
    * Constructor from JSON
@@ -115,5 +128,34 @@ public class ServiceEntry {
   public ServiceEntry setChecks(List<Check> checks) {
     this.checks = checks;
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ServiceEntry entry = (ServiceEntry) o;
+
+    if (node != null ? !node.equals(entry.node) : entry.node != null) return false;
+    if (service != null ? !service.equals(entry.service) : entry.service != null) return false;
+    return checks != null ? sorted().equals(entry.sorted()) : entry.checks == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = node != null ? node.hashCode() : 0;
+    result = 31 * result + (service != null ? service.hashCode() : 0);
+    result = 31 * result + (checks != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<Check> sorted() {
+    List<Check> sorted = null;
+    if (checks != null) {
+      sorted = new ArrayList<>(checks);
+      sorted.sort(Comparator.comparing(Check::getId));
+    }
+    return sorted;
   }
 }

@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,6 +37,16 @@ public class KeyValueList {
    * Default constructor
    */
   public KeyValueList() {}
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public KeyValueList(KeyValueList other) {
+    this.index = other.index;
+    this.list = other.list;
+  }
 
   /**
    * Constructor from JSON
@@ -96,4 +108,30 @@ public class KeyValueList {
     return this;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    KeyValueList list1 = (KeyValueList) o;
+
+    if (index != list1.index) return false;
+    return list != null ? sorted().equals(list1.sorted()) : list1.list == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (index ^ (index >>> 32));
+    result = 31 * result + (list != null ? sorted().hashCode() : 0);
+    return result;
+  }
+
+  private List<KeyValue> sorted() {
+    List<KeyValue> sorted = null;
+    if (list != null) {
+      sorted = new ArrayList<>(list);
+      sorted.sort(Comparator.comparing(KeyValue::getKey));
+    }
+    return sorted;
+  }
 }

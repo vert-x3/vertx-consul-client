@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,21 @@ public class Service {
    * Default constructor
    */
   public Service() {
+  }
+
+  /**
+   * Copy constructor
+   *
+   * @param other the one to copy
+   */
+  public Service(Service other) {
+    this.node = other.node;
+    this.nodeAddress = other.nodeAddress;
+    this.id = other.id;
+    this.name = other.name;
+    this.tags = other.tags;
+    this.address = other.address;
+    this.port = other.port;
   }
 
   /**
@@ -237,4 +253,42 @@ public class Service {
     this.port = port;
     return this;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Service service = (Service) o;
+
+    if (port != service.port) return false;
+    if (node != null ? !node.equals(service.node) : service.node != null) return false;
+    if (nodeAddress != null ? !nodeAddress.equals(service.nodeAddress) : service.nodeAddress != null) return false;
+    if (id != null ? !id.equals(service.id) : service.id != null) return false;
+    if (name != null ? !name.equals(service.name) : service.name != null) return false;
+    if (tags != null ? !sortedTags().equals(service.sortedTags()) : service.tags != null) return false;
+    return address != null ? address.equals(service.address) : service.address == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = node != null ? node.hashCode() : 0;
+    result = 31 * result + (nodeAddress != null ? nodeAddress.hashCode() : 0);
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (tags != null ? sortedTags().hashCode() : 0);
+    result = 31 * result + (address != null ? address.hashCode() : 0);
+    result = 31 * result + port;
+    return result;
+  }
+
+  private List<String> sortedTags() {
+    List<String> sorted = null;
+    if (tags != null) {
+      sorted = new ArrayList<>(tags);
+      sorted.sort(String::compareTo);
+    }
+    return sorted;
+  }
+
 }
