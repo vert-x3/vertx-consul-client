@@ -649,3 +649,19 @@ consulClient.catalogNodesWithOptions(opts, res -> {
 
 });
 ----
+
+== Watches
+
+TBD
+[source,java]
+----
+Watch.key("foo/bar", vertx)
+  .setHandler(res -> {
+    if (res.succeeded()) {
+      System.out.println("value: " + res.result().getValue());
+    } else {
+      res.cause().printStackTrace();
+    }
+  })
+  .start();
+----

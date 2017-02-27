@@ -34,6 +34,8 @@ public class ConsulTestBase extends VertxTestBase {
   protected ConsulClient masterClient;
   protected ConsulClient writeClient;
   protected ConsulClient readClient;
+  protected ConsulClientOptions writeClientOptions;
+  protected ConsulClientOptions readClientOptions;
   protected String nodeName;
   protected String dc;
 
@@ -41,8 +43,8 @@ public class ConsulTestBase extends VertxTestBase {
   public void setUp() throws Exception {
     super.setUp();
     masterClient = clientCreator.apply(vertx, config(ConsulCluster.masterToken(), false));
-    writeClient = clientCreator.apply(vertx, config(ConsulCluster.writeToken(), false));
-    readClient = clientCreator.apply(vertx, config(ConsulCluster.readToken(), false));
+    writeClient = clientCreator.apply(vertx, writeClientOptions = config(ConsulCluster.writeToken(), false));
+    readClient = clientCreator.apply(vertx, readClientOptions = config(ConsulCluster.readToken(), false));
     nodeName = ConsulCluster.nodeName();
     dc = ConsulCluster.dc();
   }

@@ -756,3 +756,18 @@ consulClient.catalogNodesWithOptions(opts, { res ->
 
 
 ----
+
+== Watches
+
+TBD
+[source,groovy]
+----
+Watch.key("foo/bar", vertx).setHandler({ res ->
+  if (res.succeeded()) {
+    println("value: ${res.result().value}")
+  } else {
+    res.cause().printStackTrace()
+  }
+}).start()
+
+----

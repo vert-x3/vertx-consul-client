@@ -358,6 +358,14 @@
  * ----
  * {@link examples.Examples#nodes}
  * ----
+ *
+ * == Watches
+ *
+ * TBD
+ * [source,$lang]
+ * ----
+ * {@link examples.Watches#watchKey}
+ * ----
  */
 @Document(fileName = "index.adoc")
 @ModuleGen(name = "vertx-consul", groupPackage = "io.vertx")

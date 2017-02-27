@@ -758,3 +758,19 @@ consulClient.catalogNodesWithOptions(opts, function (res, res_err) {
 
 
 ----
+
+== Watches
+
+TBD
+[source,js]
+----
+var Watch = require("vertx-consul-js/watch");
+Watch.key("foo/bar", vertx).setHandler(function (res, res_err) {
+  if (res_err == null) {
+    console.log("value: " + res.value);
+  } else {
+    res_err.printStackTrace();
+  }
+}).start();
+
+----
