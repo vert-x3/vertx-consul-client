@@ -724,29 +724,27 @@ consulClient.listSessionsWithOptions(blockingOpts, function (res, res_err) {
 
 ----
 
-== Nodes in cluster
+== Nodes in datacenter
 
-TBD
 [source,js]
 ----
 
 consulClient.catalogNodes(function (res, res_err) {
-
   if (res_err == null) {
-
     console.log("found " + res.list.length + " nodes");
-
     console.log("consul state index " + res.index);
-
   } else {
-
     res_err.printStackTrace();
-
   }
-
 });
 
-// blocking request to catalog for nodes, sorted by distance from agent
+
+----
+
+This endpoint supports blocking queries and sorting by distance from specified node
+
+[source,js]
+----
 
 var opts = {
   "near" : "_agent",
@@ -756,17 +754,11 @@ var opts = {
 };
 
 consulClient.catalogNodesWithOptions(opts, function (res, res_err) {
-
   if (res_err == null) {
-
     console.log("found " + res.list.length + " nodes");
-
   } else {
-
     res_err.printStackTrace();
-
   }
-
 });
 
 

@@ -609,44 +609,33 @@ consulClient.listSessionsWithOptions(blockingOpts, res -> {
 });
 ----
 
-== Nodes in cluster
+== Nodes in datacenter
 
-TBD
 [source,java]
 ----
 consulClient.catalogNodes(res -> {
-
   if (res.succeeded()) {
-
     System.out.println("found " + res.result().getList().size() + " nodes");
-
     System.out.println("consul state index " + res.result().getIndex());
-
   } else {
-
     res.cause().printStackTrace();
-
   }
-
 });
+----
 
-// blocking request to catalog for nodes, sorted by distance from agent
+This endpoint supports blocking queries and sorting by distance from specified node
 
+[source,java]
+----
 NodeQueryOptions opts = new NodeQueryOptions()
   .setNear("_agent")
   .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
 
 consulClient.catalogNodesWithOptions(opts, res -> {
-
   if (res.succeeded()) {
-
     System.out.println("found " + res.result().getList().size() + " nodes");
-
   } else {
-
     res.cause().printStackTrace();
-
   }
-
 });
 ----

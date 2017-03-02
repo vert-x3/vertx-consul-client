@@ -722,29 +722,27 @@ consulClient.listSessionsWithOptions(blockingOpts, { res ->
 
 ----
 
-== Nodes in cluster
+== Nodes in datacenter
 
-TBD
 [source,groovy]
 ----
 
 consulClient.catalogNodes({ res ->
-
   if (res.succeeded()) {
-
     println("found ${res.result().list.size()} nodes")
-
     println("consul state index ${res.result().index}")
-
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
 
-// blocking request to catalog for nodes, sorted by distance from agent
+
+----
+
+This endpoint supports blocking queries and sorting by distance from specified node
+
+[source,groovy]
+----
 
 def opts = [
   near:"_agent",
@@ -754,17 +752,11 @@ def opts = [
 ]
 
 consulClient.catalogNodesWithOptions(opts, { res ->
-
   if (res.succeeded()) {
-
     println("found ${res.result().list.size()} nodes")
-
   } else {
-
     res.cause().printStackTrace()
-
   }
-
 })
 
 
