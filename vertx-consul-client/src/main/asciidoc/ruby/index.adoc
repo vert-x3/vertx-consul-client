@@ -724,29 +724,27 @@ consulClient.list_sessions_with_options(blockingOpts) { |res_err,res|
 
 ----
 
-== Nodes in cluster
+== Nodes in datacenter
 
-TBD
 [source,ruby]
 ----
 
 consulClient.catalog_nodes() { |res_err,res|
-
   if (res_err == nil)
-
     puts "found #{res['list'].length} nodes"
-
     puts "consul state index #{res['index']}"
-
   else
-
     res_err.print_stack_trace()
-
   end
-
 }
 
-# blocking request to catalog for nodes, sorted by distance from agent
+
+----
+
+This endpoint supports blocking queries and sorting by distance from specified node
+
+[source,ruby]
+----
 
 opts = {
   'near' => "_agent",
@@ -756,17 +754,11 @@ opts = {
 }
 
 consulClient.catalog_nodes_with_options(opts) { |res_err,res|
-
   if (res_err == nil)
-
     puts "found #{res['list'].length} nodes"
-
   else
-
     res_err.print_stack_trace()
-
   end
-
 }
 
 

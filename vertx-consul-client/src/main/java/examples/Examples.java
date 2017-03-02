@@ -46,44 +46,4 @@ public class Examples {
 
   }
 
-  public void nodes(ConsulClient consulClient, long lastIndex) {
-
-    consulClient.catalogNodes(res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("found " + res.result().getList().size() + " nodes");
-
-        System.out.println("consul state index " + res.result().getIndex());
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-    // blocking request to catalog for nodes, sorted by distance from agent
-
-    NodeQueryOptions opts = new NodeQueryOptions()
-      .setNear("_agent")
-      .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
-
-    consulClient.catalogNodesWithOptions(opts, res -> {
-
-      if (res.succeeded()) {
-
-        System.out.println("found " + res.result().getList().size() + " nodes");
-
-      } else {
-
-        res.cause().printStackTrace();
-
-      }
-
-    });
-
-  }
-
 }

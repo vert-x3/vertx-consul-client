@@ -397,12 +397,18 @@
  * {@link examples.Sessions#blockingQuery}
  * ----
  *
- * == Nodes in cluster
+ * == Nodes in datacenter
  *
- * TBD
  * [source,$lang]
  * ----
- * {@link examples.Examples#nodes}
+ * {@link examples.Nodes#catalogNodes}
+ * ----
+ *
+ * This endpoint supports blocking queries and sorting by distance from specified node
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Nodes#blockingQuery}
  * ----
  */
 @Document(fileName = "index.adoc")
