@@ -345,18 +345,70 @@
  *
  * == Sessions
  *
- * TBD
+ * Consul provides a session mechanism which can be used to build distributed locks.
+ * Sessions act as a binding layer between nodes, health checks, and key/value data.
+ * When a session is constructed, a node name, a list of health checks, a behavior, a TTL, and a lock-delay
+ * may be provided.
+ *
  * [source,$lang]
  * ----
- * {@link examples.Examples#sessions}
+ * {@link examples.Sessions#sessionOpts}
  * ----
  *
- * == Nodes in cluster
+ * `lockDelay`:: can be specified as a duration string using an 's' suffix for seconds. The default is '15s'.
+ * `name`:: can be used to provide a human-readable name for the Session.
+ * `node`:: must refer to a node that is already registered, if specified. By default, the agent's own node name is used.
+ * `checks`:: is used to provide a list of associated health checks. It is highly recommended that,
+ * if you override this list, you include the default `serfHealth`.
+ * `behavior`:: can be set to either `release` or `delete`. This controls the behavior when a session is invalidated.
+ * By default, this is `release`, causing any locks that are held to be released. Changing this to `delete` causes
+ * any locks that are held to be deleted. `delete` is useful for creating ephemeral key/value entries.
+ * `ttl`:: is a duration string, and like `LockDelay` it can use s as a suffix for seconds. If specified,
+ * it must be between 10s and 86400s currently. When provided, the session is invalidated if it is not renewed before the TTL expires.
  *
- * TBD
+ * For full info see https://www.consul.io/docs/internals/sessions.html[Consul Sessions internals]
+ *
+ * The newly constructed session is provided with a named ID that can be used to identify it.
+ * This ID can be used with the KV store to acquire locks: advisory mechanisms for mutual exclusion.
+ *
  * [source,$lang]
  * ----
- * {@link examples.Examples#nodes}
+ * {@link examples.Sessions#create}
+ * ----
+ *
+ * And also to destroy it
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Sessions#destroy}
+ * ----
+ *
+ * Lists sessions belonging to a node
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Sessions#nodeSessions}
+ * ----
+ *
+ * All of the read session endpoints support blocking queries and all consistency modes.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Sessions#blockingQuery}
+ * ----
+ *
+ * == Nodes in datacenter
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Nodes#catalogNodes}
+ * ----
+ *
+ * This endpoint supports blocking queries and sorting by distance from specified node
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.Nodes#blockingQuery}
  * ----
  *
  * == Watches
