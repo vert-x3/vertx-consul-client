@@ -27,6 +27,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -38,9 +39,10 @@ class ConsulCluster {
   private static final String MASTER_TOKEN = "topSecret";
   private static final String DC = "test-dc";
   private static final String NODE_NAME = "nodeName";
-  private static final String CONSUL_VERSION = "0.7.4";
+  private static final String CONSUL_VERSION = "0.7.5";
 
   private static ConsulCluster instance;
+  private static Random random = new Random();
 
   private static ConsulCluster instance() {
     if (instance == null) {
@@ -121,9 +123,22 @@ class ConsulCluster {
       .put("addresses", new JsonObject().put("https", "0.0.0.0"))
       .put("datacenter", DC)
       .put("node_name", nodeName)
+      .put("node_id", randomNodeId())
       .put("acl_default_policy", "deny")
       .put("acl_master_token", MASTER_TOKEN)
       .put("acl_datacenter", DC);
+  }
+
+  private static String randomNodeId() {
+    return randomHex(8) + "-" + randomHex(4) + "-" + randomHex(4) + "-" + randomHex(4) + "-" + randomHex(12);
+  }
+
+  private static String randomHex(int len) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < len; i++) {
+      sb.append(Long.toHexString(random.nextInt(16)));
+    }
+    return sb.toString();
   }
 
   private void create() throws Exception {

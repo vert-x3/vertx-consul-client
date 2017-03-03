@@ -763,3 +763,22 @@ consulClient.catalog_nodes_with_options(opts) { |res_err,res|
 
 
 ----
+
+== Watches
+
+Watches are a way of specifying a view of data (e.g. list of nodes, KV pairs, health checks)
+which is monitored for updates. When an update is detected, an `Handler` with `AsyncResult` is invoked.
+As an example, you could watch the status of health checks and notify when a check is critical.
+
+[source,ruby]
+----
+require 'vertx-consul/watch'
+VertxConsul::Watch.key("foo/bar", vertx).set_handler() { |res_err,res|
+  if (res_err == nil)
+    puts "value: #{res['value']}"
+  else
+    res_err.print_stack_trace()
+  end
+}.start()
+
+----
