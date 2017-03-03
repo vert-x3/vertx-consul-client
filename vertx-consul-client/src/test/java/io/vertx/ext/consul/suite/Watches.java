@@ -201,7 +201,7 @@ public class Watches extends ConsulTestBase {
     ServiceOptions service = new ServiceOptions()
       .setCheckOptions(new CheckOptions()
         .setStatus(CheckStatus.PASSING)
-        .setTtl("2s")
+        .setTtl("4s")
         .setName(randomAlphaString(10)))
       .setId(randomAlphaString(10))
       .setName(randomAlphaString(10));
@@ -220,10 +220,10 @@ public class Watches extends ConsulTestBase {
         }
       })
       .start();
-    sleep(vertx, 1000);
+    sleep(vertx, 2000);
 
     runAsync(h -> writeClient.registerService(service, h));
-    sleep(vertx, 5000);
+    sleep(vertx, 10000);
     watch.stop();
 
     assertEquals(outs.get(0), "");

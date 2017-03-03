@@ -413,7 +413,10 @@
  *
  * == Watches
  *
- * TBD
+ * Watches are a way of specifying a view of data (e.g. list of nodes, KV pairs, health checks)
+ * which is monitored for updates. When an update is detected, an {@code Handler} with {@code AsyncResult} is invoked.
+ * As an example, you could watch the status of health checks and notify when a check is critical.
+ *
  * [source,$lang]
  * ----
  * {@link examples.Watches#watchKey}
