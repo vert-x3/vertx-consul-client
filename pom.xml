@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,13 +15,13 @@
   </modules>
 
   <artifactId>vertx-consul</artifactId>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>3.4.0</version>
   <packaging>pom</packaging>
 
   <name>Vert.x Consul</name>
 
   <properties>
-    <stack.version>3.4.0-SNAPSHOT</stack.version>
+    <stack.version>3.4.0</stack.version>
     <embedded.consul.version>0.2.2</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.12</junit.version>
