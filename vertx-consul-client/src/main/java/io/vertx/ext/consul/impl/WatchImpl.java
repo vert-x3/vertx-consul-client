@@ -103,7 +103,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
   public synchronized Watch<T> start() {
     if (!started) {
       started = true;
-      go();
+      vertx.runOnContext(v -> go());
     } else {
       throw new IllegalStateException("Watch already started");
     }
@@ -119,7 +119,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
       throw new IllegalStateException("Watch already stopped");
     }
     stopped = true;
-    consulClient.close();
+    vertx.runOnContext(v -> consulClient.close());
   }
 
   private WatchImpl<T> go() {
