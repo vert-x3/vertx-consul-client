@@ -30,6 +30,7 @@ public class ConsulTestBase extends VertxTestBase {
 
   protected static BiFunction<Vertx, ConsulClientOptions, ConsulClient> clientCreator;
   protected static Consumer<ConsulClient> clientCloser;
+  protected static String KEY_RW_PREFIX = "foo/";
 
   protected ConsulClient masterClient;
   protected ConsulClient writeClient;
