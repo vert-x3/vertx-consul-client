@@ -28,9 +28,9 @@ public class StateConsumerTest {
   @Test
   public void test1() throws InterruptedException {
     final Vertx vertx = Vertx.vertx();
-    final StateConsumer<Integer> consumer = new StateConsumer<>();
+    final StateConsumer<Integer> consumer = new StateConsumer<>(false);
     final CountDownLatch latch = new CountDownLatch(1);
-    final int n = 1000000;
+    final int n = 100000;
     vertx.runOnContext(v -> {
       latch.countDown();
       for (int i = 0; i < n; i++) {

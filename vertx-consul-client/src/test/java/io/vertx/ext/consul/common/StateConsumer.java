@@ -32,10 +32,16 @@ public class StateConsumer<T> {
   private final List<T> consumed = new ArrayList<>();
   private final Deque<T> deque = new ConcurrentLinkedDeque<>();
   private final long start;
+  private final boolean logEnabled;
   private CountDownLatch latch = new CountDownLatch(0);
 
   public StateConsumer() {
-    start = System.currentTimeMillis();
+    this(true);
+  }
+
+  public StateConsumer(boolean logEnabled) {
+    this.start = System.currentTimeMillis();
+    this.logEnabled = logEnabled;
   }
 
   public StateConsumer<T> awaitAny() throws InterruptedException {
@@ -92,6 +98,8 @@ public class StateConsumer<T> {
   }
 
   private void log(String message) {
-    System.out.println((System.currentTimeMillis() - start) + " ms: " + message);
+    if (logEnabled) {
+      System.out.println((System.currentTimeMillis() - start) + " ms: " + message);
+    }
   }
 }
