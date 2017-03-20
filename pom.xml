@@ -22,7 +22,7 @@
 
   <properties>
     <stack.version>3.4.2-SNAPSHOT</stack.version>
-    <embedded.consul.version>0.2.2</embedded.consul.version>
+    <embedded.consul.version>0.3.0</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.12</junit.version>
     <doc.skip>true</doc.skip>
