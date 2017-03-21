@@ -109,6 +109,32 @@ public interface Watch<T> {
   }
 
   /**
+   * Creates {@code Watch} to monitoring the custom user events.
+   * The underlying Consul client will be created with default options.
+   * This maps to the <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> API internally.
+   *
+   * @param event the event name
+   * @param vertx the {@code Vertx} instance
+   * @return the {@code Watch} instance
+   */
+  static Watch<EventList> events(String event, Vertx vertx) {
+    return events(event, vertx, new ConsulClientOptions());
+  }
+
+  /**
+   * Creates {@code Watch} to monitoring the custom user events.
+   * This maps to the <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> API internally.
+   *
+   * @param event the event name
+   * @param vertx the {@code Vertx} instance
+   * @param options the options to create underlying Consul client
+   * @return the {@code Watch} instance
+   */
+  static Watch<EventList> events(String event, Vertx vertx, ConsulClientOptions options) {
+    return new WatchImpl.Events(event, vertx, options);
+  }
+
+  /**
    * Set the result handler. As data is changed, the handler will be called with the result.
    *
    * @param handler the result handler

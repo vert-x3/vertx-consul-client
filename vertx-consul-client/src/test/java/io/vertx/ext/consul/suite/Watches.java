@@ -17,15 +17,14 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.common.StateConsumer;
-import io.vertx.ext.consul.Utils;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.Utils.*;
+import static io.vertx.ext.consul.Utils.getAsync;
+import static io.vertx.ext.consul.Utils.runAsync;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
 
 /**
@@ -234,5 +233,34 @@ public class Watches extends ConsulTestBase {
 
     watch.stop();
     runAsync(h -> writeClient.deregisterService(service.getId(), h));
+  }
+
+  @Test
+  public void watchEvents() throws InterruptedException {
+    StateConsumer<String> consumer = new StateConsumer<>();
+    String evName = randomAlphaString(10);
+    String p1 = randomAlphaString(10);
+    String p2 = randomAlphaString(10);
+
+    Watch<EventList> watch = Watch.events(evName, vertx, readClientOptions)
+      .setHandler(list -> {
+        if (list.succeeded()) {
+          consumer.consume(list.result().getList()
+            .stream().map(Event::getPayload).collect(Collectors.joining(",")));
+        }
+      })
+      .start();
+
+    consumer.await("");
+
+    Utils.<Event>getAsync(h -> writeClient.fireEventWithOptions(evName, new EventOptions().setPayload(p1), h));
+    Utils.<Event>getAsync(h -> writeClient.fireEventWithOptions(randomAlphaString(10), new EventOptions().setPayload(randomAlphaString(10)), h));
+    Utils.<Event>getAsync(h -> writeClient.fireEventWithOptions(evName, new EventOptions().setPayload(p2), h));
+
+    consumer.await(p1);
+    consumer.await(p1 + "," + p2);
+    consumer.check();
+
+    watch.stop();
   }
 }

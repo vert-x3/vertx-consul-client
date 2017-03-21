@@ -16,7 +16,6 @@
 package io.vertx.ext.consul;
 
 import io.vertx.ext.consul.suite.*;
-import io.vertx.ext.consul.suite.Watches;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

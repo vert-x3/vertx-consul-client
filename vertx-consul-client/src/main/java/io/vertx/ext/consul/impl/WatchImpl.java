@@ -78,6 +78,24 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
+  public static class Events extends WatchImpl<EventList> {
+
+    private final String event;
+
+    public Events(String event, Vertx vertx, ConsulClientOptions options) {
+      super(vertx, ConsulClient.create(vertx, options));
+      this.event = event;
+    }
+
+    @Override
+    void wait(long index, Handler<AsyncResult<State<EventList>>> handler) {
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      EventListOptions eOpts = new EventListOptions().setBlockingOptions(bOpts).setName(event);
+      consulClient.listEventsWithOptions(eOpts, h ->
+        handler.handle(h.map(events -> new State<EventList>(events, events.getIndex()))));
+    }
+  }
+
   private boolean started = false;
   private boolean stopped = false;
   private Handler<AsyncResult<T>> handler;
