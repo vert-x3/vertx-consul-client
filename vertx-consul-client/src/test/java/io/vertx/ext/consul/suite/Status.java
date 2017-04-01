@@ -29,13 +29,13 @@ public class Status extends ConsulTestBase {
 
   @Test
   public void leader() {
-    String leader = getAsync(h -> readClient.leaderStatus(h));
+    String leader = getAsync(h -> ctx.readClient().leaderStatus(h));
     assertEquals(leader.substring(0, leader.indexOf(':')), "127.0.0.1");
   }
 
   @Test
   public void peers() {
-    List<String> peers = getAsync(h -> readClient.peersStatus(h));
+    List<String> peers = getAsync(h -> ctx.readClient().peersStatus(h));
     assertEquals(peers.size(), 1);
   }
 

@@ -28,10 +28,10 @@ public class SecureClient extends ConsulTestBase {
   }
 
   private void go(boolean trustAll, PemTrustOptions trustOptions) {
-    ConsulClient secureClient = createSecureClient(trustAll, trustOptions);
+    ConsulClient secureClient = ctx.createSecureClient(trustAll, trustOptions);
     assertTrue(getAsync(h -> secureClient.putValue("foo/bars42", "value42", h)));
     KeyValue pair = getAsync(h -> secureClient.getValue("foo/bars42", h));
     assertEquals(pair.getValue(), "value42");
-    clientCloser.accept(secureClient);
+    ctx.closeClient(secureClient);
   }
 }

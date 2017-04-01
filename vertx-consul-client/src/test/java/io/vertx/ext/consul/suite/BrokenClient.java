@@ -15,7 +15,6 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ConsulTestBase;
@@ -31,13 +30,13 @@ public class BrokenClient extends ConsulTestBase {
 
   @Test
   public void unknownHost() {
-    ConsulClient unknownHost = clientCreator.apply(vertx, new ConsulClientOptions().setHost("unknownConsulHost"));
+    ConsulClient unknownHost = ctx.createClient(new ConsulClientOptions().setHost("unknownConsulHost"));
     tryClient(unknownHost, message -> message.contains("unknownConsulHost"));
   }
 
   @Test
   public void unknownPort() {
-    ConsulClient unknownPort = clientCreator.apply(vertx, new ConsulClientOptions().setPort(Utils.getFreePort()));
+    ConsulClient unknownPort = ctx.createClient(new ConsulClientOptions().setPort(Utils.getFreePort()));
     tryClient(unknownPort, message -> message.contains("Connection refused"));
   }
 
@@ -48,7 +47,7 @@ public class BrokenClient extends ConsulTestBase {
       }
     });
     await();
-    clientCloser.accept(client);
+    ctx.closeClient(client);
   }
 
 }

@@ -14,14 +14,16 @@ public class ConsulServiceTest extends ConsulTestSuite {
 
   @BeforeClass
   public static void initClient() {
-    ConsulTestBase.clientCreator = (vertx, config) -> {
-      String addr = "vertx.consul." + cnt.incrementAndGet();
-      DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson().put("address", addr));
-      Utils.<String>getAsync(h -> vertx.deployVerticle("service:io.vertx.consul-service", options, h));
-      return ConsulService.createEventBusProxy(vertx, addr);
-    };
-    ConsulTestBase.clientCloser = client -> {
-    };
+    ConsulTestBase.ctxFactory = vertx -> new ConsulContext(
+      config -> {
+        String addr = "vertx.consul." + cnt.incrementAndGet();
+        DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson().put("address", addr));
+        Utils.<String>getAsync(h -> vertx.deployVerticle("service:io.vertx.consul-service", options, h));
+        return ConsulService.createEventBusProxy(vertx, addr);
+      },
+      client -> {
+      }
+    );
   }
 
 }

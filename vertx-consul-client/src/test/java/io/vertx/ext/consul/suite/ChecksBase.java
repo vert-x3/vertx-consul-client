@@ -47,17 +47,17 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     Check check;
 
-    runAsync(h -> writeClient.warnCheckWithNote(checkId, "warn", h));
+    runAsync(h -> ctx.writeClient().warnCheckWithNote(checkId, "warn", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
     assertEquals("warn", check.getOutput());
 
-    runAsync(h -> writeClient.failCheckWithNote(checkId, "fail", h));
+    runAsync(h -> ctx.writeClient().failCheckWithNote(checkId, "fail", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
     assertEquals("fail", check.getOutput());
 
-    runAsync(h -> writeClient.passCheckWithNote(checkId, "pass", h));
+    runAsync(h -> ctx.writeClient().passCheckWithNote(checkId, "pass", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
     assertEquals("pass", check.getOutput());
@@ -67,7 +67,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> writeClient.deregisterCheck(checkId, h));
+    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
   }
 
   @Test
@@ -96,7 +96,7 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     reporter.close();
 
-    runAsync(h -> writeClient.deregisterCheck(checkId, h));
+    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
   }
 
   @Test
@@ -118,7 +118,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> writeClient.deregisterCheck(checkId, h));
+    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
   }
 
   @Test
@@ -145,11 +145,11 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> writeClient.deregisterCheck(checkId, h));
+    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
   }
 
   Check getCheckInfo(String id) {
-    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
     return checks.stream()
       .filter(check -> check.getId().equals(id))
       .findFirst()

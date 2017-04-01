@@ -46,15 +46,15 @@ public class Events extends ConsulTestBase {
     String name1 = "custom-event-1-" + TestUtils.randomAlphaString(10);
     String name2 = "custom-event-2-" + TestUtils.randomAlphaString(10);
     EventOptions opts = new EventOptions().setPayload("content");
-    Event event = getAsync(h -> writeClient.fireEventWithOptions(name1, opts, h));
+    Event event = getAsync(h -> ctx.writeClient().fireEventWithOptions(name1, opts, h));
     assertEquals(name1, event.getName());
     assertEquals(opts.getPayload(), event.getPayload());
     String evId1 = event.getId();
-    EventList list1 = getAsync(h -> writeClient.listEvents(h));
+    EventList list1 = getAsync(h -> ctx.writeClient().listEvents(h));
     long cnt1 = list1.getList().stream().map(Event::getId).filter(id -> id.equals(evId1)).count();
     assertEquals(cnt1, 1);
 
-    EventList list2 = getAsync(h -> writeClient.listEventsWithOptions(new EventListOptions().setName(name2), h));
+    EventList list2 = getAsync(h -> ctx.writeClient().listEventsWithOptions(new EventListOptions().setName(name2), h));
     assertEquals(list2.getList().size(), 0);
 
     CountDownLatch latch = new CountDownLatch(1);
@@ -63,7 +63,7 @@ public class Events extends ConsulTestBase {
     if (timeout) {
       blockingQueryOptions.setWait("2s");
     }
-    writeClient.listEventsWithOptions(new EventListOptions().setBlockingOptions(blockingQueryOptions), h -> {
+    ctx.writeClient().listEventsWithOptions(new EventListOptions().setBlockingOptions(blockingQueryOptions), h -> {
       List<String> names = h.result().getList().stream().map(Event::getName).collect(Collectors.toList());
       if (timeout) {
         assertTrue(names.contains(name1));
@@ -77,11 +77,11 @@ public class Events extends ConsulTestBase {
     assertEquals(latch.getCount(), 1);
     sleep(vertx, 4000);
     assertEquals(latch.getCount(), timeout ? 0 : 1);
-    Utils.<Event>getAsync(h -> writeClient.fireEvent(name2, h));
+    Utils.<Event>getAsync(h -> ctx.writeClient().fireEvent(name2, h));
     awaitLatch(latch);
 
 
-    EventList list3 = getAsync(h -> writeClient.listEventsWithOptions(new EventListOptions().setName(name2), h));
+    EventList list3 = getAsync(h -> ctx.writeClient().listEventsWithOptions(new EventListOptions().setName(name2), h));
     assertEquals(list3.getList().size(), 1);
 
   }

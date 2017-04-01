@@ -25,8 +25,10 @@ public class ConsulClientTest extends ConsulTestSuite {
 
   @BeforeClass
   public static void initCreator() {
-    ConsulTestBase.clientCreator = ConsulClientImpl::new;
-    ConsulTestBase.clientCloser = ConsulClient::close;
+    ConsulTestBase.ctxFactory = vertx -> new ConsulContext(
+      opts -> new ConsulClientImpl(vertx, opts),
+      ConsulClient::close
+    );
   }
 
 }

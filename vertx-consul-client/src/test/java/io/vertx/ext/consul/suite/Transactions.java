@@ -34,7 +34,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest request = new TxnRequest()
       .addOperation(new TxnKVOperation().setKey("foo/bar/t1").setValue("val1").setType(TxnKVVerb.SET))
       .addOperation(new TxnKVOperation().setKey("foo/bar/t2").setValue("val2").setType(TxnKVVerb.SET));
-    TxnResponse response = getAsync(h -> writeClient.transaction(request, h));
+    TxnResponse response = getAsync(h -> ctx.writeClient().transaction(request, h));
     assertEquals(0, response.getErrorsSize());
     assertEquals(2, response.getResultsSize());
     List<String> keys = getKeys(response);
@@ -43,7 +43,7 @@ public class Transactions extends ConsulTestBase {
     List<String> entries = getEntries("foo/bar/t");
     assertTrue(entries.contains("foo/bar/t1/val1"));
     assertTrue(entries.contains("foo/bar/t2/val2"));
-    runAsync(h -> writeClient.deleteValues("foo/bar/t", h));
+    runAsync(h -> ctx.writeClient().deleteValues("foo/bar/t", h));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest req1 = new TxnRequest()
       .addOperation(new TxnKVOperation().setKey("foo/bar1").setValue("newVal1").setIndex(idx1).setType(TxnKVVerb.CAS))
       .addOperation(new TxnKVOperation().setKey("foo/bar2").setValue("newVal2").setIndex(idx2 - 1).setType(TxnKVVerb.CAS));
-    TxnResponse resp1 = getAsync(h -> writeClient.transaction(req1, h));
+    TxnResponse resp1 = getAsync(h -> ctx.writeClient().transaction(req1, h));
     assertEquals(1, resp1.getErrorsSize());
     assertEquals(1, resp1.getErrors().get(0).getOpIndex());
     assertEquals(0, resp1.getResultsSize());
@@ -62,7 +62,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest req2 = new TxnRequest()
       .addOperation(new TxnKVOperation().setKey("foo/bar1").setValue("newVal1").setIndex(idx1).setType(TxnKVVerb.CAS))
       .addOperation(new TxnKVOperation().setKey("foo/bar2").setValue("newVal2").setIndex(idx2).setType(TxnKVVerb.CAS));
-    TxnResponse resp2 = getAsync(h -> writeClient.transaction(req2, h));
+    TxnResponse resp2 = getAsync(h -> ctx.writeClient().transaction(req2, h));
     assertEquals(0, resp2.getErrorsSize());
     assertEquals(2, resp2.getResultsSize());
     List<String> keys = getKeys(resp2);
@@ -71,12 +71,12 @@ public class Transactions extends ConsulTestBase {
     List<String> entries = getEntries("foo/bar");
     assertTrue(entries.contains("foo/bar1/newVal1"));
     assertTrue(entries.contains("foo/bar2/newVal2"));
-    
-    runAsync(h -> writeClient.deleteValues("foo/bar", h));
+
+    runAsync(h -> ctx.writeClient().deleteValues("foo/bar", h));
   }
 
   private List<String> getEntries(String prefix) {
-    KeyValueList list = getAsync(h -> readClient.getValues(prefix, h));
+    KeyValueList list = getAsync(h -> ctx.readClient().getValues(prefix, h));
     return list.getList().stream()
       .map(kv -> kv.getKey() + "/" + kv.getValue()).collect(Collectors.toList());
   }
@@ -87,8 +87,8 @@ public class Transactions extends ConsulTestBase {
   }
 
   private long createKV(String key, String value) {
-    assertTrue(getAsync(h -> writeClient.putValue(key, value, h)));
-    KeyValue pair = getAsync(h -> readClient.getValue(key, h));
+    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, value, h)));
+    KeyValue pair = getAsync(h -> ctx.readClient().getValue(key, h));
     return pair.getModifyIndex();
   }
 }

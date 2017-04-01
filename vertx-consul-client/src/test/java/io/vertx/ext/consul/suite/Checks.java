@@ -24,7 +24,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.*;
-import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -38,9 +37,9 @@ public class Checks extends ChecksBase {
       .setName(serviceName)
       .setAddress("10.0.0.1")
       .setPort(8080);
-    runAsync(h -> writeClient.registerService(service, h));
+    runAsync(h -> ctx.writeClient().registerService(service, h));
 
-    List<Service> services = getAsync(h -> writeClient.localServices(h));
+    List<Service> services = getAsync(h -> ctx.writeClient().localServices(h));
     Service s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
     String serviceId = s.getId();
     assertEquals(s.getAddress(), "10.0.0.1");
@@ -53,15 +52,15 @@ public class Checks extends ChecksBase {
       .setServiceId(serviceId)
       .setStatus(CheckStatus.PASSING)
       .setTtl("10s");
-    runAsync(h -> writeClient.registerCheck(check, h));
+    runAsync(h -> ctx.writeClient().registerCheck(check, h));
 
-    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
     Check c = checks.stream().filter(i -> "checkId".equals(i.getId())).findFirst().get();
     assertEquals(c.getServiceId(), serviceId);
     assertEquals(c.getStatus(), CheckStatus.PASSING);
     assertEquals(c.getNotes(), "checkNotes");
 
-    runAsync(h -> writeClient.deregisterService(serviceId, h));
+    runAsync(h -> ctx.writeClient().deregisterService(serviceId, h));
   }
 
   @Test
@@ -70,14 +69,14 @@ public class Checks extends ChecksBase {
       .setName("serviceName")
       .setId("serviceId")
       .setTags(Collections.singletonList("tag1"));
-    runAsync(h -> writeClient.registerService(opts, h));
-    runAsync(h -> writeClient.registerCheck(new CheckOptions()
+    runAsync(h -> ctx.writeClient().registerService(opts, h));
+    runAsync(h -> ctx.writeClient().registerCheck(new CheckOptions()
       .setTtl("10s")
       .setServiceId("serviceId")
       .setId("checkId1")
       .setName("checkName1"), h));
 
-    CheckList list1 = getAsync(h -> readClient.healthChecks("serviceName", h));
+    CheckList list1 = getAsync(h -> ctx.readClient().healthChecks("serviceName", h));
     assertEquals(list1.getList().size(), 1);
     assertEquals(list1.getList().get(0).getId(), "checkId1");
 
@@ -85,7 +84,7 @@ public class Checks extends ChecksBase {
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      readClient.healthChecksWithOptions("serviceName", options, h -> {
+      ctx.readClient().healthChecksWithOptions("serviceName", options, h -> {
         List<String> ids = h.result().getList().stream().map(Check::getId).collect(Collectors.toList());
         boolean success = h.result().getList().size() == 2;
         success &= ids.contains("checkId1");
@@ -96,7 +95,7 @@ public class Checks extends ChecksBase {
     sleep(vertx, 2000);
     assertEquals(latch.getCount(), 1);
 
-    runAsync(h -> writeClient.registerCheck(new CheckOptions()
+    runAsync(h -> ctx.writeClient().registerCheck(new CheckOptions()
       .setTtl("10s")
       .setServiceId("serviceId")
       .setId("checkId2")
@@ -104,9 +103,9 @@ public class Checks extends ChecksBase {
 
     awaitLatch(latch);
 
-    runAsync(h -> writeClient.deregisterCheck("checkId1", h));
-    runAsync(h -> writeClient.deregisterCheck("checkId2", h));
-    runAsync(h -> writeClient.deregisterService("serviceId", h));
+    runAsync(h -> ctx.writeClient().deregisterCheck("checkId1", h));
+    runAsync(h -> ctx.writeClient().deregisterCheck("checkId2", h));
+    runAsync(h -> ctx.writeClient().deregisterService("serviceId", h));
   }
 
   @Override
@@ -116,7 +115,7 @@ public class Checks extends ChecksBase {
       id = "checkId";
       opts.setId(id);
     }
-    runAsync(h -> writeClient.registerCheck(opts, h));
+    runAsync(h -> ctx.writeClient().registerCheck(opts, h));
     return id;
   }
 

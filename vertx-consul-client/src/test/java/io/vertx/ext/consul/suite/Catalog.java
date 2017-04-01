@@ -34,25 +34,25 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void datacenters() {
-    List<String> datacenters = Utils.getAsync(h -> readClient.catalogDatacenters(h));
+    List<String> datacenters = Utils.getAsync(h -> ctx.readClient().catalogDatacenters(h));
     assertEquals(datacenters.size(), 1);
-    assertEquals(datacenters.get(0), dc);
+    assertEquals(datacenters.get(0), ctx.dc());
   }
 
   @Test
   public void nodes() {
-    List<Node> nodes = Utils.<NodeList>getAsync(h -> readClient.catalogNodes(h)).getList();
+    List<Node> nodes = Utils.<NodeList>getAsync(h -> ctx.readClient().catalogNodes(h)).getList();
     assertEquals(nodes.size(), 1);
     Node node = nodes.get(0);
-    assertEquals(node.getName(), nodeName);
+    assertEquals(node.getName(), ctx.nodeName());
   }
 
   @Test
   public void blockingQuery() throws InterruptedException {
-    NodeList nodes1 = getAsync(h -> readClient.catalogNodes(h));
+    NodeList nodes1 = getAsync(h -> ctx.readClient().catalogNodes(h));
     CountDownLatch latch1 = new CountDownLatch(1);
     BlockingQueryOptions blockingQueryOptions1 = new BlockingQueryOptions().setIndex(nodes1.getIndex());
-    readClient.catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions1), h -> {
+    ctx.readClient().catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions1), h -> {
       List<String> names = h.result().getList().stream().map(Node::getName).collect(Collectors.toList());
       assertEquals(names.size(), 2);
       assertTrue(names.contains("attached_node"));
@@ -60,15 +60,15 @@ public class Catalog extends ConsulTestBase {
     });
     sleep(vertx, 2000);
     assertEquals(latch1.getCount(), 1);
-    ConsulProcess attached = attachConsul("attached_node");
+    ConsulProcess attached = ctx.attachConsul("attached_node");
     latch1.await(2, TimeUnit.MINUTES);
     assertEquals(latch1.getCount(), 0);
 
     // wait until second consul closes
     CountDownLatch latch2 = new CountDownLatch(1);
-    NodeList nodes2 = getAsync(h -> readClient.catalogNodes(h));
+    NodeList nodes2 = getAsync(h -> ctx.readClient().catalogNodes(h));
     BlockingQueryOptions blockingQueryOptions2 = new BlockingQueryOptions().setIndex(nodes2.getIndex());
-    readClient.catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions2), h -> {
+    ctx.readClient().catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions2), h -> {
       latch2.countDown();
     });
     attached.close();

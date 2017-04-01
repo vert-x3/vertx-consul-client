@@ -28,8 +28,8 @@ public class AgentInfo extends ConsulTestBase {
 
   @Test
   public void info() {
-    JsonObject info = getAsync(h -> readClient.agentInfo(h));
+    JsonObject info = getAsync(h -> ctx.readClient().agentInfo(h));
     JsonObject config = info.getJsonObject("Config");
-    assertEquals(config.getString("Datacenter"), dc);
+    assertEquals(config.getString("Datacenter"), ctx.dc());
   }
 }
