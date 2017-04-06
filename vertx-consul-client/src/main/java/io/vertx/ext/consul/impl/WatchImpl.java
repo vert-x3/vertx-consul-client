@@ -46,6 +46,23 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
+  public static class KeyPrefix extends WatchImpl<KeyValueList> {
+
+    private final String keyPrefix;
+
+    public KeyPrefix(String keyPrefix, Vertx vertx, ConsulClientOptions options) {
+      super(vertx, ConsulClient.create(vertx, options));
+      this.keyPrefix = keyPrefix;
+    }
+
+    @Override
+    void wait(long index, Handler<AsyncResult<State<KeyValueList>>> handler) {
+      BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      consulClient.getValuesWithOptions(keyPrefix, options, h ->
+        handler.handle(h.map(kv -> new State<KeyValueList>(kv, kv.getIndex()))));
+    }
+  }
+
   public static class Services extends WatchImpl<ServiceList> {
 
     public Services(Vertx vertx, ConsulClientOptions options) {

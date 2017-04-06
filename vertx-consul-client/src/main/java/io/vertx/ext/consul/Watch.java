@@ -35,7 +35,7 @@ public interface Watch<T> {
   /**
    * Creates {@code Watch} to monitoring a specific key in the KV store.
    * The underlying Consul client will be created with default options.
-   * This maps to the <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> API internally.
+   * This maps to the <a href="https://www.consul.io/api/kv.html">/v1/kv/</a> API internally.
    *
    * @param key the key
    * @param vertx the {@code Vertx} instance
@@ -47,7 +47,7 @@ public interface Watch<T> {
 
   /**
    * Creates {@code Watch} to monitoring a specific key in the KV store.
-   * This maps to the <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> API internally.
+   * This maps to the <a href="https://www.consul.io/api/kv.html">/v1/kv/</a> API internally.
    *
    * @param key the key
    * @param vertx the {@code Vertx} instance
@@ -56,6 +56,32 @@ public interface Watch<T> {
    */
   static Watch<KeyValue> key(String key, Vertx vertx, ConsulClientOptions options) {
     return new WatchImpl.Key(key, vertx, options);
+  }
+
+  /**
+   * Creates {@code Watch} to monitoring a prefix of keys in the KV store.
+   * The underlying Consul client will be created with default options.
+   * This maps to the <a href="https://www.consul.io/api/kv.html">/v1/kv/</a> API internally.
+   *
+   * @param keyPrefix the key
+   * @param vertx the {@code Vertx} instance
+   * @return the {@code Watch} instance
+   */
+  static Watch<KeyValueList> keyPrefix(String keyPrefix, Vertx vertx) {
+    return keyPrefix(keyPrefix, vertx, new ConsulClientOptions());
+  }
+
+  /**
+   * Creates {@code Watch} to monitoring a prefix of keys in the KV store.
+   * This maps to the <a href="https://www.consul.io/api/kv.html">/v1/kv/</a> API internally.
+   *
+   * @param keyPrefix the key
+   * @param vertx the {@code Vertx} instance
+   * @param options the options to create underlying Consul client
+   * @return the {@code Watch} instance
+   */
+  static Watch<KeyValueList> keyPrefix(String keyPrefix, Vertx vertx, ConsulClientOptions options) {
+    return new WatchImpl.KeyPrefix(keyPrefix, vertx, options);
   }
 
   /**

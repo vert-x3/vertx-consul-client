@@ -20,8 +20,10 @@ import io.vertx.ext.consul.common.StateConsumer;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.ext.consul.Utils.runAsync;
@@ -165,6 +167,37 @@ public class Watches extends ConsulTestBase {
     assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v2, h)));
     consumer.await(v2);
     runAsync(h -> ctx.writeClient().deleteValue(key, h));
+    consumer.await(NOT_FOUND);
+    consumer.check();
+
+    watch.stop();
+  }
+
+  @Test
+  public void testKeyPrefix() throws InterruptedException {
+    StateConsumer<String> consumer = new StateConsumer<>();
+    String keyPrefix = ConsulContext.KEY_RW_PREFIX + randomAlphaString(10);
+    String k1 = keyPrefix + randomAlphaString(10);
+    String k2 = keyPrefix + randomAlphaString(10);
+    String v1 = randomAlphaString(10);
+    String v2 = randomAlphaString(10);
+
+    assertTrue(getAsync(h -> ctx.writeClient().putValue(k1, v1, h)));
+
+    Watch<KeyValueList> watch = Watch.keyPrefix(keyPrefix, vertx, ctx.readClientOptions())
+      .setHandler(kv -> {
+        if (kv.succeeded()) {
+          consumer.consume(kv.result().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
+        } else {
+          consumer.consume(kv.cause().getMessage());
+        }
+      })
+      .start();
+
+    consumer.await(v1);
+    assertTrue(getAsync(h -> ctx.writeClient().putValue(k2, v2, h)));
+    consumer.await(Stream.of(v1, v2).sorted().collect(Collectors.joining("/")));
+    runAsync(h -> ctx.writeClient().deleteValues(keyPrefix, h));
     consumer.await(NOT_FOUND);
     consumer.check();
 
