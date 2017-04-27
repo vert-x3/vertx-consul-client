@@ -113,6 +113,21 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
+  public static class Nodes extends WatchImpl<NodeList> {
+
+    public Nodes(Vertx vertx, ConsulClientOptions options) {
+      super(vertx, ConsulClient.create(vertx, options));
+    }
+
+    @Override
+    void wait(long index, Handler<AsyncResult<State<NodeList>>> handler) {
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      NodeQueryOptions qOpts = new NodeQueryOptions().setBlockingOptions(bOpts);
+      consulClient.catalogNodesWithOptions(qOpts, h ->
+        handler.handle(h.map(nodes -> new State<NodeList>(nodes, nodes.getIndex()))));
+    }
+  }
+
   private boolean started = false;
   private boolean stopped = false;
   private Handler<AsyncResult<T>> handler;
