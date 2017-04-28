@@ -22,11 +22,13 @@ import io.vertx.core.net.ProxyOptions
  * @param crlPaths  Add a CRL path
  * @param crlValues  Add a CRL value
  * @param dc  Set the datacenter name. When provided, the client will use it when making requests to the Consul by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
+ * @param decoderInitialBufferSize  set to <code>initialBufferSizeHttpDecoder</code> the initial buffer of the HttpDecoder.
  * @param defaultHost  Set the default host name to be used by this client in requests if none is provided when making the request.
  * @param defaultPort  Set the default port to be used by this client in requests if none is provided when making the request.
  * @param enabledCipherSuites  Add an enabled cipher suite, appended to the ordered suites.
  * @param enabledSecureTransportProtocols  Add an enabled SSL/TLS protocols, appended to the ordered protocols.
  * @param followRedirects  Configure the default behavior of the client to follow HTTP <code>30x</code> redirections.
+ * @param forceSni  By default, the server name is only sent for Fully Qualified Domain Name (FQDN), setting this property to <code>true</code> forces the server name to be always sent.
  * @param http2ClearTextUpgrade  Set to <code>true</code> when an <i>h2c</i> connection is established using an HTTP/1.1 upgrade request, and <code>false</code> when an <i>h2c</i> connection is established directly (with prior knowledge).
  * @param http2ConnectionWindowSize  Set the default HTTP/2 connection window size. It overrides the initial window size set by , so the connection window size is greater than for its streams, in order the data throughput. <p/> A value of <code>-1</code> reuses the initial window size setting.
  * @param http2MaxPoolSize  Set the maximum pool size for HTTP/2 connections
@@ -85,11 +87,13 @@ fun ConsulClientOptions(
   crlPaths: Iterable<String>? = null,
   crlValues: Iterable<io.vertx.core.buffer.Buffer>? = null,
   dc: String? = null,
+  decoderInitialBufferSize: Int? = null,
   defaultHost: String? = null,
   defaultPort: Int? = null,
   enabledCipherSuites: Iterable<String>? = null,
   enabledSecureTransportProtocols: Iterable<String>? = null,
   followRedirects: Boolean? = null,
+  forceSni: Boolean? = null,
   http2ClearTextUpgrade: Boolean? = null,
   http2ConnectionWindowSize: Int? = null,
   http2MaxPoolSize: Int? = null,
@@ -160,6 +164,9 @@ fun ConsulClientOptions(
   if (dc != null) {
     this.setDc(dc)
   }
+  if (decoderInitialBufferSize != null) {
+    this.setDecoderInitialBufferSize(decoderInitialBufferSize)
+  }
   if (defaultHost != null) {
     this.setDefaultHost(defaultHost)
   }
@@ -178,6 +185,9 @@ fun ConsulClientOptions(
   }
   if (followRedirects != null) {
     this.setFollowRedirects(followRedirects)
+  }
+  if (forceSni != null) {
+    this.setForceSni(forceSni)
   }
   if (http2ClearTextUpgrade != null) {
     this.setHttp2ClearTextUpgrade(http2ClearTextUpgrade)
