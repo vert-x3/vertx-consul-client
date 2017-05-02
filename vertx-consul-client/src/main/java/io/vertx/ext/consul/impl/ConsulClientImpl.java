@@ -314,6 +314,21 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public ConsulClient healthState(CheckStatus checkStatus, Handler<AsyncResult<CheckList>> resultHandler) {
+    return healthStateWithOptions(checkStatus, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient healthStateWithOptions(CheckStatus checkStatus, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler) {
+    Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
+    requestArray(HttpMethod.GET, "/v1/health/state/" + checkStatus.key, query, null, resultHandler, (arr, headers) -> {
+      List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    });
+    return this;
+  }
+
+  @Override
   public ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
     return healthServiceNodesWithOptions(service, passing, null, resultHandler);
   }

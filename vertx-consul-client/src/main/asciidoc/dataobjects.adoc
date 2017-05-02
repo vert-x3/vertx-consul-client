@@ -253,6 +253,10 @@ Add a CRL value
 Set the datacenter name. When provided, the client will use it when making requests to the Consul
  by providing the "?dc" query parameter. When not provided, the datacenter of the consul agent is queried.
 +++
+|[[decoderInitialBufferSize]]`decoderInitialBufferSize`|`Number (int)`|
++++
+set to <code>initialBufferSizeHttpDecoder</code> the initial buffer of the HttpDecoder.
++++
 |[[defaultHost]]`defaultHost`|`String`|
 +++
 Set the default host name to be used by this client in requests if none is provided when making the request.
@@ -272,6 +276,11 @@ Add an enabled SSL/TLS protocols, appended to the ordered protocols.
 |[[followRedirects]]`followRedirects`|`Boolean`|
 +++
 Configure the default behavior of the client to follow HTTP <code>30x</code> redirections.
++++
+|[[forceSni]]`forceSni`|`Boolean`|
++++
+By default, the server name is only sent for Fully Qualified Domain Name (FQDN), setting
+ this property to <code>true</code> forces the server name to be always sent.
 +++
 |[[http2ClearTextUpgrade]]`http2ClearTextUpgrade`|`Boolean`|
 +++

@@ -828,4 +828,26 @@ public class ConsulClientOptions extends WebClientOptions {
   public ConsulClientOptions addCrlValue(Buffer crlValue) throws NullPointerException {
     return (ConsulClientOptions) super.addCrlValue(crlValue);
   }
+
+  /**
+   * By default, the server name is only sent for Fully Qualified Domain Name (FQDN), setting
+   * this property to {@code true} forces the server name to be always sent.
+   *
+   * @param forceSni true when the client should always use SNI on TLS/SSL connections
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setForceSni(boolean forceSni) {
+    return (ConsulClientOptions) super.setForceSni(forceSni);
+  }
+
+  /**
+   * set to {@code initialBufferSizeHttpDecoder} the initial buffer of the HttpDecoder.
+   * @param decoderInitialBufferSize the initial buffer size
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setDecoderInitialBufferSize(int decoderInitialBufferSize) {
+    return (ConsulClientOptions) super.setDecoderInitialBufferSize(decoderInitialBufferSize);
+  }
 }

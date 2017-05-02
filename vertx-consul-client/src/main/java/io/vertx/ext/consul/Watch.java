@@ -161,6 +161,30 @@ public interface Watch<T> {
   }
 
   /**
+   * Creates {@code Watch} to monitoring the list of available nodes.
+   * The underlying Consul client will be created with default options.
+   * This maps to the <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> API internally.
+   *
+   * @param vertx the {@code Vertx} instance
+   * @return the {@code Watch} instance
+   */
+  static Watch<NodeList> nodes(Vertx vertx) {
+    return new WatchImpl.Nodes(vertx, new ConsulClientOptions());
+  }
+
+  /**
+   * Creates {@code Watch} to monitoring the list of available nodes.
+   * This maps to the <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> API internally.
+   *
+   * @param vertx the {@code Vertx} instance
+   * @param options the options to create underlying Consul client
+   * @return the {@code Watch} instance
+   */
+  static Watch<NodeList> nodes(Vertx vertx, ConsulClientOptions options) {
+    return new WatchImpl.Nodes(vertx, options);
+  }
+
+  /**
    * Set the result handler. As data is changed, the handler will be called with the result.
    *
    * @param handler the result handler

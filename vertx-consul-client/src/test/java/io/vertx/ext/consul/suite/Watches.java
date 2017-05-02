@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.consul.suite;
 
+import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.common.StateConsumer;
 import org.junit.Test;
@@ -292,6 +293,33 @@ public class Watches extends ConsulTestBase {
 
     consumer.await(p1);
     consumer.await(p1 + "," + p2);
+    consumer.check();
+
+    watch.stop();
+  }
+
+  @Test
+  public void watchNodes() throws InterruptedException {
+    StateConsumer<String> consumer = new StateConsumer<>();
+    String nodeName = randomAlphaString(10);
+
+    Watch<NodeList> watch = Watch.nodes(vertx, ctx.readClientOptions())
+      .setHandler(list -> {
+        if (list.succeeded()) {
+          consumer.consume(list.result().getList()
+            .stream().map(Node::getName).filter(s -> s.equals(nodeName))
+            .findFirst().orElse(""));
+        }
+      })
+      .start();
+
+    consumer.await("");
+
+    ConsulProcess attached = ctx.attachConsul(nodeName);
+    attached.close();
+
+    consumer.await(nodeName);
+    consumer.await("");
     consumer.check();
 
     watch.stop();
