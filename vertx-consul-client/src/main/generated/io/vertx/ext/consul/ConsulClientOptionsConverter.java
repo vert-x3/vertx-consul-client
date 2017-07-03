@@ -33,8 +33,8 @@ public class ConsulClientOptionsConverter {
     if (json.getValue("dc") instanceof String) {
       obj.setDc((String)json.getValue("dc"));
     }
-    if (json.getValue("timeoutMs") instanceof Number) {
-      obj.setTimeoutMs(((Number)json.getValue("timeoutMs")).longValue());
+    if (json.getValue("timeout") instanceof Number) {
+      obj.setTimeout(((Number)json.getValue("timeout")).longValue());
     }
   }
 
@@ -45,6 +45,6 @@ public class ConsulClientOptionsConverter {
     if (obj.getDc() != null) {
       json.put("dc", obj.getDc());
     }
-    json.put("timeoutMs", obj.getTimeoutMs());
+    json.put("timeout", obj.getTimeout());
   }
 }

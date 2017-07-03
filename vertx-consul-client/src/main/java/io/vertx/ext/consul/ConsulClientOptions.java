@@ -19,7 +19,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
@@ -58,19 +57,27 @@ public class ConsulClientOptions extends WebClientOptions {
    */
   public ConsulClientOptions(ConsulClientOptions options) {
     super(options);
-    this.aclToken = options.aclToken;
-    this.dc = options.dc;
-    this.timeoutMs = options.timeoutMs;
+    setHost(options.getHost());
+    setPort(options.getPort());
+    setAclToken(options.getAclToken());
+    setDc(options.getDc());
+    setTimeout(options.getTimeout());
   }
 
   /**
    * Constructor from JSON
    *
-   * @param options the JSON
+   * @param json the JSON
    */
-  public ConsulClientOptions(JsonObject options) {
-    super(options);
-    ConsulClientOptionsConverter.fromJson(options, this);
+  public ConsulClientOptions(JsonObject json) {
+    super(json);
+    ConsulClientOptionsConverter.fromJson(json, this);
+    if (json.getValue("host") instanceof String) {
+      setHost((String)json.getValue("host"));
+    }
+    if (json.getValue("port") instanceof Number) {
+      setPort(((Number)json.getValue("port")).intValue());
+    }
   }
 
   /**
@@ -79,9 +86,13 @@ public class ConsulClientOptions extends WebClientOptions {
    * @return the JSON
    */
   public JsonObject toJson() {
-    JsonObject jsonObject = super.toJson();
-    ConsulClientOptionsConverter.toJson(this, jsonObject);
-    return jsonObject;
+    JsonObject json = super.toJson();
+    ConsulClientOptionsConverter.toJson(this, json);
+    if (getHost() != null) {
+      json.put("host", getHost());
+    }
+    json.put("port", getPort());
+    return json;
   }
 
   /**
@@ -127,7 +138,7 @@ public class ConsulClientOptions extends WebClientOptions {
    *
    * @return timeout in milliseconds
    */
-  public long getTimeoutMs() {
+  public long getTimeout() {
     return timeoutMs;
   }
 
@@ -187,7 +198,7 @@ public class ConsulClientOptions extends WebClientOptions {
    * @param timeoutMs timeout in milliseconds
    * @return reference to this, for fluency
    */
-  public ConsulClientOptions setTimeoutMs(long timeoutMs) {
+  public ConsulClientOptions setTimeout(long timeoutMs) {
     this.timeoutMs = timeoutMs;
     return this;
   }

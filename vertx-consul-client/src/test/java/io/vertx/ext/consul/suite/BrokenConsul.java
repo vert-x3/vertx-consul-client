@@ -37,7 +37,7 @@ public class BrokenConsul extends ConsulTestBase {
   @Test
   public void timeout() {
     SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
-    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeoutMs(2000));
+    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(2000));
     client.agentInfo(h -> {
       if (h.failed() && h.cause().getMessage().contains("The timeout period of 2000ms")) {
         testComplete();

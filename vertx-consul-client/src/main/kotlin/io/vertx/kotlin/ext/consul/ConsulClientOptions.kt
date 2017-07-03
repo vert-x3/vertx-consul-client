@@ -66,7 +66,7 @@ import io.vertx.core.net.ProxyOptions
  * @param ssl  Set whether SSL/TLS is enabled
  * @param tcpKeepAlive  Set whether TCP keep alive is enabled
  * @param tcpNoDelay  Set whether TCP no delay is enabled
- * @param timeoutMs  Sets the amount of time (in milliseconds) after which if the request does not return any data within the timeout period an failure will be passed to the handler and the request will be closed.
+ * @param timeout  Sets the amount of time (in milliseconds) after which if the request does not return any data within the timeout period an failure will be passed to the handler and the request will be closed.
  * @param trafficClass  Set the value of traffic class
  * @param trustAll  Set whether all server certificates should be trusted
  * @param trustStoreOptions  Set the trust options in jks format, aka Java truststore
@@ -131,7 +131,7 @@ fun ConsulClientOptions(
   ssl: Boolean? = null,
   tcpKeepAlive: Boolean? = null,
   tcpNoDelay: Boolean? = null,
-  timeoutMs: Long? = null,
+  timeout: Long? = null,
   trafficClass: Int? = null,
   trustAll: Boolean? = null,
   trustStoreOptions: io.vertx.core.net.JksOptions? = null,
@@ -300,8 +300,8 @@ fun ConsulClientOptions(
   if (tcpNoDelay != null) {
     this.setTcpNoDelay(tcpNoDelay)
   }
-  if (timeoutMs != null) {
-    this.setTimeoutMs(timeoutMs)
+  if (timeout != null) {
+    this.setTimeout(timeout)
   }
   if (trafficClass != null) {
     this.setTrafficClass(trafficClass)

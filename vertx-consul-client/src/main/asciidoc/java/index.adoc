@@ -15,7 +15,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 <dependency>
   <groupId>io.vertx</groupId>
   <artifactId>vertx-consul-client</artifactId>
-  <version>3.4.2</version>
+  <version>3.5.0-SNAPSHOT</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ To use this project, add the following dependency to the _dependencies_ section 
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-consul-client:3.4.2'
+compile 'io.vertx:vertx-consul-client:3.5.0-SNAPSHOT'
 ----
 
 == Creating a client
@@ -51,7 +51,7 @@ The following configuration is supported by the consul client:
 `port`:: Consul HTTP API port. Defaults to `8500`
 `timeout`:: Sets the amount of time (in milliseconds) after which if the request does not return any data
 within the timeout period an failure will be passed to the handler and the request will be closed.
-`acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+`aclToken`:: The ACL token. When provided, the client will use this token when making requests to the Consul
 by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
 ACL policy, is used.
 `dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul

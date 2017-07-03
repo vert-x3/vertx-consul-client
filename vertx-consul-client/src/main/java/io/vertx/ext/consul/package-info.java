@@ -48,7 +48,7 @@
  * `port`:: Consul HTTP API port. Defaults to `8500`
  * `timeout`:: Sets the amount of time (in milliseconds) after which if the request does not return any data
  * within the timeout period an failure will be passed to the handler and the request will be closed.
- * `acl_token`:: The ACL token. When provided, the client will use this token when making requests to the Consul
+ * `aclToken`:: The ACL token. When provided, the client will use this token when making requests to the Consul
  * by providing the "?token" query parameter. When not provided, the empty token, which maps to the 'anonymous'
  * ACL policy, is used.
  * `dc`:: The datacenter name. When provided, the client will use it when making requests to the Consul

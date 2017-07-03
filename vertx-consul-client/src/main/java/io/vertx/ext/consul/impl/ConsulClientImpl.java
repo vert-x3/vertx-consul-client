@@ -57,7 +57,7 @@ public class ConsulClientImpl implements ConsulClient {
     webClient = WebClient.create(vertx, options);
     aclToken = options.getAclToken();
     dc = options.getDc();
-    timeoutMs = options.getTimeoutMs();
+    timeoutMs = options.getTimeout();
   }
 
   @Override
