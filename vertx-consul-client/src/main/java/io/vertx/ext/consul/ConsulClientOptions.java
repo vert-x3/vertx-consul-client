@@ -74,9 +74,13 @@ public class ConsulClientOptions extends WebClientOptions {
     ConsulClientOptionsConverter.fromJson(json, this);
     if (json.getValue("host") instanceof String) {
       setHost((String)json.getValue("host"));
+    } else {
+      setHost(CONSUL_DEFAULT_HOST);
     }
     if (json.getValue("port") instanceof Number) {
       setPort(((Number)json.getValue("port")).intValue());
+    } else {
+      setPort(CONSUL_DEFAULT_PORT);
     }
   }
 

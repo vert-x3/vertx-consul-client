@@ -19,6 +19,13 @@ public class OptionsTest extends VertxTestBase {
     assertEquals(options.getDc(), null);
   }
 
+  @Test
+  public void fromEmptyJson() {
+    ConsulClientOptions options = new ConsulClientOptions(new JsonObject());
+    assertEquals(options.getHost(), "localhost");
+    assertEquals(options.getPort(), 8500);
+  }
+
   private void checkJson(ConsulClientOptions options, JsonObject json) {
     assertEquals(options.getHost(), json.getString("host"));
     assertEquals(options.getPort(), (int) json.getInteger("port"));
