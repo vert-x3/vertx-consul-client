@@ -47,6 +47,7 @@ public class ConsulClientImpl implements ConsulClient {
   private static final List<Integer> TXN_VALID_CODES = Arrays.asList(200, 409);
 
   private final WebClient webClient;
+  private final Context ctx;
   private final String aclToken;
   private final String dc;
   private final long timeoutMs;
@@ -55,6 +56,7 @@ public class ConsulClientImpl implements ConsulClient {
     Objects.requireNonNull(vertx);
     Objects.requireNonNull(options);
     webClient = WebClient.create(vertx, options);
+    ctx = vertx.getOrCreateContext();
     aclToken = options.getAclToken();
     dc = options.getDc();
     timeoutMs = options.getTimeout();
@@ -242,7 +244,7 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Tags", serviceOptions.getTags())
       .put("Address", serviceOptions.getAddress())
       .put("Port", serviceOptions.getPort());
-    if (serviceOptions.getCheckOptions() != null){
+    if (serviceOptions.getCheckOptions() != null) {
       jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), false));
     }
     requestVoid(HttpMethod.PUT, "/v1/agent/service/register", null, jsonOpts.encode(), resultHandler);
@@ -594,6 +596,16 @@ public class ConsulClientImpl implements ConsulClient {
   private <T> void request(List<Integer> validCodes, HttpMethod method, String path, Query query, String body,
                            Handler<AsyncResult<T>> resultHandler,
                            Function<HttpResponse<Buffer>, T> mapper) {
+    if (Vertx.currentContext() == ctx) {
+      reqOnContext(validCodes, method, path, query, body, resultHandler, mapper);
+    } else {
+      ctx.runOnContext(v -> reqOnContext(validCodes, method, path, query, body, resultHandler, mapper));
+    }
+  }
+
+  private <T> void reqOnContext(List<Integer> validCodes, HttpMethod method, String path, Query query, String body,
+                                Handler<AsyncResult<T>> resultHandler,
+                                Function<HttpResponse<Buffer>, T> mapper) {
     if (query == null) {
       query = new Query();
     }
