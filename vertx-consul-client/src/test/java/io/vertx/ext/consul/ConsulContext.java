@@ -91,6 +91,18 @@ public class ConsulContext {
     return readClient;
   }
 
+  public io.vertx.rxjava.ext.consul.ConsulClient rxMasterClient() {
+    return new io.vertx.rxjava.ext.consul.ConsulClient(masterClient);
+  }
+
+  public io.vertx.rxjava.ext.consul.ConsulClient rxWriteClient() {
+    return new io.vertx.rxjava.ext.consul.ConsulClient(writeClient);
+  }
+
+  public io.vertx.rxjava.ext.consul.ConsulClient rxReadClient() {
+    return new io.vertx.rxjava.ext.consul.ConsulClient(readClient);
+  }
+
   public ConsulClient createClient(ConsulClientOptions opts) {
     return creator.apply(opts);
   }

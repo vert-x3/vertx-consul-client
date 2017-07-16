@@ -17,8 +17,13 @@ package io.vertx.ext.consul;
 
 import io.vertx.core.Vertx;
 import io.vertx.test.core.VertxTestBase;
+import rx.functions.Func1;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static io.vertx.test.core.TestUtils.randomAlphaString;
+import static io.vertx.test.core.TestUtils.randomUnicodeString;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -42,4 +47,18 @@ public class ConsulTestBase extends VertxTestBase {
     super.tearDown();
   }
 
+  public static <T> Func1<T, T> check(Consumer<T> check) {
+    return s -> {
+      check.accept(s);
+      return s;
+    };
+  }
+
+  public static String randomFooBarAlpha() {
+    return "foo/bar" + randomAlphaString(10);
+  }
+
+  public static String randomFooBarUnicode() {
+    return "foo/bar" + randomUnicodeString(10);
+  }
 }
