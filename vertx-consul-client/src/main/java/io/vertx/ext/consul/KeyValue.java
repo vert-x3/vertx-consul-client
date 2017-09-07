@@ -77,6 +77,16 @@ public class KeyValue implements TxnResult {
   }
 
   /**
+   * Return {@code true} if there is a key/value pair present, otherwise {@code false}.
+   *
+   * @return {@code true} if there is a key/value pair present, otherwise {@code false}
+   */
+  @GenIgnore
+  public boolean isPresent() {
+    return key != null;
+  }
+
+  /**
    * Get the key
    *
    * @return the key

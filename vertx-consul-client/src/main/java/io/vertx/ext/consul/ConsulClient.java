@@ -97,7 +97,8 @@ public interface ConsulClient {
   ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
 
   /**
-   * Returns key/value pair that corresponding to the specified key
+   * Returns key/value pair that corresponding to the specified key.
+   * An empty {@link KeyValue} object will be returned if no such key is found.
    *
    * @param key           the key
    * @param resultHandler will be provided with key/value pair
@@ -109,6 +110,7 @@ public interface ConsulClient {
 
   /**
    * Returns key/value pair that corresponding to the specified key.
+   * An empty {@link KeyValue} object will be returned if no such key is found.
    * This is blocking query unlike {@link ConsulClient#getValue(String, Handler)}
    *
    * @param key           the key
@@ -133,6 +135,7 @@ public interface ConsulClient {
 
   /**
    * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * An empty {@link KeyValueList} object will be returned if no such key prefix is found.
    *
    * @param keyPrefix     the prefix
    * @param resultHandler will be provided with list of key/value pairs
@@ -144,6 +147,7 @@ public interface ConsulClient {
 
   /**
    * Returns the list of key/value pairs that corresponding to the specified key prefix.
+   * An empty {@link KeyValueList} object will be returned if no such key prefix is found.
    * This is blocking query unlike {@link ConsulClient#getValues(String, Handler)}
    *
    * @param keyPrefix     the prefix

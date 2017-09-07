@@ -71,6 +71,26 @@ public class KVStore extends ConsulTestBase {
   }
 
   @Test
+  public void keyNotFound(TestContext tc) {
+    Async async = tc.async();
+    String key = randomFooBarUnicode();
+    ctx.rxReadClient()
+      .rxGetValue(key)
+      .map(check(kv -> tc.assertFalse(kv.isPresent())))
+      .subscribe(o -> async.complete(), tc::fail);
+  }
+
+  @Test
+  public void keysNotFound(TestContext tc) {
+    Async async = tc.async();
+    String key = randomFooBarUnicode();
+    ctx.rxReadClient()
+      .rxGetValues(key)
+      .map(check(list -> tc.assertFalse(list.isPresent())))
+      .subscribe(o -> async.complete(), tc::fail);
+  }
+
+  @Test
   public void writeClientHaveFullAccessToOneValue(TestContext tc) {
     Async async = tc.async();
     String key = randomFooBarAlpha();

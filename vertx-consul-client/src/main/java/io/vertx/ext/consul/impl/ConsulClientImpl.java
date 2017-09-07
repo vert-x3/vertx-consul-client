@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.consul.impl;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
@@ -43,8 +44,9 @@ public class ConsulClientImpl implements ConsulClient {
   private static final String TOKEN_HEADER = "X-Consul-Token";
   private static final String INDEX_HEADER = "X-Consul-Index";
 
-  private static final List<Integer> DEFAULT_VALID_CODES = Collections.singletonList(200);
-  private static final List<Integer> TXN_VALID_CODES = Arrays.asList(200, 409);
+  private static final List<Integer> DEFAULT_VALID_CODES = Collections.singletonList(HttpResponseStatus.OK.code());
+  private static final List<Integer> TXN_VALID_CODES = Arrays.asList(HttpResponseStatus.OK.code(), HttpResponseStatus.CONFLICT.code());
+  private static final List<Integer> KV_VALID_CODES = Arrays.asList(HttpResponseStatus.OK.code(), HttpResponseStatus.NOT_FOUND.code());
 
   private final WebClient webClient;
   private final Context ctx;
@@ -97,8 +99,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(key), new Query().put(options), null, resultHandler, (arr, headers) ->
-      KVParser.parse(arr.getJsonObject(0)));
+    request(KV_VALID_CODES, HttpMethod.GET, "/v1/kv/" + urlEncode(key), new Query().put(options), null, resultHandler, resp -> {
+      if (resp.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
+        return new KeyValue();
+      } else {
+        return KVParser.parse(resp.bodyAsJsonArray().getJsonObject(0));
+      }
+    });
     return this;
   }
 
@@ -116,9 +123,13 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler) {
     Query query = Query.of("recurse", true).put(options);
-    requestArray(HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, null, resultHandler, (arr, headers) -> {
-      List<KeyValue> list = arr.stream().map(obj -> KVParser.parse((JsonObject) obj)).collect(Collectors.toList());
-      return new KeyValueList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+    request(KV_VALID_CODES, HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, null, resultHandler, resp -> {
+      if (resp.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
+        return new KeyValueList();
+      } else {
+        List<KeyValue> list = resp.bodyAsJsonArray().stream().map(obj -> KVParser.parse((JsonObject) obj)).collect(Collectors.toList());
+        return new KeyValueList().setList(list).setIndex(Long.parseLong(resp.headers().get(INDEX_HEADER)));
+      }
     });
     return this;
   }
