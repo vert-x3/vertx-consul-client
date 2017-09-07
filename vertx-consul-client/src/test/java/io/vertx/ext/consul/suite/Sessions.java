@@ -149,7 +149,7 @@ public class Sessions extends ConsulTestBase {
     assertEquals(id, pair.getSession());
     runAsync(h -> ctx.writeClient().destroySession(id, h));
     ctx.writeClient().getValue("foo/bar", h -> {
-      if (h.failed()) {
+      if (h.succeeded() && !h.result().isPresent()) {
         testComplete();
       }
     });

@@ -21,7 +21,6 @@ import io.vertx.ext.consul.common.StateConsumer;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +34,7 @@ import static io.vertx.test.core.TestUtils.randomAlphaString;
  */
 public class Watches extends ConsulTestBase {
 
-  private static final String NOT_FOUND = "Not Found";
+  private static final String EMPTY_MESSAGE = randomAlphaString(10);
   private static final String CONNECTION_REFUSED = "Connection refused";
 
   @Test
@@ -65,26 +64,17 @@ public class Watches extends ConsulTestBase {
 
   @Test
   public void connectionRefused() throws InterruptedException {
-    checkDelay(new ConsulClientOptions().setPort(Utils.getFreePort()), CONNECTION_REFUSED);
-  }
-
-  @Test
-  public void keyNotFound() throws InterruptedException {
-    checkDelay(ctx.readClientOptions(), NOT_FOUND);
-  }
-
-  private void checkDelay(ConsulClientOptions options, String err) throws InterruptedException {
     StateConsumer<Long> consumer = new StateConsumer<>();
     String key = ConsulContext.KEY_RW_PREFIX + randomAlphaString(10);
     long t0 = System.currentTimeMillis();
 
-    Watch<KeyValue> watch = Watch.key(key, vertx, options)
+    Watch<KeyValue> watch = Watch.key(key, vertx, new ConsulClientOptions().setPort(Utils.getFreePort()))
       .setHandler(h -> {
         if (h.succeeded()) {
           fail();
         } else {
           assertTrue(h.failed());
-          assertTrue(h.cause().getMessage().contains(err));
+          assertTrue(h.cause().getMessage().contains(CONNECTION_REFUSED));
           consumer.consume(System.currentTimeMillis() - t0);
         }
       })
@@ -124,22 +114,21 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          consumer.consume(kv.result().getValue());
+          consumer.consume(kv.result().isPresent() ? kv.result().getValue() : EMPTY_MESSAGE);
         } else {
           consumer.consume(kv.cause().getMessage());
         }
       })
       .start();
 
-    consumer.await(NOT_FOUND);  // immediately
-    consumer.await(NOT_FOUND);  // second try after 1s delay
+    consumer.await(EMPTY_MESSAGE);
 
     assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v1, h)));
     consumer.await(v1);
     assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v2, h)));
     consumer.await(v2);
     runAsync(h -> ctx.writeClient().deleteValue(key, h));
-    consumer.await(NOT_FOUND);
+    consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
     watch.stop();
@@ -157,7 +146,7 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          consumer.consume(kv.result().getValue());
+          consumer.consume(kv.result().isPresent() ? kv.result().getValue() : EMPTY_MESSAGE);
         } else {
           consumer.consume(kv.cause().getMessage());
         }
@@ -168,7 +157,7 @@ public class Watches extends ConsulTestBase {
     assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v2, h)));
     consumer.await(v2);
     runAsync(h -> ctx.writeClient().deleteValue(key, h));
-    consumer.await(NOT_FOUND);
+    consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
     watch.stop();
@@ -188,7 +177,11 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValueList> watch = Watch.keyPrefix(keyPrefix, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          consumer.consume(kv.result().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
+          if (kv.result().isPresent()) {
+            consumer.consume(kv.result().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
+          } else {
+            consumer.consume(EMPTY_MESSAGE);
+          }
         } else {
           consumer.consume(kv.cause().getMessage());
         }
@@ -199,7 +192,7 @@ public class Watches extends ConsulTestBase {
     assertTrue(getAsync(h -> ctx.writeClient().putValue(k2, v2, h)));
     consumer.await(Stream.of(v1, v2).sorted().collect(Collectors.joining("/")));
     runAsync(h -> ctx.writeClient().deleteValues(keyPrefix, h));
-    consumer.await(NOT_FOUND);
+    consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
     watch.stop();

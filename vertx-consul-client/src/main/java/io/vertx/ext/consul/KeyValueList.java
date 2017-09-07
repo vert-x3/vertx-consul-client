@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
@@ -66,6 +67,16 @@ public class KeyValueList {
     JsonObject jsonObject = new JsonObject();
     KeyValueListConverter.toJson(this, jsonObject);
     return jsonObject;
+  }
+
+  /**
+   * Return {@code true} if there is a key/value pairs present, otherwise {@code false}.
+   *
+   * @return {@code true} if there is a key/value pairs present, otherwise {@code false}
+   */
+  @GenIgnore
+  public boolean isPresent() {
+    return list != null;
   }
 
   /**
