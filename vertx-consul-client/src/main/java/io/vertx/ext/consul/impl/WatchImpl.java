@@ -128,8 +128,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
-  private boolean started = false;
-  private boolean stopped = false;
+  private volatile boolean started = false;
+  private volatile boolean stopped = false;
   private Handler<AsyncResult<T>> handler;
   private State<T> current = new State<>(null, 0);
 
@@ -173,19 +173,20 @@ public abstract class WatchImpl<T> implements Watch<T> {
   }
 
   private WatchImpl<T> go() {
-    if (!stopped) {
-      fetch(current.index, newState -> {
-        if (!newState.equals(current)) {
-          current = newState;
-          sendSuccess(current.value);
-        }
-        vertx.runOnContext(v -> go());
-      });
-    }
+    fetch(current.index, newState -> {
+      if (!newState.equals(current)) {
+        current = newState;
+        sendSuccess(current.value);
+      }
+      vertx.runOnContext(v -> go());
+    });
     return this;
   }
 
   private void fetch(long cnt, Handler<State<T>> result) {
+    if (stopped) {
+      return;
+    }
     wait(current.index, h -> {
       if (h.succeeded()) {
         result.handle(h.result());
