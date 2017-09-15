@@ -36,7 +36,7 @@ public interface ConsulClient {
   /**
    * Create a Consul client with default options.
    *
-   * @param vertx  the Vert.x instance
+   * @param vertx the Vert.x instance
    * @return the client
    */
   static ConsulClient create(Vertx vertx) {
@@ -46,7 +46,7 @@ public interface ConsulClient {
   /**
    * Create a Consul client.
    *
-   * @param vertx  the Vert.x instance
+   * @param vertx   the Vert.x instance
    * @param options the options
    * @return the client
    */
@@ -95,6 +95,29 @@ public interface ConsulClient {
    */
   @Fluent
   ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
+
+  /**
+   * Returns the list of keys that corresponding to the specified key prefix.
+   *
+   * @param keyPrefix     the prefix
+   * @param resultHandler will be provided with keys list
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/kv.html">/v1/kv/&lt;key&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient getKeys(String keyPrefix, Handler<AsyncResult<List<String>>> resultHandler);
+
+  /**
+   * Returns the list of keys that corresponding to the specified key prefix.
+   *
+   * @param keyPrefix     the prefix
+   * @param options       the blocking options
+   * @param resultHandler will be provided with keys list
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/kv.html">/v1/kv/&lt;key&gt;</a> endpoint
+   */
+  @Fluent
+  ConsulClient getKeysWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<String>>> resultHandler);
 
   /**
    * Returns key/value pair that corresponding to the specified key.
@@ -196,7 +219,7 @@ public interface ConsulClient {
   /**
    * Manages multiple operations inside a single, atomic transaction.
    *
-   * @param request transaction request
+   * @param request       transaction request
    * @param resultHandler will be provided with result of transaction
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
@@ -413,7 +436,7 @@ public interface ConsulClient {
   /**
    * Returns the checks associated with the service
    *
-   * @param service the service name
+   * @param service       the service name
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_checks">/v1/health/checks/&lt;service&gt;</a> endpoint
@@ -424,7 +447,7 @@ public interface ConsulClient {
   /**
    * Returns the checks associated with the service
    *
-   * @param service the service name
+   * @param service       the service name
    * @param options       options used to request checks
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
@@ -436,7 +459,7 @@ public interface ConsulClient {
   /**
    * Returns the checks in the specified status
    *
-   * @param checkStatus the check status
+   * @param checkStatus   the check status
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/&lt;state&gt;</a> endpoint
@@ -447,7 +470,7 @@ public interface ConsulClient {
   /**
    * Returns the checks in the specified status
    *
-   * @param checkStatus the check status
+   * @param checkStatus   the check status
    * @param options       options used to request checks
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
@@ -460,8 +483,8 @@ public interface ConsulClient {
    * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodes} endpoint;
    * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
    *
-   * @param service the service name
-   * @param passing if true, filter results to only nodes with all checks in the passing state
+   * @param service       the service name
+   * @param passing       if true, filter results to only nodes with all checks in the passing state
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
@@ -473,9 +496,9 @@ public interface ConsulClient {
    * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodesWithOptions} endpoint;
    * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
    *
-   * @param service the service name
-   * @param passing if true, filter results to only nodes with all checks in the passing state
-   * @param options options used to request services
+   * @param service       the service name
+   * @param passing       if true, filter results to only nodes with all checks in the passing state
+   * @param options       options used to request services
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint

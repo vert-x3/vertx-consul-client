@@ -196,6 +196,20 @@ public class KVStore extends ConsulTestBase {
     blockingQuery(tc, key -> ctx.rxReadClient().rxGetValues(key).map(KeyValueList::getIndex));
   }
 
+  @Test
+  public void canGetKeysList(TestContext tc) {
+    Async async = tc.async();
+    String keyPrefix = randomFooBarAlpha();
+    String key = keyPrefix + randomAlphaString(10);
+    ctx.rxWriteClient()
+      .rxPutValue(key, randomAlphaString(10))
+      .map(check(tc::assertTrue))
+      .flatMap(b -> ctx.rxReadClient().rxGetKeys(keyPrefix))
+      .map(check(list -> tc.assertTrue(list.contains(key))))
+      .flatMap(list -> ctx.rxWriteClient().rxDeleteValues(keyPrefix))
+      .subscribe(o -> async.complete(), tc::fail);
+  }
+
   private void blockingQuery(TestContext tc, Function<String, Single<Long>> indexSupplier) {
     Async async = tc.async();
     String key = randomFooBarAlpha();

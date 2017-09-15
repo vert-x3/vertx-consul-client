@@ -26,10 +26,7 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -89,6 +86,24 @@ public class ConsulClientImpl implements ConsulClient {
     requestArray(HttpMethod.GET, "/v1/coordinate/datacenters", null, null, resultHandler, (arr, headers) ->
       arr.stream().map(obj -> CoordinateParser.parseDc((JsonObject) obj)).collect(Collectors.toList())
     );
+    return this;
+  }
+
+  @Override
+  public ConsulClient getKeys(String keyPrefix, Handler<AsyncResult<List<String>>> resultHandler) {
+    return getKeysWithOptions(keyPrefix, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient getKeysWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<String>>> resultHandler) {
+    Query query = Query.of("recurse", true).put("keys", true).put(options);
+    request(KV_VALID_CODES, HttpMethod.GET, "/v1/kv/" + urlEncode(keyPrefix), query, null, resultHandler, resp -> {
+      if (resp.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
+        return new ArrayList<>();
+      } else {
+        return resp.bodyAsJsonArray().stream().map(Object::toString).collect(Collectors.toList());
+      }
+    });
     return this;
   }
 
