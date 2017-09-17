@@ -59,7 +59,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with the configuration and member information of the local agent
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_self">/v1/agent/self</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent.html#read-configuration">/v1/agent/self</a> endpoint
    */
   @Fluent
   ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler);
@@ -69,7 +69,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with network coordinates of nodes in datacenter
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/coordinate.html#coordinate_nodes">/v1/coordinate/nodes</a> endpoint
+   * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
   ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler);
@@ -81,7 +81,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with network coordinates of nodes in datacenter
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/coordinate.html#coordinate_nodes">/v1/coordinate/nodes</a> endpoint
+   * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
   ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler);
@@ -91,7 +91,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with network coordinates for all Consul servers
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/coordinate.html#coordinate_datacenters">/v1/coordinate/datacenters</a> endpoint
+   * @see <a href="https://www.consul.io/api/coordinate.html#read-wan-coordinates">/v1/coordinate/datacenters</a> endpoint
    */
   @Fluent
   ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
@@ -102,7 +102,7 @@ public interface ConsulClient {
    * @param keyPrefix     the prefix
    * @param resultHandler will be provided with keys list
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/api/kv.html">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getKeys(String keyPrefix, Handler<AsyncResult<List<String>>> resultHandler);
@@ -114,7 +114,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with keys list
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/api/kv.html">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getKeysWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<String>>> resultHandler);
@@ -126,7 +126,7 @@ public interface ConsulClient {
    * @param key           the key
    * @param resultHandler will be provided with key/value pair
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
@@ -140,7 +140,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with key/value pair
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
@@ -151,7 +151,7 @@ public interface ConsulClient {
    * @param key           the key
    * @param resultHandler will be called on complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
@@ -163,7 +163,7 @@ public interface ConsulClient {
    * @param keyPrefix     the prefix
    * @param resultHandler will be provided with list of key/value pairs
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler);
@@ -177,7 +177,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with list of key/value pairs
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler);
@@ -188,7 +188,7 @@ public interface ConsulClient {
    * @param keyPrefix     the prefix
    * @param resultHandler will be called on complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
@@ -200,7 +200,7 @@ public interface ConsulClient {
    * @param value         the value
    * @param resultHandler will be provided with success of operation
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
@@ -211,7 +211,7 @@ public interface ConsulClient {
    * @param options       options used to push pair
    * @param resultHandler will be provided with success of operation
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#single">/v1/kv/&lt;key&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
@@ -222,7 +222,7 @@ public interface ConsulClient {
    * @param request       transaction request
    * @param resultHandler will be provided with result of transaction
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/kv.html#txn">/v1/txn</a> endpoint
+   * @see <a href="https://www.consul.io/api/txn.html">/v1/txn</a> endpoint
    */
   @Fluent
   ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler);
@@ -233,7 +233,7 @@ public interface ConsulClient {
    * @param token     properties of the token
    * @param idHandler will be provided with ID of created token
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_create">/v1/acl/create</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
    */
   @Fluent
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
@@ -244,7 +244,7 @@ public interface ConsulClient {
    * @param token     properties of the token to be updated
    * @param idHandler will be provided with ID of updated
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_update">/v1/acl/update</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
    */
   @Fluent
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
@@ -255,7 +255,7 @@ public interface ConsulClient {
    * @param id        the ID of token to be cloned
    * @param idHandler will be provided with ID of cloned token
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_clone">/v1/acl/clone/&lt;id&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
@@ -265,7 +265,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of tokens
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_list">/v1/acl/list</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
    */
   @Fluent
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
@@ -276,7 +276,7 @@ public interface ConsulClient {
    * @param id           the ID of token
    * @param tokenHandler will be provided with token
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_info">/v1/acl/info/&lt;id&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
@@ -287,7 +287,7 @@ public interface ConsulClient {
    * @param id            the ID of token
    * @param resultHandler will be called on complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/acl.html#acl_destroy">/v1/acl/destroy/&lt;id&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
@@ -298,7 +298,7 @@ public interface ConsulClient {
    * @param name          name of event
    * @param resultHandler will be provided with properties of event
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_fire">/v1/event/fire/&lt;name&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
   @Fluent
   ConsulClient fireEvent(String name, Handler<AsyncResult<Event>> resultHandler);
@@ -310,7 +310,7 @@ public interface ConsulClient {
    * @param options       options used to create event
    * @param resultHandler will be provided with properties of event
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_fire">/v1/event/fire/&lt;name&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
   @Fluent
   ConsulClient fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler);
@@ -320,7 +320,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of events
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> endpoint
+   * @see <a href="https://www.consul.io/api/event.html#list-events">/v1/event/list</a> endpoint
    */
   @Fluent
   ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler);
@@ -338,7 +338,7 @@ public interface ConsulClient {
    * @param resultHandler will be provided with list of events
    * @param options       the blocking options
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/event.html#event_list">/v1/event/list</a> endpoint
+   * @see <a href="https://www.consul.io/api/event.html#list-events">/v1/event/list</a> endpoint
    */
   @Fluent
   ConsulClient listEventsWithOptions(EventListOptions options, Handler<AsyncResult<EventList>> resultHandler);
@@ -349,7 +349,7 @@ public interface ConsulClient {
    * @param serviceOptions the options of new service
    * @param resultHandler  will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_service_register">/v1/agent/service/register</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/service.html#register-service">/v1/agent/service/register</a> endpoint
    * @see ServiceOptions
    */
   @Fluent
@@ -361,7 +361,7 @@ public interface ConsulClient {
    * @param maintenanceOptions the maintenance options
    * @param resultHandler      will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_service_maintenance">/v1/agent/service/maintenance/&lt;serviceId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/service.html#enable-maintenance-mode">/v1/agent/service/maintenance/:service_id</a> endpoint
    * @see MaintenanceOptions
    */
   @Fluent
@@ -374,7 +374,7 @@ public interface ConsulClient {
    * @param id            the ID of service
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_service_deregister">/v1/agent/service/deregister/&lt;serviceId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/service.html#deregister-service">/v1/agent/service/deregister/:service_id</a> endpoint
    */
   @Fluent
   ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
@@ -385,7 +385,7 @@ public interface ConsulClient {
    * @param service       name of service
    * @param resultHandler will be provided with list of nodes providing given service
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_service">/v1/catalog/service/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
   @Fluent
   ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler);
@@ -397,7 +397,7 @@ public interface ConsulClient {
    * @param options       options used to request services
    * @param resultHandler will be provided with list of nodes providing given service
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_service">/v1/catalog/service/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
   @Fluent
   ConsulClient catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
@@ -407,7 +407,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of datacenters
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_datacenters">/v1/catalog/datacenters</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-datacenters">/v1/catalog/datacenters</a> endpoint
    */
   @Fluent
   ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler);
@@ -417,7 +417,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of nodes
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_nodes">/v1/catalog/nodes</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> endpoint
    */
   @Fluent
   ConsulClient catalogNodes(Handler<AsyncResult<NodeList>> resultHandler);
@@ -428,7 +428,7 @@ public interface ConsulClient {
    * @param resultHandler will be provided with list of nodes
    * @param options       options used to request nodes
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_nodes">/v1/catalog/nodes</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> endpoint
    */
   @Fluent
   ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
@@ -439,7 +439,7 @@ public interface ConsulClient {
    * @param service       the service name
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_checks">/v1/health/checks/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
   @Fluent
   ConsulClient healthChecks(String service, Handler<AsyncResult<CheckList>> resultHandler);
@@ -451,7 +451,7 @@ public interface ConsulClient {
    * @param options       options used to request checks
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_checks">/v1/health/checks/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
   @Fluent
   ConsulClient healthChecksWithOptions(String service, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
@@ -462,7 +462,7 @@ public interface ConsulClient {
    * @param checkStatus   the check status
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/&lt;state&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
   @Fluent
   ConsulClient healthState(CheckStatus checkStatus, Handler<AsyncResult<CheckList>> resultHandler);
@@ -474,7 +474,7 @@ public interface ConsulClient {
    * @param options       options used to request checks
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/&lt;state&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
   @Fluent
   ConsulClient healthStateWithOptions(CheckStatus checkStatus, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
@@ -487,7 +487,7 @@ public interface ConsulClient {
    * @param passing       if true, filter results to only nodes with all checks in the passing state
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
   ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
@@ -501,7 +501,7 @@ public interface ConsulClient {
    * @param options       options used to request services
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
   ConsulClient healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
@@ -511,7 +511,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_services">/v1/catalog/services</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   @Fluent
   ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler);
@@ -523,7 +523,7 @@ public interface ConsulClient {
    * @param resultHandler will be provided with list of services
    * @param options       the blocking options
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_services">/v1/catalog/services</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   @Fluent
   ConsulClient catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
@@ -534,7 +534,7 @@ public interface ConsulClient {
    * @param node          node name
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_node">/v1/catalog/node/&lt;node&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
   @Fluent
   ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler);
@@ -547,7 +547,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/catalog.html#catalog_node">/v1/catalog/node/&lt;node&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
   @Fluent
   ConsulClient catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
@@ -557,7 +557,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of services
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_services">/v1/agent/services</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/service.html#list-services">/v1/agent/services</a> endpoint
    */
   @Fluent
   ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
@@ -567,7 +567,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of checks
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_checks">/v1/agent/checks</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#list-checks">/v1/agent/checks</a> endpoint
    */
   @Fluent
   ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler);
@@ -579,7 +579,7 @@ public interface ConsulClient {
    * @param checkOptions  options used to register new check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_register">/v1/agent/check/register</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#register-check">/v1/agent/check/register</a> endpoint
    */
   @Fluent
   ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler);
@@ -590,7 +590,7 @@ public interface ConsulClient {
    * @param checkId       the ID of check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_deregister">/v1/agent/check/deregister/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#deregister-check">/v1/agent/check/deregister/:check_id</a> endpoint
    */
   @Fluent
   ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
@@ -601,7 +601,7 @@ public interface ConsulClient {
    * @param checkId       the ID of check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_pass">/v1/agent/check/pass/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-pass">/v1/agent/check/pass/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -614,7 +614,7 @@ public interface ConsulClient {
    * @param note          a human-readable message with the status of the check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_pass">/v1/agent/check/pass/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-pass">/v1/agent/check/pass/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -626,7 +626,7 @@ public interface ConsulClient {
    * @param checkId       the ID of check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_warn">/v1/agent/check/warn/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-warn">/v1/agent/check/warn/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -639,7 +639,7 @@ public interface ConsulClient {
    * @param note          a human-readable message with the status of the check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_warn">/v1/agent/check/warn/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-warn">/v1/agent/check/warn/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -651,7 +651,7 @@ public interface ConsulClient {
    * @param checkId       the ID of check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_fail">/v1/agent/check/fail/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-fail">/v1/agent/check/fail/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -664,7 +664,7 @@ public interface ConsulClient {
    * @param note          a human-readable message with the status of the check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_fail">/v1/agent/check/fail/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-fail">/v1/agent/check/fail/:check_id</a> endpoint
    * @see CheckStatus
    */
   @Fluent
@@ -677,7 +677,7 @@ public interface ConsulClient {
    * @param status        new status of check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_update">/v1/agent/check/update/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
   @Fluent
   ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler);
@@ -690,7 +690,7 @@ public interface ConsulClient {
    * @param note          a human-readable message with the status of the check
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/agent.html#agent_check_update">/v1/agent/check/update/&lt;checkId&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
   @Fluent
   ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
@@ -701,7 +701,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with address of cluster leader
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/status.html#status_leader">/v1/status/leader</a> endpoint
+   * @see <a href="https://www.consul.io/api/status.html#get-raft-leader">/v1/status/leader</a> endpoint
    */
   @Fluent
   ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler);
@@ -712,7 +712,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of peers
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/status.html#status_peers">/v1/status/peers</a> endpoint
+   * @see <a href="https://www.consul.io/api/status.html#list-raft-peers">/v1/status/peers</a> endpoint
    */
   @Fluent
   ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
@@ -722,7 +722,7 @@ public interface ConsulClient {
    *
    * @param idHandler will be provided with ID of new session
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_create">/v1/session/create</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#create-session">/v1/session/create</a> endpoint
    */
   @Fluent
   ConsulClient createSession(Handler<AsyncResult<String>> idHandler);
@@ -733,7 +733,7 @@ public interface ConsulClient {
    * @param options   options used to create session
    * @param idHandler will be provided with ID of new session
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_create">/v1/session/create</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#create-session">/v1/session/create</a> endpoint
    */
   @Fluent
   ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler);
@@ -744,7 +744,7 @@ public interface ConsulClient {
    * @param id            the ID of requested session
    * @param resultHandler will be provided with info of requested session
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_info">/v1/session/info/&lt;session&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
@@ -757,7 +757,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with info of requested session
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_info">/v1/session/info/&lt;session&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler);
@@ -768,7 +768,7 @@ public interface ConsulClient {
    * @param id            the ID of session that should be renewed
    * @param resultHandler will be provided with info of renewed session
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_renew">/v1/session/renew/&lt;session&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#renew-session">/v1/session/renew/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
@@ -778,7 +778,7 @@ public interface ConsulClient {
    *
    * @param resultHandler will be provided with list of sessions
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_list">/v1/session/list</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#list-sessions">/v1/session/list</a> endpoint
    */
   @Fluent
   ConsulClient listSessions(Handler<AsyncResult<SessionList>> resultHandler);
@@ -790,7 +790,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with list of sessions
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_list">/v1/session/list</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#list-sessions">/v1/session/list</a> endpoint
    */
   @Fluent
   ConsulClient listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
@@ -801,7 +801,7 @@ public interface ConsulClient {
    * @param nodeId        the ID of node
    * @param resultHandler will be provided with list of sessions
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_node">/v1/session/node/&lt;node&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
   @Fluent
   ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler);
@@ -814,7 +814,7 @@ public interface ConsulClient {
    * @param options       the blocking options
    * @param resultHandler will be provided with list of sessions
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_node">/v1/session/node/&lt;node&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
   @Fluent
   ConsulClient listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
@@ -825,7 +825,7 @@ public interface ConsulClient {
    * @param id            the ID of session
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/docs/agent/http/session.html#session_destroy">/v1/session/destroy/&lt;session&gt;</a> endpoint
+   * @see <a href="https://www.consul.io/api/session.html#delete-session">/v1/session/destroy/:uuid</a> endpoint
    */
   @Fluent
   ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
