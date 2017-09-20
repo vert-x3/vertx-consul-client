@@ -831,6 +831,47 @@ public interface ConsulClient {
   ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
+   * @param definition    definition of the prepare query
+   * @param resultHandler will be provided with id of created prepare query
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#create-prepared-query">/v1/query</a> endpoint
+   */
+  @Fluent
+  ConsulClient createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler);
+
+  /**
+   * Returns an existing prepared query
+   *
+   * @param queryId       the id of the query to read
+   * @param resultHandler will be provided with definition of the prepare query
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#read-prepared-query-1">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
+
+  /**
+   * Returns a list of all prepared queries.
+   *
+   * @param resultHandler will be provided with list of definitions of the all prepare queries
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#read-prepared-query">/v1/query</a> endpoint
+   */
+  @Fluent
+  ConsulClient getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler);
+
+  /**
+   * Deletes an existing prepared query
+   *
+   * @param queryId       the id of the query to delete
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#delete-prepared-query">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
    * Close the client and release its resources
    */
   void close();

@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static io.vertx.test.core.TestUtils.*;
@@ -81,6 +82,23 @@ public class RandomObjects {
       .setTag(randomAlphaString(10))
       .setVersion(randomPositiveInt())
       .setLTime(randomPositiveInt());
+  }
+
+  public static PreparedQueryDefinition randomPreparedQueryDefinition() {
+    return new PreparedQueryDefinition()
+      .setDcs(Collections.singletonList(randomAlphaString(10)))
+      .setDnsTtl(randomAlphaString(5))
+      .setId(randomAlphaString(10))
+      .setMeta(Collections.singletonMap(randomAlphaString(5), randomAlphaString(10)))
+      .setName(randomAlphaString(10))
+      .setNearestN(randomInt())
+      .setPassing(randomBoolean())
+      .setService(randomAlphaString(10))
+      .setSession(randomAlphaString(10))
+      .setTags(Collections.singletonList(randomAlphaString(10)))
+      .setTemplateRegexp(randomAlphaString(10))
+      .setTemplateType(randomAlphaString(10))
+      .setToken(randomAlphaString(10));
   }
 
   public static ServiceEntry randomServiceEntry() {

@@ -592,6 +592,36 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public ConsulClient createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler) {
+    requestObject(HttpMethod.POST, "/v1/query", null, definition.toJson().encode(), resultHandler, (obj, headers) -> obj.getString("ID"));
+    return this;
+  }
+
+  @Override
+  public ConsulClient getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
+    getPreparedQueryList(queryId, h -> resultHandler.handle(h.map(list -> list.get(0))));
+    return this;
+  }
+
+  @Override
+  public ConsulClient getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
+    getPreparedQueryList(null, resultHandler);
+    return this;
+  }
+
+  private void getPreparedQueryList(String queryId, Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
+    String path = "/v1/query" + (queryId == null ? "" : "/" + urlEncode(queryId));
+    requestArray(HttpMethod.GET, path, null, null, resultHandler, (arr, headers) -> arr.stream()
+      .map(obj -> new PreparedQueryDefinition((JsonObject) obj)).collect(Collectors.toList()));
+  }
+
+  @Override
+  public ConsulClient deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler) {
+    requestVoid(HttpMethod.DELETE, "/v1/query/" + urlEncode(queryId), null, null, resultHandler);
+    return this;
+  }
+
+  @Override
   public void close() {
     webClient.close();
   }

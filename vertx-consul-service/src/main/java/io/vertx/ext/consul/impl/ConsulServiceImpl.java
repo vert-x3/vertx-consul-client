@@ -403,6 +403,30 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler) {
+    consulClient.createPreparedQuery(definition, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
+    consulClient.getPreparedQuery(queryId, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
+    consulClient.getAllPreparedQueries(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.deletePreparedQuery(queryId, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
     consulClient.localServices(resultHandler);
     return this;

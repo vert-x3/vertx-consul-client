@@ -296,6 +296,22 @@ public interface ConsulService extends ConsulClient {
   ConsulService destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
+  @Fluent
+  ConsulService createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
   @ProxyIgnore
   void close();
 }
