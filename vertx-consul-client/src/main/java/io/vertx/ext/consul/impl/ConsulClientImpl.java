@@ -598,8 +598,8 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
-    getPreparedQueryList(queryId, h -> resultHandler.handle(h.map(list -> list.get(0))));
+  public ConsulClient getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
+    getPreparedQueryList(id, h -> resultHandler.handle(h.map(list -> list.get(0))));
     return this;
   }
 
@@ -609,15 +609,40 @@ public class ConsulClientImpl implements ConsulClient {
     return this;
   }
 
-  private void getPreparedQueryList(String queryId, Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
-    String path = "/v1/query" + (queryId == null ? "" : "/" + urlEncode(queryId));
+  private void getPreparedQueryList(String id, Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
+    String path = "/v1/query" + (id == null ? "" : "/" + urlEncode(id));
     requestArray(HttpMethod.GET, path, null, null, resultHandler, (arr, headers) -> arr.stream()
       .map(obj -> new PreparedQueryDefinition((JsonObject) obj)).collect(Collectors.toList()));
   }
 
   @Override
-  public ConsulClient deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.DELETE, "/v1/query/" + urlEncode(queryId), null, null, resultHandler);
+  public ConsulClient deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler) {
+    requestVoid(HttpMethod.DELETE, "/v1/query/" + urlEncode(id), null, null, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulClient executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    return executePreparedQueryWithOptions(query, null, resultHandler);
+  }
+
+  @Override
+  public ConsulClient executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    String path = "/v1/query/" + urlEncode(query) + "/execute";
+    Query q = new Query();
+    if (options != null) {
+      q.put("near", options.getNear()).put("limit", options.getLimit());
+    }
+    requestObject(HttpMethod.GET, path, q, null, resultHandler, (obj, headers) -> {
+      return new PreparedQueryExecuteResponse()
+        .setService(obj.getString("Service"))
+        .setDc(obj.getString("Datacenter"))
+        .setFailovers(obj.getInteger("Failovers"))
+        .setDnsTtl(obj.getJsonObject("DNS").getString("TTL"))
+        .setNodes(obj.getJsonArray("Nodes").stream()
+          .map(o -> ServiceEntryParser.parse((JsonObject) o))
+          .collect(Collectors.toList()));
+    });
     return this;
   }
 

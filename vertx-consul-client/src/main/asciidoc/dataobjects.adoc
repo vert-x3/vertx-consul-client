@@ -961,6 +961,65 @@ Set the ACL token to use each time the query is executed. This allows queries to
 +++
 |===
 
+[[PreparedQueryExecuteOptions]]
+== PreparedQueryExecuteOptions
+
+++++
+ Options used to execute prepared query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[limit]]`limit`|`Number (int)`|
++++
+Set the size of the list to the given number of nodes. This is applied after any sorting or shuffling.
++++
+|[[near]]`near`|`String`|
++++
+Set node name for sorting the list in ascending order based on the estimated round trip time from that node.
+ Passing <code>_agent</code> will use the agent's node for the sort. If this is not present,
+ the default behavior will shuffle the nodes randomly each time the query is executed.
++++
+|===
+
+[[PreparedQueryExecuteResponse]]
+== PreparedQueryExecuteResponse
+
+++++
+ The results of executing prepared query
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[dc]]`dc`|`String`|
++++
+Set the datacenter that ultimately provided the list of nodes
++++
+|[[dnsTtl]]`dnsTtl`|`String`|
++++
+Set the TTL duration when query results are served over DNS. If this is specified, it will take precedence over any Consul agent-specific configuration.
++++
+|[[failovers]]`failovers`|`Number (int)`|
++++
+Set the number of remote datacenters that were queried while executing the query.
++++
+|[[nodes]]`nodes`|`Array of link:dataobjects.html#ServiceEntry[ServiceEntry]`|
++++
+Set the list of healthy nodes providing the given service, as specified by the constraints of the prepared query.
++++
+|[[service]]`service`|`String`|
++++
+Set the service name that the query was selecting.
+ This is useful for context in case an empty list of nodes is returned.
++++
+|===
+
 [[Service]]
 == Service
 

@@ -17,6 +17,7 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.PreparedQueryDefinition;
+import io.vertx.ext.consul.ServiceOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -39,6 +40,29 @@ public class PreparedQuery extends ConsulTestBase {
         .rxGetPreparedQuery(id)
         .map(check(q -> tc.assertTrue(q.getService().equals(service))))
         .flatMap(list -> ctx.rxWriteClient().rxDeletePreparedQuery(id)))
+      .subscribe(o -> async.complete(), tc::fail);
+  }
+
+  @Test
+  public void execute(TestContext tc) {
+    Async async = tc.async();
+    PreparedQueryDefinition def = new PreparedQueryDefinition()
+      .setService("service-${match(1)}-${match(2)}")
+      .setTemplateType("name_prefix_match")
+      .setTemplateRegexp("^find_(.+?)_(.+?)$");
+    ctx.rxWriteClient().rxCreatePreparedQuery(def)
+      .flatMap(qid ->
+        ctx.rxWriteClient().rxExecutePreparedQuery("find_1_2")
+          .map(check(resp -> tc.assertEquals(resp.getNodes().size(), 0)))
+          .flatMap(resp -> ctx.rxWriteClient()
+            .rxRegisterService(new ServiceOptions().setName("service-1-2")))
+          .flatMap(v -> ctx.rxWriteClient()
+            .rxExecutePreparedQuery("find_1_2")
+            .map(check(resp -> tc.assertEquals(resp.getNodes().size(), 1))))
+          .flatMap(resp -> ctx.rxWriteClient()
+            .rxDeregisterService("service-1-2"))
+          .flatMap(v -> ctx.rxWriteClient()
+            .rxDeletePreparedQuery(qid)))
       .subscribe(o -> async.complete(), tc::fail);
   }
 }

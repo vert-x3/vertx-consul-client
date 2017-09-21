@@ -301,7 +301,7 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
+  ConsulService getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
 
   @Override
   @Fluent
@@ -309,7 +309,15 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
-  ConsulService deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler);
+  ConsulService deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
+
+  @Override
+  @Fluent
+  ConsulService executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
 
   @Override
   @ProxyIgnore

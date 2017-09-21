@@ -409,8 +409,8 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService getPreparedQuery(String queryId, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
-    consulClient.getPreparedQuery(queryId, resultHandler);
+  public ConsulService getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
+    consulClient.getPreparedQuery(id, resultHandler);
     return this;
   }
 
@@ -421,8 +421,20 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
-  public ConsulService deletePreparedQuery(String queryId, Handler<AsyncResult<Void>> resultHandler) {
-    consulClient.deletePreparedQuery(queryId, resultHandler);
+  public ConsulService deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.deletePreparedQuery(id, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    consulClient.executePreparedQuery(query, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    consulClient.executePreparedQueryWithOptions(query, options, resultHandler);
     return this;
   }
 
