@@ -31,14 +31,19 @@ import org.junit.runner.RunWith;
 public class PreparedQuery extends ConsulTestBase {
 
   @Test
-  public void createAndDestroy(TestContext tc) {
+  public void createUpdateAndDestroy(TestContext tc) {
     Async async = tc.async();
-    String service = randomFooBarAlpha();
+    String service1 = randomFooBarAlpha();
+    String service2 = randomFooBarAlpha();
     ctx.rxWriteClient()
-      .rxCreatePreparedQuery(new PreparedQueryDefinition().setService(service))
+      .rxCreatePreparedQuery(new PreparedQueryDefinition().setService(service1))
       .flatMap(id -> ctx.rxReadClient()
         .rxGetPreparedQuery(id)
-        .map(check(q -> tc.assertTrue(q.getService().equals(service))))
+        .map(check(q -> tc.assertTrue(q.getService().equals(service1))))
+        .flatMap(def -> ctx.rxWriteClient().rxUpdatePreparedQuery(def.setService(service2)))
+        .flatMap(v -> ctx.rxReadClient()
+          .rxGetPreparedQuery(id)
+          .map(check(q -> tc.assertTrue(q.getService().equals(service2)))))
         .flatMap(list -> ctx.rxWriteClient().rxDeletePreparedQuery(id)))
       .subscribe(o -> async.complete(), tc::fail);
   }

@@ -609,6 +609,13 @@ public class ConsulClientImpl implements ConsulClient {
     return this;
   }
 
+  @Override
+  public ConsulClient updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler) {
+    String path = "/v1/query/" + urlEncode(definition.getId());
+    requestVoid(HttpMethod.PUT, path, null, definition.toJson().encode(), resultHandler);
+    return this;
+  }
+
   private void getPreparedQueryList(String id, Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
     String path = "/v1/query" + (id == null ? "" : "/" + urlEncode(id));
     requestArray(HttpMethod.GET, path, null, null, resultHandler, (arr, headers) -> arr.stream()

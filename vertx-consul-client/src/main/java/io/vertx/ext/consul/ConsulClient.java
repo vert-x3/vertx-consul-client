@@ -861,6 +861,15 @@ public interface ConsulClient {
   ConsulClient getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler);
 
   /**
+   * @param definition    definition of the prepare query
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#update-prepared-query">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
    * Deletes an existing prepared query
    *
    * @param id            the id of the query to delete

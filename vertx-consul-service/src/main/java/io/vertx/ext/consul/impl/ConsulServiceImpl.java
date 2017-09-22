@@ -421,6 +421,12 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.updatePreparedQuery(definition, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler) {
     consulClient.deletePreparedQuery(id, resultHandler);
     return this;

@@ -309,6 +309,10 @@ public interface ConsulService extends ConsulClient {
 
   @Override
   @Fluent
+  ConsulService updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler);
+
+  @Override
+  @Fluent
   ConsulService deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler);
 
   @Override
