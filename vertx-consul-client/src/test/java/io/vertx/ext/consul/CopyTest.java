@@ -236,6 +236,28 @@ public class CopyTest extends VertxTestBase {
   }
 
   @Test
+  public void testPreparedQueryDefinitionCopy() {
+    PreparedQueryDefinition pqd = randomPreparedQueryDefinition();
+    checkPreparedQueryDefinition(pqd, new PreparedQueryDefinition(pqd.toJson()));
+  }
+
+  private void checkPreparedQueryDefinition(PreparedQueryDefinition expected, PreparedQueryDefinition actual) {
+    assertEquals(expected.getDcs(), actual.getDcs());
+    assertEquals(expected.getDnsTtl(), actual.getDnsTtl());
+    assertEquals(expected.getId(), actual.getId());
+    assertEquals(expected.getMeta(), actual.getMeta());
+    assertEquals(expected.getName(), actual.getName());
+    assertEquals(expected.getNearestN(), actual.getNearestN());
+    assertEquals(expected.getPassing(), actual.getPassing());
+    assertEquals(expected.getService(), actual.getService());
+    assertEquals(expected.getSession(), actual.getSession());
+    assertEquals(expected.getTags(), actual.getTags());
+    assertEquals(expected.getTemplateRegexp(), actual.getTemplateRegexp());
+    assertEquals(expected.getTemplateType(), actual.getTemplateType());
+    assertEquals(expected.getToken(), actual.getToken());
+  }
+
+  @Test
   public void testServiceEntryCopy() {
     ServiceEntry entry = randomServiceEntry();
     checkServiceEntry(entry, new ServiceEntry(entry));

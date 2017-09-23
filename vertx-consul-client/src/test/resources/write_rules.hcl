@@ -10,3 +10,6 @@ event "" {
 service "" {
   policy = "write"
 }
+query "" {
+  policy = "write"
+}

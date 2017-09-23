@@ -40,7 +40,8 @@ import org.junit.runners.Suite;
   Status.class,
   SecureClient.class,
   Transactions.class,
-  Watches.class
+  Watches.class,
+  PreparedQuery.class
 })
 public class ConsulTestSuite {
 

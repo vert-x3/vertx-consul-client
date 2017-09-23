@@ -331,7 +331,7 @@ public interface ConsulClient {
    * are slightly different. Most blocking queries provide a monotonic index and block until a newer index is available.
    * This can be supported as a consequence of the total ordering of the consensus protocol. With gossip,
    * there is no ordering, and instead {@code X-Consul-Index} maps to the newest event that matches the query.
-   *
+   * <p>
    * In practice, this means the index is only useful when used against a single agent and has no meaning globally.
    * Because Consul defines the index as being opaque, clients should not be expecting a natural ordering either.
    *
@@ -829,6 +829,81 @@ public interface ConsulClient {
    */
   @Fluent
   ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * @param definition    definition of the prepare query
+   * @param resultHandler will be provided with id of created prepare query
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#create-prepared-query">/v1/query</a> endpoint
+   */
+  @Fluent
+  ConsulClient createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler);
+
+  /**
+   * Returns an existing prepared query
+   *
+   * @param id            the id of the query to read
+   * @param resultHandler will be provided with definition of the prepare query
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#read-prepared-query-1">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
+
+  /**
+   * Returns a list of all prepared queries.
+   *
+   * @param resultHandler will be provided with list of definitions of the all prepare queries
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#read-prepared-query">/v1/query</a> endpoint
+   */
+  @Fluent
+  ConsulClient getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler);
+
+  /**
+   * @param definition    definition of the prepare query
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#update-prepared-query">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * Deletes an existing prepared query
+   *
+   * @param id            the id of the query to delete
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#delete-prepared-query">/v1/query/:uuid</a> endpoint
+   */
+  @Fluent
+  ConsulClient deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * Executes an existing prepared query.
+   *
+   * @param query         the ID of the query to execute. This can also be the name of an existing prepared query,
+   *                      or a name that matches a prefix name for a prepared query template.
+   * @param resultHandler will be provided with response
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
+   */
+  @Fluent
+  ConsulClient executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
+
+  /**
+   * Executes an existing prepared query.
+   *
+   * @param query         the ID of the query to execute. This can also be the name of an existing prepared query,
+   *                      or a name that matches a prefix name for a prepared query template.
+   * @param options       the options used to execute prepared query
+   * @param resultHandler will be provided with response
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
+   */
+  @Fluent
+  ConsulClient executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
 
   /**
    * Close the client and release its resources

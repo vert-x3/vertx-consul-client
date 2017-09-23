@@ -403,6 +403,48 @@ public class ConsulServiceImpl implements ConsulService {
   }
 
   @Override
+  public ConsulService createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler) {
+    consulClient.createPreparedQuery(definition, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
+    consulClient.getPreparedQuery(id, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
+    consulClient.getAllPreparedQueries(resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.updatePreparedQuery(definition, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler) {
+    consulClient.deletePreparedQuery(id, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    consulClient.executePreparedQuery(query, resultHandler);
+    return this;
+  }
+
+  @Override
+  public ConsulService executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
+    consulClient.executePreparedQueryWithOptions(query, options, resultHandler);
+    return this;
+  }
+
+  @Override
   public ConsulService localServices(Handler<AsyncResult<List<Service>>> resultHandler) {
     consulClient.localServices(resultHandler);
     return this;
