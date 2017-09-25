@@ -60,12 +60,16 @@ import io.vertx.core.net.ProxyOptions
  * @param proxyOptions  Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
  * @param receiveBufferSize  Set the TCP receive buffer size
  * @param reuseAddress  Set the value of reuse address
+ * @param reusePort  Set the value of reuse port. <p/> This is only supported by native transports.
  * @param sendBufferSize  Set the TCP send buffer size
  * @param sendUnmaskedFrames  Set true when the client wants to skip frame masking. You may want to set it true on server by server websocket communication: In this case you are by passing RFC6455 protocol. It's false as default.
  * @param soLinger  Set whether SO_linger keep alive is enabled
  * @param ssl  Set whether SSL/TLS is enabled
+ * @param tcpCork  Enable the <code>TCP_CORK</code> option - only with linux native transport.
+ * @param tcpFastOpen  Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
  * @param tcpKeepAlive  Set whether TCP keep alive is enabled
  * @param tcpNoDelay  Set whether TCP no delay is enabled
+ * @param tcpQuickAck  Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
  * @param timeout  Sets the amount of time (in milliseconds) after which if the request does not return any data within the timeout period an failure will be passed to the handler and the request will be closed.
  * @param trafficClass  Set the value of traffic class
  * @param trustAll  Set whether all server certificates should be trusted
@@ -125,12 +129,16 @@ fun ConsulClientOptions(
   proxyOptions: io.vertx.core.net.ProxyOptions? = null,
   receiveBufferSize: Int? = null,
   reuseAddress: Boolean? = null,
+  reusePort: Boolean? = null,
   sendBufferSize: Int? = null,
   sendUnmaskedFrames: Boolean? = null,
   soLinger: Int? = null,
   ssl: Boolean? = null,
+  tcpCork: Boolean? = null,
+  tcpFastOpen: Boolean? = null,
   tcpKeepAlive: Boolean? = null,
   tcpNoDelay: Boolean? = null,
+  tcpQuickAck: Boolean? = null,
   timeout: Long? = null,
   trafficClass: Int? = null,
   trustAll: Boolean? = null,
@@ -282,6 +290,9 @@ fun ConsulClientOptions(
   if (reuseAddress != null) {
     this.setReuseAddress(reuseAddress)
   }
+  if (reusePort != null) {
+    this.setReusePort(reusePort)
+  }
   if (sendBufferSize != null) {
     this.setSendBufferSize(sendBufferSize)
   }
@@ -294,11 +305,20 @@ fun ConsulClientOptions(
   if (ssl != null) {
     this.setSsl(ssl)
   }
+  if (tcpCork != null) {
+    this.setTcpCork(tcpCork)
+  }
+  if (tcpFastOpen != null) {
+    this.setTcpFastOpen(tcpFastOpen)
+  }
   if (tcpKeepAlive != null) {
     this.setTcpKeepAlive(tcpKeepAlive)
   }
   if (tcpNoDelay != null) {
     this.setTcpNoDelay(tcpNoDelay)
+  }
+  if (tcpQuickAck != null) {
+    this.setTcpQuickAck(tcpQuickAck)
   }
   if (timeout != null) {
     this.setTimeout(timeout)

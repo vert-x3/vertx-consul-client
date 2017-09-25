@@ -414,6 +414,12 @@ Set the TCP receive buffer size
 +++
 Set the value of reuse address
 +++
+|[[reusePort]]`reusePort`|`Boolean`|
++++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
++++
 |[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
 +++
 Set the TCP send buffer size
@@ -432,6 +438,14 @@ Set whether SO_linger keep alive is enabled
 +++
 Set whether SSL/TLS is enabled
 +++
+|[[tcpCork]]`tcpCork`|`Boolean`|
++++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`tcpFastOpen`|`Boolean`|
++++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
 |[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
 +++
 Set whether TCP keep alive is enabled
@@ -439,6 +453,10 @@ Set whether TCP keep alive is enabled
 |[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
 +++
 Set whether TCP no delay is enabled
++++
+|[[tcpQuickAck]]`tcpQuickAck`|`Boolean`|
++++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
 |[[timeout]]`timeout`|`Number (long)`|
 +++

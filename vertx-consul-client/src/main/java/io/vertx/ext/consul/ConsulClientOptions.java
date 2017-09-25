@@ -240,6 +240,18 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
+   * Set the value of reuse port.
+   * <p/>
+   * This is only supported by native transports.
+   *
+   * @param reusePort  the value of reuse port
+   * @return a reference to this, so the API can be used fluently
+   */
+  public ConsulClientOptions setReusePort(boolean reusePort) {
+    return (ConsulClientOptions) super.setReusePort(reusePort);
+  }
+
+  /**
    * Set the value of traffic class
    *
    * @param trafficClass  the value of traffic class
@@ -270,6 +282,36 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setTcpKeepAlive(boolean tcpKeepAlive) {
     return (ConsulClientOptions) super.setTcpKeepAlive(tcpKeepAlive);
+  }
+
+  /**
+   * Enable the {@code TCP_CORK} option - only with linux native transport.
+   *
+   * @param tcpCork the cork value
+   * @return a reference to this, so the API can be used fluently
+   */
+  public ConsulClientOptions setTcpCork(boolean tcpCork) {
+    return (ConsulClientOptions) super.setTcpCork(tcpCork);
+  }
+
+  /**
+   * Enable the {@code TCP_QUICKACK} option - only with linux native transport.
+   *
+   * @param tcpQuickAck the quick ack value
+   * @return a reference to this, so the API can be used fluently
+   */
+  public ConsulClientOptions setTcpQuickAck(boolean tcpQuickAck) {
+    return (ConsulClientOptions) super.setTcpQuickAck(tcpQuickAck);
+  }
+
+  /**
+   * Enable the {@code TCP_FASTOPEN} option - only with linux native transport.
+   *
+   * @param tcpFastOpen the fast open value
+   * @return a reference to this, so the API can be used fluently
+   */
+  public ConsulClientOptions setTcpFastOpen(boolean tcpFastOpen) {
+    return (ConsulClientOptions) super.setTcpFastOpen(tcpFastOpen);
   }
 
   /**
