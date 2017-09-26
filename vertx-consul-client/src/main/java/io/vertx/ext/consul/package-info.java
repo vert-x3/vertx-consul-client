@@ -411,6 +411,65 @@
  * {@link examples.Nodes#blockingQuery}
  * ----
  *
+ * == Prepated Queries
+ *
+ * This endpoint creates, updates, destroys, and executes prepared queries.
+ * Prepared queries allow you to register a complex service query and then execute it later via its ID
+ * or name to get a set of healthy nodes that provide a given service. This is particularly useful in combination
+ * with Consul's DNS Interface as it allows for much richer queries than would be possible given
+ * the limited entry points exposed by DNS.
+ *
+ * There are many parameters to creating a prepared query.
+ * For full details please https://www.consul.io/api/query.html[see docs]
+ *
+ * `dc` :: Specifies the datacenter to query. This will default to the datacenter of the agent being queried. This is specified as part of the URL as a query parameter.
+ * `name` :: Specifies an optional friendly name that can be used to execute a query instead of using its ID.
+ * `session` :: Specifies the ID of an existing session. This provides a way to automatically remove a prepared query when the given session is invalidated. If not given the prepared query must be manually removed when no longer needed.
+ * `token` :: Specifies the ACL token to use each time the query is executed. This allows queries to be executed by clients with lesser or even no ACL Token, so this should be used with care. The token itself can only be seen by clients with a management token. If the Token field is left blank or omitted, the client's ACL Token will be used to determine if they have access to the service being queried. If the client does not supply an ACL Token, the anonymous token will be used.
+ * `service` :: Specifies the name of the service to query. This is required field.
+ * `failover` :: contains two fields, both of which are optional, and determine what happens if no healthy nodes are available in the local datacenter when the query is executed. It allows the use of nodes in other datacenters with very little configuration.
+ * `nearestN` :: Specifies that the query will be forwarded to up to NearestN other datacenters based on their estimated network round trip time using Network Coordinates from the WAN gossip pool. The median round trip time from the server handling the query to the servers in the remote datacenter is used to determine the priority.
+ * `datacenters` :: Specifies a fixed list of remote datacenters to forward the query to if there are no healthy nodes in the local datacenter. Datacenters are queried in the order given in the list. If this option is combined with NearestN, then the NearestN queries will be performed first, followed by the list given by Datacenters. A given datacenter will only be queried one time during a failover, even if it is selected by both NearestN and is listed in Datacenters.
+ * `onlyPassing` :: Specifies the behavior of the query's health check filtering. If this is set to false, the results will include nodes with checks in the passing as well as the warning states. If this is set to true, only nodes with checks in the passing state will be returned.
+ * `tags` :: Specifies a list of service tags to filter the query results. For a service to pass the tag filter it must have all of the required tags, and none of the excluded tags (prefixed with !).
+ * `nodeMeta` :: Specifies a list of user-defined key/value pairs that will be used for filtering the query results to nodes with the given metadata values present.
+ * `dnsTtl` :: Specifies the TTL duration when query results are served over DNS. If this is specified, it will take precedence over any Consul agent-specific configuration.
+ * `templateType` :: is the query type, which must be `name_prefix_match`. This means that the template will apply to any query lookup with a name whose prefix matches the Name field of the template. In this example, any query for geo-db will match this query. Query templates are resolved using a longest prefix match, so it's possible to have high-level templates that are overridden for specific services. Static queries are always resolved first, so they can also override templates.
+ * `templateRegexp` :: is an optional regular expression which is used to extract fields from the entire name, once this template is selected. In this example, the regular expression takes the first item after the "-" as the database name and everything else after as a tag. See the RE2 reference for syntax of this regular expression.
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.PreparedQueries#preparedQueryDefinition}
+ * ----
+ *
+ * If the query is successfully created, its ID will be provided
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.PreparedQueries#createQuery}
+ * ----
+ *
+ * The prepared query can be executed by its id
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.PreparedQueries#executeQueryId}
+ * ----
+ *
+ * or by query string that must match template regexp
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.PreparedQueries#executeQuery}
+ * ----
+ *
+ * Finally, `ConsulClient` allows you to modify, get or delete prepared queries
+ *
+ * [source,$lang]
+ * ----
+ * {@link examples.PreparedQueries#deleteQuery}
+ * ----
+ *
  * == Watches
  *
  * Watches are a way of specifying a view of data (e.g. list of nodes, KV pairs, health checks)
