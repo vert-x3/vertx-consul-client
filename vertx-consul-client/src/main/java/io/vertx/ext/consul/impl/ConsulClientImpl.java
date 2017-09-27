@@ -31,6 +31,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static io.vertx.ext.consul.impl.Utils.listOf;
 import static io.vertx.ext.consul.impl.Utils.urlEncode;
 
 /**
@@ -307,7 +308,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
-    requestArray(HttpMethod.GET, "/v1/catalog/datacenters", null, null, resultHandler, (arr, headers) -> arr.getList());
+    requestArray(HttpMethod.GET, "/v1/catalog/datacenters", null, null, resultHandler, (arr, headers) -> listOf(arr));
     return this;
   }
 

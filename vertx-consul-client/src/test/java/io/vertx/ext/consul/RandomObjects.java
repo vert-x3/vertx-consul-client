@@ -87,11 +87,11 @@ public class RandomObjects {
   public static PreparedQueryDefinition randomPreparedQueryDefinition() {
     return new PreparedQueryDefinition()
       .setDcs(Collections.singletonList(randomAlphaString(10)))
-      .setDnsTtl(randomAlphaString(5))
+      .setDnsTtl((randomPositiveInt() % 10) + "s")
       .setId(randomAlphaString(10))
       .setMeta(Collections.singletonMap(randomAlphaString(5), randomAlphaString(10)))
       .setName(randomAlphaString(10))
-      .setNearestN(randomInt())
+      .setNearestN(randomPositiveInt())
       .setPassing(randomBoolean())
       .setService(randomAlphaString(10))
       .setSession(randomAlphaString(10))

@@ -22,6 +22,8 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.vertx.ext.consul.impl.Utils.listOf;
+
 /**
  * Options used to create session.
  *
@@ -74,7 +76,7 @@ public class SessionOptions {
     this.name = options.getString(NAME_KEY);
     this.node = options.getString(NODE_KEY);
     JsonArray arr = options.getJsonArray(CHECKS_KEY);
-    this.checks = arr == null ? null : arr.getList();
+    this.checks = listOf(arr);
     this.behavior = SessionBehavior.of(options.getString(BEHAVIOR_KEY));
     this.ttl = cutSeconds(options.getString(TTL_KEY));
   }

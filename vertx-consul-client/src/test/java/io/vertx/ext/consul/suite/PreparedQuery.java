@@ -24,6 +24,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static io.vertx.ext.consul.RandomObjects.randomPreparedQueryDefinition;
+
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -45,6 +47,39 @@ public class PreparedQuery extends ConsulTestBase {
           .rxGetPreparedQuery(id)
           .map(check(q -> tc.assertTrue(q.getService().equals(service2)))))
         .flatMap(list -> ctx.rxWriteClient().rxDeletePreparedQuery(id)))
+      .subscribe(o -> async.complete(), tc::fail);
+  }
+
+  @Test
+  public void checkDefinition(TestContext tc) {
+    Async async = tc.async();
+    ctx.rxWriteClient()
+      .rxCreateSession()
+      .map(sessId -> randomPreparedQueryDefinition()
+        .setId("")
+        .setTemplateType("name_prefix_match")
+        .setTemplateRegexp("^find_(.+?)_(.+?)$")
+        .setSession(sessId))
+      .flatMap(expected -> ctx.rxWriteClient()
+        .rxCreatePreparedQuery(expected)
+        .flatMap(id -> ctx.rxReadClient()
+          .rxGetPreparedQuery(id)
+          .map(check(actual -> {
+            tc.assertEquals(expected.getService(), actual.getService());
+            tc.assertEquals(expected.getDcs(), actual.getDcs());
+            tc.assertEquals(expected.getDnsTtl(), actual.getDnsTtl());
+            tc.assertEquals(expected.getMeta(), actual.getMeta());
+            tc.assertEquals(expected.getName(), actual.getName());
+            tc.assertEquals(expected.getNearestN(), actual.getNearestN());
+            tc.assertEquals(expected.getPassing(), actual.getPassing());
+            tc.assertEquals(expected.getSession(), actual.getSession());
+            tc.assertEquals(expected.getTags(), actual.getTags());
+            tc.assertEquals(expected.getTemplateRegexp(), actual.getTemplateRegexp());
+            tc.assertEquals(expected.getTemplateType(), actual.getTemplateType());
+          }))
+          .map(actual -> ctx.rxWriteClient().rxDeletePreparedQuery(actual.getId()))
+          .map(v -> ctx.rxWriteClient().rxDestroySession(expected.getSession()))
+        ))
       .subscribe(o -> async.complete(), tc::fail);
   }
 

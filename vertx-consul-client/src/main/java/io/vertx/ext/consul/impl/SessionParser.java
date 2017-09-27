@@ -21,6 +21,8 @@ import io.vertx.ext.consul.Session;
 
 import java.util.concurrent.TimeUnit;
 
+import static io.vertx.ext.consul.impl.Utils.listOf;
+
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -43,7 +45,7 @@ class SessionParser {
     res.setId(session.getString(ID_KEY));
     res.setCreateIndex(session.getLong(CREATE_INDEX_KEY, 0L));
     JsonArray arr = session.getJsonArray(CHECKS_KEY);
-    res.setChecks(arr == null ? null : arr.getList());
+    res.setChecks(listOf(arr));
     res.setIndex(index);
     return res;
   }

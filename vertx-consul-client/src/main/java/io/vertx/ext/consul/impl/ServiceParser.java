@@ -22,6 +22,8 @@ import io.vertx.ext.consul.Service;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.vertx.ext.consul.impl.Utils.listOf;
+
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -38,7 +40,7 @@ class ServiceParser {
     return new Service()
       .setId(jsonObject.getString(AGENT_SERVICE_ID))
       .setName(jsonObject.getString(AGENT_SERVICE_SERVICE))
-      .setTags(tagsArr == null ? null : tagsArr.getList())
+      .setTags(listOf(tagsArr))
       .setAddress(jsonObject.getString(AGENT_SERVICE_ADDRESS))
       .setPort(jsonObject.getInteger(AGENT_SERVICE_PORT));
   }
@@ -58,7 +60,7 @@ class ServiceParser {
       .setId(serviceInfo.getString(AGENT_SERVICE_ID))
       .setAddress(serviceInfo.getString(AGENT_SERVICE_ADDRESS))
       .setName(serviceInfo.getString(AGENT_SERVICE_SERVICE))
-      .setTags(tagsArr == null ? null : tagsArr.getList())
+      .setTags(listOf(tagsArr))
       .setPort(serviceInfo.getInteger(AGENT_SERVICE_PORT));
   }
 

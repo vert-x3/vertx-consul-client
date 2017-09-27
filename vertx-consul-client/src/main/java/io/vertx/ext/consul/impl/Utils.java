@@ -15,9 +15,12 @@
  */
 package io.vertx.ext.consul.impl;
 
+import io.vertx.core.json.JsonArray;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -45,6 +48,15 @@ public class Utils {
       return "";
     } else {
       return new String(Base64.getDecoder().decode(src));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> List<T> listOf(JsonArray arr) {
+    if (arr == null) {
+      return null;
+    } else {
+      return (List<T>) arr.getList();
     }
   }
 }
