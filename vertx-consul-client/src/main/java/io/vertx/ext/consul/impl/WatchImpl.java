@@ -173,7 +173,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
   }
 
   private WatchImpl<T> go() {
-    fetch(current.index, newState -> {
+    fetch(0, newState -> {
       if (!newState.equals(current)) {
         current = newState;
         sendSuccess(current.value);
@@ -188,6 +188,9 @@ public abstract class WatchImpl<T> implements Watch<T> {
       return;
     }
     wait(current.index, h -> {
+      if (stopped) {
+        return;
+      }
       if (h.succeeded()) {
         result.handle(h.result());
       } else {

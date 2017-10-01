@@ -22,7 +22,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.io.File;
@@ -102,13 +101,11 @@ class ConsulCluster {
   }
 
   static ConsulProcess attach(String nodeName) {
-    JsonObject config = consulConfig(nodeName, Utils.getFreePort())
-      .put("leave_on_terminate", true)
-      .put("start_join", new JsonArray().add("127.0.0.1:" + instance().consul.getSerfLanPort()));;
     return ConsulStarterBuilder.consulStarter()
       .withLogLevel(LogLevel.ERR)
       .withConsulVersion(CONSUL_VERSION)
-      .withCustomConfig(config.encode())
+      .withCustomConfig(consulConfig(nodeName, Utils.getFreePort()).encode())
+      .withAttachedTo(instance().consul)
       .build()
       .start();
   }
@@ -116,6 +113,7 @@ class ConsulCluster {
   private static JsonObject consulConfig(String nodeName, int httpsPort) {
     return new JsonObject()
       .put("server", true)
+      .put("leave_on_terminate", true)
       .put("key_file", copyFileFromResources("client-key.pem", "client-key"))
       .put("cert_file", copyFileFromResources("client-cert.pem", "client-cert"))
       .put("ca_file", copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"))
