@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import rx.Single;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -33,6 +34,22 @@ import static io.vertx.test.core.TestUtils.*;
  */
 @RunWith(VertxUnitRunner.class)
 public class KVStore extends ConsulTestBase {
+
+  @Test
+  public void handleExceptions() {
+    CountDownLatch latch = new CountDownLatch(2);
+    String unknownKey = randomFooBarAlpha();
+    ctx.readClient().getValue(unknownKey, kv -> {
+      latch.countDown();
+      throw new RuntimeException();
+    });
+    boolean zero = true;
+    try {
+      zero = latch.await(2, TimeUnit.SECONDS);
+    } catch (Exception ignore) {
+    }
+    assertFalse(zero);
+  }
 
   @Test
   public void readClientCantWriteOneValue(TestContext tc) {

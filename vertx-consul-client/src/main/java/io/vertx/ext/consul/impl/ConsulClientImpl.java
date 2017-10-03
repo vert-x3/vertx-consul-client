@@ -713,11 +713,14 @@ public class ConsulClientImpl implements ConsulClient {
       if (h.succeeded()) {
         HttpResponse<Buffer> resp = h.result();
         if (validCodes.contains(resp.statusCode())) {
+          T mapped;
           try {
-            resultHandler.handle(Future.succeededFuture(mapper.apply(resp)));
+            mapped = mapper.apply(resp);
           } catch (Throwable throwable) {
             resultHandler.handle(Future.failedFuture(throwable));
+            return;
           }
+          resultHandler.handle(Future.succeededFuture(mapped));
         } else {
           resultHandler.handle(Future.failedFuture(resp.statusMessage()));
         }
