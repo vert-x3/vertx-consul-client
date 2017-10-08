@@ -191,7 +191,7 @@ public interface Watch<T> {
    * @return reference to this, for fluency
    */
   @Fluent
-  Watch<T> setHandler(Handler<AsyncResult<T>> handler);
+  Watch<T> setHandler(Handler<WatchResult<T>> handler);
 
   /**
    * Start this {@code Watch}

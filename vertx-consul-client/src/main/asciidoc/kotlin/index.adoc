@@ -857,7 +857,7 @@ As an example, you could watch the status of health checks and notify when a che
 ----
 Watch.key("foo/bar", vertx).setHandler({ res ->
   if (res.succeeded()) {
-    println("value: ${res.result().value}")
+    println("value: ${res.nextResult().value}")
   } else {
     res.cause().printStackTrace()
   }

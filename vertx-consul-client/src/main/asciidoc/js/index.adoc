@@ -881,11 +881,11 @@ As an example, you could watch the status of health checks and notify when a che
 [source,js]
 ----
 var Watch = require("vertx-consul-js/watch");
-Watch.key("foo/bar", vertx).setHandler(function (res, res_err) {
-  if (res_err == null) {
-    console.log("value: " + res.value);
+Watch.key("foo/bar", vertx).setHandler(function (res) {
+  if (res.succeeded()) {
+    console.log("value: " + res.nextResult().value);
   } else {
-    res_err.printStackTrace();
+    res.cause().printStackTrace();
   }
 }).start();
 

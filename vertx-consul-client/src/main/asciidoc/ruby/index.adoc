@@ -881,11 +881,11 @@ As an example, you could watch the status of health checks and notify when a che
 [source,ruby]
 ----
 require 'vertx-consul/watch'
-VertxConsul::Watch.key("foo/bar", vertx).set_handler() { |res_err,res|
-  if (res_err == nil)
-    puts "value: #{res['value']}"
+VertxConsul::Watch.key("foo/bar", vertx).set_handler() { |res|
+  if (res.succeeded?())
+    puts "value: #{res.next_result()['value']}"
   else
-    res_err.print_stack_trace()
+    res.cause().print_stack_trace()
   end
 }.start()
 

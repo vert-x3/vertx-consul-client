@@ -27,7 +27,7 @@ public class Watches {
     Watch.key("foo/bar", vertx)
       .setHandler(res -> {
         if (res.succeeded()) {
-          System.out.println("value: " + res.result().getValue());
+          System.out.println("value: " + res.nextResult().getValue());
         } else {
           res.cause().printStackTrace();
         }

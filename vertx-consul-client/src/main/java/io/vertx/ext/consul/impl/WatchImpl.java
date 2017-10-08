@@ -130,7 +130,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
 
   private volatile boolean started = false;
   private volatile boolean stopped = false;
-  private Handler<AsyncResult<T>> handler;
+  private Handler<WatchResult<T>> handler;
   private State<T> current = new State<>(null, 0);
 
   protected final Vertx vertx;
@@ -144,7 +144,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
   abstract void wait(long index, Handler<AsyncResult<State<T>>> handler);
 
   @Override
-  public Watch<T> setHandler(Handler<AsyncResult<T>> handler) {
+  public Watch<T> setHandler(Handler<WatchResult<T>> handler) {
     this.handler = handler;
     return this;
   }
@@ -175,8 +175,9 @@ public abstract class WatchImpl<T> implements Watch<T> {
   private WatchImpl<T> go() {
     fetch(0, newState -> {
       if (!newState.equals(current)) {
+        State<T> prevState = current;
         current = newState;
-        sendSuccess(current.value);
+        sendSuccess(prevState.value, newState.value);
       }
       vertx.runOnContext(v -> go());
     });
@@ -194,7 +195,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
       if (h.succeeded()) {
         result.handle(h.result());
       } else {
-        sendFail(h.cause());
+        sendFail(current.value, h.cause());
         long newCnt = cnt + 1;
         long delay = newCnt * newCnt;
         if (delay > DELAY_LIMIT_SECONDS) {
@@ -205,15 +206,65 @@ public abstract class WatchImpl<T> implements Watch<T> {
     });
   }
 
-  private void sendSuccess(T value) {
+  private void sendSuccess(T prevValue, T nextValue) {
     if (!stopped && handler != null) {
-      handler.handle(Future.succeededFuture(value));
+      handler.handle(new WatchResult<T>() {
+        @Override
+        public T prevResult() {
+          return prevValue;
+        }
+
+        @Override
+        public T nextResult() {
+          return nextValue;
+        }
+
+        @Override
+        public Throwable cause() {
+          return null;
+        }
+
+        @Override
+        public boolean succeeded() {
+          return true;
+        }
+
+        @Override
+        public boolean failed() {
+          return false;
+        }
+      });
     }
   }
 
-  private void sendFail(Throwable throwable) {
+  private void sendFail(T prevValue, Throwable cause) {
     if (!stopped && handler != null) {
-      handler.handle(Future.failedFuture(throwable));
+      handler.handle(new WatchResult<T>() {
+        @Override
+        public T prevResult() {
+          return prevValue;
+        }
+
+        @Override
+        public T nextResult() {
+          return null;
+        }
+
+        @Override
+        public Throwable cause() {
+          return cause;
+        }
+
+        @Override
+        public boolean succeeded() {
+          return false;
+        }
+
+        @Override
+        public boolean failed() {
+          return true;
+        }
+      });
     }
   }
 

@@ -114,7 +114,7 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          consumer.consume(kv.result().isPresent() ? kv.result().getValue() : EMPTY_MESSAGE);
+          consumer.consume(kv.nextResult().isPresent() ? kv.nextResult().getValue() : EMPTY_MESSAGE);
         } else {
           consumer.consume(kv.cause().getMessage());
         }
@@ -146,7 +146,7 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          consumer.consume(kv.result().isPresent() ? kv.result().getValue() : EMPTY_MESSAGE);
+          consumer.consume(kv.nextResult().isPresent() ? kv.nextResult().getValue() : EMPTY_MESSAGE);
         } else {
           consumer.consume(kv.cause().getMessage());
         }
@@ -177,8 +177,8 @@ public class Watches extends ConsulTestBase {
     Watch<KeyValueList> watch = Watch.keyPrefix(keyPrefix, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
         if (kv.succeeded()) {
-          if (kv.result().isPresent()) {
-            consumer.consume(kv.result().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
+          if (kv.nextResult().isPresent()) {
+            consumer.consume(kv.nextResult().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
           } else {
             consumer.consume(EMPTY_MESSAGE);
           }
@@ -209,7 +209,7 @@ public class Watches extends ConsulTestBase {
     Watch<ServiceList> watch = Watch.services(vertx, ctx.readClientOptions())
       .setHandler(list -> {
         if (list.succeeded()) {
-          consumer.consume(list.result().getList()
+          consumer.consume(list.nextResult().getList()
             .stream().map(Service::getName).filter(s -> s.equals(service.getName()))
             .findFirst().orElse(""));
         }
@@ -241,7 +241,7 @@ public class Watches extends ConsulTestBase {
     Watch<ServiceEntryList> watch = Watch.service(service.getName(), vertx, ctx.readClientOptions())
       .setHandler(list -> {
         if (list.succeeded()) {
-          consumer.consume(list.result().getList()
+          consumer.consume(list.nextResult().getList()
             .stream().filter(s -> s.getService().getName().equals(service.getName()))
             .map(e -> e.getService().getName() + "/" + e.getChecks().stream()
               .filter(c -> c.getId().equals("service:" + service.getId()))
@@ -272,7 +272,7 @@ public class Watches extends ConsulTestBase {
     Watch<EventList> watch = Watch.events(evName, vertx, ctx.readClientOptions())
       .setHandler(list -> {
         if (list.succeeded()) {
-          consumer.consume(list.result().getList()
+          consumer.consume(list.nextResult().getList()
             .stream().map(Event::getPayload).collect(Collectors.joining(",")));
         }
       })
@@ -299,7 +299,7 @@ public class Watches extends ConsulTestBase {
     Watch<NodeList> watch = Watch.nodes(vertx, ctx.readClientOptions())
       .setHandler(list -> {
         if (list.succeeded()) {
-          consumer.consume(list.result().getList()
+          consumer.consume(list.nextResult().getList()
             .stream().map(Node::getName).filter(s -> s.equals(nodeName))
             .findFirst().orElse(""));
         }
