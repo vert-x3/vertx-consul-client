@@ -47,7 +47,7 @@ public class ConsulTestSuite {
 
   @BeforeClass
   public static void startConsul() throws Exception {
-    ConsulCluster.consul();
+    ConsulCluster.start();
   }
 
   @AfterClass

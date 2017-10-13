@@ -15,8 +15,8 @@
  */
 package io.vertx.ext.consul.suite;
 
-import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.dc.ConsulAgent;
 import org.junit.Test;
 
 import java.util.List;
@@ -62,11 +62,11 @@ public class Coordinates extends ConsulTestBase {
     });
 
     sleep(vertx, 2000);
-    ConsulProcess attached = ctx.attachConsul("new_node");
+    ConsulAgent attached = ctx.attachAgent("new_node");
     latch.await(2, TimeUnit.MINUTES);
     assertEquals(latch.getCount(), 0);
 
-    attached.close();
+    ctx.detachAgent(attached);
 
     // wait until the second consul will leave
     assertTrue(waitPeers());
@@ -102,7 +102,7 @@ public class Coordinates extends ConsulTestBase {
       return;
     }
     DcCoordinates coordinate = datacenters.get(0);
-    assertEquals(coordinate.getDatacenter(), ctx.dc());
+    assertEquals(coordinate.getDatacenter(), ctx.dc().getName());
   }
 
 }

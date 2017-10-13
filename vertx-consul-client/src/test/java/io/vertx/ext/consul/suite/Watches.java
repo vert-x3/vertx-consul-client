@@ -15,9 +15,9 @@
  */
 package io.vertx.ext.consul.suite;
 
-import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.common.StateConsumer;
+import io.vertx.ext.consul.dc.ConsulAgent;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -308,8 +308,8 @@ public class Watches extends ConsulTestBase {
 
     consumer.await("");
 
-    ConsulProcess attached = ctx.attachConsul(nodeName);
-    attached.close();
+    ConsulAgent attached = ctx.attachAgent(nodeName);
+    ctx.detachAgent(attached);
 
     consumer.await(nodeName);
     consumer.await("");

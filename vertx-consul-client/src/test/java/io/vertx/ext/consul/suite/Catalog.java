@@ -15,8 +15,8 @@
  */
 package io.vertx.ext.consul.suite;
 
-import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.dc.ConsulAgent;
 import org.junit.Test;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class Catalog extends ConsulTestBase {
   public void datacenters() {
     List<String> datacenters = Utils.getAsync(h -> ctx.readClient().catalogDatacenters(h));
     assertEquals(datacenters.size(), 1);
-    assertEquals(datacenters.get(0), ctx.dc());
+    assertEquals(datacenters.get(0), ctx.dc().getName());
   }
 
   @Test
@@ -60,7 +60,7 @@ public class Catalog extends ConsulTestBase {
     });
     sleep(vertx, 2000);
     assertEquals(latch1.getCount(), 1);
-    ConsulProcess attached = ctx.attachConsul("attached_node");
+    ConsulAgent attached = ctx.attachAgent("attached_node");
     latch1.await(2, TimeUnit.MINUTES);
     assertEquals(latch1.getCount(), 0);
 
@@ -71,7 +71,7 @@ public class Catalog extends ConsulTestBase {
     ctx.readClient().catalogNodesWithOptions(new NodeQueryOptions().setBlockingOptions(blockingQueryOptions2), h -> {
       latch2.countDown();
     });
-    attached.close();
+    ctx.detachAgent(attached);
     latch2.await(2, TimeUnit.MINUTES);
     assertEquals(latch2.getCount(), 0);
   }
