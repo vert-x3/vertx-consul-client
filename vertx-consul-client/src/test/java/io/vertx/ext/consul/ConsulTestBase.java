@@ -16,7 +16,9 @@
 package io.vertx.ext.consul;
 
 import io.vertx.core.Vertx;
+import io.vertx.ext.consul.impl.ConsulClientImpl;
 import io.vertx.test.core.VertxTestBase;
+import org.junit.BeforeClass;
 import rx.functions.Func1;
 
 import java.util.function.Consumer;
@@ -30,8 +32,17 @@ import static io.vertx.test.core.TestUtils.randomUnicodeString;
  */
 public class ConsulTestBase extends VertxTestBase {
 
-  protected static Function<Vertx, ConsulContext> ctxFactory;
+  static Function<Vertx, ConsulContext> ctxFactory = vertx ->
+    new ConsulContext(
+      opts -> new ConsulClientImpl(vertx, opts),
+      ConsulClient::close
+    );
   protected ConsulContext ctx;
+
+  @BeforeClass
+  public static void startConsul() throws Exception {
+    ConsulCluster.start();
+  }
 
   @Override
   public void setUp() throws Exception {

@@ -21,13 +21,15 @@ import io.vertx.ext.consul.dc.ConsulDatacenter;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-class ConsulCluster {
+public class ConsulCluster {
 
   private static final ConsulDatacenter dc = ConsulDatacenter.create();
+  private static final AtomicBoolean started = new AtomicBoolean();
 
   private static ConsulAgent defaultAgent;
   private static String writeToken;
@@ -40,20 +42,19 @@ class ConsulCluster {
       .setCaFile(copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"));
   }
 
-  static void start() {
-    ConsulAgentOptions options = sslOptions();
-    defaultAgent = dc.attachAgent(options);
-    try {
-      writeToken = defaultAgent.createAclToken(Utils.readResource("write_rules.hcl"));
-      readToken = defaultAgent.createAclToken(Utils.readResource("read_rules.hcl"));
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+  public static void start() {
+    if (started.compareAndSet(false, true)) {
+      ConsulAgentOptions options = sslOptions();
+      defaultAgent = dc.attachAgent(options);
+      try {
+        writeToken = defaultAgent.createAclToken(Utils.readResource("write_rules.hcl"));
+        readToken = defaultAgent.createAclToken(Utils.readResource("read_rules.hcl"));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+      Runtime.getRuntime().addShutdownHook(new Thread(dc::stop));
     }
-  }
-
-  static void close() {
-    dc.stop();
   }
 
   static ConsulDatacenter dc() {

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class ConsulServiceTest extends ConsulTestSuite {
+public class ConsulServiceTest extends ConsulClientTest {
 
   private static AtomicInteger cnt = new AtomicInteger(1);
 

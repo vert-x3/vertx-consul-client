@@ -15,20 +15,31 @@
  */
 package io.vertx.ext.consul;
 
-import io.vertx.ext.consul.impl.ConsulClientImpl;
-import org.junit.BeforeClass;
+import io.vertx.ext.consul.suite.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class ConsulClientTest extends ConsulTestSuite {
-
-  @BeforeClass
-  public static void initCreator() {
-    ConsulTestBase.ctxFactory = vertx -> new ConsulContext(
-      opts -> new ConsulClientImpl(vertx, opts),
-      ConsulClient::close
-    );
-  }
-
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+  BrokenConsul.class,
+  BrokenClient.class,
+  AgentInfo.class,
+  AclTokens.class,
+  Catalog.class,
+  Checks.class,
+  Coordinates.class,
+  Events.class,
+  KVStore.class,
+  Services.class,
+  Sessions.class,
+  Status.class,
+  SecureClient.class,
+  Transactions.class,
+  Watches.class,
+  PreparedQuery.class
+})
+public class ConsulClientTest {
 }
