@@ -16,87 +16,56 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.AclToken;
-import io.vertx.ext.consul.AclTokenType;
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
-
-import java.util.List;
-
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
+import org.junit.runner.RunWith;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class AclTokens extends ConsulTestBase {
 
   @Test
-  public void serializeToken() {
-    AclToken src = new AclToken()
-      .setId("tokenId")
-      .setName("tokenName")
-      .setType(AclTokenType.MANAGEMENT)
-      .setRules("tokenRules");
-    AclToken restored = new AclToken(src.toJson());
-    assertEquals(src.getId(), restored.getId());
-    assertEquals(src.getName(), restored.getName());
-    assertEquals(src.getType(), restored.getType());
-    assertEquals(src.getRules(), restored.getRules());
+  public void lifecycle(TestContext tc) {
+    ctx.masterClient().listAclTokens(tc.asyncAssertSuccess(backupTokens -> {
+      AclToken init = new AclToken()
+        .setName("tokenName")
+        .setRules("key \"bar/\" { policy = \"read\" }");
+      ctx.masterClient().createAclToken(init, tc.asyncAssertSuccess(id -> {
+        ctx.masterClient().infoAclToken(id, tc.asyncAssertSuccess(token -> {
+          tc.assertEquals(id, token.getId());
+          tc.assertEquals(init.getName(), token.getName());
+          tc.assertEquals(init.getRules(), token.getRules());
+          ctx.masterClient().cloneAclToken(id, tc.asyncAssertSuccess(clonedId -> {
+            ctx.masterClient().infoAclToken(clonedId, tc.asyncAssertSuccess(clonedToken -> {
+              tc.assertEquals(clonedId, clonedToken.getId());
+              tc.assertEquals(token.getName(), clonedToken.getName());
+              tc.assertEquals(token.getRules(), clonedToken.getRules());
+              AclToken token2 = new AclToken()
+                .setId(clonedToken.getId())
+                .setName("updatedName")
+                .setRules("key \"bar/\" { policy = \"write\" }");
+              ctx.masterClient().updateAclToken(token2, tc.asyncAssertSuccess(updatedId -> {
+                ctx.masterClient().infoAclToken(updatedId, tc.asyncAssertSuccess(updatedToken -> {
+                  tc.assertEquals(token2.getId(), updatedToken.getId());
+                  tc.assertEquals(token2.getName(), updatedToken.getName());
+                  tc.assertEquals(token2.getRules(), updatedToken.getRules());
+                  ctx.masterClient().destroyAclToken(id, tc.asyncAssertSuccess(v1 -> {
+                    ctx.masterClient().destroyAclToken(clonedId, tc.asyncAssertSuccess(v2 -> {
+                      ctx.masterClient().listAclTokens(tc.asyncAssertSuccess(aliveTokens -> {
+                        tc.assertEquals(backupTokens.size(), aliveTokens.size());
+                      }));
+                    }));
+                  }));
+                }));
+              }));
+            }));
+          }));
+        }));
+      }));
+    }));
   }
-
-  @Test
-  public void copyToken() {
-    AclToken src = new AclToken()
-      .setId("tokenId")
-      .setName("tokenName")
-      .setType(AclTokenType.MANAGEMENT)
-      .setRules("tokenRules");
-    AclToken restored = new AclToken(src);
-    assertEquals(src.getId(), restored.getId());
-    assertEquals(src.getName(), restored.getName());
-    assertEquals(src.getType(), restored.getType());
-    assertEquals(src.getRules(), restored.getRules());
-  }
-
-  @Test
-  public void tokenLifecycle() {
-    List<AclToken> backupTokens = getAsync(h -> ctx.masterClient().listAclTokens(h));
-
-    AclToken init = new AclToken()
-      .setName("tokenName")
-      .setRules("key \"bar/\" { policy = \"read\" }");
-    String id = getAsync(h -> ctx.masterClient().createAclToken(init, h));
-
-    List<AclToken> list = getAsync(h -> ctx.masterClient().listAclTokens(h));
-    long filteredById = list.stream().filter(t -> t.getId().equals(id)).count();
-    assertEquals(1, filteredById);
-
-    AclToken token = getAsync(h -> ctx.masterClient().infoAclToken(id, h));
-    assertEquals(id, token.getId());
-    assertEquals(init.getName(), token.getName());
-    assertEquals(init.getRules(), token.getRules());
-
-    String clonedId = getAsync(h -> ctx.masterClient().cloneAclToken(id, h));
-    AclToken clonedToken = getAsync(h -> ctx.masterClient().infoAclToken(clonedId, h));
-    assertEquals(clonedId, clonedToken.getId());
-    assertEquals(token.getName(), clonedToken.getName());
-    assertEquals(token.getRules(), clonedToken.getRules());
-
-    AclToken token2 = new AclToken()
-      .setId(clonedToken.getId())
-      .setName("updatedName")
-      .setRules("key \"bar/\" { policy = \"write\" }");
-    String updatedId = getAsync(h -> ctx.masterClient().updateAclToken(token2, h));
-    AclToken updatedToken = getAsync(h -> ctx.masterClient().infoAclToken(updatedId, h));
-    assertEquals(token2.getId(), updatedToken.getId());
-    assertEquals(token2.getName(), updatedToken.getName());
-    assertEquals(token2.getRules(), updatedToken.getRules());
-
-    runAsync(h -> ctx.masterClient().destroyAclToken(id, h));
-    runAsync(h -> ctx.masterClient().destroyAclToken(clonedId, h));
-
-    List<AclToken> aliveTokens = getAsync(h -> ctx.masterClient().listAclTokens(h));
-    assertEquals(backupTokens.size(), aliveTokens.size());
-  }
-
 }

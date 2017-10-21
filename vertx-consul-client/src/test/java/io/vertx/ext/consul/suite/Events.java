@@ -24,7 +24,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
 import static io.vertx.ext.consul.Utils.sleep;
 
 /**

@@ -16,27 +16,29 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
-
-import java.util.List;
-
-import static io.vertx.ext.consul.Utils.getAsync;
+import org.junit.runner.RunWith;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class Status extends ConsulTestBase {
 
   @Test
-  public void leader() {
-    String leader = getAsync(h -> ctx.readClient().leaderStatus(h));
-    assertEquals(leader.substring(0, leader.indexOf(':')), "127.0.0.1");
+  public void leader(TestContext tc) {
+    ctx.readClient().leaderStatus(tc.asyncAssertSuccess(leader -> {
+      tc.assertEquals(leader.substring(0, leader.indexOf(':')), "127.0.0.1");
+    }));
   }
 
   @Test
-  public void peers() {
-    List<String> peers = getAsync(h -> ctx.readClient().peersStatus(h));
-    assertEquals(peers.size(), 1);
+  public void peers(TestContext tc) {
+    ctx.readClient().peersStatus(tc.asyncAssertSuccess(peers -> {
+      tc.assertEquals(peers.size(), 1);
+    }));
   }
 
 }

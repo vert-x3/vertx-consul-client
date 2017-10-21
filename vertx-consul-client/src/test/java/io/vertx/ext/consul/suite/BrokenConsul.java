@@ -24,7 +24,10 @@ import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Utils;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -32,34 +35,29 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class BrokenConsul extends ConsulTestBase {
 
   @Test
-  public void timeout() {
+  public void timeout(TestContext tc) {
     SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
-    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(2000));
-    client.agentInfo(h -> {
-      if (h.failed() && h.cause().getMessage().contains("The timeout period of 2000ms")) {
-        testComplete();
-      }
-    });
-    await();
-    ctx.closeClient(client);
-    slowConsul.close();
+    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(1000));
+    client.agentInfo(tc.asyncAssertFailure(t -> {
+      ctx.closeClient(client);
+      slowConsul.close();
+      tc.assertTrue(t.getMessage().contains("The timeout period of 1000ms"));
+    }));
   }
 
   @Test
-  public void closedConnection() {
+  public void closedConnection(TestContext tc) {
     BrokenHttpServer brokenConsul = new BrokenHttpServer(vertx);
     ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(brokenConsul.port()));
-    client.agentInfo(h -> {
-      if (h.failed() && h.cause().getMessage().contains("Connection was closed")) {
-        testComplete();
-      }
-    });
-    await();
-    ctx.closeClient(client);
-    brokenConsul.close();
+    client.agentInfo(tc.asyncAssertFailure(t -> {
+      ctx.closeClient(client);
+      brokenConsul.close();
+      tc.assertTrue(t.getMessage().contains("Connection was closed"));
+    }));
   }
 
   static class SlowHttpServer extends CustomHttpServer {

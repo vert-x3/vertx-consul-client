@@ -26,6 +26,15 @@ import static io.vertx.test.core.TestUtils.*;
  */
 public class RandomObjects {
 
+  public static AclToken randomAclToken() {
+    AclTokenType[] types = AclTokenType.values();
+    return new AclToken()
+      .setId(randomAlphaString(10))
+      .setName(randomAlphaString(10))
+      .setType(types[randomPositiveInt() % types.length])
+      .setRules(randomAlphaString(10));
+  }
+
   public static KeyValue randomKeyValue() {
     return new KeyValue()
       .setKey(randomAlphaString(10))
@@ -138,5 +147,18 @@ public class RandomObjects {
       .setCreateIndex(randomLong())
       .setIndex(randomLong())
       .setChecks(checks);
+  }
+
+  public static SessionOptions randomSessionOptions() {
+    List<String> checks = new ArrayList<>();
+    checks.add(randomAlphaString(10));
+    checks.add(randomAlphaString(10));
+    return new SessionOptions()
+      .setBehavior(SessionBehavior.values()[randomPositiveInt() % SessionBehavior.values().length])
+      .setChecks(checks)
+      .setLockDelay(randomPositiveInt())
+      .setName(randomAlphaString(10))
+      .setNode(randomAlphaString(10))
+      .setTtl(10 + (randomPositiveInt() % 100));
   }
 }

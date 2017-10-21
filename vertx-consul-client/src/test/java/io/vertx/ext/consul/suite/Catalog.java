@@ -17,7 +17,10 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -30,21 +33,24 @@ import static io.vertx.ext.consul.Utils.sleep;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class Catalog extends ConsulTestBase {
 
   @Test
-  public void datacenters() {
-    List<String> datacenters = Utils.getAsync(h -> ctx.readClient().catalogDatacenters(h));
-    assertEquals(datacenters.size(), 1);
-    assertEquals(datacenters.get(0), ctx.dc().getName());
+  public void datacenters(TestContext tc) {
+    ctx.readClient().catalogDatacenters(tc.asyncAssertSuccess(datacenters -> {
+      tc.assertEquals(datacenters.size(), 1);
+      tc.assertEquals(datacenters.get(0), ctx.dc().getName());
+    }));
   }
 
   @Test
-  public void nodes() {
-    List<Node> nodes = Utils.<NodeList>getAsync(h -> ctx.readClient().catalogNodes(h)).getList();
-    assertEquals(nodes.size(), 1);
-    Node node = nodes.get(0);
-    assertEquals(node.getName(), ctx.nodeName());
+  public void nodes(TestContext tc) {
+    ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes -> {
+      tc.assertEquals(nodes.getList().size(), 1);
+      Node node = nodes.getList().get(0);
+      tc.assertEquals(node.getName(), ctx.nodeName());
+    }));
   }
 
   @Test

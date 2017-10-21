@@ -18,87 +18,77 @@ package io.vertx.ext.consul.suite;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
-import static io.vertx.ext.consul.Utils.sleep;
+import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class Sessions extends ConsulTestBase {
 
   @Test
-  public void sessionOptionsSerialization() {
-    SessionOptions options = new SessionOptions()
-      .setBehavior(SessionBehavior.RELEASE)
-      .setChecks(Arrays.asList("c1", "c2"))
-      .setLockDelay(42)
-      .setName("optName")
-      .setNode("optNode")
-      .setTtl(442);
-    SessionOptions restored = new SessionOptions(options.toJson());
-    assertEquals(options.getBehavior(), restored.getBehavior());
-    assertEquals(options.getChecks(), restored.getChecks());
-    assertEquals(options.getLockDelay(), restored.getLockDelay());
-    assertEquals(options.getName(), restored.getName());
-    assertEquals(options.getNode(), restored.getNode());
-    assertEquals(options.getTtl(), restored.getTtl());
+  public void createDefaultSession(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        tc.assertEquals(id, session.getId());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
   }
 
   @Test
-  public void createDefaultSession() {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    assertEquals(id, session.getId());
-    assertEquals(ctx.nodeName(), session.getNode());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-  }
-
-  @Test
-  public void createSessionWithOptions() {
+  public void createSessionWithOptions(TestContext tc) {
     SessionOptions opt = new SessionOptions()
       .setBehavior(SessionBehavior.DELETE)
       .setLockDelay(42)
       .setName("optName")
       .setTtl(442);
-    String id = getAsync(h -> ctx.writeClient().createSessionWithOptions(opt, h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    List<String> checks = session.getChecks();
-    assertEquals(1, checks.size());
-    assertTrue("serfHealth".equals(checks.get(0)));
-    assertEquals(opt.getLockDelay(), session.getLockDelay());
-    assertEquals(ctx.nodeName(), session.getNode());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-  }
-
-  @Test(expected = RuntimeException.class)
-  public void unknownNode() {
-    Utils.<String>getAsync(h -> ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode"), h));
-  }
-
-  @Test(expected = RuntimeException.class)
-  public void unknownSession() {
-    Utils.<Session>getAsync(h -> ctx.writeClient().infoSession("00000000-0000-0000-0000-000000000000", h));
+    ctx.writeClient().createSessionWithOptions(opt, tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        List<String> checks = session.getChecks();
+        tc.assertEquals(1, checks.size());
+        tc.assertTrue("serfHealth".equals(checks.get(0)));
+        tc.assertEquals(opt.getLockDelay(), session.getLockDelay());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
   }
 
   @Test
-  public void listSessions() {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    SessionList list = getAsync(h -> ctx.writeClient().listSessions(h));
-    assertEquals(session.getId(), list.getList().get(0).getId());
-    SessionList nodeSesions = getAsync(h -> ctx.writeClient().listNodeSessions(session.getNode(), h));
-    assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
+  public void unknownNode(TestContext tc) {
+    ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode"), tc.asyncAssertFailure());
+  }
+
+  @Test
+  public void unknownSession(TestContext tc) {
+    ctx.writeClient().infoSession("00000000-0000-0000-0000-000000000000", tc.asyncAssertFailure());
+  }
+
+  @Test
+  public void listSessions(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        ctx.writeClient().listSessions(tc.asyncAssertSuccess(list -> {
+          tc.assertEquals(session.getId(), list.getList().get(0).getId());
+          ctx.writeClient().listNodeSessions(session.getNode(), tc.asyncAssertSuccess(nodeSesions -> {
+            tc.assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
+            ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+          }));
+        }));
+      }));
+    }));
   }
 
   @Test
@@ -141,18 +131,20 @@ public class Sessions extends ConsulTestBase {
   }
 
   @Test
-  public void deleteBehavior() {
-    String id = getAsync(h -> ctx.writeClient().createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), h));
-    assertTrue(getAsync(h -> ctx.writeClient().putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), h)));
-    KeyValue pair = getAsync(h -> ctx.writeClient().getValue("foo/bar", h));
-    assertEquals("value1", pair.getValue());
-    assertEquals(id, pair.getSession());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-    ctx.writeClient().getValue("foo/bar", h -> {
-      if (h.succeeded() && !h.result().isPresent()) {
-        testComplete();
-      }
-    });
-    await(10, TimeUnit.SECONDS);
+  public void deleteBehavior(TestContext tc) {
+    ctx.writeClient().createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.writeClient().getValue("foo/bar", tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals("value1", pair.getValue());
+          tc.assertEquals(id, pair.getSession());
+          ctx.writeClient().destroySession(id, tc.asyncAssertSuccess(v -> {
+            ctx.writeClient().getValue("foo/bar", tc.asyncAssertSuccess(notfound -> {
+              tc.assertFalse(notfound.isPresent());
+            }));
+          }));
+        }));
+      }));
+    }));
   }
 }

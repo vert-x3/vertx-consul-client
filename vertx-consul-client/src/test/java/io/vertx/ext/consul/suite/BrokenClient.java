@@ -19,35 +19,33 @@ import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.Utils;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
-
-import java.util.function.Function;
+import org.junit.runner.RunWith;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class BrokenClient extends ConsulTestBase {
 
   @Test
-  public void unknownHost() {
+  public void unknownHost(TestContext tc) {
     ConsulClient unknownHost = ctx.createClient(new ConsulClientOptions().setHost("unknownConsulHost"));
-    tryClient(unknownHost, message -> message.contains("unknownConsulHost"));
+    tryClient(tc, unknownHost, "unknownConsulHost");
   }
 
   @Test
-  public void unknownPort() {
+  public void unknownPort(TestContext tc) {
     ConsulClient unknownPort = ctx.createClient(new ConsulClientOptions().setPort(Utils.getFreePort()));
-    tryClient(unknownPort, message -> message.contains("Connection refused"));
+    tryClient(tc, unknownPort, "Connection refused");
   }
 
-  private void tryClient(ConsulClient client, Function<String, Boolean> expectedExceptionMessage) {
-    client.agentInfo(h -> {
-      if (h.failed() && expectedExceptionMessage.apply(h.cause().getMessage())) {
-        testComplete();
-      }
-    });
-    await();
-    ctx.closeClient(client);
+  private void tryClient(TestContext tc, ConsulClient client, String expectedExceptionMessageSubstring) {
+    client.agentInfo(tc.asyncAssertFailure(t -> {
+      tc.assertTrue(t.getMessage().contains(expectedExceptionMessageSubstring));
+      ctx.closeClient(client);
+    }));
   }
-
 }
