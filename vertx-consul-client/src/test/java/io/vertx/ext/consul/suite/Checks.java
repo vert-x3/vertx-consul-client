@@ -15,7 +15,9 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -141,6 +143,13 @@ public class Checks extends ChecksBase {
     }
     runAsync(h -> ctx.writeClient().registerCheck(opts, h));
     return id;
+  }
+
+  @Override
+  void createCheck(TestContext tc, CheckOptions opts, Handler<String> idHandler) {
+    String id = opts.getId() == null ? randomAlphaString(10) : opts.getId();
+    opts.setId(id);
+    ctx.writeClient().registerCheck(opts, tc.asyncAssertSuccess(v -> idHandler.handle(id)));
   }
 
 }

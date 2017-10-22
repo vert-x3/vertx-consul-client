@@ -15,9 +15,12 @@
  */
 package io.vertx.ext.consul;
 
+import io.vertx.test.core.TestUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.vertx.test.core.TestUtils.*;
 
@@ -27,11 +30,10 @@ import static io.vertx.test.core.TestUtils.*;
 public class RandomObjects {
 
   public static AclToken randomAclToken() {
-    AclTokenType[] types = AclTokenType.values();
     return new AclToken()
       .setId(randomAlphaString(10))
       .setName(randomAlphaString(10))
-      .setType(types[randomPositiveInt() % types.length])
+      .setType(randomElement(AclTokenType.values()))
       .setRules(randomAlphaString(10));
   }
 
@@ -47,9 +49,6 @@ public class RandomObjects {
   }
 
   public static Service randomService() {
-    List<String> tags = new ArrayList<>();
-    tags.add(randomAlphaString(10));
-    tags.add(randomAlphaString(10));
     return new Service()
       .setNode(randomAlphaString(10))
       .setNodeAddress(randomAlphaString(10))
@@ -57,11 +56,10 @@ public class RandomObjects {
       .setName(randomAlphaString(10))
       .setAddress(randomAlphaString(10))
       .setPort(randomInt())
-      .setTags(tags);
+      .setTags(randomStringList(2));
   }
 
   public static Check randomCheck() {
-    int id = randomPositiveInt() % CheckStatus.values().length;
     return new Check()
       .setId(randomAlphaString(10))
       .setName(randomAlphaString(10))
@@ -70,7 +68,21 @@ public class RandomObjects {
       .setOutput(randomAlphaString(100))
       .setServiceId(randomAlphaString(10))
       .setServiceName(randomAlphaString(10))
-      .setStatus(CheckStatus.values()[id]);
+      .setStatus(randomElement(CheckStatus.values()));
+  }
+
+  public static CheckOptions randomCheckOptions() {
+    return new CheckOptions()
+      .setId(randomAlphaString(10))
+      .setName(randomAlphaString(10))
+      .setNotes(randomAlphaString(10))
+      .setServiceId(randomAlphaString(10))
+      .setStatus(randomElement(CheckStatus.values()))
+      .setTtl(randomSeconds());
+  }
+
+  private static String randomSeconds() {
+    return (1 + (randomPositiveInt() % 10)) + "s";
   }
 
   public static Node randomNode() {
@@ -95,8 +107,8 @@ public class RandomObjects {
 
   public static PreparedQueryDefinition randomPreparedQueryDefinition() {
     return new PreparedQueryDefinition()
-      .setDcs(Collections.singletonList(randomAlphaString(10)))
-      .setDnsTtl((randomPositiveInt() % 10) + "s")
+      .setDcs(randomStringList(1))
+      .setDnsTtl(randomSeconds())
       .setId(randomAlphaString(10))
       .setMeta(Collections.singletonMap(randomAlphaString(5), randomAlphaString(10)))
       .setName(randomAlphaString(10))
@@ -104,61 +116,67 @@ public class RandomObjects {
       .setPassing(randomBoolean())
       .setService(randomAlphaString(10))
       .setSession(randomAlphaString(10))
-      .setTags(Collections.singletonList(randomAlphaString(10)))
+      .setTags(randomStringList(2))
       .setTemplateRegexp(randomAlphaString(10))
       .setTemplateType(randomAlphaString(10))
       .setToken(randomAlphaString(10));
   }
 
   public static ServiceEntry randomServiceEntry() {
-    List<Check> checks = new ArrayList<>();
-    checks.add(randomCheck());
-    checks.add(randomCheck());
     return new ServiceEntry()
       .setNode(randomNode())
       .setService(randomService())
-      .setChecks(checks);
+      .setChecks(randomObjectList(2, RandomObjects::randomCheck));
   }
 
   public static Coordinate randomCoordinate() {
-    List<Float> vec = new ArrayList<>();
-    vec.add(randomFloat());
-    vec.add(randomFloat());
-    vec.add(randomFloat());
-    vec.add(randomFloat());
-    vec.add(randomFloat());
-    vec.add(randomFloat());
     return new Coordinate()
       .setNode(randomAlphaString(10))
       .setAdj(randomFloat())
       .setHeight(randomFloat())
       .setErr(randomFloat())
-      .setVec(vec);
+      .setVec(randomObjectList(6, TestUtils::randomFloat));
   }
 
   public static Session randomSession() {
-    List<String> checks = new ArrayList<>();
-    checks.add(randomAlphaString(10));
-    checks.add(randomAlphaString(10));
     return new Session()
       .setNode(randomAlphaString(10))
       .setId(randomAlphaString(10))
       .setLockDelay(randomLong())
       .setCreateIndex(randomLong())
       .setIndex(randomLong())
-      .setChecks(checks);
+      .setChecks(randomStringList(2));
   }
 
   public static SessionOptions randomSessionOptions() {
-    List<String> checks = new ArrayList<>();
-    checks.add(randomAlphaString(10));
-    checks.add(randomAlphaString(10));
     return new SessionOptions()
-      .setBehavior(SessionBehavior.values()[randomPositiveInt() % SessionBehavior.values().length])
-      .setChecks(checks)
+      .setBehavior(randomElement(SessionBehavior.values()))
+      .setChecks(randomStringList(2))
       .setLockDelay(randomPositiveInt())
       .setName(randomAlphaString(10))
       .setNode(randomAlphaString(10))
       .setTtl(10 + (randomPositiveInt() % 100));
+  }
+
+  public static ServiceOptions randomServiceOptions() {
+    return new ServiceOptions()
+      .setId(randomAlphaString(10))
+      .setName(randomAlphaString(10))
+      .setTags(randomStringList(2))
+      .setCheckOptions(randomCheckOptions())
+      .setAddress(randomAlphaString(10))
+      .setPort(randomPortInt());
+  }
+
+  public static List<String> randomStringList(int n) {
+    return randomObjectList(n, () -> randomAlphaString(10));
+  }
+
+  public static <T> List<T> randomObjectList(int n, Supplier<T> s) {
+    List<T> list = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      list.add(s.get());
+    }
+    return list;
   }
 }

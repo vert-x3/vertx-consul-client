@@ -18,17 +18,15 @@ package io.vertx.ext.consul.suite;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-
-import static io.vertx.ext.consul.Utils.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -92,42 +90,50 @@ public class Sessions extends ConsulTestBase {
   }
 
   @Test
-  public void listSessionsBlocking() throws InterruptedException {
-    testSessionsBlocking((opts, h) -> ctx.readClient().listSessionsWithOptions(opts, h));
+  public void listSessionsBlocking(TestContext tc) throws InterruptedException {
+    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listSessionsWithOptions(opts, h));
   }
 
   @Test
-  public void listNodeSessionsBlocking() throws InterruptedException {
-    testSessionsBlocking((opts, h) -> ctx.readClient().listNodeSessionsWithOptions(ctx.nodeName(), opts, h));
+  public void listNodeSessionsBlocking(TestContext tc) throws InterruptedException {
+    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listNodeSessionsWithOptions(ctx.nodeName(), opts, h));
   }
 
-  private void testSessionsBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) throws InterruptedException {
-    String id1 = getAsync(h -> ctx.writeClient().createSession(h));
-    SessionList list1 = getAsync(h -> ctx.readClient().listSessions(h));
-    CountDownLatch latch = new CountDownLatch(1);
-    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
-      List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
-      assertTrue(ids.contains(id1));
-      latch.countDown();
-    });
-    sleep(vertx, 2000);
-    assertEquals(latch.getCount(), 1);
-    String id2 = getAsync(h -> ctx.writeClient().createSession(h));
-    awaitLatch(latch);
-    runAsync(h -> ctx.writeClient().destroySession(id1, h));
-    runAsync(h -> ctx.writeClient().destroySession(id2, h));
+  private void testSessionsBlocking(TestContext tc, BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id1 -> {
+      ctx.readClient().listSessions(tc.asyncAssertSuccess(list1 -> {
+        Async async = tc.async();
+        request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+          List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
+          assertTrue(ids.contains(id1));
+          async.countDown();
+        });
+        vertx.setTimer(1000, l -> {
+          assertEquals(async.count(), 1);
+          ctx.writeClient().createSession(tc.asyncAssertSuccess(id2 -> {
+            async.handler(a -> {
+              ctx.writeClient().destroySession(id1, tc.asyncAssertSuccess(d1 -> {
+                ctx.writeClient().destroySession(id2, tc.asyncAssertSuccess());
+              }));
+            });
+          }));
+        });
+      }));
+    }));
   }
 
   @Test
-  public void sessionInfoBlocking() throws InterruptedException {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session s1 = getAsync(h -> ctx.readClient().infoSession(id, h));
-    CountDownLatch latch = new CountDownLatch(1);
-    ctx.readClient().infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()), h -> latch.countDown());
-    sleep(vertx, 2000);
-    assertEquals(latch.getCount(), 1);
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-    awaitLatch(latch);
+  public void sessionInfoBlocking(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.readClient().infoSession(id, tc.asyncAssertSuccess(s1 -> {
+        Async async = tc.async();
+        ctx.readClient().infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()), h -> async.countDown());
+        vertx.setTimer(1000, l -> {
+          assertEquals(async.count(), 1);
+          ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+        });
+      }));
+    }));
   }
 
   @Test

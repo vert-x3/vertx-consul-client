@@ -15,7 +15,6 @@
  */
 package io.vertx.ext.consul;
 
-import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -24,11 +23,13 @@ import java.util.List;
 import static io.vertx.ext.consul.RandomObjects.*;
 import static io.vertx.test.core.TestUtils.randomLong;
 import static io.vertx.test.core.TestUtils.randomPositiveInt;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class CopyTest extends VertxTestBase {
+public class CopyTest {
 
   @Test
   public void testAclToken() {

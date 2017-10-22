@@ -1,13 +1,14 @@
 package io.vertx.ext.consul;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class OptionsTest extends VertxTestBase {
+public class OptionsTest {
 
   @Test
   public void defaults() {
