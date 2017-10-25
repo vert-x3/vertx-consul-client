@@ -15,8 +15,9 @@
  */
 package io.vertx.ext.consul;
 
-import com.pszymczyk.consul.ConsulProcess;
 import io.vertx.core.net.PemTrustOptions;
+import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.consul.dc.ConsulDatacenter;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -45,14 +46,14 @@ public class ConsulContext {
   private static ConsulClientOptions config(String token, boolean secure) {
     return new ConsulClientOptions()
       .setAclToken(token)
-      .setDc(ConsulCluster.dc())
+      .setDc(ConsulCluster.dc().getName())
       .setHost("localhost")
-      .setPort(secure ? ConsulCluster.httpsPort() : ConsulCluster.consul().getHttpPort())
+      .setPort(secure ? ConsulCluster.getDefaultAgent().getHttpsPort() : ConsulCluster.getDefaultAgent().getHttpPort())
       .setSsl(secure);
   }
 
   public void start() {
-    masterClient = creator.apply(config(ConsulCluster.masterToken(), false));
+    masterClient = creator.apply(config(ConsulCluster.dc().getMasterToken(), false));
     writeClient = creator.apply(writeClientOptions = config(ConsulCluster.writeToken(), false));
     readClient = creator.apply(readClientOptions = config(ConsulCluster.readToken(), false));
   }
@@ -64,10 +65,10 @@ public class ConsulContext {
   }
 
   public String nodeName() {
-    return ConsulCluster.nodeName();
+    return ConsulCluster.getDefaultAgent().getName();
   }
 
-  public String dc() {
+  public ConsulDatacenter dc() {
     return ConsulCluster.dc();
   }
 
@@ -118,7 +119,11 @@ public class ConsulContext {
     closer.accept(client);
   }
 
-  public ConsulProcess attachConsul(String nodeName) {
+  public ConsulAgent attachAgent(String nodeName) {
     return ConsulCluster.attach(nodeName);
+  }
+
+  public void detachAgent(ConsulAgent agent) {
+    ConsulCluster.detach(agent);
   }
 }

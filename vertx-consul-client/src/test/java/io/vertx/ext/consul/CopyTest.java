@@ -15,7 +15,6 @@
  */
 package io.vertx.ext.consul;
 
-import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -24,11 +23,27 @@ import java.util.List;
 import static io.vertx.ext.consul.RandomObjects.*;
 import static io.vertx.test.core.TestUtils.randomLong;
 import static io.vertx.test.core.TestUtils.randomPositiveInt;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class CopyTest extends VertxTestBase {
+public class CopyTest {
+
+  @Test
+  public void testAclToken() {
+    AclToken token = randomAclToken();
+    checkAclToken(token, new AclToken(token));
+    checkAclToken(token, new AclToken(token.toJson()));
+  }
+
+  private void checkAclToken(AclToken expected, AclToken actual) {
+    assertEquals(expected.getId(), actual.getId());
+    assertEquals(expected.getName(), actual.getName());
+    assertEquals(expected.getType(), actual.getType());
+    assertEquals(expected.getRules(), actual.getRules());
+  }
 
   @Test
   public void testKeyValueCopy() {
@@ -140,11 +155,11 @@ public class CopyTest extends VertxTestBase {
     Session session = randomSession();
     checkSession(session, new Session(session));
     checkSession(session, new Session(session.toJson()));
-    List<String> checksSuffled = new ArrayList<>();
-    checksSuffled.add(session.getChecks().get(1));
-    checksSuffled.add(session.getChecks().get(0));
+    List<String> checksShuffled = new ArrayList<>();
+    checksShuffled.add(session.getChecks().get(1));
+    checksShuffled.add(session.getChecks().get(0));
     Session shuffled = new Session(session)
-      .setChecks(checksSuffled);
+      .setChecks(checksShuffled);
     checkSession(session, shuffled);
   }
 
@@ -160,6 +175,22 @@ public class CopyTest extends VertxTestBase {
     List<String> actualList = actual.getChecks();
     assertTrue(expectedList.containsAll(actualList));
     assertTrue(actualList.containsAll(expectedList));
+  }
+
+  @Test
+  public void testSessionOptions() {
+    SessionOptions opts = randomSessionOptions();
+    checkSessionOptions(opts, new SessionOptions(opts));
+    checkSessionOptions(opts, new SessionOptions(opts.toJson()));
+  }
+
+  private void checkSessionOptions(SessionOptions expected, SessionOptions actual) {
+    assertEquals(expected.getBehavior(), actual.getBehavior());
+    assertEquals(expected.getChecks(), actual.getChecks());
+    assertEquals(expected.getLockDelay(), actual.getLockDelay());
+    assertEquals(expected.getName(), actual.getName());
+    assertEquals(expected.getNode(), actual.getNode());
+    assertEquals(expected.getTtl(), actual.getTtl());
   }
 
   @Test

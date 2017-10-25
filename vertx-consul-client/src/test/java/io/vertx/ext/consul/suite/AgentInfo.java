@@ -17,19 +17,22 @@ package io.vertx.ext.consul.suite;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
-
-import static io.vertx.ext.consul.Utils.getAsync;
+import org.junit.runner.RunWith;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class AgentInfo extends ConsulTestBase {
 
   @Test
-  public void info() {
-    JsonObject info = getAsync(h -> ctx.readClient().agentInfo(h));
-    JsonObject config = info.getJsonObject("Config");
-    assertEquals(config.getString("Datacenter"), ctx.dc());
+  public void info(TestContext tc) {
+    ctx.readClient().agentInfo(tc.asyncAssertSuccess(info -> {
+      JsonObject config = info.getJsonObject("Config");
+      tc.assertEquals(config.getString("Datacenter"), ctx.dc().getName());
+    }));
   }
 }

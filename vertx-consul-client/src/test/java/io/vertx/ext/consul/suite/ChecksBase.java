@@ -15,10 +15,14 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,23 +30,28 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static io.vertx.ext.consul.Utils.*;
+import static io.vertx.test.core.TestUtils.randomAlphaString;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public abstract class ChecksBase extends ConsulTestBase {
 
   abstract String createCheck(CheckOptions opts);
 
+  abstract void createCheck(TestContext tc, CheckOptions opts, Handler<String> idHandler);
+
   @Test
-  public void ttlCheckLifecycle() {
+  public void ttlCheckLifecycle(TestContext tc) {
     CheckOptions opts = new CheckOptions()
       .setTtl("2s")
-      .setName("checkName");
+      .setName(randomAlphaString(10));
     String checkId = createCheck(opts);
 
     Check check;
@@ -154,6 +163,15 @@ public abstract class ChecksBase extends ConsulTestBase {
       .filter(check -> check.getId().equals(id))
       .findFirst()
       .get();
+  }
+
+  void getCheckInfo(TestContext tc, String id, Handler<Check> resultHandler) {
+    ctx.writeClient().localChecks(tc.asyncAssertSuccess(list -> {
+      resultHandler.handle(list.stream()
+        .filter(check -> check.getId().equals(id))
+        .findFirst()
+        .orElseThrow(NoSuchElementException::new));
+    }));
   }
 
   private static class ScriptHealthReporter {

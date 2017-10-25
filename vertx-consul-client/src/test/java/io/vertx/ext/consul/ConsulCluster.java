@@ -15,182 +15,70 @@
  */
 package io.vertx.ext.consul;
 
-import com.pszymczyk.consul.ConsulProcess;
-import com.pszymczyk.consul.ConsulStarterBuilder;
-import com.pszymczyk.consul.LogLevel;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.json.JsonObject;
+import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.consul.dc.ConsulAgentOptions;
+import io.vertx.ext.consul.dc.ConsulDatacenter;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Random;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-class ConsulCluster {
+public class ConsulCluster {
 
-  private static final String MASTER_TOKEN = "topSecret";
-  private static final String DC = "test-dc";
-  private static final String NODE_NAME = "nodeName";
-  private static final String CONSUL_VERSION = "0.7.5";
+  private static final ConsulDatacenter dc = ConsulDatacenter.create();
+  private static final AtomicBoolean started = new AtomicBoolean();
 
-  private static ConsulCluster instance;
-  private static Random random = new Random();
+  private static ConsulAgent defaultAgent;
+  private static String writeToken;
+  private static String readToken;
 
-  private static ConsulCluster instance() {
-    if (instance == null) {
-      synchronized (ConsulCluster.class) {
-        if (instance == null) {
-          instance = new ConsulCluster();
-        }
+  private static ConsulAgentOptions sslOptions() {
+    return new ConsulAgentOptions()
+      .setKeyFile(copyFileFromResources("client-key.pem", "client-key"))
+      .setCertFile(copyFileFromResources("client-cert.pem", "client-cert"))
+      .setCaFile(copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"));
+  }
+
+  public static void start() {
+    if (started.compareAndSet(false, true)) {
+      ConsulAgentOptions options = sslOptions();
+      defaultAgent = dc.attachAgent(options);
+      try {
+        writeToken = defaultAgent.createAclToken(Utils.readResource("write_rules.hcl"));
+        readToken = defaultAgent.createAclToken(Utils.readResource("read_rules.hcl"));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
       }
+      Runtime.getRuntime().addShutdownHook(new Thread(dc::stop));
     }
-    return instance;
   }
 
-  static ConsulProcess consul() {
-    return instance().consul;
-  }
-
-  static void close() {
-    instance().consul.close();
-    instance = null;
-  }
-
-  static String dc() {
-    return DC;
-  }
-
-  static String masterToken() {
-    return MASTER_TOKEN;
+  static ConsulDatacenter dc() {
+    return dc;
   }
 
   static String writeToken() {
-    return instance().writeToken;
+    return writeToken;
   }
 
   static String readToken() {
-    return instance().readToken;
+    return readToken;
   }
 
-  static int httpsPort() {
-    return instance().httpsPort;
+  public static ConsulAgent getDefaultAgent() {
+    return defaultAgent;
   }
 
-  static String nodeName() {
-    return NODE_NAME;
+  static ConsulAgent attach(String nodeName) {
+    return dc.attachAgent(sslOptions().setNodeName(nodeName));
   }
 
-  private ConsulProcess consul;
-  private String writeToken;
-  private String readToken;
-  private int httpsPort;
-
-  private ConsulCluster() {
-    try {
-      create();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  static ConsulProcess attach(String nodeName) {
-    return ConsulStarterBuilder.consulStarter()
-      .withLogLevel(LogLevel.ERR)
-      .withConsulVersion(CONSUL_VERSION)
-      .withCustomConfig(consulConfig(nodeName, Utils.getFreePort()).encode())
-      .withAttachedTo(instance().consul)
-      .build()
-      .start();
-  }
-
-  private static JsonObject consulConfig(String nodeName, int httpsPort) {
-    return new JsonObject()
-      .put("server", true)
-      .put("leave_on_terminate", true)
-      .put("key_file", copyFileFromResources("client-key.pem", "client-key"))
-      .put("cert_file", copyFileFromResources("client-cert.pem", "client-cert"))
-      .put("ca_file", copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"))
-      .put("ports", new JsonObject().put("https", httpsPort))
-      .put("addresses", new JsonObject().put("https", "0.0.0.0"))
-      .put("datacenter", DC)
-      .put("node_name", nodeName)
-      .put("node_id", randomNodeId())
-      .put("acl_default_policy", "deny")
-      .put("acl_master_token", MASTER_TOKEN)
-      .put("acl_datacenter", DC);
-  }
-
-  private static String randomNodeId() {
-    return randomHex(8) + "-" + randomHex(4) + "-" + randomHex(4) + "-" + randomHex(4) + "-" + randomHex(12);
-  }
-
-  private static String randomHex(int len) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < len; i++) {
-      sb.append(Long.toHexString(random.nextInt(16)));
-    }
-    return sb.toString();
-  }
-
-  private void create() throws Exception {
-    httpsPort = Utils.getFreePort();
-    JsonObject config = consulConfig(NODE_NAME, httpsPort);
-    consul = ConsulStarterBuilder.consulStarter()
-      .withLogLevel(LogLevel.ERR)
-      .withConsulVersion(CONSUL_VERSION)
-      .withCustomConfig(config.encode())
-      .build()
-      .start();
-
-    CountDownLatch latch = new CountDownLatch(2);
-    Vertx vertx = Vertx.vertx();
-    createToken(vertx, "write_rules.hcl", token -> {
-      writeToken = token;
-      latch.countDown();
-    });
-    createToken(vertx, "read_rules.hcl", token -> {
-      readToken = token;
-      latch.countDown();
-    });
-    latch.await(10, TimeUnit.SECONDS);
-    vertx.close();
-
-    if (writeToken == null || readToken == null) {
-      throw new RuntimeException("Starting consul fails " + writeToken + "/" + readToken);
-    }
-  }
-
-  private void createToken(Vertx vertx, String rules, Handler<String> tokenHandler) {
-    HttpClientOptions httpClientOptions = new HttpClientOptions().setDefaultPort(consul.getHttpPort());
-    HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
-    String rulesBody;
-    try {
-      rulesBody = Utils.readResource(rules);
-    } catch (Exception e) {
-      tokenHandler.handle(null);
-      return;
-    }
-    String request = new JsonObject()
-      .put("Rules", rulesBody)
-      .encode();
-    httpClient.put("/v1/acl/create?token=" + MASTER_TOKEN, h -> {
-      if (h.statusCode() == 200) {
-        h.bodyHandler(bh -> {
-          JsonObject responce = new JsonObject(bh.toString());
-          httpClient.close();
-          tokenHandler.handle(responce.getString("ID"));
-        });
-      } else {
-        tokenHandler.handle(null);
-      }
-    }).end(request);
+  static void detach(ConsulAgent agent) {
+    dc.detachAgent(agent);
   }
 
   private static String copyFileFromResources(String fName, String toName) {

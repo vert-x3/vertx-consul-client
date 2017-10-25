@@ -18,141 +18,139 @@ package io.vertx.ext.consul.suite;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-
-import static io.vertx.ext.consul.Utils.getAsync;
-import static io.vertx.ext.consul.Utils.runAsync;
-import static io.vertx.ext.consul.Utils.sleep;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
+@RunWith(VertxUnitRunner.class)
 public class Sessions extends ConsulTestBase {
 
   @Test
-  public void sessionOptionsSerialization() {
-    SessionOptions options = new SessionOptions()
-      .setBehavior(SessionBehavior.RELEASE)
-      .setChecks(Arrays.asList("c1", "c2"))
-      .setLockDelay(42)
-      .setName("optName")
-      .setNode("optNode")
-      .setTtl(442);
-    SessionOptions restored = new SessionOptions(options.toJson());
-    assertEquals(options.getBehavior(), restored.getBehavior());
-    assertEquals(options.getChecks(), restored.getChecks());
-    assertEquals(options.getLockDelay(), restored.getLockDelay());
-    assertEquals(options.getName(), restored.getName());
-    assertEquals(options.getNode(), restored.getNode());
-    assertEquals(options.getTtl(), restored.getTtl());
+  public void createDefaultSession(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        tc.assertEquals(id, session.getId());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
   }
 
   @Test
-  public void createDefaultSession() {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    assertEquals(id, session.getId());
-    assertEquals(ctx.nodeName(), session.getNode());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-  }
-
-  @Test
-  public void createSessionWithOptions() {
+  public void createSessionWithOptions(TestContext tc) {
     SessionOptions opt = new SessionOptions()
       .setBehavior(SessionBehavior.DELETE)
       .setLockDelay(42)
       .setName("optName")
       .setTtl(442);
-    String id = getAsync(h -> ctx.writeClient().createSessionWithOptions(opt, h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    List<String> checks = session.getChecks();
-    assertEquals(1, checks.size());
-    assertTrue("serfHealth".equals(checks.get(0)));
-    assertEquals(opt.getLockDelay(), session.getLockDelay());
-    assertEquals(ctx.nodeName(), session.getNode());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-  }
-
-  @Test(expected = RuntimeException.class)
-  public void unknownNode() {
-    Utils.<String>getAsync(h -> ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode"), h));
-  }
-
-  @Test(expected = RuntimeException.class)
-  public void unknownSession() {
-    Utils.<Session>getAsync(h -> ctx.writeClient().infoSession("00000000-0000-0000-0000-000000000000", h));
+    ctx.writeClient().createSessionWithOptions(opt, tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        List<String> checks = session.getChecks();
+        tc.assertEquals(1, checks.size());
+        tc.assertTrue("serfHealth".equals(checks.get(0)));
+        tc.assertEquals(opt.getLockDelay(), session.getLockDelay());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
   }
 
   @Test
-  public void listSessions() {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session session = getAsync(h -> ctx.writeClient().infoSession(id, h));
-    SessionList list = getAsync(h -> ctx.writeClient().listSessions(h));
-    assertEquals(session.getId(), list.getList().get(0).getId());
-    SessionList nodeSesions = getAsync(h -> ctx.writeClient().listNodeSessions(session.getNode(), h));
-    assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
+  public void unknownNode(TestContext tc) {
+    ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode"), tc.asyncAssertFailure());
   }
 
   @Test
-  public void listSessionsBlocking() throws InterruptedException {
-    testSessionsBlocking((opts, h) -> ctx.readClient().listSessionsWithOptions(opts, h));
+  public void unknownSession(TestContext tc) {
+    ctx.writeClient().infoSession("00000000-0000-0000-0000-000000000000", tc.asyncAssertFailure());
   }
 
   @Test
-  public void listNodeSessionsBlocking() throws InterruptedException {
-    testSessionsBlocking((opts, h) -> ctx.readClient().listNodeSessionsWithOptions(ctx.nodeName(), opts, h));
-  }
-
-  private void testSessionsBlocking(BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) throws InterruptedException {
-    String id1 = getAsync(h -> ctx.writeClient().createSession(h));
-    SessionList list1 = getAsync(h -> ctx.readClient().listSessions(h));
-    CountDownLatch latch = new CountDownLatch(1);
-    request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
-      List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
-      assertTrue(ids.contains(id1));
-      latch.countDown();
-    });
-    sleep(vertx, 2000);
-    assertEquals(latch.getCount(), 1);
-    String id2 = getAsync(h -> ctx.writeClient().createSession(h));
-    awaitLatch(latch);
-    runAsync(h -> ctx.writeClient().destroySession(id1, h));
-    runAsync(h -> ctx.writeClient().destroySession(id2, h));
+  public void listSessions(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        ctx.writeClient().listSessions(tc.asyncAssertSuccess(list -> {
+          tc.assertEquals(session.getId(), list.getList().get(0).getId());
+          ctx.writeClient().listNodeSessions(session.getNode(), tc.asyncAssertSuccess(nodeSesions -> {
+            tc.assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
+            ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+          }));
+        }));
+      }));
+    }));
   }
 
   @Test
-  public void sessionInfoBlocking() throws InterruptedException {
-    String id = getAsync(h -> ctx.writeClient().createSession(h));
-    Session s1 = getAsync(h -> ctx.readClient().infoSession(id, h));
-    CountDownLatch latch = new CountDownLatch(1);
-    ctx.readClient().infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()), h -> latch.countDown());
-    sleep(vertx, 2000);
-    assertEquals(latch.getCount(), 1);
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-    awaitLatch(latch);
+  public void listSessionsBlocking(TestContext tc) throws InterruptedException {
+    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listSessionsWithOptions(opts, h));
   }
 
   @Test
-  public void deleteBehavior() {
-    String id = getAsync(h -> ctx.writeClient().createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), h));
-    assertTrue(getAsync(h -> ctx.writeClient().putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), h)));
-    KeyValue pair = getAsync(h -> ctx.writeClient().getValue("foo/bar", h));
-    assertEquals("value1", pair.getValue());
-    assertEquals(id, pair.getSession());
-    runAsync(h -> ctx.writeClient().destroySession(id, h));
-    ctx.writeClient().getValue("foo/bar", h -> {
-      if (h.succeeded() && !h.result().isPresent()) {
-        testComplete();
-      }
-    });
-    await(10, TimeUnit.SECONDS);
+  public void listNodeSessionsBlocking(TestContext tc) throws InterruptedException {
+    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listNodeSessionsWithOptions(ctx.nodeName(), opts, h));
+  }
+
+  private void testSessionsBlocking(TestContext tc, BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id1 -> {
+      ctx.readClient().listSessions(tc.asyncAssertSuccess(list1 -> {
+        Async async = tc.async();
+        request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
+          List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
+          assertTrue(ids.contains(id1));
+          async.countDown();
+        });
+        vertx.setTimer(1000, l -> {
+          assertEquals(async.count(), 1);
+          ctx.writeClient().createSession(tc.asyncAssertSuccess(id2 -> {
+            async.handler(a -> {
+              ctx.writeClient().destroySession(id1, tc.asyncAssertSuccess(d1 -> {
+                ctx.writeClient().destroySession(id2, tc.asyncAssertSuccess());
+              }));
+            });
+          }));
+        });
+      }));
+    }));
+  }
+
+  @Test
+  public void sessionInfoBlocking(TestContext tc) {
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(id -> {
+      ctx.readClient().infoSession(id, tc.asyncAssertSuccess(s1 -> {
+        Async async = tc.async();
+        ctx.readClient().infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()), h -> async.countDown());
+        vertx.setTimer(1000, l -> {
+          assertEquals(async.count(), 1);
+          ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+        });
+      }));
+    }));
+  }
+
+  @Test
+  public void deleteBehavior(TestContext tc) {
+    ctx.writeClient().createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE), tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id), tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.writeClient().getValue("foo/bar", tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals("value1", pair.getValue());
+          tc.assertEquals(id, pair.getSession());
+          ctx.writeClient().destroySession(id, tc.asyncAssertSuccess(v -> {
+            ctx.writeClient().getValue("foo/bar", tc.asyncAssertSuccess(notfound -> {
+              tc.assertFalse(notfound.isPresent());
+            }));
+          }));
+        }));
+      }));
+    }));
   }
 }
