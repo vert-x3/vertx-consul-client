@@ -64,6 +64,9 @@ public class ConsulAgent {
     if (options.getConsulVersion().compareTo("0.8.0") >= 0) {
       cfg.put("acl_enforce_version_8", false);
     }
+    if (options.getConsulVersion().compareTo("0.9.0") >= 0) {
+      cfg.put("enable_script_checks", true);
+    }
     int sslCnt = 0;
     if (options.getKeyFile() != null) {
       cfg.put("key_file", options.getKeyFile());
