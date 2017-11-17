@@ -287,7 +287,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/service/deregister/" + urlEncode(id), null, null, resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/service/deregister/" + urlEncode(id), null, null, resultHandler);
     return this;
   }
 
@@ -454,7 +454,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/deregister/" + urlEncode(checkId), null, null, resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/deregister/" + urlEncode(checkId), null, null, resultHandler);
     return this;
   }
 
@@ -465,7 +465,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/pass/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/pass/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
     return this;
   }
 
@@ -476,7 +476,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/warn/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/warn/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
     return this;
   }
 
@@ -487,7 +487,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.GET, "/v1/agent/check/fail/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/fail/" + urlEncode(checkId), Query.of("note", note), null, resultHandler);
     return this;
   }
 

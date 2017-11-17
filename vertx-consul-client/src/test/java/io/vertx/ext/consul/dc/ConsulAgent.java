@@ -61,6 +61,15 @@ public class ConsulAgent {
       .put("acl_default_policy", "deny")
       .put("acl_master_token", dc.getMasterToken())
       .put("acl_datacenter", dc.getName());
+    if (options.getConsulVersion().compareTo("0.8.0") < 0) {
+      cfg.put("ports", new JsonObject().put("rpc", getFreePort()));
+    }
+    if (options.getConsulVersion().compareTo("0.8.0") >= 0) {
+      cfg.put("acl_enforce_version_8", false);
+    }
+    if (options.getConsulVersion().compareTo("0.9.0") >= 0) {
+      cfg.put("enable_script_checks", true);
+    }
     int sslCnt = 0;
     if (options.getKeyFile() != null) {
       cfg.put("key_file", options.getKeyFile());
@@ -76,8 +85,9 @@ public class ConsulAgent {
     }
     if (sslCnt == 3) {
       httpsPort = getFreePort();
-      cfg.put("ports", new JsonObject().put("https", httpsPort))
-        .put("addresses", new JsonObject().put("https", "0.0.0.0"));
+      JsonObject ports = cfg.getJsonObject("ports", new JsonObject());
+      ports.put("https", httpsPort);
+      cfg.put("ports", ports).put("addresses", new JsonObject().put("https", "0.0.0.0"));
     } else {
       httpsPort = -1;
     }

@@ -75,7 +75,13 @@ public class Services extends ChecksBase {
               async.countDown();
             }));
             async.handler(v -> {
-              ctx.writeClient().deregisterService(serviceId, tc.asyncAssertSuccess());
+              ctx.writeClient().deregisterService(serviceId, tc.asyncAssertSuccess(deregistered -> {
+                ctx.writeClient().localServices(tc.asyncAssertSuccess(cleaned -> {
+                  tc.assertEquals(cleaned.stream()
+                    .filter(i -> serviceName.equals(i.getName()))
+                    .count(), 0L);
+                }));
+              }));
             });
           }));
         }));
