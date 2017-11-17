@@ -36,10 +36,23 @@ public class ConsulCluster {
   private static String readToken;
 
   private static ConsulAgentOptions sslOptions() {
-    return new ConsulAgentOptions()
+    ConsulAgentOptions opts = new ConsulAgentOptions()
       .setKeyFile(copyFileFromResources("client-key.pem", "client-key"))
       .setCertFile(copyFileFromResources("client-cert.pem", "client-cert"))
       .setCaFile(copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"));
+    String v = getVersion();
+    if (v != null) {
+      opts.setConsulVersion(v);
+    }
+    return opts;
+  }
+
+  private static String getVersion() {
+    String result = System.getProperty("CONSUL_AGENT_VERSION");
+    if (result == null || result.isEmpty()) {
+      result = System.getenv("CONSUL_AGENT_VERSION");
+    }
+    return result;
   }
 
   public static void start() {

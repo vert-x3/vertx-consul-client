@@ -61,6 +61,9 @@ public class ConsulAgent {
       .put("acl_default_policy", "deny")
       .put("acl_master_token", dc.getMasterToken())
       .put("acl_datacenter", dc.getName());
+    if (options.getConsulVersion().compareTo("0.8.0") >= 0) {
+      cfg.put("acl_enforce_version_8", false);
+    }
     int sslCnt = 0;
     if (options.getKeyFile() != null) {
       cfg.put("key_file", options.getKeyFile());
