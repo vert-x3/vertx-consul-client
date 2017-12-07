@@ -182,6 +182,9 @@ public class CopyTest {
     SessionOptions opts = randomSessionOptions();
     checkSessionOptions(opts, new SessionOptions(opts));
     checkSessionOptions(opts, new SessionOptions(opts.toJson()));
+    SessionOptions nullChecks = opts.setChecks(null);
+    checkSessionOptions(nullChecks, new SessionOptions(nullChecks));
+    checkSessionOptions(nullChecks, new SessionOptions(nullChecks.toJson()));
   }
 
   private void checkSessionOptions(SessionOptions expected, SessionOptions actual) {

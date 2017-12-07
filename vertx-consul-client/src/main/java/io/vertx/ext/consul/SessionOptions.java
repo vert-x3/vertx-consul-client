@@ -16,10 +16,8 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.vertx.ext.consul.impl.Utils.listOf;
@@ -61,7 +59,7 @@ public class SessionOptions {
     this.lockDelay = options.lockDelay;
     this.name = options.name;
     this.node = options.node;
-    this.checks = new ArrayList<>(options.checks);
+    this.checks = listOf(options.checks);
     this.behavior = options.behavior;
     this.ttl = options.ttl;
   }
@@ -75,8 +73,7 @@ public class SessionOptions {
     this.lockDelay = cutSeconds(options.getString(LOCK_KEY));
     this.name = options.getString(NAME_KEY);
     this.node = options.getString(NODE_KEY);
-    JsonArray arr = options.getJsonArray(CHECKS_KEY);
-    this.checks = listOf(arr);
+    this.checks = listOf(options.getJsonArray(CHECKS_KEY));
     this.behavior = SessionBehavior.of(options.getString(BEHAVIOR_KEY));
     this.ttl = cutSeconds(options.getString(TTL_KEY));
   }

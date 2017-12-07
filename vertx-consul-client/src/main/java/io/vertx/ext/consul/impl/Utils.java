@@ -19,6 +19,7 @@ import io.vertx.core.json.JsonArray;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -48,6 +49,14 @@ public class Utils {
       return "";
     } else {
       return new String(Base64.getDecoder().decode(src));
+    }
+  }
+
+  public static <T> List<T> listOf(List<T> list) {
+    if (list == null) {
+      return null;
+    } else {
+      return new ArrayList<>(list);
     }
   }
 
