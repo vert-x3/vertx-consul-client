@@ -93,7 +93,7 @@ public class ConsulClientOptions extends WebClientOptions {
    *
    * For example:
    * <p><code>
-   * consul://consul.example.com/?dc=dc1&acl=00000000-0000-0000-0000-000000000000
+   * consul://consul.example.com/?dc=dc1&amp;acl=00000000-0000-0000-0000-000000000000
    * </code></p>
    * @param uri the URI
    */
