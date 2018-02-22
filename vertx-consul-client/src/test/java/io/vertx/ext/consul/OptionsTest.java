@@ -3,6 +3,8 @@ package io.vertx.ext.consul;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
+import java.net.URI;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -18,6 +20,24 @@ public class OptionsTest {
     assertEquals(options.getTimeout(), 0);
     assertEquals(options.getAclToken(), null);
     assertEquals(options.getDc(), null);
+  }
+
+  @Test
+  public void fromURI() {
+    checkURI(URI.create("consul://host"), "host", 8500, null, null);
+    checkURI(URI.create("scheme://host?acl=secret"), "host", 8500, null, "secret");
+    checkURI(URI.create("will://host?aclToken=token"), "host", 8500, null, "token");
+    checkURI(URI.create("be://google?dc=data"), "google", 8500, "data", null);
+    checkURI(URI.create("ignored://example?dc=center&acl=000"), "example", 8500, "center", "000");
+    checkURI(URI.create("full://1:2?dc=3&acl=4"), "1", 2, "3", "4");
+  }
+
+  private void checkURI(URI uri, String host, int port, String dc, String acl) {
+    ConsulClientOptions options = new ConsulClientOptions(uri);
+    assertEquals(options.getHost(), host);
+    assertEquals(options.getPort(), port);
+    assertEquals(options.getDc(), dc);
+    assertEquals(options.getAclToken(), acl);
   }
 
   @Test
