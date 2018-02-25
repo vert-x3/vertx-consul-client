@@ -17,6 +17,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.core.VertxException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
 import io.vertx.core.http.HttpVersion;
@@ -24,7 +25,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
 import io.vertx.ext.web.client.WebClientOptions;
 
-import java.util.List;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Options used to create Consul client.
@@ -82,6 +85,58 @@ public class ConsulClientOptions extends WebClientOptions {
     } else {
       setPort(CONSUL_DEFAULT_PORT);
     }
+  }
+
+  /**
+   * Constructor from {@link URI}.
+   * The datacenter and the acl token can be defined in the query; the scheme will be ignored.
+   *
+   * For example:
+   * <p><code>
+   * consul://consul.example.com/?dc=dc1&amp;acl=00000000-0000-0000-0000-000000000000
+   * </code></p>
+   * @param uri the URI
+   */
+  public ConsulClientOptions(URI uri) {
+    setHost(uri.getHost());
+    setPort(uri.getPort() < 0 ? CONSUL_DEFAULT_PORT : uri.getPort());
+    Map<String, List<String>> params = params(uri);
+    setDc(getParam(params, "dc"));
+    setAclToken(getParam(params, "acl", "aclToken"));
+  }
+
+  private static String getParam(Map<String, List<String>> params, String... keyVariants) {
+    for (String key : keyVariants) {
+      if (params.containsKey(key)) {
+        List<String> values = params.get(key);
+        return values.get(0);
+      }
+    }
+    return null;
+  }
+
+  private static Map<String, List<String>> params(URI uri) {
+    if (uri.getQuery() == null || uri.getQuery().isEmpty()) {
+      return Collections.emptyMap();
+    }
+    final Map<String, List<String>> queryPairs = new LinkedHashMap<>();
+    final String[] pairs = uri.getQuery().split("&");
+    for (String pair : pairs) {
+      try {
+        final int idx = pair.indexOf("=");
+        final String key = idx > 0
+          ? URLDecoder.decode(pair.substring(0, idx), "UTF-8")
+          : pair;
+        final String value = idx > 0 && pair.length() > idx + 1
+          ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8")
+          : null;
+        List<String> list = queryPairs.computeIfAbsent(key, k -> new ArrayList<>());
+        list.add(value);
+      } catch (Exception e) {
+        throw new VertxException(e);
+      }
+    }
+    return queryPairs;
   }
 
   /**
