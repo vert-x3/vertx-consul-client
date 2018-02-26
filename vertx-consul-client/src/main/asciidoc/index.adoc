@@ -1,7 +1,6 @@
 = Vert.x Consul Client
 
 https://www.consul.io[Consul] is a tool for discovering and configuring services in your infrastructure.
-
 A Vert.x client allowing applications to interact with a Consul system via blocking and non-blocking HTTP API.
 
 == Using Vert.x Consul Client
@@ -13,9 +12,9 @@ To use this project, add the following dependency to the _dependencies_ section 
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-  <groupId>io.vertx</groupId>
-  <artifactId>vertx-consul-client</artifactId>
-  <version>3.6.0-SNAPSHOT</version>
+  <groupId>${maven.groupId}</groupId>
+  <artifactId>${maven.artifactId}</artifactId>
+  <version>${maven.version}</version>
 </dependency>
 ----
 
@@ -23,32 +22,23 @@ To use this project, add the following dependency to the _dependencies_ section 
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-consul-client:3.6.0-SNAPSHOT'
+compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
 ----
 
 == Creating a client
 
 Just use factory method:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var client = ConsulClient.create(vertx)
-
-
+{@link examples.Examples#exampleCreateDefault}
 ----
 
 Also the client can be configured with an options.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var options = ConsulClientOptions(
-  host = "consul.example.com")
-
-var client = ConsulClient.create(vertx, options)
-
-
+{@link examples.Examples#exampleCreateWithOptions}
 ----
 
 The following configuration is supported by the consul client:
@@ -68,7 +58,7 @@ therefore a lot of settings are available. Please see the documentation.
 
 == Using the API
 
-The client API is represented by `link:../../apidocs/io/vertx/ext/consul/ConsulClient.html[ConsulClient]`. The API is very similar to Consul's
+The client API is represented by {@link io.vertx.ext.consul.ConsulClient}. The API is very similar to Consul's
 HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API docs]
 
 === Blocking queries
@@ -80,17 +70,12 @@ the current state of the requested resource. The following configuration is used
 `index`:: value indicating that the client wishes to wait for any changes subsequent to that index.
 `wait`:: parameter specifying a maximum duration for the blocking request. This is limited to 10 minutes.
 
-[source,kotlin]
+[source,$lang]
+----
+{@link examples.Examples#blockingOptions}
 ----
 
-var opts = BlockingQueryOptions(
-  index = lastIndex,
-  wait = "1m")
-
-
-----
-
-A critical note is that the return of a blocking request is *no guarantee* of a change.
+A critical note is that the return of a blocking request isno guarantee* of a change.
 It is possible that the timeout was reached or that there was an idempotent write that does not affect the result of the query.
 
 == Key/Value Store
@@ -105,38 +90,16 @@ The following endpoints are supported:
 
 Consul client can return the value for certain key
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.getValue("key", { res ->
-  if (res.succeeded()) {
-    println("retrieved value: ${res.result().value}")
-    println("modify index: ${res.result().modifyIndex}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#getValue}
 ----
 
 ...or it can return all key-value pairs with the given prefix
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.getValues("prefix", { res ->
-  if (res.succeeded()) {
-    println("modify index: ${res.result().index}")
-    for (kv in res.result().list) {
-      println("retrieved value: ${kv.value}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#getValues}
 ----
 
 The returned key-value object contains these fields (see https://www.consul.io/docs/agent/http/kv.html#single[documentation]):
@@ -152,63 +115,23 @@ sense for their application
 
 The modify index can be used for blocking queries:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = BlockingQueryOptions(
-  index = modifyIndex,
-  wait = "1m")
-
-consulClient.getValueWithOptions("key", opts, { res ->
-  if (res.succeeded()) {
-    println("retrieved value: ${res.result().value}")
-    println("new modify index: ${res.result().modifyIndex}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#blocking}
 ----
 
 === Put key-value pair to store
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.putValue("key", "value", { res ->
-  if (res.succeeded()) {
-    var opResult = res.result() ? "success" : "fail"
-    println("result of the operation: ${opResult}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#put}
 ----
 
 Put request with options also accepted
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = KeyValueOptions(
-  flags = 42,
-  casIndex = modifyIndex,
-  acquireSession = "acquireSessionID",
-  releaseSession = "releaseSessionID")
-
-consulClient.putValueWithOptions("key", "value", opts, { res ->
-  if (res.succeeded()) {
-    var opResult = res.result() ? "success" : "fail"
-    println("result of the operation: ${opResult}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#putWithOptions}
 ----
 
 The list of the query options that can be used with a `PUT` request:
@@ -235,61 +158,25 @@ inside a single, atomic transaction. KV is the only available operation type, th
 may be added in future versions of Consul to be mixed with key/value operations
 (see https://www.consul.io/docs/agent/http/kv.html#txn[documentation]).
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var request = TxnRequest(
-  operations = listOf(TxnKVOperation(
-    key = "key1",
-    value = "value1",
-    type = TxnKVVerb.SET), TxnKVOperation(
-    key = "key2",
-    value = "value2",
-    type = TxnKVVerb.SET)))
-
-consulClient.transaction(request, { res ->
-  if (res.succeeded()) {
-    println("succeeded results: ${res.result().results.size}")
-    println("errors: ${res.result().errors.size}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
+{@link examples.KV#transaction}
 ----
 
 === Delete key-value pair
 
 At last, Consul client allows to delete key-value pair from store:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.deleteValue("key", { res ->
-  if (res.succeeded()) {
-    println("complete")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#deleteValue}
 ----
 
 ...or all key-value pairs with corresponding key prefix
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.deleteValues("prefix", { res ->
-  if (res.succeeded()) {
-    println("complete")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.KV#deleteValues}
 ----
 
 == Services
@@ -302,19 +189,9 @@ and to potentially associate it with a health check.
 
 A service definition must include a `name` and may optionally provide an `id`, `tags`, `address`, `port`, and `checks`.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = ServiceOptions(
-  name = "serviceName",
-  id = "serviceId",
-  tags = listOf("tag1", "tag2"),
-  checkOptions = CheckOptions(
-    ttl = "10s"),
-  address = "10.0.0.1",
-  port = 8048)
-
-
+{@link examples.Services#servicesOpts}
 ----
 
 `name`:: the name of service
@@ -330,80 +207,33 @@ the address and port of a service can be discovered.
 
 These options used to register service in catalog:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.registerService(opts, { res ->
-  if (res.succeeded()) {
-    println("Service successfully registered")
-  } else {
-    res.cause().printStackTrace()
-  }
-
-})
-
-
+{@link examples.Services#register}
 ----
 
 === Service discovery
 
 Consul client allows to obtain actual list of the nodes providing a service
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.catalogServiceNodes("serviceName", { res ->
-  if (res.succeeded()) {
-    println("found ${res.result().list.size} services")
-    println("consul state index: ${res.result().index}")
-    for (service in res.result().list) {
-      println("Service node: ${service.node}")
-      println("Service address: ${service.address}")
-      println("Service port: ${service.port}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Services#discovery}
 ----
 
 It is possible to obtain this list with the statuses of the associated health checks.
 The result can be filtered by check status.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.healthServiceNodes("serviceName", passingOnly, { res ->
-  if (res.succeeded()) {
-    println("found ${res.result().list.size} services")
-    println("consul state index: ${res.result().index}")
-    for (entry in res.result().list) {
-      println("Service node: ${entry.node}")
-      println("Service address: ${entry.service.address}")
-      println("Service port: ${entry.service.port}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Services#health}
 ----
 
 There are additional parameters for services queries
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var queryOpts = ServiceQueryOptions(
-  tag = "tag1",
-  near = "_agent",
-  blockingOptions = BlockingQueryOptions(
-    index = lastIndex))
-
-
+{@link examples.Services#queryOpts}
 ----
 
 `tag`:: by default, all nodes matching the service are returned.
@@ -414,36 +244,18 @@ based on the estimated round trip time from that node. Passing `near`=`_agent` w
 
 Then the request should look like
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, { res ->
-  if (res.succeeded()) {
-    println("found ${res.result().list.size} services")
-  } else {
-    res.cause().printStackTrace()
-  }
-
-})
-
+{@link examples.Services#queryWithOptions}
 ----
 
 === Deregister service
 
 Service can be deregistered by its ID:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.deregisterService("serviceId", { res ->
-  if (res.succeeded()) {
-    println("Service successfully deregistered")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Services#deregister}
 ----
 
 == Health Checks
@@ -452,14 +264,9 @@ One of the primary roles of the agent is management of system-level and applicat
 A health check is considered to be application-level if it is associated with a service.
 If not associated with a service, the check monitors the health of the entire node.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = CheckOptions(
-  tcp = "localhost:4848",
-  interval = "1s")
-
-
+{@link examples.Health#checkOpts}
 ----
 
 The list of check options that supported by Consul client is:
@@ -488,18 +295,9 @@ The `Name` field is mandatory, as is one of `Script`, `HTTP`, `TCP` or `TTL`. `S
 also require that `Interval` be set. If an `ID` is not provided, it is set to `Name`.
 You cannot have duplicate ID entries per agent, so it may be necessary to provide an ID.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.registerCheck(opts, { res ->
-  if (res.succeeded()) {
-    println("check successfully registered")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Health#tcpHealth}
 ----
 
 == Events
@@ -510,19 +308,9 @@ restart services, or perform any other orchestration action.
 
 To send user event only its name is required
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.fireEvent("eventName", { res ->
-  if (res.succeeded()) {
-    println("Event sent")
-    println("id: ${res.result().id}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Events#sendWithName}
 ----
 
 Also additional options can be specified.
@@ -533,70 +321,25 @@ Also additional options can be specified.
 `payload`:: an optional body of the event.
 The body contents are opaque to Consul and become the "payload" of the event
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = EventOptions(
-  tag = "tag",
-  payload = "message")
-
-consulClient.fireEventWithOptions("eventName", opts, { res ->
-  if (res.succeeded()) {
-    println("Event sent")
-    println("id: ${res.result().id}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Events#sendWithOptions}
 ----
 
 The Consul Client supports queries for obtain the most recent events known by the agent. Events are broadcast using
 the gossip protocol, so they have no global ordering nor do they make a promise of delivery. Agents only buffer
 the most recent entries. The current buffer size is 256, but this value could change in the future.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.listEvents({ res ->
-  if (res.succeeded()) {
-    println("Consul index: ${res.result().index}")
-    for (event in res.result().list) {
-      println("Event id: ${event.id}")
-      println("Event name: ${event.name}")
-      println("Event payload: ${event.payload}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Events#list}
 ----
 
 The Consul Index can be used to prepare blocking requests:
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = EventListOptions(
-  name = "eventName",
-  blockingOptions = BlockingQueryOptions(
-    index = lastIndex))
-
-consulClient.listEventsWithOptions(opts, { res ->
-  if (res.succeeded()) {
-    println("Consul index: ${res.result().index}")
-    for (event in res.result().list) {
-      println("Event id: ${event.id}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Events#listWithOptions}
 ----
 
 == Sessions
@@ -606,14 +349,9 @@ Sessions act as a binding layer between nodes, health checks, and key/value data
 When a session is constructed, a node name, a list of health checks, a behavior, a TTL, and a lock-delay
 may be provided.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = SessionOptions(
-  node = "nodeId",
-  behavior = SessionBehavior.RELEASE)
-
-
+{@link examples.Sessions#sessionOpts}
 ----
 
 `lockDelay`:: can be specified as a duration string using an 's' suffix for seconds. The default is '15s'.
@@ -632,112 +370,44 @@ For full info see https://www.consul.io/docs/internals/sessions.html[Consul Sess
 The newly constructed session is provided with a named ID that can be used to identify it.
 This ID can be used with the KV store to acquire locks: advisory mechanisms for mutual exclusion.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.createSessionWithOptions(opts, { res ->
-  if (res.succeeded()) {
-    println("Session successfully created")
-    println("id: ${res.result()}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Sessions#create}
 ----
 
 And also to destroy it
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.destroySession(sessionId, { res ->
-  if (res.succeeded()) {
-    println("Session successfully destroyed")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Sessions#destroy}
 ----
 
 Lists sessions belonging to a node
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.listNodeSessions("nodeId", { res ->
-  if (res.succeeded()) {
-    for (session in res.result().list) {
-      println("Session id: ${session.id}")
-      println("Session node: ${session.node}")
-      println("Session create index: ${session.createIndex}")
-    }
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Sessions#nodeSessions}
 ----
 
 All of the read session endpoints support blocking queries and all consistency modes.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var blockingOpts = BlockingQueryOptions(
-  index = lastIndex)
-
-consulClient.listSessionsWithOptions(blockingOpts, { res ->
-  if (res.succeeded()) {
-    println("Found ${res.result().list.size} sessions")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Sessions#blockingQuery}
 ----
 
 == Nodes in datacenter
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.catalogNodes({ res ->
-  if (res.succeeded()) {
-    println("found ${res.result().list.size} nodes")
-    println("consul state index ${res.result().index}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Nodes#catalogNodes}
 ----
 
 This endpoint supports blocking queries and sorting by distance from specified node
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var opts = NodeQueryOptions(
-  near = "_agent",
-  blockingOptions = BlockingQueryOptions(
-    index = lastIndex))
-
-consulClient.catalogNodesWithOptions(opts, { res ->
-  if (res.succeeded()) {
-    println("found ${res.result().list.size} nodes")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.Nodes#blockingQuery}
 ----
 
 == Prepated Queries
@@ -766,101 +436,46 @@ For full details please https://www.consul.io/api/query.html[see docs]
 `templateType` :: is the query type, which must be `name_prefix_match`. This means that the template will apply to any query lookup with a name whose prefix matches the Name field of the template. In this example, any query for geo-db will match this query. Query templates are resolved using a longest prefix match, so it's possible to have high-level templates that are overridden for specific services. Static queries are always resolved first, so they can also override templates.
 `templateRegexp` :: is an optional regular expression which is used to extract fields from the entire name, once this template is selected. In this example, the regular expression takes the first item after the "-" as the database name and everything else after as a tag. See the RE2 reference for syntax of this regular expression.
 
-[source,kotlin]
+[source,$lang]
 ----
-
-var def = PreparedQueryDefinition(
-  name = "Query name",
-  service = "service-\$${match(1)}-\$${match(2)}",
-  dcs = listOf("dc1", "dc42"),
-  templateType = "name_prefix_match",
-  templateRegexp = "^find_(.+?)_(.+?)\$$")
-
-
+{@link examples.PreparedQueries#preparedQueryDefinition}
 ----
 
 If the query is successfully created, its ID will be provided
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.createPreparedQuery(def, { res ->
-  if (res.succeeded()) {
-    var queryId = res.result()
-    println("Query created: ${queryId}")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.PreparedQueries#createQuery}
 ----
 
 The prepared query can be executed by its id
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.executePreparedQuery(id, { res ->
-  if (res.succeeded()) {
-    var response = res.result()
-    println("Found ${response.nodes.size} nodes")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.PreparedQueries#executeQueryId}
 ----
 
 or by query string that must match template regexp
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.executePreparedQuery("find_1_2", { res ->
-  // matches template regexp "^find_(.+?)_(.+?)$"
-  if (res.succeeded()) {
-    var response = res.result()
-    println("Found ${response.nodes.size} nodes")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.PreparedQueries#executeQuery}
 ----
 
 Finally, `ConsulClient` allows you to modify, get or delete prepared queries
 
-[source,kotlin]
+[source,$lang]
 ----
-
-consulClient.deletePreparedQuery(query, { res ->
-  if (res.succeeded()) {
-    println("Query deleted")
-  } else {
-    res.cause().printStackTrace()
-  }
-})
-
-
+{@link examples.PreparedQueries#deleteQuery}
 ----
 
 == Watches
 
 Watches are a way of specifying a view of data (e.g. list of nodes, KV pairs, health checks)
-which is monitored for updates. When an update is detected, an `Handler` with `AsyncResult` is invoked.
+which is monitored for updates. When an update is detected, an {@code Handler} with {@code AsyncResult} is invoked.
 As an example, you could watch the status of health checks and notify when a check is critical.
 
-[source,kotlin]
+[source,$lang]
 ----
-Watch.key("foo/bar", vertx).setHandler({ res ->
-  if (res.succeeded()) {
-    println("value: ${res.nextResult().value}")
-  } else {
-    res.cause().printStackTrace()
-  }
-}).start()
-
+{@link examples.Watches#watchKey}
 ----
