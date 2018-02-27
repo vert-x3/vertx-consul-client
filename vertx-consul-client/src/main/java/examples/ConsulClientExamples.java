@@ -21,7 +21,7 @@ import io.vertx.ext.consul.*;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-public class Examples {
+public class ConsulClientExamples {
 
   public void exampleCreateDefault(Vertx vertx) {
 

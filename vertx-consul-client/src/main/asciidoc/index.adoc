@@ -31,14 +31,14 @@ Just use factory method:
 
 [source,$lang]
 ----
-{@link examples.Examples#exampleCreateDefault}
+{@link examples.ConsulClientExamples#exampleCreateDefault}
 ----
 
 Also the client can be configured with an options.
 
 [source,$lang]
 ----
-{@link examples.Examples#exampleCreateWithOptions}
+{@link examples.ConsulClientExamples#exampleCreateWithOptions}
 ----
 
 The following configuration is supported by the consul client:
@@ -72,7 +72,7 @@ the current state of the requested resource. The following configuration is used
 
 [source,$lang]
 ----
-{@link examples.Examples#blockingOptions}
+{@link examples.ConsulClientExamples#blockingOptions}
 ----
 
 A critical note is that the return of a blocking request is *no guarantee* of a change.
