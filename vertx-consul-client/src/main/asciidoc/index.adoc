@@ -63,7 +63,7 @@ HTTP API that described in https://www.consul.io/docs/agent/http.html[Consul API
 
 === Blocking queries
 
-Certain endpoints support a feature called a "blocking query." A blocking query is used to wait for a potential
+Certain endpoints support a feature called a "blocking query". A blocking query is used to wait for a potential
 change using long polling. Any endpoint that supports blocking also provide a unique identifier (index) representing
 the current state of the requested resource. The following configuration is used to perform blocking queries:
 
@@ -75,7 +75,7 @@ the current state of the requested resource. The following configuration is used
 {@link examples.Examples#blockingOptions}
 ----
 
-A critical note is that the return of a blocking request isno guarantee* of a change.
+A critical note is that the return of a blocking request is *no guarantee* of a change.
 It is possible that the timeout was reached or that there was an idempotent write that does not affect the result of the query.
 
 == Key/Value Store
