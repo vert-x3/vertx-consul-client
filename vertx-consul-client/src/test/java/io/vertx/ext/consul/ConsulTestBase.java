@@ -19,9 +19,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.consul.impl.ConsulClientImpl;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.BeforeClass;
-import rx.functions.Func1;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.vertx.test.core.TestUtils.randomAlphaString;
@@ -56,13 +54,6 @@ public class ConsulTestBase extends VertxTestBase {
     ctx.stop();
     ctx = null;
     super.tearDown();
-  }
-
-  public static <T> Func1<T, T> check(Consumer<T> check) {
-    return s -> {
-      check.accept(s);
-      return s;
-    };
   }
 
   public static String randomFooBarAlpha() {

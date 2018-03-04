@@ -15,17 +15,18 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import rx.Single;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 
 import static io.vertx.test.core.TestUtils.*;
 
@@ -53,199 +54,202 @@ public class KVStore extends ConsulTestBase {
 
   @Test
   public void readClientCantWriteOneValue(TestContext tc) {
-    Async async = tc.async();
-    ctx.rxReadClient().rxPutValue("foo/bar1", "value1")
-      .subscribe(o -> tc.fail(), t -> async.complete());
+    ctx.readClient().putValue("foo/bar1", "value1", tc.asyncAssertFailure());
   }
 
   @Test
   public void readClientEmptyValue(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarAlpha();
-    ctx.rxWriteClient()
-      .rxPutValue(key, "")
-      .map(check(tc::assertTrue))
-      .flatMap(b -> ctx.rxReadClient().rxGetValue(key))
-      .map(check(pair -> tc.assertEquals(key, pair.getKey())))
-      .map(check(pair -> tc.assertEquals("", pair.getValue())))
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValue(key, "", tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals(key, pair.getKey());
+          tc.assertEquals("", pair.getValue());
+          ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess());
+        }));
+      }));
   }
 
   @Test
   public void readClientCanReadOneValue(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarUnicode();
     String value = randomUnicodeString(10);
-    ctx.rxWriteClient()
-      .rxPutValue(key, value)
-      .map(check(tc::assertTrue))
-      .flatMap(b -> ctx.rxReadClient().rxGetValue(key))
-      .map(check(pair -> tc.assertEquals(key, pair.getKey())))
-      .map(check(pair -> tc.assertEquals(value, pair.getValue())))
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValue(key, value, tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals(key, pair.getKey());
+          tc.assertEquals(value, pair.getValue());
+          ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess());
+        }));
+      }));
   }
 
   @Test
   public void keyNotFound(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarUnicode();
-    ctx.rxReadClient()
-      .rxGetValue(key)
-      .map(check(kv -> tc.assertFalse(kv.isPresent())))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.readClient()
+      .getValue(key, tc.asyncAssertSuccess(kv -> {
+        tc.assertFalse(kv.isPresent());
+      }));
   }
 
   @Test
   public void keysNotFound(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarUnicode();
-    ctx.rxReadClient()
-      .rxGetValues(key)
-      .map(check(list -> tc.assertFalse(list.isPresent())))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.readClient()
+      .getValues(key, tc.asyncAssertSuccess(list -> {
+        tc.assertFalse(list.isPresent());
+      }));
   }
 
   @Test
   public void writeClientHaveFullAccessToOneValue(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
     KeyValueOptions opts = new KeyValueOptions().setFlags(randomLong());
-    ctx.rxWriteClient()
-      .rxPutValueWithOptions(key, value, opts)
-      .map(check(tc::assertTrue))
-      .flatMap(b -> ctx.rxReadClient().rxGetValue(key))
-      .map(check(pair -> tc.assertEquals(key, pair.getKey())))
-      .map(check(pair -> tc.assertEquals(value, pair.getValue())))
-      .map(check(pair -> assertEquals(opts.getFlags(), pair.getFlags())))
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValueWithOptions(key, value, opts, tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals(key, pair.getKey());
+          tc.assertEquals(value, pair.getValue());
+          assertEquals(opts.getFlags(), pair.getFlags());
+          ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess());
+        }));
+      }));
   }
 
   @Test
   public void readClientCanReadValues(TestContext tc) {
-    valuesAccess(tc, ctx.rxReadClient());
+    valuesAccess(tc, ctx.readClient());
   }
 
   @Test
   public void writeClientHaveFullAccessToValues(TestContext tc) {
-    valuesAccess(tc, ctx.rxWriteClient());
+    valuesAccess(tc, ctx.writeClient());
   }
 
-  private void valuesAccess(TestContext tc, io.vertx.rxjava.ext.consul.ConsulClient accessClient) {
-    Async async = tc.async();
+  private void valuesAccess(TestContext tc, ConsulClient accessClient) {
     String key1 = randomFooBarAlpha();
     String value1 = randomAlphaString(10);
     String key2 = randomFooBarAlpha();
     String value2 = randomAlphaString(10);
-    Single.concat(
-      ctx.rxWriteClient().rxPutValue(key1, value1),
-      ctx.rxWriteClient().rxPutValue(key2, value2))
-      .reduce(true, (b1, b2) -> b1 & b2).toSingle()
-      .map(check(tc::assertTrue))
-      .flatMap(b -> accessClient.rxGetValues("foo/bar"))
-      .map(KeyValueList::getList)
-      .map(check(list -> tc.assertEquals(list.size(), 2)))
-      .map(check(list -> tc.assertTrue(list.stream()
-        .filter(kv -> kv.getKey().equals(key1) && kv.getValue().equals(value1))
-        .count() == 1)))
-      .map(check(list -> tc.assertTrue(list.stream()
-        .filter(kv -> kv.getKey().equals(key2) && kv.getValue().equals(value2))
-        .count() == 1)))
-      .flatMap(list -> ctx.rxWriteClient().rxDeleteValues("foo/bar"))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient().putValue(key1, value1, tc.asyncAssertSuccess(b1 -> {
+      tc.assertTrue(b1);
+      ctx.writeClient().putValue(key2, value2, tc.asyncAssertSuccess(b2 -> {
+        tc.assertTrue(b2);
+        accessClient.getValues("foo/bar", tc.asyncAssertSuccess(kvList -> {
+          List<KeyValue> list = kvList.getList();
+          tc.assertEquals(list.size(), 2);
+          tc.assertTrue(list.stream()
+            .filter(kv -> kv.getKey().equals(key1) && kv.getValue().equals(value1))
+            .count() == 1);
+          tc.assertTrue(list.stream()
+            .filter(kv -> kv.getKey().equals(key2) && kv.getValue().equals(value2))
+            .count() == 1);
+          ctx.writeClient().deleteValues("foo/bar", tc.asyncAssertSuccess());
+        }));
+      }));
+    }));
   }
 
   @Test
   public void canSetAllFlags(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
     KeyValueOptions opts = new KeyValueOptions().setFlags(-1);
-    ctx.rxWriteClient()
-      .rxPutValueWithOptions(key, value, opts)
-      .map(check(tc::assertTrue))
-      .flatMap(b -> ctx.rxReadClient().rxGetValue(key))
-      .map(check(pair -> tc.assertEquals(key, pair.getKey())))
-      .map(check(pair -> tc.assertEquals(value, pair.getValue())))
-      .map(check(pair -> assertEquals(opts.getFlags(), pair.getFlags())))
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValueWithOptions(key, value, opts, tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair -> {
+          tc.assertEquals(key, pair.getKey());
+          tc.assertEquals(value, pair.getValue());
+          assertEquals(opts.getFlags(), pair.getFlags());
+          ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess());
+        }));
+      }));
   }
 
   @Test
   public void checkAndSet(TestContext tc) {
-    Async async = tc.async();
     String key = randomFooBarAlpha();
-    ctx.rxWriteClient()
-      .rxPutValue(key, randomAlphaString(10))
-      .map(check(tc::assertTrue))
-      .flatMap(b1 -> ctx.rxReadClient().rxGetValue(key))
-      .flatMap(pair1 -> ctx.rxWriteClient().rxPutValue(key, randomAlphaString(10))
-        .map(check(tc::assertTrue))
-        .flatMap(b2 -> ctx.rxReadClient().rxGetValue(key))
-        .map(check(pair2 -> tc.assertTrue(pair1.getModifyIndex() < pair2.getModifyIndex())))
-        .flatMap(pair2 -> Single.concat(
-          ctx.rxWriteClient().rxPutValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair1.getModifyIndex())).map(b -> !b),
-          ctx.rxWriteClient().rxPutValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair2.getModifyIndex())))
-          .reduce(true, (b1, b2) -> b1 & b2).toSingle())
-      )
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValue(key, randomAlphaString(10), tc.asyncAssertSuccess(b1 -> {
+        tc.assertTrue(b1);
+        ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair1 -> {
+          ctx.writeClient().putValue(key, randomAlphaString(10), tc.asyncAssertSuccess(b2 -> {
+            tc.assertTrue(b2);
+            ctx.readClient().getValue(key, tc.asyncAssertSuccess(pair2 -> {
+              tc.assertTrue(pair1.getModifyIndex() < pair2.getModifyIndex());
+              ctx.writeClient().putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair1.getModifyIndex()), tc.asyncAssertSuccess(b3 -> {
+                tc.assertFalse(b3);
+                ctx.writeClient().putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair2.getModifyIndex()), tc.asyncAssertSuccess(b4 -> {
+                  tc.assertTrue(b4);
+                  ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess());
+                }));
+              }));
+            }));
+          }));
+        }));
+      }));
   }
 
   @Test
   public void clientCantDeleteUnknownKey(TestContext tc) {
-    Async async = tc.async();
-    ctx.rxReadClient().rxDeleteValue("unknown")
-      .subscribe(o -> tc.fail(), t -> async.complete());
+    ctx.readClient().deleteValue("unknown", tc.asyncAssertFailure());
   }
 
   @Test
   public void canGetValueBlocking(TestContext tc) {
-    blockingQuery(tc, key -> ctx.rxReadClient().rxGetValue(key).map(KeyValue::getModifyIndex));
+    blockingQuery(tc, (key, h) -> ctx.readClient().getValue(key, tc.asyncAssertSuccess(list -> h.handle(list.getModifyIndex()))));
   }
 
   @Test
   public void canGetValuesBlocking(TestContext tc) {
-    blockingQuery(tc, key -> ctx.rxReadClient().rxGetValues(key).map(KeyValueList::getIndex));
+    blockingQuery(tc, (key, h) -> ctx.readClient().getValues(key, tc.asyncAssertSuccess(list -> h.handle(list.getIndex()))));
   }
 
   @Test
   public void canGetKeysList(TestContext tc) {
-    Async async = tc.async();
     String keyPrefix = randomFooBarAlpha();
     String key = keyPrefix + randomAlphaString(10);
-    ctx.rxWriteClient()
-      .rxPutValue(key, randomAlphaString(10))
-      .map(check(tc::assertTrue))
-      .flatMap(b -> ctx.rxReadClient().rxGetKeys(keyPrefix))
-      .map(check(list -> tc.assertTrue(list.contains(key))))
-      .flatMap(list -> ctx.rxWriteClient().rxDeleteValues(keyPrefix))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValue(key, randomAlphaString(10), tc.asyncAssertSuccess(b -> {
+        tc.assertTrue(b);
+        ctx.readClient().getKeys(keyPrefix, tc.asyncAssertSuccess(list -> {
+          tc.assertTrue(list.contains(key));
+          ctx.writeClient().deleteValues(keyPrefix, tc.asyncAssertSuccess());
+        }));
+      }));
   }
 
-  private void blockingQuery(TestContext tc, Function<String, Single<Long>> indexSupplier) {
-    Async async = tc.async();
+  private void blockingQuery(TestContext tc, BiConsumer<String, Handler<Long>> indexSupplier) {
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
-    ctx.rxWriteClient()
-      .rxPutValue(key, randomAlphaString(10))
-      .map(check(tc::assertTrue))
-      .flatMap(b -> indexSupplier.apply(key))
-      .flatMap(consulIndex -> Single.concat(
-        Single.just(ctx.rxWriteClient()).delay(2, TimeUnit.SECONDS)
-          .flatMap(c -> c.rxPutValue(key, value).map(check(tc::assertTrue))),
-        ctx.rxReadClient().rxGetValueWithOptions(key, new BlockingQueryOptions().setIndex(consulIndex))
-          .map(check(kv -> tc.assertTrue(kv.getModifyIndex() > consulIndex)))
-          .map(check(kv -> tc.assertEquals(kv.getValue(), value))),
-        ctx.rxReadClient().rxGetValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(consulIndex))
-          .map(check(list -> tc.assertTrue(list.getIndex() > consulIndex)))
-          .map(check(list -> tc.assertTrue(list.getList().size() == 1))))
-        .reduce(null, (ignore1, ignore2) -> null).toSingle())
-      .flatMap(pair -> ctx.rxWriteClient().rxDeleteValue(key))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .putValue(key, randomAlphaString(10), tc.asyncAssertSuccess(b1 -> {
+        tc.assertTrue(b1);
+        indexSupplier.accept(key, consulIndex -> {
+          Async async = tc.async(2);
+          vertx.setTimer(TimeUnit.SECONDS.toMillis(2), l -> {
+            ctx.writeClient().putValue(key, value, tc.asyncAssertSuccess(b2 -> {
+              tc.assertTrue(b2);
+              ctx.readClient().getValueWithOptions(key, new BlockingQueryOptions().setIndex(consulIndex), tc.asyncAssertSuccess(kv -> {
+                tc.assertTrue(kv.getModifyIndex() > consulIndex);
+                tc.assertEquals(kv.getValue(), value);
+                async.countDown();
+              }));
+              ctx.readClient().getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(consulIndex), tc.asyncAssertSuccess(kv -> {
+                tc.assertTrue(kv.getIndex() > consulIndex);
+                tc.assertTrue(kv.getList().size() == 1);
+                async.countDown();
+              }));
+            }));
+          });
+          async.handler(v -> ctx.writeClient().deleteValue(key, tc.asyncAssertSuccess()));
+        });
+      }));
   }
 }

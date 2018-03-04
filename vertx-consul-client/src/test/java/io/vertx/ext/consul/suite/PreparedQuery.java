@@ -18,7 +18,6 @@ package io.vertx.ext.consul.suite;
 import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.consul.PreparedQueryDefinition;
 import io.vertx.ext.consul.ServiceOptions;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
@@ -34,75 +33,74 @@ public class PreparedQuery extends ConsulTestBase {
 
   @Test
   public void createUpdateAndDestroy(TestContext tc) {
-    Async async = tc.async();
     String service1 = randomFooBarAlpha();
     String service2 = randomFooBarAlpha();
-    ctx.rxWriteClient()
-      .rxCreatePreparedQuery(new PreparedQueryDefinition().setService(service1))
-      .flatMap(id -> ctx.rxReadClient()
-        .rxGetPreparedQuery(id)
-        .map(check(q -> tc.assertTrue(q.getService().equals(service1))))
-        .flatMap(def -> ctx.rxWriteClient().rxUpdatePreparedQuery(def.setService(service2)))
-        .flatMap(v -> ctx.rxReadClient()
-          .rxGetPreparedQuery(id)
-          .map(check(q -> tc.assertTrue(q.getService().equals(service2)))))
-        .flatMap(list -> ctx.rxWriteClient().rxDeletePreparedQuery(id)))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient()
+      .createPreparedQuery(new PreparedQueryDefinition().setService(service1), tc.asyncAssertSuccess(id -> {
+        ctx.readClient()
+          .getPreparedQuery(id, tc.asyncAssertSuccess(def1 -> {
+            tc.assertTrue(def1.getService().equals(service1));
+            ctx.writeClient().updatePreparedQuery(def1.setService(service2), tc.asyncAssertSuccess(updated -> {
+              ctx.readClient().getPreparedQuery(id, tc.asyncAssertSuccess(def2 -> {
+                tc.assertTrue(def2.getService().equals(service2));
+                ctx.writeClient().deletePreparedQuery(id, tc.asyncAssertSuccess());
+              }));
+            }));
+          }));
+      }));
   }
 
   @Test
   public void checkDefinition(TestContext tc) {
-    Async async = tc.async();
-    ctx.rxWriteClient()
-      .rxCreateSession()
-      .map(sessId -> randomPreparedQueryDefinition()
+    ctx.writeClient().createSession(tc.asyncAssertSuccess(sessId -> {
+      PreparedQueryDefinition expected = randomPreparedQueryDefinition()
         .setId("")
         .setTemplateType("name_prefix_match")
         .setTemplateRegexp("^find_(.+?)_(.+?)$")
-        .setSession(sessId))
-      .flatMap(expected -> ctx.rxWriteClient()
-        .rxCreatePreparedQuery(expected)
-        .flatMap(id -> ctx.rxReadClient()
-          .rxGetPreparedQuery(id)
-          .map(check(actual -> {
-            tc.assertEquals(expected.getService(), actual.getService());
-            tc.assertEquals(expected.getDcs(), actual.getDcs());
-            tc.assertEquals(expected.getDnsTtl(), actual.getDnsTtl());
-            tc.assertEquals(expected.getMeta(), actual.getMeta());
-            tc.assertEquals(expected.getName(), actual.getName());
-            tc.assertEquals(expected.getNearestN(), actual.getNearestN());
-            tc.assertEquals(expected.getPassing(), actual.getPassing());
-            tc.assertEquals(expected.getSession(), actual.getSession());
-            tc.assertEquals(expected.getTags(), actual.getTags());
-            tc.assertEquals(expected.getTemplateRegexp(), actual.getTemplateRegexp());
-            tc.assertEquals(expected.getTemplateType(), actual.getTemplateType());
-          }))
-          .map(actual -> ctx.rxWriteClient().rxDeletePreparedQuery(actual.getId()))
-          .map(v -> ctx.rxWriteClient().rxDestroySession(expected.getSession()))
-        ))
-      .subscribe(o -> async.complete(), tc::fail);
+        .setSession(sessId);
+      ctx.writeClient().createPreparedQuery(expected, tc.asyncAssertSuccess(id -> {
+        ctx.readClient().getPreparedQuery(id, tc.asyncAssertSuccess(actual -> {
+          tc.assertEquals(expected.getService(), actual.getService());
+          tc.assertEquals(expected.getDcs(), actual.getDcs());
+          tc.assertEquals(expected.getDnsTtl(), actual.getDnsTtl());
+          tc.assertEquals(expected.getMeta(), actual.getMeta());
+          tc.assertEquals(expected.getName(), actual.getName());
+          tc.assertEquals(expected.getNearestN(), actual.getNearestN());
+          tc.assertEquals(expected.getPassing(), actual.getPassing());
+          tc.assertEquals(expected.getSession(), actual.getSession());
+          tc.assertEquals(expected.getTags(), actual.getTags());
+          tc.assertEquals(expected.getTemplateRegexp(), actual.getTemplateRegexp());
+          tc.assertEquals(expected.getTemplateType(), actual.getTemplateType());
+          ctx.writeClient().deletePreparedQuery(actual.getId(), tc.asyncAssertSuccess(v -> {
+            ctx.writeClient().destroySession(expected.getSession(), tc.asyncAssertSuccess());
+          }));
+        }));
+      }));
+    }));
   }
 
   @Test
   public void execute(TestContext tc) {
-    Async async = tc.async();
     PreparedQueryDefinition def = new PreparedQueryDefinition()
       .setService("service-${match(1)}-${match(2)}")
       .setTemplateType("name_prefix_match")
       .setTemplateRegexp("^find_(.+?)_(.+?)$");
-    ctx.rxWriteClient().rxCreatePreparedQuery(def)
-      .flatMap(qid ->
-        ctx.rxWriteClient().rxExecutePreparedQuery("find_1_2")
-          .map(check(resp -> tc.assertEquals(resp.getNodes().size(), 0)))
-          .flatMap(resp -> ctx.rxWriteClient()
-            .rxRegisterService(new ServiceOptions().setName("service-1-2")))
-          .flatMap(v -> ctx.rxWriteClient()
-            .rxExecutePreparedQuery("find_1_2")
-            .map(check(resp -> tc.assertEquals(resp.getNodes().size(), 1))))
-          .flatMap(resp -> ctx.rxWriteClient()
-            .rxDeregisterService("service-1-2"))
-          .flatMap(v -> ctx.rxWriteClient()
-            .rxDeletePreparedQuery(qid)))
-      .subscribe(o -> async.complete(), tc::fail);
+    ctx.writeClient().createPreparedQuery(def, tc.asyncAssertSuccess(qid -> {
+      ctx.writeClient().executePreparedQuery("find_1_2", tc.asyncAssertSuccess(resp1 -> {
+        tc.assertEquals(resp1.getNodes().size(), 0);
+        ctx.writeClient()
+          .registerService(new ServiceOptions().setName("service-1-2"), tc.asyncAssertSuccess(v1 -> {
+            ctx.writeClient()
+              .executePreparedQuery("find_1_2", tc.asyncAssertSuccess(resp2 -> {
+                tc.assertEquals(resp2.getNodes().size(), 1);
+                ctx.writeClient()
+                  .deregisterService("service-1-2", tc.asyncAssertSuccess(v2 -> {
+                    ctx.writeClient()
+                      .deletePreparedQuery(qid, tc.asyncAssertSuccess());
+                  }));
+              }));
+          }));
+      }));
+    }));
   }
 }
