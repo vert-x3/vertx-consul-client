@@ -56,11 +56,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-codetrans</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>com.pszymczyk.consul</groupId>
       <artifactId>embedded-consul</artifactId>
       <version>${embedded.consul.version}</version>
