@@ -6,8 +6,8 @@ An asynchronous client for interacting with a Consul
 
 Please see the asciidoc documentation:
 
-* http://vertx.io/docs/vertx-consul-client/java/[Java documentation]
-* http://vertx.io/docs/vertx-consul-client/js/[JavaScript documentation]
-* http://vertx.io/docs/vertx-consul-client/kotlin/[Kotlin documentation]
-* http://vertx.io/docs/vertx-consul-client/groovy/[Groovy documentation]
-* http://vertx.io/docs/vertx-consul-client/ruby/[Ruby documentation]
+* [Java documentation](http://vertx.io/docs/vertx-consul-client/java/)
+* [JavaScript documentation](http://vertx.io/docs/vertx-consul-client/js/)
+* [Kotlin documentation](http://vertx.io/docs/vertx-consul-client/kotlin/)
+* [Groovy documentation](http://vertx.io/docs/vertx-consul-client/groovy/)
+* [Ruby documentation](http://vertx.io/docs/vertx-consul-client/ruby/)
