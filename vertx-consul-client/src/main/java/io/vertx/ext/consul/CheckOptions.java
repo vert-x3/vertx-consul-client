@@ -32,6 +32,9 @@ public class CheckOptions {
   private String http;
   private String ttl;
   private String tcp;
+  private String grpc;
+  private boolean grpcTls;
+  private boolean tlsSkipVerify;
   private String interval;
   private String notes;
   private String serviceId;
@@ -157,6 +160,73 @@ public class CheckOptions {
    */
   public CheckOptions setHttp(String http) {
     this.http = http;
+    return this;
+  }
+
+  /**
+   * Specifies a gRPC check's endpoint that supports the standard
+   * <a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md">gRPC health checking protocol</a>.
+   * The state of the check will be updated at the given Interval by probing the configured endpoint.
+   * The endpoint must be represented as {@code address:port/service}
+   *
+   * @return gRPC endpoint
+   */
+  public String getGrpc() {
+    return grpc;
+  }
+
+  /**
+   * Specifies a gRPC check's endpoint that supports the standard
+   * <a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md">gRPC health checking protocol</a>.
+   * The state of the check will be updated at the given Interval by probing the configured endpoint.
+   * The endpoint must be represented as {@code address:port/service}
+   *
+   * @param grpc endpoint
+   */
+  public CheckOptions setGrpc(String grpc) {
+    this.grpc = grpc;
+    return this;
+  }
+
+  /**
+   * Specifies whether to use TLS for this gRPC health check.
+   * If TLS is enabled, then by default, a valid TLS certificate is expected.
+   * Certificate verification can be turned off by setting {@code TLSSkipVerify} to {@code true}.
+   *
+   * @return true if TLS is enabled
+   */
+  public boolean isGrpcTls() {
+    return grpcTls;
+  }
+
+  /**
+   * Specifies whether to use TLS for this gRPC health check.
+   * If TLS is enabled, then by default, a valid TLS certificate is expected.
+   * Certificate verification can be turned off by setting {@code TLSSkipVerify} to {@code true}.
+   *
+   * @param grpcTls true if TLS is enabled
+   */
+  public CheckOptions setGrpcTls(boolean grpcTls) {
+    this.grpcTls = grpcTls;
+    return this;
+  }
+
+  /**
+   * Specifies if the certificate for an HTTPS check should not be verified.
+   *
+   * @return true if the certificate for an HTTPS check should not be verified.
+   */
+  public boolean isTlsSkipVerify() {
+    return tlsSkipVerify;
+  }
+
+  /**
+   * Specifies if the certificate for an HTTPS check should not be verified.
+   *
+   * @param tlsSkipVerify true if the certificate for an HTTPS check should not be verified.
+   */
+  public CheckOptions setTlsSkipVerify(boolean tlsSkipVerify) {
+    this.tlsSkipVerify = tlsSkipVerify;
     return this;
   }
 

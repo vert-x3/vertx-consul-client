@@ -30,6 +30,12 @@ public class CheckOptionsConverter {
     if (json.getValue("deregisterAfter") instanceof String) {
       obj.setDeregisterAfter((String)json.getValue("deregisterAfter"));
     }
+    if (json.getValue("grpc") instanceof String) {
+      obj.setGrpc((String)json.getValue("grpc"));
+    }
+    if (json.getValue("grpcTls") instanceof Boolean) {
+      obj.setGrpcTls((Boolean)json.getValue("grpcTls"));
+    }
     if (json.getValue("http") instanceof String) {
       obj.setHttp((String)json.getValue("http"));
     }
@@ -57,6 +63,9 @@ public class CheckOptionsConverter {
     if (json.getValue("tcp") instanceof String) {
       obj.setTcp((String)json.getValue("tcp"));
     }
+    if (json.getValue("tlsSkipVerify") instanceof Boolean) {
+      obj.setTlsSkipVerify((Boolean)json.getValue("tlsSkipVerify"));
+    }
     if (json.getValue("ttl") instanceof String) {
       obj.setTtl((String)json.getValue("ttl"));
     }
@@ -66,6 +75,10 @@ public class CheckOptionsConverter {
     if (obj.getDeregisterAfter() != null) {
       json.put("deregisterAfter", obj.getDeregisterAfter());
     }
+    if (obj.getGrpc() != null) {
+      json.put("grpc", obj.getGrpc());
+    }
+    json.put("grpcTls", obj.isGrpcTls());
     if (obj.getHttp() != null) {
       json.put("http", obj.getHttp());
     }
@@ -93,6 +106,7 @@ public class CheckOptionsConverter {
     if (obj.getTcp() != null) {
       json.put("tcp", obj.getTcp());
     }
+    json.put("tlsSkipVerify", obj.isTlsSkipVerify());
     if (obj.getTtl() != null) {
       json.put("ttl", obj.getTtl());
     }

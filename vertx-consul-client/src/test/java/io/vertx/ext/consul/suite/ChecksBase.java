@@ -15,12 +15,19 @@
  */
 package io.vertx.ext.consul.suite;
 
+import grpc.health.v1.HealthCheck;
+import grpc.health.v1.HealthGrpc;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.grpc.VertxServer;
+import io.vertx.grpc.VertxServerBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -106,6 +113,42 @@ public abstract class ChecksBase extends ConsulTestBase {
     reporter.close();
 
     runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+  }
+
+  @Test
+  public void grpcCheckLifecycle(TestContext tc) {
+    if (ctx.consulVersion().compareTo("1.0.3") < 0) {
+      System.out.println("skip " + ctx.consulVersion() + " version");
+      return;
+    }
+    GrpcHealthReporter reporter = new GrpcHealthReporter(vertx);
+    Async async = tc.async();
+
+    CheckOptions opts = new CheckOptions()
+      .setGrpc("localhost:" + reporter.port() + "/testee")
+      .setInterval("2s")
+      .setName("checkName");
+    String checkId = createCheck(opts);
+
+    reporter.start(tc.asyncAssertSuccess(v1 -> {
+      vertx.setTimer(3000, t1 -> {
+        getCheckInfo(tc, checkId, c1 -> {
+          tc.assertEquals(CheckStatus.PASSING, c1.getStatus());
+          reporter.setStatus(HealthCheck.HealthCheckResponse.ServingStatus.NOT_SERVING);
+
+          vertx.setTimer(3000, t2 -> {
+            getCheckInfo(tc, checkId, c2 -> {
+              tc.assertEquals(CheckStatus.CRITICAL, c2.getStatus());
+
+              reporter.close(tc.asyncAssertSuccess(v2 -> {
+                ctx.writeClient().deregisterCheck(checkId, tc.asyncAssertSuccess(v -> async.complete()));
+              }));
+            });
+          });
+
+        });
+      });
+    }));
   }
 
   @Test
@@ -265,6 +308,47 @@ public abstract class ChecksBase extends ConsulTestBase {
         default:
           return 500;
       }
+    }
+
+  }
+
+  private static class GrpcHealthReporter {
+
+    private final VertxServer server;
+    private final int port;
+
+    private HealthCheck.HealthCheckResponse.ServingStatus status = HealthCheck.HealthCheckResponse.ServingStatus.SERVING;
+
+    GrpcHealthReporter(Vertx vertx) {
+      this.port = Utils.getFreePort();
+      HealthGrpc.HealthVertxImplBase service = new HealthGrpc.HealthVertxImplBase() {
+        @Override
+        public void check(HealthCheck.HealthCheckRequest request, Future<HealthCheck.HealthCheckResponse> response) {
+          response.complete(HealthCheck.HealthCheckResponse.newBuilder()
+            .setStatus(status)
+            .build());
+        }
+      };
+      server = VertxServerBuilder
+        .forPort(vertx, port)
+        .addService(service)
+        .build();
+    }
+
+    int port() {
+      return port;
+    }
+
+    void setStatus(HealthCheck.HealthCheckResponse.ServingStatus status) {
+      this.status = status;
+    }
+
+    void start(Handler<AsyncResult<Void>> h) {
+      server.start(h);
+    }
+
+    void close(Handler<AsyncResult<Void>> h) {
+      server.shutdown(h);
     }
 
   }

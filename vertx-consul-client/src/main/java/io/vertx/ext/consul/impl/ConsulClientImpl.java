@@ -437,9 +437,14 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Notes", checkOptions.getNotes())
       .put("Script", checkOptions.getScript())
       .put("HTTP", checkOptions.getHttp())
+      .put("TLSSkipVerify", checkOptions.isTlsSkipVerify())
+      .put("GRPC", checkOptions.getGrpc())
       .put("Interval", checkOptions.getInterval())
       .put("TTL", checkOptions.getTtl())
       .put("TCP", checkOptions.getTcp());
+    if (checkOptions.getGrpc() != null) {
+      json.put("GRPCUseTLS", checkOptions.isGrpcTls());
+    }
     if (checkOptions.getDeregisterAfter() != null) {
       json.put("DeregisterCriticalServiceAfter", checkOptions.getDeregisterAfter());
     }

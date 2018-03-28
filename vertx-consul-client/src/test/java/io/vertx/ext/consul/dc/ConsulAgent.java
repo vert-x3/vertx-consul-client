@@ -44,6 +44,7 @@ public class ConsulAgent {
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private final ConsulProcess process;
+  private final String consulVersion;
   private final String masterToken;
   private final String host;
   private final String name;
@@ -97,6 +98,7 @@ public class ConsulAgent {
         .map(agent -> "127.0.0.1:" + agent.getSerfLanPort())
         .collect(Collector.of(JsonArray::new, JsonArray::add, JsonArray::addAll)));
     }
+    consulVersion = options.getConsulVersion();
     host = options.getAddress();
     name = options.getNodeName();
     masterToken = dc.getMasterToken();
@@ -147,6 +149,10 @@ public class ConsulAgent {
 
   public String getName() {
     return name;
+  }
+
+  public String getConsulVersion() {
+    return consulVersion;
   }
 
   private static int getFreePort() {
