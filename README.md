@@ -6,7 +6,7 @@ An asynchronous client for interacting with a Consul
 
 Please see the asciidoc documentation:
 
-* [Java in-source docs](vertx-consul-client/src/main/asciidoc/java/index.adoc)
-* [JavaScript in-source docs](vertx-consul-client/src/main/asciidoc/js/index.adoc)
-* [Groovy in-source docs](vertx-consul-client/src/main/asciidoc/groovy/index.adoc)
-* [Ruby in-source docs](vertx-consul-client/src/main/asciidoc/ruby/index.adoc)
+* [Java in-source docs](src/main/asciidoc/java/index.adoc)
+* [JavaScript in-source docs](src/main/asciidoc/js/index.adoc)
+* [Groovy in-source docs](src/main/asciidoc/groovy/index.adoc)
+* [Ruby in-source docs](src/main/asciidoc/ruby/index.adoc)
