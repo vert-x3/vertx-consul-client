@@ -20,6 +20,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.VertxException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
+import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
@@ -962,4 +963,31 @@ public class ConsulClientOptions extends WebClientOptions {
   public ConsulClientOptions setDecoderInitialBufferSize(int decoderInitialBufferSize) {
     return (ConsulClientOptions) super.setDecoderInitialBufferSize(decoderInitialBufferSize);
   }
+
+  @Override
+  public ConsulClientOptions removeEnabledSecureTransportProtocol(String protocol) {
+    return (ConsulClientOptions) super.removeEnabledSecureTransportProtocol(protocol);
+  }
+
+  @Override
+  public ConsulClientOptions setHttp2KeepAliveTimeout(int keepAliveTimeout) {
+    return (ConsulClientOptions) super.setHttp2KeepAliveTimeout(keepAliveTimeout);
+  }
+
+  @Override
+  public ConsulClientOptions setKeepAliveTimeout(int keepAliveTimeout) {
+    return (ConsulClientOptions) super.setKeepAliveTimeout(keepAliveTimeout);
+  }
+
+  @Override
+  public ConsulClientOptions setPoolCleanerPeriod(int poolCleanerPeriod) {
+    return (ConsulClientOptions) super.setPoolCleanerPeriod(poolCleanerPeriod);
+  }
+
+  @Override
+  public ConsulClientOptions setEnabledSecureTransportProtocols(Set<String> enabledSecureTransportProtocols) {
+    return (ConsulClientOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
+  }
+
+
 }
