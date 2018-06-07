@@ -1,19 +1,3 @@
-/*
- * Copyright (c) 2014 Red Hat, Inc. and others
- *
- * Red Hat licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package io.vertx.ext.consul;
 
 import io.vertx.core.json.JsonObject;
@@ -21,57 +5,92 @@ import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.ext.consul.CheckOptions}.
- *
- * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.CheckOptions} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link "io.vertx.ext.consul.CheckOptions} original class using Vert.x codegen.
  */
 public class CheckOptionsConverter {
 
-  public static void fromJson(JsonObject json, CheckOptions obj) {
-    if (json.getValue("deregisterAfter") instanceof String) {
-      obj.setDeregisterAfter((String)json.getValue("deregisterAfter"));
-    }
-    if (json.getValue("grpc") instanceof String) {
-      obj.setGrpc((String)json.getValue("grpc"));
-    }
-    if (json.getValue("grpcTls") instanceof Boolean) {
-      obj.setGrpcTls((Boolean)json.getValue("grpcTls"));
-    }
-    if (json.getValue("http") instanceof String) {
-      obj.setHttp((String)json.getValue("http"));
-    }
-    if (json.getValue("id") instanceof String) {
-      obj.setId((String)json.getValue("id"));
-    }
-    if (json.getValue("interval") instanceof String) {
-      obj.setInterval((String)json.getValue("interval"));
-    }
-    if (json.getValue("name") instanceof String) {
-      obj.setName((String)json.getValue("name"));
-    }
-    if (json.getValue("notes") instanceof String) {
-      obj.setNotes((String)json.getValue("notes"));
-    }
-    if (json.getValue("script") instanceof String) {
-      obj.setScript((String)json.getValue("script"));
-    }
-    if (json.getValue("serviceId") instanceof String) {
-      obj.setServiceId((String)json.getValue("serviceId"));
-    }
-    if (json.getValue("status") instanceof String) {
-      obj.setStatus(io.vertx.ext.consul.CheckStatus.valueOf((String)json.getValue("status")));
-    }
-    if (json.getValue("tcp") instanceof String) {
-      obj.setTcp((String)json.getValue("tcp"));
-    }
-    if (json.getValue("tlsSkipVerify") instanceof Boolean) {
-      obj.setTlsSkipVerify((Boolean)json.getValue("tlsSkipVerify"));
-    }
-    if (json.getValue("ttl") instanceof String) {
-      obj.setTtl((String)json.getValue("ttl"));
+  public static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, CheckOptions obj) {
+    for (java.util.Map.Entry<String, Object> member : json) {
+      switch (member.getKey()) {
+        case "deregisterAfter":
+          if (member.getValue() instanceof String) {
+            obj.setDeregisterAfter((String)member.getValue());
+          }
+          break;
+        case "grpc":
+          if (member.getValue() instanceof String) {
+            obj.setGrpc((String)member.getValue());
+          }
+          break;
+        case "grpcTls":
+          if (member.getValue() instanceof Boolean) {
+            obj.setGrpcTls((Boolean)member.getValue());
+          }
+          break;
+        case "http":
+          if (member.getValue() instanceof String) {
+            obj.setHttp((String)member.getValue());
+          }
+          break;
+        case "id":
+          if (member.getValue() instanceof String) {
+            obj.setId((String)member.getValue());
+          }
+          break;
+        case "interval":
+          if (member.getValue() instanceof String) {
+            obj.setInterval((String)member.getValue());
+          }
+          break;
+        case "name":
+          if (member.getValue() instanceof String) {
+            obj.setName((String)member.getValue());
+          }
+          break;
+        case "notes":
+          if (member.getValue() instanceof String) {
+            obj.setNotes((String)member.getValue());
+          }
+          break;
+        case "script":
+          if (member.getValue() instanceof String) {
+            obj.setScript((String)member.getValue());
+          }
+          break;
+        case "serviceId":
+          if (member.getValue() instanceof String) {
+            obj.setServiceId((String)member.getValue());
+          }
+          break;
+        case "status":
+          if (member.getValue() instanceof String) {
+            obj.setStatus(io.vertx.ext.consul.CheckStatus.valueOf((String)member.getValue()));
+          }
+          break;
+        case "tcp":
+          if (member.getValue() instanceof String) {
+            obj.setTcp((String)member.getValue());
+          }
+          break;
+        case "tlsSkipVerify":
+          if (member.getValue() instanceof Boolean) {
+            obj.setTlsSkipVerify((Boolean)member.getValue());
+          }
+          break;
+        case "ttl":
+          if (member.getValue() instanceof String) {
+            obj.setTtl((String)member.getValue());
+          }
+          break;
+      }
     }
   }
 
   public static void toJson(CheckOptions obj, JsonObject json) {
+    toJson(obj, json.getMap());
+  }
+
+  public static void toJson(CheckOptions obj, java.util.Map<String, Object> json) {
     if (obj.getDeregisterAfter() != null) {
       json.put("deregisterAfter", obj.getDeregisterAfter());
     }

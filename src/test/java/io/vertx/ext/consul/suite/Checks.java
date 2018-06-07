@@ -74,12 +74,12 @@ public class Checks extends ChecksBase {
       .setId(serviceName)
       .setCheckOptions(new CheckOptions().setTtl("1m"));
     runAsync(h -> ctx.writeClient().registerService(opts, h));
-    CheckList list1 = getAsync(h -> ctx.readClient().healthState(CheckStatus.CRITICAL, h));
+    CheckList list1 = getAsync(h -> ctx.readClient().healthState(HealthState.CRITICAL, h));
     CountDownLatch latch = new CountDownLatch(1);
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthStateWithOptions(CheckStatus.PASSING, options, h -> {
+      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options, h -> {
         List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
       });
