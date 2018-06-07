@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
@@ -178,7 +179,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     ScriptHealthReporter reporter = new ScriptHealthReporter();
 
     CheckOptions opts = new CheckOptions()
-      .setScript(reporter.scriptPath())
+      .setScriptArgs(reporter.scriptArgs())
       .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
@@ -242,6 +243,12 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     String scriptPath() {
       return scriptFile.getAbsolutePath();
+    }
+
+    List<String> scriptArgs() {
+      List<String> scriptArgs = new ArrayList<>();
+      scriptArgs.add(scriptPath());
+      return scriptArgs;
     }
 
     void setStatus(CheckStatus status) {
