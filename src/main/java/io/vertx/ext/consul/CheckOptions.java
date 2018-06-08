@@ -18,6 +18,8 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.List;
+
 /**
  * Options used to register checks in Consul.
  *
@@ -28,7 +30,7 @@ public class CheckOptions {
 
   private String id;
   private String name;
-  private String script;
+  private List<String> scriptArgs;
   private String http;
   private String ttl;
   private String tcp;
@@ -55,7 +57,7 @@ public class CheckOptions {
   public CheckOptions(CheckOptions options) {
     this.id = options.id;
     this.name = options.name;
-    this.script = options.script;
+    this.scriptArgs = options.scriptArgs;
     this.http = options.http;
     this.ttl = options.ttl;
     this.tcp = options.tcp;
@@ -124,22 +126,22 @@ public class CheckOptions {
   }
 
   /**
-   * Get path to checking script
+   * Get scriptArgs
    *
-   * @return path to script
+   * @return scriptArgs
    */
-  public String getScript() {
-    return script;
+  public List<String> getScriptArgs() {
+    return scriptArgs;
   }
 
   /**
-   * Set path to checking script. Also you should set checking interval
+   * Set scriptArgs. Also you should set checking interval
    *
-   * @param script path to script
+   * @param scriptArgs
    * @return reference to this, for fluency
    */
-  public CheckOptions setScript(String script) {
-    this.script = script;
+  public CheckOptions setScriptArgs(List<String> scriptArgs) {
+    this.scriptArgs = scriptArgs;
     return this;
   }
 
