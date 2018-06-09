@@ -52,9 +52,14 @@ public class CheckOptionsConverter {
             obj.setNotes((String)member.getValue());
           }
           break;
-        case "script":
-          if (member.getValue() instanceof String) {
-            obj.setScript((String)member.getValue());
+        case "scriptArgs":
+          if (member.getValue() instanceof JsonArray) {
+            java.util.ArrayList<java.lang.String> list =  new java.util.ArrayList<>();
+            ((Iterable<Object>)member.getValue()).forEach( item -> {
+              if (item instanceof String)
+                list.add((String)item);
+            });
+            obj.setScriptArgs(list);
           }
           break;
         case "serviceId":
@@ -113,8 +118,10 @@ public class CheckOptionsConverter {
     if (obj.getNotes() != null) {
       json.put("notes", obj.getNotes());
     }
-    if (obj.getScript() != null) {
-      json.put("script", obj.getScript());
+    if (obj.getScriptArgs() != null) {
+      JsonArray array = new JsonArray();
+      obj.getScriptArgs().forEach(item -> array.add(item));
+      json.put("scriptArgs", array);
     }
     if (obj.getServiceId() != null) {
       json.put("serviceId", obj.getServiceId());
