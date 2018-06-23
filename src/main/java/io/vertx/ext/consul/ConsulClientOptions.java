@@ -20,7 +20,6 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.VertxException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
@@ -29,6 +28,7 @@ import io.vertx.ext.web.client.WebClientOptions;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Options used to create Consul client.
@@ -402,6 +402,17 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setIdleTimeout(int idleTimeout) {
     return (ConsulClientOptions) super.setIdleTimeout(idleTimeout);
+  }
+
+  /**
+   * Set the idle timeout unit. If not specified, default is seconds.
+   *
+   * @param idleTimeoutUnit specify time unit.
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Override
+  public ConsulClientOptions setIdleTimeoutUnit(TimeUnit idleTimeoutUnit) {
+    return (ConsulClientOptions) super.setIdleTimeoutUnit(idleTimeoutUnit);
   }
 
   /**
