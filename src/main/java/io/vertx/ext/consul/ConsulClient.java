@@ -611,7 +611,7 @@ public interface ConsulClient {
    * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
    * @param checkId       the ID of check
-   * @param note          a human-readable message with the status of the check
+   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-pass">/v1/agent/check/pass/:check_id</a> endpoint
@@ -636,7 +636,7 @@ public interface ConsulClient {
    * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
    * @param checkId       the ID of check
-   * @param note          a human-readable message with the status of the check
+   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-warn">/v1/agent/check/warn/:check_id</a> endpoint
@@ -661,7 +661,7 @@ public interface ConsulClient {
    * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
    * @param checkId       the ID of check
-   * @param note          a human-readable message with the status of the check
+   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-fail">/v1/agent/check/fail/:check_id</a> endpoint
@@ -687,7 +687,7 @@ public interface ConsulClient {
    *
    * @param checkId       the ID of check
    * @param status        new status of check
-   * @param note          a human-readable message with the status of the check
+   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint

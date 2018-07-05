@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.ext.consul.BlockingQueryOptions}.
- * NOTE: This class has been automatically generated from the {@link "io.vertx.ext.consul.BlockingQueryOptions} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.BlockingQueryOptions} original class using Vert.x codegen.
  */
 public class BlockingQueryOptionsConverter {
 

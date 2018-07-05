@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.ext.consul.KeyValueList}.
- * NOTE: This class has been automatically generated from the {@link "io.vertx.ext.consul.KeyValueList} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.KeyValueList} original class using Vert.x codegen.
  */
 public class KeyValueListConverter {
 

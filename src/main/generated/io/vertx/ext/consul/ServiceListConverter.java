@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link io.vertx.ext.consul.ServiceList}.
- * NOTE: This class has been automatically generated from the {@link "io.vertx.ext.consul.ServiceList} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.vertx.ext.consul.ServiceList} original class using Vert.x codegen.
  */
 public class ServiceListConverter {
 
