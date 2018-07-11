@@ -17,10 +17,12 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.consul.impl.Utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Holds properties of service, node and related checks
@@ -68,6 +70,20 @@ public class ServiceEntry {
     JsonObject jsonObject = new JsonObject();
     ServiceEntryConverter.toJson(this, jsonObject);
     return jsonObject;
+  }
+
+  /**
+   * AggregatedStatus returns the "best" status for the list of health checks.
+   * Because a given entry may have many service and node-level health checks
+   * attached, this function determines the best representative of the status as
+   * as single string using the following heuristic:
+   *
+   * critical > warning > passing
+   *
+   * @return an aggregated status
+   */
+  public CheckStatus aggregatedStatus() {
+    return Utils.aggregateCheckStatus(checks.stream().map(Check::getStatus).collect(Collectors.toList()));
   }
 
   /**

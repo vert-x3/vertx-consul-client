@@ -16,6 +16,7 @@
 package io.vertx.ext.consul.impl;
 
 import io.vertx.core.json.JsonArray;
+import io.vertx.ext.consul.CheckStatus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,6 +28,27 @@ import java.util.List;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class Utils {
+
+  public static CheckStatus aggregateCheckStatus(List<CheckStatus> checks) {
+    boolean warning = false, critical = false;
+    for (CheckStatus status: checks) {
+      switch (status) {
+        case WARNING:
+          warning = true;
+          break;
+        case CRITICAL:
+          critical = true;
+          break;
+      }
+    }
+    if (critical) {
+      return CheckStatus.CRITICAL;
+    } else  if (warning) {
+      return CheckStatus.WARNING;
+    } else {
+      return CheckStatus.PASSING;
+    }
+  }
 
   public static String urlEncode(String str) {
     try {
