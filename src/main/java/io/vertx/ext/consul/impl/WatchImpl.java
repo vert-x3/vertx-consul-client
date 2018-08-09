@@ -172,16 +172,18 @@ public abstract class WatchImpl<T> implements Watch<T> {
     vertx.runOnContext(v -> consulClient.close());
   }
 
-  private WatchImpl<T> go() {
+  private void go() {
     fetch(0, newState -> {
-      if (!newState.equals(current)) {
+      if (newState.equals(current)) {
+        // avoid floods
+        vertx.setTimer(1000, l -> go());
+      } else {
         State<T> prevState = current;
         current = newState;
         sendSuccess(prevState.value, newState.value);
+        vertx.runOnContext(v -> go());
       }
-      vertx.runOnContext(v -> go());
     });
-    return this;
   }
 
   private void fetch(long cnt, Handler<State<T>> result) {
@@ -268,7 +270,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
-  private static class State<T> {
+  static class State<T> {
 
     final T value;
     final long index;

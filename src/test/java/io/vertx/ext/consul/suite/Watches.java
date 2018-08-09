@@ -15,13 +15,16 @@
  */
 package io.vertx.ext.consul.suite;
 
+import io.vertx.core.Future;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.common.StateConsumer;
 import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.consul.impl.WatchKeyPrefixCnt;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -194,6 +197,23 @@ public class Watches extends ConsulTestBase {
     runAsync(h -> ctx.writeClient().deleteValues(keyPrefix, h));
     consumer.await(EMPTY_MESSAGE);
     consumer.check();
+
+    watch.stop();
+  }
+
+  @Test
+  public void iss54() {
+    String keyPrefix = ConsulContext.KEY_RW_PREFIX + randomAlphaString(10);
+    AtomicInteger eventCnt = new AtomicInteger();
+
+    WatchKeyPrefixCnt watch = new WatchKeyPrefixCnt(keyPrefix, vertx, ctx.readClientOptions());
+    watch.setHandler(kv -> eventCnt.incrementAndGet());
+    watch.start();
+
+    runAsync(h -> vertx.setTimer(1500, l -> h.handle(Future.succeededFuture())));
+
+    assertEquals(1, eventCnt.get());
+    assertTrue(watch.cnt() < 5);
 
     watch.stop();
   }
