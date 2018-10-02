@@ -1,6 +1,6 @@
 # Consul Client
 
-[![Build Status](https://travis-ci.org/vert-x3/vertx-consul-client.svg?branch=master?branch=master)](https://travis-ci.org/vert-x3/vertx-consul-client)
+[![Build Status](https://travis-ci.org/vert-x3/vertx-consul-client.svg?branch=master)](https://travis-ci.org/vert-x3/vertx-consul-client)
 
 An asynchronous client for interacting with a Consul
 
