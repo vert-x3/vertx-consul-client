@@ -65,6 +65,43 @@ public class Sessions extends ConsulTestBase {
   }
 
   @Test
+  public void createSessionWithOptionsWithZeroLockDelay(TestContext tc) {
+    SessionOptions opt = new SessionOptions()
+      .setBehavior(SessionBehavior.DELETE)
+      .setLockDelay(0L)
+      .setName("optName")
+      .setTtl(442);
+    ctx.writeClient().createSessionWithOptions(opt, tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        List<String> checks = session.getChecks();
+        tc.assertEquals(1, checks.size());
+        tc.assertTrue("serfHealth".equals(checks.get(0)));
+        tc.assertEquals(0L, session.getLockDelay());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
+  }
+
+  @Test
+  public void createSessionWithOptionsWithDefaultLockDelay(TestContext tc) {
+    SessionOptions opt = new SessionOptions()
+      .setBehavior(SessionBehavior.DELETE)
+      .setName("optName")
+      .setTtl(442);
+    ctx.writeClient().createSessionWithOptions(opt, tc.asyncAssertSuccess(id -> {
+      ctx.writeClient().infoSession(id, tc.asyncAssertSuccess(session -> {
+        List<String> checks = session.getChecks();
+        tc.assertEquals(1, checks.size());
+        tc.assertTrue("serfHealth".equals(checks.get(0)));
+        tc.assertEquals(15L, session.getLockDelay());
+        tc.assertEquals(ctx.nodeName(), session.getNode());
+        ctx.writeClient().destroySession(id, tc.asyncAssertSuccess());
+      }));
+    }));
+  }
+
+  @Test
   public void unknownNode(TestContext tc) {
     ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode"), tc.asyncAssertFailure());
   }
