@@ -37,12 +37,12 @@ public class SessionOptions {
   private static final String BEHAVIOR_KEY = "Behavior";
   private static final String TTL_KEY = "TTL";
 
-  private long lockDelay;
+  private Long lockDelay;
   private String name;
   private String node;
   private List<String> checks;
   private SessionBehavior behavior;
-  private long ttl;
+  private Long ttl;
 
   /**
    * Default constructor
@@ -85,9 +85,10 @@ public class SessionOptions {
    */
   public JsonObject toJson() {
     JsonObject jsonObject = new JsonObject();
-    if (lockDelay != 0) {
+    if (lockDelay != null) {
       jsonObject.put(LOCK_KEY, lockDelay + "s");
     }
+
     if (name != null) {
       jsonObject.put(NAME_KEY, name);
     }
@@ -100,7 +101,7 @@ public class SessionOptions {
     if (behavior != null) {
       jsonObject.put(BEHAVIOR_KEY, behavior.key);
     }
-    if (ttl != 0) {
+    if (ttl != null) {
       jsonObject.put(TTL_KEY, ttl + "s");
     }
     return jsonObject;
@@ -241,11 +242,11 @@ public class SessionOptions {
     return this;
   }
 
-  private static long cutSeconds(String value) {
+  private static Long cutSeconds(String value) {
     if (value != null && value.endsWith("s")) {
-      return Integer.parseInt(value.substring(0, value.length() - 1));
+      return Long.parseLong(value.substring(0, value.length() - 1));
     } else {
-      return 0L;
+      return null;
     }
   }
 }
