@@ -22,10 +22,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -40,31 +37,40 @@ import static io.vertx.test.core.TestUtils.randomAlphaString;
  */
 public class Services extends ChecksBase {
 
+  private static String checkService(TestContext tc, List<Service> list, String name, ServiceOptions options) {
+    Service s = list.stream()
+      .filter(i -> name.equals(i.getName()))
+      .findFirst()
+      .orElseThrow(NoSuchElementException::new);
+    String serviceId = s.getId();
+    tc.assertEquals(s.getTags(), options.getTags());
+    tc.assertEquals(s.getAddress(), options.getAddress());
+    tc.assertEquals(s.getPort(), options.getPort());
+    for (Map.Entry<String, String> entry : options.getMeta().entrySet()) {
+      tc.assertEquals(s.getMeta().get(entry.getKey()), entry.getValue());
+    }
+    return serviceId;
+  }
+
   @Test
   public void createLocalService(TestContext tc) {
     String serviceName = randomAlphaString(10);
-    ServiceOptions service = randomServiceOptions().setName(serviceName).setId(null);
-    ctx.writeClient().registerService(service, tc.asyncAssertSuccess(reg -> {
+    ServiceOptions opts = randomServiceOptions().setName(serviceName).setId(null);
+    ctx.writeClient().registerService(opts, tc.asyncAssertSuccess(reg -> {
       ctx.writeClient().localServices(tc.asyncAssertSuccess(services -> {
-        Service s = services.stream()
-          .filter(i -> serviceName.equals(i.getName()))
-          .findFirst()
-          .orElseThrow(NoSuchElementException::new);
-        String serviceId = s.getId();
-        tc.assertEquals(s.getTags(), service.getTags());
-        tc.assertEquals(s.getAddress(), service.getAddress());
-        tc.assertEquals(s.getPort(), service.getPort());
+        String serviceId = checkService(tc, services, serviceName, opts);
         ctx.writeClient().localChecks(tc.asyncAssertSuccess(checks -> {
           Check c = checks.stream()
             .filter(i -> serviceName.equals(i.getServiceName()))
             .findFirst()
             .orElseThrow(NoSuchElementException::new);
           tc.assertEquals(c.getId(), "service:" + serviceName);
-          tc.assertEquals(c.getNotes(), service.getCheckOptions().getNotes());
+          tc.assertEquals(c.getNotes(), opts.getCheckOptions().getNotes());
           ctx.writeClient().catalogNodeServices(ctx.nodeName(), tc.asyncAssertSuccess(nodeServices -> {
             tc.assertEquals(2, nodeServices.getList().size());
+            checkService(tc, nodeServices.getList(), serviceName, opts);
             Async async = tc.async(2);
-            ServiceQueryOptions knownOpts = new ServiceQueryOptions().setTag(service.getTags().get(0));
+            ServiceQueryOptions knownOpts = new ServiceQueryOptions().setTag(opts.getTags().get(0));
             ctx.writeClient().catalogServiceNodesWithOptions(serviceName, knownOpts, tc.asyncAssertSuccess(nodeServicesWithKnownTag -> {
               tc.assertEquals(1, nodeServicesWithKnownTag.getList().size());
               async.countDown();

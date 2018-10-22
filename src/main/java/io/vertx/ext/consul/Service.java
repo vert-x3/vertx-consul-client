@@ -20,8 +20,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.vertx.ext.consul.impl.Utils.listOf;
+import static io.vertx.ext.consul.impl.Utils.mapStringString;
 
 /**
  * Holds properties of service and node that its containing
@@ -37,6 +42,7 @@ public class Service {
   private static final String SERVICE_NAME = "ServiceName";
   private static final String SERVICE_TAGS = "ServiceTags";
   private static final String SERVICE_ADDRESS = "ServiceAddress";
+  private static final String SERVICE_META = "ServiceMeta";
   private static final String SERVICE_PORT = "ServicePort";
 
   private String node;
@@ -45,6 +51,7 @@ public class Service {
   private String name;
   private List<String> tags;
   private String address;
+  private Map<String, String> meta;
   private int port;
 
   /**
@@ -65,6 +72,7 @@ public class Service {
     this.name = other.name;
     this.tags = other.tags;
     this.address = other.address;
+    this.meta = other.meta;
     this.port = other.port;
   }
 
@@ -78,9 +86,9 @@ public class Service {
     this.nodeAddress = service.getString(ADDRESS);
     this.id = service.getString(SERVICE_ID);
     this.name = service.getString(SERVICE_NAME);
-    JsonArray tagsArr = service.getJsonArray(SERVICE_TAGS);
-    this.tags = tagsArr == null ? null : tagsArr.stream().map(obj -> (String) obj).collect(Collectors.toList());
+    this.tags = listOf(service.getJsonArray(SERVICE_TAGS));
     this.address = service.getString(SERVICE_ADDRESS);
+    this.meta = mapStringString(service.getJsonObject(SERVICE_META));
     this.port = service.getInteger(SERVICE_PORT, 0);
   }
 
@@ -108,6 +116,9 @@ public class Service {
     }
     if (address != null) {
       jsonObject.put(SERVICE_ADDRESS, address);
+    }
+    if (meta != null && !meta.isEmpty()) {
+      jsonObject.put(SERVICE_META, meta);
     }
     if (port != 0) {
       jsonObject.put(SERVICE_PORT, port);
@@ -235,6 +246,26 @@ public class Service {
   }
 
   /**
+   * Get arbitrary KV metadata linked to the service instance.
+   *
+   * @return arbitrary KV metadata
+   */
+  public Map<String, String> getMeta() {
+    return meta;
+  }
+
+  /**
+   * Specifies arbitrary KV metadata linked to the service instance.
+   *
+   * @param meta arbitrary KV metadata
+   * @return reference to this, for fluency
+   */
+  public Service setMeta(Map<String, String> meta) {
+    this.meta = meta;
+    return this;
+  }
+
+  /**
    * Get service port
    *
    * @return service port
@@ -266,6 +297,7 @@ public class Service {
     if (nodeAddress != null ? !nodeAddress.equals(service.nodeAddress) : service.nodeAddress != null) return false;
     if (id != null ? !id.equals(service.id) : service.id != null) return false;
     if (name != null ? !name.equals(service.name) : service.name != null) return false;
+    if (meta != null ? !meta.equals(service.meta) : service.meta != null) return false;
     if (tags != null ? !sortedTags().equals(service.sortedTags()) : service.tags != null) return false;
     return address != null ? address.equals(service.address) : service.address == null;
   }
@@ -278,6 +310,7 @@ public class Service {
     result = 31 * result + (name != null ? name.hashCode() : 0);
     result = 31 * result + (tags != null ? sortedTags().hashCode() : 0);
     result = 31 * result + (address != null ? address.hashCode() : 0);
+    result = 31 * result + (meta != null ? meta.hashCode() : 0);
     result = 31 * result + port;
     return result;
   }

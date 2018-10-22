@@ -274,6 +274,9 @@ public class ConsulClientImpl implements ConsulClient {
     if (serviceOptions.getCheckOptions() != null) {
       jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), false));
     }
+    if (serviceOptions.getMeta() != null && !serviceOptions.getMeta().isEmpty()) {
+      jsonOpts.put("Meta", serviceOptions.getMeta());
+    }
     requestVoid(HttpMethod.PUT, "/v1/agent/service/register", null, jsonOpts.encode(), resultHandler);
     return this;
   }
