@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.impl.Utils.listOf;
+import static io.vertx.ext.consul.impl.Utils.mapStringString;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -33,6 +34,7 @@ class ServiceParser {
   private static final String AGENT_SERVICE_SERVICE = "Service";
   private static final String AGENT_SERVICE_TAGS = "Tags";
   private static final String AGENT_SERVICE_ADDRESS = "Address";
+  private static final String AGENT_SERVICE_META = "Meta";
   private static final String AGENT_SERVICE_PORT = "Port";
 
   static Service parseAgentInfo(JsonObject jsonObject) {
@@ -41,6 +43,7 @@ class ServiceParser {
       .setId(jsonObject.getString(AGENT_SERVICE_ID))
       .setName(jsonObject.getString(AGENT_SERVICE_SERVICE))
       .setTags(listOf(tagsArr))
+      .setMeta(mapStringString(jsonObject.getJsonObject(AGENT_SERVICE_META)))
       .setAddress(jsonObject.getString(AGENT_SERVICE_ADDRESS))
       .setPort(jsonObject.getInteger(AGENT_SERVICE_PORT));
   }
@@ -59,6 +62,7 @@ class ServiceParser {
       .setNodeAddress(nodeAddress)
       .setId(serviceInfo.getString(AGENT_SERVICE_ID))
       .setAddress(serviceInfo.getString(AGENT_SERVICE_ADDRESS))
+      .setMeta(mapStringString(serviceInfo.getJsonObject(AGENT_SERVICE_META)))
       .setName(serviceInfo.getString(AGENT_SERVICE_SERVICE))
       .setTags(listOf(tagsArr))
       .setPort(serviceInfo.getInteger(AGENT_SERVICE_PORT));

@@ -16,13 +16,12 @@
 package io.vertx.ext.consul.impl;
 
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.CheckStatus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -79,6 +78,17 @@ public class Utils {
       return null;
     } else {
       return new ArrayList<>(list);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Map<String, String> mapStringString(JsonObject obj) {
+    if (obj == null) {
+      return null;
+    } else {
+      Map<String, String> map = new HashMap<>();
+      obj.getMap().forEach((k, v) -> map.put(k, (String) v));
+      return map;
     }
   }
 

@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Options used to register service.
@@ -33,6 +34,7 @@ public class ServiceOptions {
   private String name;
   private List<String> tags;
   private String address;
+  private Map<String, String> meta;
   private int port;
   private CheckOptions checkOptions;
 
@@ -52,6 +54,7 @@ public class ServiceOptions {
     this.name = options.name;
     this.tags = options.tags;
     this.address = options.address;
+    this.meta = options.meta;
     this.port = options.port;
     this.checkOptions = options.checkOptions;
   }
@@ -153,6 +156,26 @@ public class ServiceOptions {
    */
   public ServiceOptions setAddress(String address) {
     this.address = address;
+    return this;
+  }
+
+  /**
+   * Get arbitrary KV metadata linked to the service instance.
+   *
+   * @return arbitrary KV metadata
+   */
+  public Map<String, String> getMeta() {
+    return meta;
+  }
+
+  /**
+   * Specifies arbitrary KV metadata linked to the service instance.
+   *
+   * @param meta arbitrary KV metadata
+   * @return reference to this, for fluency
+   */
+  public ServiceOptions setMeta(Map<String, String> meta) {
+    this.meta = meta;
     return this;
   }
 

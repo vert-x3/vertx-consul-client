@@ -17,9 +17,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.test.core.TestUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static io.vertx.test.core.TestUtils.*;
@@ -165,7 +163,15 @@ public class RandomObjects {
       .setTags(randomStringList(2))
       .setCheckOptions(randomCheckOptions())
       .setAddress(randomAlphaString(10))
+      .setMeta(randomMeta())
       .setPort(randomPortInt());
+  }
+
+  public static Map<String, String> randomMeta() {
+    Map<String, String> meta = new HashMap<>();
+    meta.put(randomAlphaString(10), randomAlphaString(10));
+    meta.put(randomAlphaString(10), randomAlphaString(10));
+    return meta;
   }
 
   public static List<String> randomStringList(int n) {
