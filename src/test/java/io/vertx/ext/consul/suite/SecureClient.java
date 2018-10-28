@@ -24,7 +24,7 @@ public class SecureClient extends ConsulTestBase {
   @Test
   public void withTrustOptions(TestContext tc) throws Exception {
     PemTrustOptions options = new PemTrustOptions()
-      .addCertValue(Buffer.buffer(Utils.readResource("client-cert.pem")));
+      .addCertValue(Buffer.buffer(Utils.readResource("server-cert-ca-chain.pem")));
     go(tc, false, options);
   }
 

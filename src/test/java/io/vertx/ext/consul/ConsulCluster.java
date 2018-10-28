@@ -37,9 +37,9 @@ public class ConsulCluster {
 
   private static ConsulAgentOptions sslOptions() {
     ConsulAgentOptions opts = new ConsulAgentOptions()
-      .setKeyFile(copyFileFromResources("client-key.pem", "client-key"))
-      .setCertFile(copyFileFromResources("client-cert.pem", "client-cert"))
-      .setCaFile(copyFileFromResources("client-cert-root-ca.pem", "client-cert-root-ca"));
+      .setKeyFile(copyFileFromResources("server-key.pem", "server-key"))
+      .setCertFile(copyFileFromResources("server-cert.pem", "server-cert"))
+      .setCaFile(copyFileFromResources("server-cert-ca-chain.pem", "server-cert-ca-chain"));
     String v = getVersion();
     if (v != null) {
       opts.setConsulVersion(v);
