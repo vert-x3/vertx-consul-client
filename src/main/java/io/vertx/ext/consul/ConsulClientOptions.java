@@ -382,17 +382,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set whether Netty pooled buffers are enabled
-   *
-   * @param usePooledBuffers true if pooled buffers enabled
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setUsePooledBuffers(boolean usePooledBuffers) {
-    return (ConsulClientOptions) super.setUsePooledBuffers(usePooledBuffers);
-  }
-
-  /**
    * Set the idle timeout, in seconds. zero means don't timeout.
    * This determines if a connection will timeout and be closed if no data is received within the timeout.
    *
