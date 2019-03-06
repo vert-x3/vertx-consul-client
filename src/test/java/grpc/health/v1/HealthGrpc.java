@@ -24,35 +24,6 @@ public final class HealthGrpc {
 
   private HealthGrpc() {}
 
-  private static <T> io.grpc.stub.StreamObserver<T> toObserver(final io.vertx.core.Handler<io.vertx.core.AsyncResult<T>> handler) {
-    return new io.grpc.stub.StreamObserver<T>() {
-      private volatile boolean resolved = false;
-      @Override
-      public void onNext(T value) {
-        if (!resolved) {
-          resolved = true;
-          handler.handle(io.vertx.core.Future.succeededFuture(value));
-        }
-      }
-
-      @Override
-      public void onError(Throwable t) {
-        if (!resolved) {
-          resolved = true;
-          handler.handle(io.vertx.core.Future.failedFuture(t));
-        }
-      }
-
-      @Override
-      public void onCompleted() {
-        if (!resolved) {
-          resolved = true;
-          handler.handle(io.vertx.core.Future.succeededFuture());
-        }
-      }
-    };
-  }
-
   public static final String SERVICE_NAME = "grpc.health.v1.Health";
 
   // Static method descriptors that strictly reflect the proto.
@@ -113,13 +84,6 @@ public final class HealthGrpc {
   }
 
   /**
-   * Creates a new vertx stub that supports all call types for the service
-   */
-  public static HealthVertxStub newVertxStub(io.grpc.Channel channel) {
-    return new HealthVertxStub(channel);
-  }
-
-  /**
    */
   public static abstract class HealthImplBase implements io.grpc.BindableService {
 
@@ -146,11 +110,11 @@ public final class HealthGrpc {
   /**
    */
   public static final class HealthStub extends io.grpc.stub.AbstractStub<HealthStub> {
-    public HealthStub(io.grpc.Channel channel) {
+    private HealthStub(io.grpc.Channel channel) {
       super(channel);
     }
 
-    public HealthStub(io.grpc.Channel channel,
+    private HealthStub(io.grpc.Channel channel,
         io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
@@ -173,11 +137,11 @@ public final class HealthGrpc {
   /**
    */
   public static final class HealthBlockingStub extends io.grpc.stub.AbstractStub<HealthBlockingStub> {
-    public HealthBlockingStub(io.grpc.Channel channel) {
+    private HealthBlockingStub(io.grpc.Channel channel) {
       super(channel);
     }
 
-    public HealthBlockingStub(io.grpc.Channel channel,
+    private HealthBlockingStub(io.grpc.Channel channel,
         io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
@@ -199,11 +163,11 @@ public final class HealthGrpc {
   /**
    */
   public static final class HealthFutureStub extends io.grpc.stub.AbstractStub<HealthFutureStub> {
-    public HealthFutureStub(io.grpc.Channel channel) {
+    private HealthFutureStub(io.grpc.Channel channel) {
       super(channel);
     }
 
-    public HealthFutureStub(io.grpc.Channel channel,
+    private HealthFutureStub(io.grpc.Channel channel,
         io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
@@ -220,57 +184,6 @@ public final class HealthGrpc {
         grpc.health.v1.HealthCheck.HealthCheckRequest request) {
       return futureUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request);
-    }
-  }
-
-  /**
-   */
-  public static abstract class HealthVertxImplBase implements io.grpc.BindableService {
-
-    /**
-     */
-    public void check(grpc.health.v1.HealthCheck.HealthCheckRequest request,
-        io.vertx.core.Future<grpc.health.v1.HealthCheck.HealthCheckResponse> response) {
-      asyncUnimplementedUnaryCall(getCheckMethod(), HealthGrpc.toObserver(response.completer()));
-    }
-
-    @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
-      return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
-          .addMethod(
-            getCheckMethod(),
-            asyncUnaryCall(
-              new VertxMethodHandlers<
-                grpc.health.v1.HealthCheck.HealthCheckRequest,
-                grpc.health.v1.HealthCheck.HealthCheckResponse>(
-                  this, METHODID_CHECK)))
-          .build();
-    }
-  }
-
-  /**
-   */
-  public static final class HealthVertxStub extends io.grpc.stub.AbstractStub<HealthVertxStub> {
-    public HealthVertxStub(io.grpc.Channel channel) {
-      super(channel);
-    }
-
-    public HealthVertxStub(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
-      super(channel, callOptions);
-    }
-
-    @java.lang.Override
-    protected HealthVertxStub build(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
-      return new HealthVertxStub(channel, callOptions);
-    }
-
-    /**
-     */
-    public void check(grpc.health.v1.HealthCheck.HealthCheckRequest request,
-        io.vertx.core.Handler<io.vertx.core.AsyncResult<grpc.health.v1.HealthCheck.HealthCheckResponse>> response) {
-      asyncUnaryCall(
-          getChannel().newCall(getCheckMethod(), getCallOptions()), request, HealthGrpc.toObserver(response));
     }
   }
 
@@ -296,50 +209,6 @@ public final class HealthGrpc {
         case METHODID_CHECK:
           serviceImpl.check((grpc.health.v1.HealthCheck.HealthCheckRequest) request,
               (io.grpc.stub.StreamObserver<grpc.health.v1.HealthCheck.HealthCheckResponse>) responseObserver);
-          break;
-        default:
-          throw new AssertionError();
-      }
-    }
-
-    @java.lang.Override
-    @java.lang.SuppressWarnings("unchecked")
-    public io.grpc.stub.StreamObserver<Req> invoke(
-        io.grpc.stub.StreamObserver<Resp> responseObserver) {
-      switch (methodId) {
-        default:
-          throw new AssertionError();
-      }
-    }
-  }
-
-  private static final class VertxMethodHandlers<Req, Resp> implements
-      io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
-      io.grpc.stub.ServerCalls.ServerStreamingMethod<Req, Resp>,
-      io.grpc.stub.ServerCalls.ClientStreamingMethod<Req, Resp>,
-      io.grpc.stub.ServerCalls.BidiStreamingMethod<Req, Resp> {
-    private final HealthVertxImplBase serviceImpl;
-    private final int methodId;
-
-    VertxMethodHandlers(HealthVertxImplBase serviceImpl, int methodId) {
-      this.serviceImpl = serviceImpl;
-      this.methodId = methodId;
-    }
-
-    @java.lang.Override
-    @java.lang.SuppressWarnings("unchecked")
-    public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
-      switch (methodId) {
-        case METHODID_CHECK:
-          serviceImpl.check((grpc.health.v1.HealthCheck.HealthCheckRequest) request,
-              (io.vertx.core.Future<grpc.health.v1.HealthCheck.HealthCheckResponse>) io.vertx.core.Future.<grpc.health.v1.HealthCheck.HealthCheckResponse>future().setHandler(ar -> {
-                if (ar.succeeded()) {
-                  ((io.grpc.stub.StreamObserver<grpc.health.v1.HealthCheck.HealthCheckResponse>) responseObserver).onNext(ar.result());
-                  responseObserver.onCompleted();
-                } else {
-                  responseObserver.onError(ar.cause());
-                }
-              }));
           break;
         default:
           throw new AssertionError();

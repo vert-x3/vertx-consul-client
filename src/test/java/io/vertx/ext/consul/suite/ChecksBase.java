@@ -17,6 +17,7 @@ package io.vertx.ext.consul.suite;
 
 import grpc.health.v1.HealthCheck;
 import grpc.health.v1.HealthGrpc;
+import io.grpc.stub.StreamObserver;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -328,12 +329,13 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     GrpcHealthReporter(Vertx vertx) {
       this.port = Utils.getFreePort();
-      HealthGrpc.HealthVertxImplBase service = new HealthGrpc.HealthVertxImplBase() {
+      HealthGrpc.HealthImplBase service = new HealthGrpc.HealthImplBase() {
         @Override
-        public void check(HealthCheck.HealthCheckRequest request, Future<HealthCheck.HealthCheckResponse> response) {
-          response.complete(HealthCheck.HealthCheckResponse.newBuilder()
+        public void check(HealthCheck.HealthCheckRequest request, StreamObserver<HealthCheck.HealthCheckResponse> response) {
+          response.onNext(HealthCheck.HealthCheckResponse.newBuilder()
             .setStatus(status)
             .build());
+          response.onCompleted();
         }
       };
       server = VertxServerBuilder
