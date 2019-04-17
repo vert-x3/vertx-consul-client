@@ -730,7 +730,9 @@ public class ConsulClientImpl implements ConsulClient {
           }
           resultHandler.handle(Future.succeededFuture(mapped));
         } else {
-          resultHandler.handle(Future.failedFuture(resp.statusMessage()));
+          resultHandler.handle(Future.failedFuture(
+            String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()))
+          );
         }
       } else {
         resultHandler.handle(Future.failedFuture(h.cause()));
