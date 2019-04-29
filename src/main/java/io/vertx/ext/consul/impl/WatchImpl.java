@@ -169,7 +169,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
       throw new IllegalStateException("Watch already stopped");
     }
     stopped = true;
-    vertx.runOnContext(v -> consulClient.close());
+    consulClient.close();
   }
 
   private void go() {
