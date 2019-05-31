@@ -17,6 +17,7 @@ package io.vertx.ext.consul.impl;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.BlockingQueryOptions;
+import io.vertx.ext.consul.v1.ConsistencyMode;
 import io.vertx.ext.web.client.HttpRequest;
 
 import java.util.HashMap;
@@ -26,19 +27,19 @@ import java.util.Set;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-class Query {
+public class Query {
 
   private final Map<String, String> map = new HashMap<>();
 
-  static Query of(BlockingQueryOptions options) {
+  public static Query of(BlockingQueryOptions options) {
     return new Query().put(options);
   }
 
-  static Query of(String key, Object value) {
+  public static Query of(String key, Object value) {
     return new Query().put(key, value);
   }
 
-  Query put(String key, Object value) {
+  public Query put(String key, Object value) {
     if (value == null) {
       return this;
     }
@@ -49,7 +50,11 @@ class Query {
     return this;
   }
 
-  Query put(BlockingQueryOptions options) {
+  public Query put(ConsistencyMode consistencyMode) {
+    return put();
+  }
+
+  public Query put(BlockingQueryOptions options) {
     if (options != null) {
       put("index", Long.toUnsignedString(options.getIndex()));
       if (options.getWait() != null) {
@@ -59,7 +64,7 @@ class Query {
     return this;
   }
 
-  Set<Map.Entry<String, String>> entrySet() {
+  public Set<Map.Entry<String, String>> entrySet() {
     return map.entrySet();
   }
 }

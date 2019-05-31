@@ -23,7 +23,7 @@ import java.util.Base64;
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-class KVParser {
+public class KVParser {
 
   private static final String KEY_KEY = "Key";
   private static final String VALUE_KEY = "Value";
@@ -33,7 +33,7 @@ class KVParser {
   private static final String MODIFY_KEY = "ModifyIndex";
   private static final String LOCK_KEY = "LockIndex";
 
-  static KeyValue parse(JsonObject json) {
+  public static KeyValue parse(JsonObject json) {
     return new KeyValue()
       .setKey(json.getString(KEY_KEY))
       .setValue(Utils.decode64(json.getString(VALUE_KEY)))
