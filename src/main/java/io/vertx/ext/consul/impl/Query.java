@@ -15,10 +15,8 @@
  */
 package io.vertx.ext.consul.impl;
 
-import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.BlockingQueryOptions;
 import io.vertx.ext.consul.v1.ConsistencyMode;
-import io.vertx.ext.web.client.HttpRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +49,7 @@ public class Query {
   }
 
   public Query put(ConsistencyMode consistencyMode) {
-    return put();
+    return put(consistencyMode.name().toLowerCase(), true);
   }
 
   public Query put(BlockingQueryOptions options) {

@@ -903,6 +903,31 @@ Set the service name that the query was selecting.
 +++
 |===
 
+[[QueryOptions]]
+== QueryOptions
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[allowStale]]`@allowStale`|`Boolean`|-
+|[[connect]]`@connect`|`Boolean`|-
+|[[datacenter]]`@datacenter`|`String`|-
+|[[filter]]`@filter`|`String`|-
+|[[maxAgeSeconds]]`@maxAgeSeconds`|`Number (long)`|-
+|[[near]]`@near`|`String`|-
+|[[nodeMeta]]`@nodeMeta`|`String`|-
+|[[relayFactor]]`@relayFactor`|`Number (byte)`|-
+|[[requireConsistent]]`@requireConsistent`|`Boolean`|-
+|[[staleIfErrorSeconds]]`@staleIfErrorSeconds`|`Number (long)`|-
+|[[token]]`@token`|`String`|-
+|[[useCache]]`@useCache`|`Boolean`|-
+|[[waitHash]]`@waitHash`|`String`|-
+|[[waitIndex]]`@waitIndex`|`Number (long)`|-
+|[[waitTimeSeconds]]`@waitTimeSeconds`|`Number (long)`|-
+|===
+
 [[Service]]
 == Service
 
@@ -1246,5 +1271,28 @@ Returns the number of errors in this response
 |[[resultsSize]]`@resultsSize`|`Number (int)`|+++
 Returns the number of results in this response
 +++
+|===
+
+[[WriteOptions]]
+== WriteOptions
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[datacenter]]`@datacenter`|`String`|-
+|[[relayFactor]]`@relayFactor`|`Number (byte)`|-
+|[[token]]`@token`|`String`|-
+|===
+
+[[Xxx]]
+== Xxx
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
 |===
 

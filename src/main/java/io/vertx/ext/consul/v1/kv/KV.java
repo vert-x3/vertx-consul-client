@@ -1,35 +1,46 @@
 package io.vertx.ext.consul.v1.kv;
 
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.consul.KeyValueList;
-
-import java.util.List;
+import io.vertx.ext.consul.v1.QueryOptions;
+import io.vertx.ext.consul.v1.WriteOptions;
 
 
 /**
  * An object to consul /kv endpoint functionality interaction.
  */
+@VertxGen
 public interface KV {
 
-  KV get(String key, Handler<AsyncResult<KeyValueList>> resultHandler);
+  @Fluent
+  KV get(String key, QueryOptions options, Handler<AsyncResult<QueryMetaWith<KVPair>>> handler);
 
-  KV get(String key, KvGetOptions kvGetOptions, Handler<AsyncResult<KeyValueList>> resultHandler);
+  @Fluent
+  KV acquire(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Boolean>>> handler);
 
-  KV keys(String key, Handler<AsyncResult<List<String>>> resultHandler);
+  @Fluent
+  KV cas(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Boolean>>> handler);
 
-  KV keys(String key, KvGetOptions options, Handler<AsyncResult<List<String>>> resultHandler);
+  @Fluent
+  KV delete(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Void>>> handler);
 
-  KV raw(String key, Handler<AsyncResult<Buffer>> resultHandler);
+  @Fluent
+  KV deleteCas(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Boolean>>> handler);
 
-  KV raw(String key, KvGetOptions options, Handler<AsyncResult<Buffer>> resultHandler);
+  @Fluent
+  KV deleteTree(String prefix, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Void>>> handler);
 
-  KV put(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
+  @Fluent
+  KV keys(String prefix, String separator, QueryOptions options, Handler<AsyncResult<QueryMetaWithList<String>>> handler);
 
-  KV put(String key, String value, KvPutOptions options, Handler<AsyncResult<Boolean>> resultHandler);
+  @Fluent
+  KV keys(String prefix, QueryOptions options, Handler<AsyncResult<QueryMetaWithList<KVPair>>> handler);
 
-  KV delete(String key, Handler<AsyncResult<Boolean>> resultHandler);
+  @Fluent
+  KV put(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Void>>> handler);
 
-  KV delete(String key, KvDeleteOptions options, Handler<AsyncResult<Boolean>> resultHandler);
+  @Fluent
+  KV release(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Boolean>>> handler);
 }
