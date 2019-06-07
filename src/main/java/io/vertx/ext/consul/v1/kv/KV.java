@@ -2,9 +2,8 @@ package io.vertx.ext.consul.v1.kv;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.ext.consul.BlockingQueryOptions;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.KeyValueList;
-import io.vertx.ext.consul.v1.ConsistencyMode;
 
 import java.util.List;
 
@@ -21,6 +20,10 @@ public interface KV {
   KV keys(String key, Handler<AsyncResult<List<String>>> resultHandler);
 
   KV keys(String key, KvGetOptions options, Handler<AsyncResult<List<String>>> resultHandler);
+
+  KV raw(String key, Handler<AsyncResult<Buffer>> resultHandler);
+
+  KV raw(String key, KvGetOptions options, Handler<AsyncResult<Buffer>> resultHandler);
 
   KV put(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
 
