@@ -18,6 +18,7 @@ package io.vertx.ext.consul;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 
 import java.io.BufferedReader;
@@ -54,11 +55,11 @@ public class Utils {
    * @param runner blocking query parameters consumer. First parameter is consul index,
    *               second one is the future to collect next consul index for next try if query will be unsuccessful
    */
-  public static void waitBlockingQuery(CountDownLatch latch, int maxAttempts, long startIndex, BiConsumer<Long, Future<Long>> runner) {
+  public static void waitBlockingQuery(CountDownLatch latch, int maxAttempts, long startIndex, BiConsumer<Long, Promise<Long>> runner) {
     if (maxAttempts > 0) {
-      Future<Long> future = Future.future();
-      runner.accept(startIndex, future);
-      future.setHandler(h -> {
+      Promise<Long> promise = Promise.promise();
+      runner.accept(startIndex, promise);
+      promise.future().setHandler(h -> {
         if (h.succeeded()) {
           long nextIndex = h.result();
           if (nextIndex >= 0) {
@@ -77,7 +78,7 @@ public class Utils {
    * Completes future with next consul index in case of unsuccessful result, -1 else.
    * See {@link #waitBlockingQuery(CountDownLatch, int, long, BiConsumer)}
    */
-  public static void waitComplete(Vertx vertx, Future<Long> fut, long idx, boolean result) {
+  public static void waitComplete(Vertx vertx, Promise<Long> fut, long idx, boolean result) {
     if (result) {
       fut.complete(-1L);
     } else {
@@ -88,12 +89,12 @@ public class Utils {
 
   public static void runAsync(Consumer<Handler<AsyncResult<Void>>> runner) {
     CountDownLatch latch = new CountDownLatch(1);
-    Future<Void> future = Future.future();
+    Promise<Void> promise = Promise.promise();
     runner.accept(h -> {
       if (h.succeeded()) {
-        future.complete();
+        promise.complete();
       } else {
-        future.fail(h.cause());
+        promise.fail(h.cause());
       }
       latch.countDown();
     });
@@ -102,19 +103,19 @@ public class Utils {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    if (future.failed()) {
-      throw new RuntimeException(future.cause());
+    if (promise.future().failed()) {
+      throw new RuntimeException(promise.future().cause());
     }
   }
 
   public static <T> T getAsync(Consumer<Handler<AsyncResult<T>>> runner) {
     CountDownLatch latch = new CountDownLatch(1);
-    Future<T> future = Future.future();
+    Promise<T> promise = Promise.promise();
     runner.accept(h -> {
       if (h.succeeded()) {
-        future.complete(h.result());
+        promise.complete(h.result());
       } else {
-        future.fail(h.cause());
+        promise.fail(h.cause());
       }
       latch.countDown();
     });
@@ -123,10 +124,10 @@ public class Utils {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    if (future.succeeded()) {
-      return future.result();
+    if (promise.future().succeeded()) {
+      return promise.future().result();
     } else {
-      throw new RuntimeException(future.cause());
+      throw new RuntimeException(promise.future().cause());
     }
   }
 
