@@ -20,6 +20,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ConsulTestBase;
@@ -68,7 +69,11 @@ public class BrokenConsul extends ConsulTestBase {
 
   static class BrokenHttpServer extends CustomHttpServer {
     BrokenHttpServer(Vertx vertx) {
-      super(vertx, h -> h.response().putHeader(HttpHeaders.CONTENT_LENGTH, "10000").write("start and ... ").close());
+      super(vertx, h -> {
+        HttpServerResponse resp = h.response();
+        resp.putHeader(HttpHeaders.CONTENT_LENGTH, "10000").write("start and ... ");
+        resp.close();
+      });
     }
   }
 
