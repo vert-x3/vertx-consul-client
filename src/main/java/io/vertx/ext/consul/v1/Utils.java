@@ -1,6 +1,9 @@
 package io.vertx.ext.consul.v1;
 
+import io.vertx.core.MultiMap;
+import io.vertx.ext.consul.v1.kv.QueryMeta;
 import io.vertx.ext.web.client.HttpRequest;
+import io.vertx.ext.web.client.HttpResponse;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -70,6 +73,37 @@ public class Utils {
     }
     if (cc.size() > 0) {
       request.headers().set("Cache-Control", cc.stream().collect(Collectors.joining(", ")));
+    }
+  }
+
+  public static <T> void parseQueryMeta(HttpResponse<T> response, QueryMeta queryMeta) {
+    MultiMap headers = response.headers();
+    String indexStr = headers.get("X-Consul-Index");
+    if (indexStr != null && !indexStr.equals("")) {
+      long index = Long.parseUnsignedLong(indexStr, 10);
+      queryMeta.setLastIndex(index);
+    }
+    queryMeta.setLastContentHash(headers.get("X-Consul-ContentHash"));
+    long last = Long.parseUnsignedLong(headers.get("X-Consul-LastContact"), 10);
+    queryMeta.setLastContactMillis(last);
+    if (headers.get("X-Consul-KnownLeader").equals("true")) {
+      queryMeta.setKnownLeader(true);
+    } else {
+      queryMeta.setKnownLeader(false);
+    }
+    if (headers.get("X-Consul-Translate-Addresses").equals("true")) {
+      queryMeta.setAddressTranslationEnabled(true);
+    } else {
+      queryMeta.setAddressTranslationEnabled(false);
+    }
+    String cacheStr = headers.get("X-Cache");
+    if (cacheStr != null && !cacheStr.equals("")) {
+      queryMeta.setCacheHit(cacheStr.equalsIgnoreCase("HIT"));
+    }
+    String ageStr = headers.get("Age");
+    if (ageStr != null && !ageStr.equals("")) {
+      long age = Long.parseUnsignedLong(ageStr, 10);
+      queryMeta.setCacheAgeSeconds(age);
     }
   }
 }

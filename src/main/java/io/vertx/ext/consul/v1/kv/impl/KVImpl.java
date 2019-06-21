@@ -2,20 +2,24 @@ package io.vertx.ext.consul.v1.kv.impl;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.v1.ConsulRequester;
 import io.vertx.ext.consul.v1.QueryOptions;
+import io.vertx.ext.consul.v1.Utils;
 import io.vertx.ext.consul.v1.WriteOptions;
-import io.vertx.ext.consul.v1.kv.KV;
-import io.vertx.ext.consul.v1.kv.KVPair;
-import io.vertx.ext.consul.v1.kv.QueryMetaWith;
-import io.vertx.ext.consul.v1.kv.QueryMetaWithList;
+import io.vertx.ext.consul.v1.kv.*;
 import io.vertx.ext.web.client.HttpRequest;
+import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static io.vertx.ext.consul.impl.Utils.urlEncode;
 
@@ -34,19 +38,52 @@ public class KVImpl implements KV {
 
   @Override
   public KV get(String key, QueryOptions options, Handler<AsyncResult<QueryMetaWith<KVPair>>> handler) {
-    //    Query query = keyGetQuery(kvGetOptions);
-//    requester.request(KV_VALID_CODES, HttpMethod.GET, V1_KV + urlEncode(key), query, null, resultHandler, resp -> {
-//      if (resp.statusCode() == HttpResponseStatus.NOT_FOUND.code()) {
-//        return new KeyValueList();
-//      } else {
-//        List<KeyValue> list = resp.bodyAsJsonArray().stream().map(obj -> KVParser.parse((JsonObject) obj)).collect(Collectors.toList());
-//        return new KeyValueList().setList(list).setIndex(Long.parseLong(resp.headers().get(INDEX_HEADER)));
-//      }
-//    });
-//    return this;
-    HttpRequest<Buffer> bufferHttpRequest = webClient.get(V1_KV + urlEncode(key));
-
+    Promise<QueryMetaWith<Buffer>> promise = Promise.promise();
+    getInternal(key, new HashMap<>(0), options, promise);
+    promise.future().<QueryMetaWith<KVPair>>map(res -> {
+      if (res == null) {
+        return new QueryMetaWithImpl<>(res.queryMeta(), null);
+      } else {
+        KVPairImpl kvPair = res.with().toJsonObject().mapTo(KVPairImpl.class);
+        return new QueryMetaWithImpl<>(res.queryMeta(), kvPair);
+      }
+    }).setHandler(handler);
     return this;
+  }
+
+  private <T> void getInternal(String key,
+                               Map<String, String> params,
+                               QueryOptions options,
+                               Handler<AsyncResult<QueryMetaWith<Buffer>>> handler) {
+    HttpRequest<Buffer> r = webClient.get(V1_KV + urlEncode(key));
+    Utils.setQueryOptions(r, options);
+    for (Map.Entry<String, String> entry : params.entrySet()) {
+      r.setQueryParam(entry.getKey(), entry.getValue());
+    }
+    Promise<HttpResponse<Buffer>> promise = Promise.promise();
+    long tick = System.nanoTime();
+    r.send(promise);
+    promise.future().setHandler(result -> {
+      if (result.succeeded()) {
+        HttpResponse<Buffer> response = result.result();
+        QueryMeta queryMeta = new QueryMeta();
+        Utils.parseQueryMeta(response, queryMeta);
+        long tok = System.nanoTime();
+        long requestTime = tok - tick;
+        long requestTimeMillis = TimeUnit.NANOSECONDS.toMillis(requestTime);
+        queryMeta.setRequestTimeMillis(requestTimeMillis);
+        int statusCode = response.statusCode();
+        if (statusCode == 404) {
+          handler.handle(Future.succeededFuture(new QueryMetaWithImpl<>(queryMeta, null)));
+        } else if (statusCode != 200) {
+          handler.handle(Future.failedFuture(String.format("Unexpected response code: %d", statusCode)));
+        } else {
+          handler.handle(Future.succeededFuture(new QueryMetaWithImpl<>(queryMeta, response.body())));
+        }
+      } else {
+        handler.handle(Future.failedFuture(result.cause()));
+      }
+    });
   }
 
   @Override
@@ -93,7 +130,6 @@ public class KVImpl implements KV {
   public KV release(KVPair kvPair, WriteOptions writeOptions, Handler<AsyncResult<QueryMetaWith<Boolean>>> handler) {
     return null;
   }
-
 
 
 //  @Override
