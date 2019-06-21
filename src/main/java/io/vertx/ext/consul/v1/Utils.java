@@ -2,7 +2,9 @@ package io.vertx.ext.consul.v1;
 
 import io.vertx.ext.web.client.HttpRequest;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Utils {
   public static <T> void setQueryOptions(HttpRequest<T> request, QueryOptions options) {
@@ -55,6 +57,19 @@ public class Utils {
     }
     if (options.isConnect()) {
       request.addQueryParam("connect", Boolean.toString(true));
+    }
+    if (options.isUseCache() && !options.isRequireConsistent()) {
+      request.setQueryParam("cached", "");
+    }
+    ArrayList<String> cc = new ArrayList<>();
+    if (options.getMaxAgeSeconds() > 0) {
+      cc.add(String.format("max-age=%d", options.getMaxAgeSeconds()));
+    }
+    if (options.getStaleIfErrorSeconds() > 0) {
+      cc.add(String.format("stale-if-error=%d", options.getStaleIfErrorSeconds()));
+    }
+    if (cc.size() > 0) {
+      request.headers().set("Cache-Control", cc.stream().collect(Collectors.joining(", ")));
     }
   }
 }
