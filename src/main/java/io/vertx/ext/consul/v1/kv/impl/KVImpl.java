@@ -51,7 +51,7 @@ public class KVImpl implements KV {
     return this;
   }
 
-  private <T> void getInternal(String key,
+  private void getInternal(String key,
                                Map<String, String> params,
                                QueryOptions options,
                                Handler<AsyncResult<QueryMetaWith<Buffer>>> handler) {
@@ -66,7 +66,7 @@ public class KVImpl implements KV {
     promise.future().setHandler(result -> {
       if (result.succeeded()) {
         HttpResponse<Buffer> response = result.result();
-        QueryMeta queryMeta = new QueryMeta();
+        QueryMeta queryMeta = new QueryMetaImpl();
         Utils.parseQueryMeta(response, queryMeta);
         long tok = System.nanoTime();
         long requestTime = tok - tick;
