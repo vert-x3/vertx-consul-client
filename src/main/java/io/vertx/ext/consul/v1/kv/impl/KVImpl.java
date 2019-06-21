@@ -1,12 +1,10 @@
 package io.vertx.ext.consul.v1.kv.impl;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.consul.v1.ConsulRequester;
 import io.vertx.ext.consul.v1.QueryOptions;
 import io.vertx.ext.consul.v1.Utils;
 import io.vertx.ext.consul.v1.WriteOptions;
@@ -15,9 +13,7 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -25,14 +21,11 @@ import static io.vertx.ext.consul.impl.Utils.urlEncode;
 
 public class KVImpl implements KV {
 
-  private static final List<Integer> KV_VALID_CODES = Arrays.asList(HttpResponseStatus.OK.code(), HttpResponseStatus.NOT_FOUND.code());
   private final static String V1_KV = "/v1/kv/";
 
-  private ConsulRequester requester;
   private WebClient webClient;
 
-  public KVImpl(ConsulRequester requester, WebClient webClient) {
-    this.requester = requester;
+  public KVImpl(WebClient webClient) {
     this.webClient = webClient;
   }
 
