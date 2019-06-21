@@ -14,62 +14,62 @@ public class Utils {
     if (options == null) {
       return;
     }
-    String datacenter = options.getDatacenter();
+    String datacenter = options.datacenter();
     if (datacenter != null) {
       request.addQueryParam("dc", datacenter);
     }
-    if (options.isAllowStale()) {
+    if (options.allowStale()) {
       request.addQueryParam("stale", "");
     }
-    if (options.isRequireConsistent()) {
+    if (options.requireConsistent()) {
       request.addQueryParam("consistent", "");
     }
-    long waitIndex = options.getWaitIndex();
+    long waitIndex = options.waitIndex();
     if (waitIndex != 0) {
       request.addQueryParam("index", Long.toUnsignedString(waitIndex));
     }
-    long waitTimeMillis = options.getWaitTimeMillis();
+    long waitTimeMillis = options.waitTimeMillis();
     if (waitTimeMillis != 0) {
       request.addQueryParam("wait", String.format("%dms", waitIndex));
     }
-    String waitHash = options.getWaitHash();
+    String waitHash = options.waitHash();
     if (waitHash != null) {
       request.addQueryParam("hash", waitHash);
     }
-    String token = options.getToken();
+    String token = options.token();
     if (token != null) {
       request.putHeader("X-Consul-Token", token);
     }
-    String near = options.getNear();
+    String near = options.near();
     if (near != null) {
       request.putHeader("near", near);
     }
-    String filter = options.getFilter();
+    String filter = options.filter();
     if (filter != null) {
       request.addQueryParam("filter", filter);
     }
-    Map<String, String> nodeMeta = options.getNodeMeta();
+    Map<String, String> nodeMeta = options.nodeMeta();
     if (nodeMeta != null && nodeMeta.size() > 0) {
       for (Map.Entry<String, String> entry : nodeMeta.entrySet()) {
         request.addQueryParam("node-meta", entry.getKey() + ":" + entry.getValue());
       }
     }
-    byte relayFactor = options.getRelayFactor();
+    byte relayFactor = options.relayFactor();
     if (relayFactor != 0) {
       request.addQueryParam("relay-factor", Long.toUnsignedString(Byte.toUnsignedLong(relayFactor)));
     }
-    if (options.isConnect()) {
+    if (options.connect()) {
       request.addQueryParam("connect", Boolean.toString(true));
     }
-    if (options.isUseCache() && !options.isRequireConsistent()) {
+    if (options.useCache() && !options.requireConsistent()) {
       request.setQueryParam("cached", "");
     }
     ArrayList<String> cc = new ArrayList<>();
-    if (options.getMaxAgeSeconds() > 0) {
-      cc.add(String.format("max-age=%d", options.getMaxAgeSeconds()));
+    if (options.maxAgeSeconds() > 0) {
+      cc.add(String.format("max-age=%d", options.maxAgeSeconds()));
     }
-    if (options.getStaleIfErrorSeconds() > 0) {
-      cc.add(String.format("stale-if-error=%d", options.getStaleIfErrorSeconds()));
+    if (options.staleIfErrorSeconds() > 0) {
+      cc.add(String.format("stale-if-error=%d", options.staleIfErrorSeconds()));
     }
     if (cc.size() > 0) {
       request.headers().set("Cache-Control", cc.stream().collect(Collectors.joining(", ")));
