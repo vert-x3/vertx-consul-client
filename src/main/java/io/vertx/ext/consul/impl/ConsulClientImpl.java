@@ -69,8 +69,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<JsonObject> agentInfo() {
+    Promise<JsonObject> promise = Promise.promise();
+    agentInfo(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler) {
     return coordinateNodesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public Future<CoordinateList> coordinateNodes() {
+    Promise<CoordinateList> promise = Promise.promise();
+    coordinateNodes(promise);
+    return promise.future();
   }
 
   @Override
@@ -83,6 +97,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<CoordinateList> coordinateNodesWithOptions(BlockingQueryOptions options) {
+    Promise<CoordinateList> promise = Promise.promise();
+    coordinateNodesWithOptions(options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/coordinate/datacenters", null, null, resultHandler, (arr, headers) ->
       arr.stream().map(obj -> CoordinateParser.parseDc((JsonObject) obj)).collect(Collectors.toList())
@@ -91,8 +112,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<DcCoordinates>> coordinateDatacenters() {
+    Promise<List<DcCoordinates>> promise = Promise.promise();
+    coordinateDatacenters(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient getKeys(String keyPrefix, Handler<AsyncResult<List<String>>> resultHandler) {
     return getKeysWithOptions(keyPrefix, null, resultHandler);
+  }
+
+  @Override
+  public Future<List<String>> getKeys(String keyPrefix) {
+    Promise<List<String>> promise = Promise.promise();
+    getKeys(keyPrefix, promise);
+    return promise.future();
   }
 
   @Override
@@ -109,8 +144,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<String>> getKeysWithOptions(String keyPrefix, BlockingQueryOptions options) {
+    Promise<List<String>> promise = Promise.promise();
+    getKeysWithOptions(keyPrefix, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler) {
     return getValueWithOptions(key, null, resultHandler);
+  }
+
+  @Override
+  public Future<KeyValue> getValue(String key) {
+    Promise<KeyValue> promise = Promise.promise();
+    getValue(key, promise);
+    return promise.future();
   }
 
   @Override
@@ -126,14 +175,35 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<KeyValue> getValueWithOptions(String key, BlockingQueryOptions options) {
+    Promise<KeyValue> promise = Promise.promise();
+    getValueWithOptions(key, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler) {
     requestVoid(HttpMethod.DELETE, "/v1/kv/" + urlEncode(key), null, null, resultHandler);
     return this;
   }
 
   @Override
+  public Future<Void> deleteValue(String key) {
+    Promise<Void> promise = Promise.promise();
+    deleteValue(key, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler) {
     return getValuesWithOptions(keyPrefix, null, resultHandler);
+  }
+
+  @Override
+  public Future<KeyValueList> getValues(String keyPrefix) {
+    Promise<KeyValueList> promise = Promise.promise();
+    getValues(keyPrefix, promise);
+    return promise.future();
   }
 
   @Override
@@ -151,14 +221,35 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<KeyValueList> getValuesWithOptions(String keyPrefix, BlockingQueryOptions options) {
+    Promise<KeyValueList> promise = Promise.promise();
+    getValuesWithOptions(keyPrefix, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler) {
     requestVoid(HttpMethod.DELETE, "/v1/kv/" + urlEncode(keyPrefix), Query.of("recurse", true), null, resultHandler);
     return this;
   }
 
   @Override
+  public Future<Void> deleteValues(String keyPrefix) {
+    Promise<Void> promise = Promise.promise();
+    deleteValues(keyPrefix, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler) {
     return putValueWithOptions(key, value, null, resultHandler);
+  }
+
+  @Override
+  public Future<Boolean> putValue(String key, String value) {
+    Promise<Boolean> promise = Promise.promise();
+    putValue(key, value, promise);
+    return promise.future();
   }
 
   @Override
@@ -179,10 +270,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Boolean> putValueWithOptions(String key, String value, KeyValueOptions options) {
+    Promise<Boolean> promise = Promise.promise();
+    putValueWithOptions(key, value, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler) {
     String boby = request.toJson().getJsonArray("operations").encode();
     request(TXN_VALID_CODES, HttpMethod.PUT, "/v1/txn", null, boby, resultHandler, resp -> TxnResponseParser.parse(resp.bodyAsJsonObject()));
     return this;
+  }
+
+  @Override
+  public Future<TxnResponse> transaction(TxnRequest request) {
+    Promise<TxnResponse> promise = Promise.promise();
+    transaction(request, promise);
+    return promise.future();
   }
 
   @Override
@@ -193,6 +298,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<String> createAclToken(AclToken token) {
+    Promise<String> promise = Promise.promise();
+    createAclToken(token, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
     requestObject(HttpMethod.PUT, "/v1/acl/update", null, token.toJson().encode(), idHandler, (obj, headers) ->
       obj.getString("ID"));
@@ -200,10 +312,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<String> updateAclToken(AclToken token) {
+    Promise<String> promise = Promise.promise();
+    updateAclToken(token, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler) {
     requestObject(HttpMethod.PUT, "/v1/acl/clone/" + urlEncode(id), null, null, idHandler, (obj, headers) ->
       obj.getString("ID"));
     return this;
+  }
+
+  @Override
+  public Future<String> cloneAclToken(String id) {
+    Promise<String> promise = Promise.promise();
+    cloneAclToken(id, promise);
+    return promise.future();
   }
 
   @Override
@@ -216,6 +342,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<AclToken>> listAclTokens() {
+    Promise<List<AclToken>> promise = Promise.promise();
+    listAclTokens(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler) {
     requestArray(HttpMethod.GET, "/v1/acl/info/" + urlEncode(id), null, null, tokenHandler, (arr, headers) -> {
       JsonObject jsonObject = arr.getJsonObject(0);
@@ -225,15 +358,36 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<AclToken> infoAclToken(String id) {
+    Promise<AclToken> promise = Promise.promise();
+    infoAclToken(id, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler) {
     requestVoid(HttpMethod.PUT, "/v1/acl/destroy/" + urlEncode(id), null, null, resultHandler);
     return this;
   }
 
   @Override
+  public Future<Void> destroyAclToken(String id) {
+    Promise<Void> promise = Promise.promise();
+    destroyAclToken(id, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient fireEvent(String name, Handler<AsyncResult<Event>> resultHandler) {
     fireEventWithOptions(name, null, resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<Event> fireEvent(String name) {
+    Promise<Event> promise = Promise.promise();
+    fireEvent(name, promise);
+    return promise.future();
   }
 
   @Override
@@ -248,9 +402,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Event> fireEventWithOptions(String name, EventOptions options) {
+    Promise<Event> promise = Promise.promise();
+    fireEventWithOptions(name, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler) {
     listEventsWithOptions(null, resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<EventList> listEvents() {
+    Promise<EventList> promise = Promise.promise();
+    listEvents(promise);
+    return promise.future();
   }
 
   @Override
@@ -261,6 +429,13 @@ public class ConsulClientImpl implements ConsulClient {
       return new EventList().setList(list).setIndex(Long.parseUnsignedLong(headers.get(INDEX_HEADER)));
     });
     return this;
+  }
+
+  @Override
+  public Future<EventList> listEventsWithOptions(EventListOptions options) {
+    Promise<EventList> promise = Promise.promise();
+    listEventsWithOptions(options, promise);
+    return promise.future();
   }
 
   @Override
@@ -282,10 +457,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> registerService(ServiceOptions serviceOptions) {
+    Promise<Void> promise = Promise.promise();
+    registerService(serviceOptions, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient maintenanceService(MaintenanceOptions opts, Handler<AsyncResult<Void>> resultHandler) {
     Query query = Query.of("enable", opts.isEnable()).put("reason", opts.getReason());
     requestVoid(HttpMethod.PUT, "/v1/agent/service/maintenance/" + urlEncode(opts.getId()), query, null, resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<Void> maintenanceService(MaintenanceOptions maintenanceOptions) {
+    Promise<Void> promise = Promise.promise();
+    maintenanceService(maintenanceOptions, promise);
+    return promise.future();
   }
 
   @Override
@@ -295,8 +484,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> deregisterService(String id) {
+    Promise<Void> promise = Promise.promise();
+    deregisterService(id, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler) {
     return catalogServiceNodesWithOptions(service, null, resultHandler);
+  }
+
+  @Override
+  public Future<ServiceList> catalogServiceNodes(String service) {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogServiceNodes(service, promise);
+    return promise.future();
   }
 
   @Override
@@ -310,14 +513,35 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<ServiceList> catalogServiceNodesWithOptions(String service, ServiceQueryOptions options) {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogServiceNodesWithOptions(service, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/catalog/datacenters", null, null, resultHandler, (arr, headers) -> listOf(arr));
     return this;
   }
 
   @Override
+  public Future<List<String>> catalogDatacenters() {
+    Promise<List<String>> promise = Promise.promise();
+    catalogDatacenters(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient catalogNodes(Handler<AsyncResult<NodeList>> resultHandler) {
     return catalogNodesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public Future<NodeList> catalogNodes() {
+    Promise<NodeList> promise = Promise.promise();
+    catalogNodes(promise);
+    return promise.future();
   }
 
   @Override
@@ -331,8 +555,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<NodeList> catalogNodesWithOptions(NodeQueryOptions options) {
+    Promise<NodeList> promise = Promise.promise();
+    catalogNodesWithOptions(options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient healthChecks(String service, Handler<AsyncResult<CheckList>> resultHandler) {
     return healthChecksWithOptions(service, null, resultHandler);
+  }
+
+  @Override
+  public Future<CheckList> healthChecks(String service) {
+    Promise<CheckList> promise = Promise.promise();
+    healthChecks(service, promise);
+    return promise.future();
   }
 
   @Override
@@ -346,8 +584,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<CheckList> healthChecksWithOptions(String service, CheckQueryOptions options) {
+    Promise<CheckList> promise = Promise.promise();
+    healthChecksWithOptions(service, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient healthState(HealthState healthState, Handler<AsyncResult<CheckList>> resultHandler) {
     return healthStateWithOptions(healthState, null, resultHandler);
+  }
+
+  @Override
+  public Future<CheckList> healthState(HealthState healthState) {
+    Promise<CheckList> promise = Promise.promise();
+    healthState(healthState, promise);
+    return promise.future();
   }
 
   @Override
@@ -361,8 +613,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<CheckList> healthStateWithOptions(HealthState healthState, CheckQueryOptions options) {
+    Promise<CheckList> promise = Promise.promise();
+    healthStateWithOptions(healthState, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler) {
     return healthServiceNodesWithOptions(service, passing, null, resultHandler);
+  }
+
+  @Override
+  public Future<ServiceEntryList> healthServiceNodes(String service, boolean passing) {
+    Promise<ServiceEntryList> promise = Promise.promise();
+    healthServiceNodes(service, passing, promise);
+    return promise.future();
   }
 
   @Override
@@ -379,8 +645,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<ServiceEntryList> healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options) {
+    Promise<ServiceEntryList> promise = Promise.promise();
+    healthServiceNodesWithOptions(service, passing, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler) {
     return catalogServicesWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public Future<ServiceList> catalogServices() {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogServices(promise);
+    return promise.future();
   }
 
   @Override
@@ -393,11 +673,25 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<ServiceList> catalogServicesWithOptions(BlockingQueryOptions options) {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogServicesWithOptions(options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/agent/checks", null, null, resultHandler, (json, headers) -> json.stream()
       .map(obj -> CheckParser.parse((JsonObject) obj.getValue()))
       .collect(Collectors.toList()));
     return this;
+  }
+
+  @Override
+  public Future<List<Check>> localChecks() {
+    Promise<List<Check>> promise = Promise.promise();
+    localChecks(promise);
+    return promise.future();
   }
 
   @Override
@@ -409,8 +703,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<Service>> localServices() {
+    Promise<List<Service>> promise = Promise.promise();
+    localServices(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler) {
     return catalogNodeServicesWithOptions(node, null, resultHandler);
+  }
+
+  @Override
+  public Future<ServiceList> catalogNodeServices(String node) {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogNodeServices(node, promise);
+    return promise.future();
   }
 
   @Override
@@ -428,9 +736,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<ServiceList> catalogNodeServicesWithOptions(String node, BlockingQueryOptions options) {
+    Promise<ServiceList> promise = Promise.promise();
+    catalogNodeServicesWithOptions(node, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
     requestVoid(HttpMethod.PUT, "/v1/agent/check/register", null, checkOpts(checkOptions, true).encode(), resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<Void> registerCheck(CheckOptions checkOptions) {
+    Promise<Void> promise = Promise.promise();
+    registerCheck(checkOptions, promise);
+    return promise.future();
   }
 
   private static JsonObject checkOpts(CheckOptions checkOptions, boolean extended) {
@@ -467,8 +789,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> deregisterCheck(String checkId) {
+    Promise<Void> promise = Promise.promise();
+    deregisterCheck(checkId, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     return passCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public Future<Void> passCheck(String checkId) {
+    Promise<Void> promise = Promise.promise();
+    passCheck(checkId, promise);
+    return promise.future();
   }
 
   @Override
@@ -478,8 +814,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> passCheckWithNote(String checkId, String note) {
+    Promise<Void> promise = Promise.promise();
+    passCheckWithNote(checkId, note, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     return warnCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public Future<Void> warnCheck(String checkId) {
+    Promise<Void> promise = Promise.promise();
+    warnCheck(checkId, promise);
+    return promise.future();
   }
 
   @Override
@@ -489,8 +839,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> warnCheckWithNote(String checkId, String note) {
+    Promise<Void> promise = Promise.promise();
+    warnCheckWithNote(checkId, note, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler) {
     return failCheckWithNote(checkId, null, resultHandler);
+  }
+
+  @Override
+  public Future<Void> failCheck(String checkId) {
+    Promise<Void> promise = Promise.promise();
+    failCheck(checkId, promise);
+    return promise.future();
   }
 
   @Override
@@ -500,8 +864,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> failCheckWithNote(String checkId, String note) {
+    Promise<Void> promise = Promise.promise();
+    failCheckWithNote(checkId, note, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler) {
     return updateCheckWithNote(checkId, status, null, resultHandler);
+  }
+
+  @Override
+  public Future<Void> updateCheck(String checkId, CheckStatus status) {
+    Promise<Void> promise = Promise.promise();
+    updateCheck(checkId, status, promise);
+    return promise.future();
   }
 
   @Override
@@ -515,10 +893,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> updateCheckWithNote(String checkId, CheckStatus status, String note) {
+    Promise<Void> promise = Promise.promise();
+    updateCheckWithNote(checkId, status, note, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler) {
     requestString(HttpMethod.GET, "/v1/status/leader", null, null, resultHandler, (leader, headers) ->
       leader.substring(1, leader.length() - 2));
     return this;
+  }
+
+  @Override
+  public Future<String> leaderStatus() {
+    Promise<String> promise = Promise.promise();
+    leaderStatus(promise);
+    return promise.future();
   }
 
   @Override
@@ -530,9 +922,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<String>> peersStatus() {
+    Promise<List<String>> promise = Promise.promise();
+    peersStatus(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient createSession(Handler<AsyncResult<String>> idHandler) {
     createSessionWithOptions(null, idHandler);
     return this;
+  }
+
+  @Override
+  public Future<String> createSession() {
+    Promise<String> promise = Promise.promise();
+    createSession(promise);
+    return promise.future();
   }
 
   @Override
@@ -543,8 +949,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<String> createSessionWithOptions(SessionOptions options) {
+    Promise<String> promise = Promise.promise();
+    createSessionWithOptions(options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler) {
     return infoSessionWithOptions(id, null, resultHandler);
+  }
+
+  @Override
+  public Future<Session> infoSession(String id) {
+    Promise<Session> promise = Promise.promise();
+    infoSession(id, promise);
+    return promise.future();
   }
 
   @Override
@@ -560,6 +980,13 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Session> infoSessionWithOptions(String id, BlockingQueryOptions options) {
+    Promise<Session> promise = Promise.promise();
+    infoSessionWithOptions(id, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler) {
     requestArray(HttpMethod.PUT, "/v1/session/renew/" + urlEncode(id), null, null, resultHandler, (arr, headers) ->
       SessionParser.parse(arr.getJsonObject(0)));
@@ -567,8 +994,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Session> renewSession(String id) {
+    Promise<Session> promise = Promise.promise();
+    renewSession(id, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient listSessions(Handler<AsyncResult<SessionList>> resultHandler) {
     return listSessionsWithOptions(null, resultHandler);
+  }
+
+  @Override
+  public Future<SessionList> listSessions() {
+    Promise<SessionList> promise = Promise.promise();
+    listSessions(promise);
+    return promise.future();
   }
 
   @Override
@@ -581,8 +1022,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<SessionList> listSessionsWithOptions(BlockingQueryOptions options) {
+    Promise<SessionList> promise = Promise.promise();
+    listSessionsWithOptions(options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler) {
     return listNodeSessionsWithOptions(nodeId, null, resultHandler);
+  }
+
+  @Override
+  public Future<SessionList> listNodeSessions(String nodeId) {
+    Promise<SessionList> promise = Promise.promise();
+    listNodeSessions(nodeId, promise);
+    return promise.future();
   }
 
   @Override
@@ -595,9 +1050,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<SessionList> listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options) {
+    Promise<SessionList> promise = Promise.promise();
+    listNodeSessionsWithOptions(nodeId, options, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler) {
     requestVoid(HttpMethod.PUT, "/v1/session/destroy/" + urlEncode(id), null, null, resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<Void> destroySession(String id) {
+    Promise<Void> promise = Promise.promise();
+    destroySession(id, promise);
+    return promise.future();
   }
 
   @Override
@@ -607,9 +1076,23 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<String> createPreparedQuery(PreparedQueryDefinition definition) {
+    Promise<String> promise = Promise.promise();
+    createPreparedQuery(definition, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler) {
     getPreparedQueryList(id, h -> resultHandler.handle(h.map(list -> list.get(0))));
     return this;
+  }
+
+  @Override
+  public Future<PreparedQueryDefinition> getPreparedQuery(String id) {
+    Promise<PreparedQueryDefinition> promise = Promise.promise();
+    getPreparedQuery(id, promise);
+    return promise.future();
   }
 
   @Override
@@ -619,10 +1102,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<List<PreparedQueryDefinition>> getAllPreparedQueries() {
+    Promise<List<PreparedQueryDefinition>> promise = Promise.promise();
+    getAllPreparedQueries(promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler) {
     String path = "/v1/query/" + urlEncode(definition.getId());
     requestVoid(HttpMethod.PUT, path, null, definition.toJson().encode(), resultHandler);
     return this;
+  }
+
+  @Override
+  public Future<Void> updatePreparedQuery(PreparedQueryDefinition definition) {
+    Promise<Void> promise = Promise.promise();
+    updatePreparedQuery(definition, promise);
+    return promise.future();
   }
 
   private void getPreparedQueryList(String id, Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler) {
@@ -638,8 +1135,22 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<Void> deletePreparedQuery(String id) {
+    Promise<Void> promise = Promise.promise();
+    deletePreparedQuery(id, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler) {
     return executePreparedQueryWithOptions(query, null, resultHandler);
+  }
+
+  @Override
+  public Future<PreparedQueryExecuteResponse> executePreparedQuery(String query) {
+    Promise<PreparedQueryExecuteResponse> promise = Promise.promise();
+    executePreparedQuery(query, promise);
+    return promise.future();
   }
 
   @Override
@@ -660,6 +1171,13 @@ public class ConsulClientImpl implements ConsulClient {
           .collect(Collectors.toList()));
     });
     return this;
+  }
+
+  @Override
+  public Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options) {
+    Promise<PreparedQueryExecuteResponse> promise = Promise.promise();
+    executePreparedQueryWithOptions(query, options, promise);
+    return promise.future();
   }
 
   @Override
