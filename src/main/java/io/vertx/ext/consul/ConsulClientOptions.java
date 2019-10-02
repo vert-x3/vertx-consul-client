@@ -989,5 +989,33 @@ public class ConsulClientOptions extends WebClientOptions {
     return (ConsulClientOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
   }
 
+  @Override
+  public ConsulClientOptions setSslHandshakeTimeout(long sslHandshakeTimeout) {
+    return (ConsulClientOptions) super.setSslHandshakeTimeout(sslHandshakeTimeout);
+  }
 
+  @Override
+  public ConsulClientOptions setSslHandshakeTimeoutUnit(TimeUnit sslHandshakeTimeoutUnit) {
+    return (ConsulClientOptions) super.setSslHandshakeTimeoutUnit(sslHandshakeTimeoutUnit);
+  }
+
+  @Override
+  public ConsulClientOptions setTryUsePerMessageWebsocketCompression(boolean offer) {
+    return (ConsulClientOptions) super.setTryUsePerMessageWebsocketCompression(offer);
+  }
+
+  @Override
+  public ConsulClientOptions setWebsocketCompressionLevel(int compressionLevel) {
+    return (ConsulClientOptions) super.setWebsocketCompressionLevel(compressionLevel);
+  }
+
+  @Override
+  public ConsulClientOptions setWebsocketCompressionAllowClientNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebsocketCompressionAllowClientNoContext(offer);
+  }
+
+  @Override
+  public ConsulClientOptions setWebsocketCompressionRequestServerNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebsocketCompressionRequestServerNoContext(offer);
+  }
 }
