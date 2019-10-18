@@ -34,6 +34,7 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collector;
 
 /**
@@ -58,10 +59,19 @@ public class ConsulAgent {
       .put("leave_on_terminate", true)
       .put("datacenter", dc.getName())
       .put("node_name", options.getNodeName())
-      .put("node_id", options.getNodeId())
-      .put("acl_default_policy", "deny")
-      .put("acl_master_token", dc.getMasterToken())
-      .put("acl_datacenter", dc.getName());
+      .put("node_id", options.getNodeId());
+    if (options.getConsulVersion().compareTo("1.4.0") >= 0) {
+      cfg.put("acl", new JsonObject()
+          .put("enabled", true)
+          .put("default_policy", "deny")
+          .put("tokens", new JsonObject().put("master", dc.getMasterToken()))
+        )
+        .put("primary_datacenter", dc.getName());
+    } else {
+      cfg.put("acl_default_policy", "deny")
+        .put("acl_master_token", dc.getMasterToken())
+        .put("acl_datacenter", dc.getName());
+    }
     if (options.getConsulVersion().compareTo("0.8.0") < 0) {
       cfg.put("ports", new JsonObject().put("rpc", getFreePort()));
     }
