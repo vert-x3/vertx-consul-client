@@ -13,7 +13,7 @@
 
   <properties>
     <stack.version>3.9.0-SNAPSHOT</stack.version>
-    <embedded.consul.version>1.0.0</embedded.consul.version>
+    <embedded.consul.version>2.1.4</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.12</junit.version>
   </properties>
