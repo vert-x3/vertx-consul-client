@@ -15,6 +15,8 @@
  */
 package io.vertx.ext.consul.dc;
 
+import java.util.UUID;
+
 import static io.vertx.test.core.TestUtils.randomAlphaString;
 import static io.vertx.test.core.TestUtils.randomPositiveInt;
 
@@ -28,7 +30,7 @@ public class ConsulDatacenterOptions {
 
   public ConsulDatacenterOptions() {
     name = "dc-" + randomPositiveInt();
-    masterToken = randomAlphaString(16);
+    masterToken = UUID.randomUUID().toString();
   }
 
   public String getName() {
