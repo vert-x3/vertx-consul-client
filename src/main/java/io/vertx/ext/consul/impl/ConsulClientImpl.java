@@ -1235,27 +1235,31 @@ public class ConsulClientImpl implements ConsulClient {
     if (timeoutMs > 0) {
       rq.timeout(timeoutMs);
     }
-    rq.sendBuffer(body == null ? Buffer.buffer() : Buffer.buffer(body), h -> {
-      if (h.succeeded()) {
-        HttpResponse<Buffer> resp = h.result();
-        if (validCodes.contains(resp.statusCode())) {
-          T mapped;
-          try {
-            mapped = mapper.apply(resp);
-          } catch (Throwable throwable) {
-            resultHandler.handle(Future.failedFuture(throwable));
-            return;
+    try {
+      rq.sendBuffer(body == null ? Buffer.buffer() : Buffer.buffer(body), h -> {
+        if (h.succeeded()) {
+          HttpResponse<Buffer> resp = h.result();
+          if (validCodes.contains(resp.statusCode())) {
+            T mapped;
+            try {
+              mapped = mapper.apply(resp);
+            } catch (Throwable throwable) {
+              resultHandler.handle(Future.failedFuture(throwable));
+              return;
+            }
+            resultHandler.handle(Future.succeededFuture(mapped));
+          } else {
+            resultHandler.handle(Future.failedFuture(
+              String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()))
+            );
           }
-          resultHandler.handle(Future.succeededFuture(mapped));
         } else {
-          resultHandler.handle(Future.failedFuture(
-            String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()))
-          );
+          resultHandler.handle(Future.failedFuture(h.cause()));
         }
-      } else {
-        resultHandler.handle(Future.failedFuture(h.cause()));
-      }
-    });
+      });
+    } catch (final IllegalStateException e) {
+      resultHandler.handle(Future.failedFuture(e));
+    }
   }
 
 }
