@@ -15,6 +15,8 @@
  */
 package io.vertx.ext.consul;
 
+import io.vertx.codegen.annotations.VertxGen;
+
 /**
  * Acl token type is either "client" (meaning the token cannot modify ACL rules) or "management"
  * (meaning the token is allowed to perform all actions).
@@ -22,6 +24,7 @@ package io.vertx.ext.consul;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/internals/acl.html">Acl Consul system</a>
  */
+@VertxGen
 public enum AclTokenType {
 
   CLIENT("client"),
