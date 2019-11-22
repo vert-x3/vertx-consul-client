@@ -15,11 +15,10 @@
  */
 package io.vertx.ext.consul.dc;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pszymczyk.consul.ConsulProcess;
 import com.pszymczyk.consul.ConsulStarterBuilder;
 import com.pszymczyk.consul.LogLevel;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.http.HttpResponse;
@@ -34,15 +33,12 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collector;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class ConsulAgent {
-
-  private static final ObjectMapper mapper = new ObjectMapper();
 
   private final ConsulProcess process;
   private final String consulVersion;
@@ -131,14 +127,13 @@ public class ConsulAgent {
     Map<String, String> tokenRequest = new HashMap<>();
     tokenRequest.put("Type", "client");
     tokenRequest.put("Rules", rules);
-    put.setEntity(new StringEntity(mapper.writeValueAsString(tokenRequest)));
+    put.setEntity(new StringEntity(Json.encode(tokenRequest)));
     HttpResponse response = client.execute(put);
     if (response.getStatusLine().getStatusCode() != 200) {
       throw new RuntimeException("Bad response");
     }
-    Map<String, String> tokenResponse = mapper.readValue(EntityUtils.toString(response.getEntity()), new TypeReference<Map<String, String>>() {
-    });
-    return tokenResponse.get("ID");
+    JsonObject tokenResponse = new JsonObject(EntityUtils.toString(response.getEntity()));
+    return tokenResponse.getString("ID");
   }
 
   public int getSerfLanPort() {
