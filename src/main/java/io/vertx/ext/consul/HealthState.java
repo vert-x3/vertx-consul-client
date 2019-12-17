@@ -15,11 +15,14 @@
  */
 package io.vertx.ext.consul;
 
+import io.vertx.codegen.annotations.VertxGen;
+
 /**
  * Represents an health states.
  *
  * @author Lukas Prettenthaler
  */
+@VertxGen
 public enum HealthState {
 
   PASSING("passing"),

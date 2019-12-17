@@ -15,12 +15,15 @@
  */
 package io.vertx.ext.consul;
 
+import io.vertx.codegen.annotations.VertxGen;
+
 /**
  * Represents an check status.
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/agent/checks.html">Consul checks documentation</a>
  */
+@VertxGen
 public enum CheckStatus {
 
   PASSING("passing"),
