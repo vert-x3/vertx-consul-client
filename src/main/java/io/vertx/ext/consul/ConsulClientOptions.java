@@ -1000,5 +1000,48 @@ public class ConsulClientOptions extends WebClientOptions {
     return (ConsulClientOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
   }
 
+  @Override
+  public ConsulClientOptions setMaxWebSocketFrameSize(int maxWebsocketFrameSize) {
+    return (ConsulClientOptions) super.setMaxWebSocketFrameSize(maxWebsocketFrameSize);
+  }
 
+  @Override
+  public ConsulClientOptions setMaxWebSocketMessageSize(int maxWebsocketMessageSize) {
+    return (ConsulClientOptions) super.setMaxWebSocketMessageSize(maxWebsocketMessageSize);
+  }
+
+  @Override
+  public ConsulClientOptions setSslHandshakeTimeout(long sslHandshakeTimeout) {
+    return (ConsulClientOptions) super.setSslHandshakeTimeout(sslHandshakeTimeout);
+  }
+
+  @Override
+  public ConsulClientOptions setSslHandshakeTimeoutUnit(TimeUnit sslHandshakeTimeoutUnit) {
+    return (ConsulClientOptions) super.setSslHandshakeTimeoutUnit(sslHandshakeTimeoutUnit);
+  }
+
+  @Override
+  public ConsulClientOptions setTryUsePerFrameWebSocketCompression(boolean offer) {
+    return (ConsulClientOptions) super.setTryUsePerFrameWebSocketCompression(offer);
+  }
+
+  @Override
+  public ConsulClientOptions setTryUsePerMessageWebSocketCompression(boolean offer) {
+    return (ConsulClientOptions) super.setTryUsePerMessageWebSocketCompression(offer);
+  }
+
+  @Override
+  public ConsulClientOptions setWebSocketCompressionLevel(int compressionLevel) {
+    return (ConsulClientOptions) super.setWebSocketCompressionLevel(compressionLevel);
+  }
+
+  @Override
+  public ConsulClientOptions setWebSocketCompressionAllowClientNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebSocketCompressionAllowClientNoContext(offer);
+  }
+
+  @Override
+  public ConsulClientOptions setWebSocketCompressionRequestServerNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebSocketCompressionRequestServerNoContext(offer);
+  }
 }
