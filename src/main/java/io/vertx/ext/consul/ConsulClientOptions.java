@@ -647,8 +647,8 @@ public class ConsulClientOptions extends WebClientOptions {
    * @return a reference to this, so the API can be used fluently
    */
   @Override
-  public ConsulClientOptions setMaxWebsocketFrameSize(int maxWebsocketFrameSize) {
-    return (ConsulClientOptions) super.setMaxWebsocketFrameSize(maxWebsocketFrameSize);
+  public ConsulClientOptions setMaxWebSocketFrameSize(int maxWebsocketFrameSize) {
+    return (ConsulClientOptions) super.setMaxWebSocketFrameSize(maxWebsocketFrameSize);
   }
 
   /**
@@ -893,8 +893,8 @@ public class ConsulClientOptions extends WebClientOptions {
    * @return a reference to this, so the API can be used fluently
    */
   @Override
-  public ConsulClientOptions setMaxWebsocketMessageSize(int maxWebsocketMessageSize) {
-    return (ConsulClientOptions) super.setMaxWebsocketMessageSize(maxWebsocketMessageSize);
+  public ConsulClientOptions setMaxWebSocketMessageSize(int maxWebsocketMessageSize) {
+    return (ConsulClientOptions) super.setMaxWebSocketMessageSize(maxWebsocketMessageSize);
   }
 
   /**
@@ -1000,22 +1000,22 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   @Override
-  public ConsulClientOptions setTryUsePerMessageWebsocketCompression(boolean offer) {
-    return (ConsulClientOptions) super.setTryUsePerMessageWebsocketCompression(offer);
+  public ConsulClientOptions setTryUsePerMessageWebSocketCompression(boolean offer) {
+    return (ConsulClientOptions) super.setTryUsePerMessageWebSocketCompression(offer);
   }
 
   @Override
-  public ConsulClientOptions setWebsocketCompressionLevel(int compressionLevel) {
-    return (ConsulClientOptions) super.setWebsocketCompressionLevel(compressionLevel);
+  public ConsulClientOptions setWebSocketCompressionLevel(int compressionLevel) {
+    return (ConsulClientOptions) super.setWebSocketCompressionLevel(compressionLevel);
   }
 
   @Override
-  public ConsulClientOptions setWebsocketCompressionAllowClientNoContext(boolean offer) {
-    return (ConsulClientOptions) super.setWebsocketCompressionAllowClientNoContext(offer);
+  public ConsulClientOptions setWebSocketCompressionAllowClientNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebSocketCompressionAllowClientNoContext(offer);
   }
 
   @Override
-  public ConsulClientOptions setWebsocketCompressionRequestServerNoContext(boolean offer) {
-    return (ConsulClientOptions) super.setWebsocketCompressionRequestServerNoContext(offer);
+  public ConsulClientOptions setWebSocketCompressionRequestServerNoContext(boolean offer) {
+    return (ConsulClientOptions) super.setWebSocketCompressionRequestServerNoContext(offer);
   }
 }
