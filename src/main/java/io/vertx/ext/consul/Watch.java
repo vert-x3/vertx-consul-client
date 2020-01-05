@@ -17,14 +17,15 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.impl.WatchImpl;
 
 /**
  * Watches are a way of specifying a view of data (e.g. list of nodes, KV pairs, health checks)
- * which is monitored for updates. When an update is detected, an {@code Handler} with {@code AsyncResult} is invoked.
+ * which is monitored for updates. When an update is detected, an {@code Handler} with {@code WatchResult} is invoked.
+ * All errors, except {@code java.util.concurrent.TimeoutException}, will be handled, with resubscribing with a progressive delay.
+ * All timeout errors will be ignored, with resubscribing without any delay.
  * As an example, you could watch the status of health checks and notify when a check is critical.
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>

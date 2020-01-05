@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -215,6 +217,39 @@ public class Watches extends ConsulTestBase {
     assertEquals(1, eventCnt.get());
     assertTrue(watch.cnt() < 5);
 
+    watch.stop();
+  }
+
+  @Test
+  public void iss70() throws InterruptedException {
+    String key = ConsulContext.KEY_RW_PREFIX + randomAlphaString(10);
+    String v1 = randomAlphaString(10);
+    String v2 = randomAlphaString(10);
+
+    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v1, h)));
+
+    CountDownLatch succ = new CountDownLatch(1);
+    AtomicInteger errs = new AtomicInteger();
+    Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions().setTimeout(TimeUnit.SECONDS.toMillis(10)))
+      .setHandler(kv -> {
+        if (kv.succeeded()) {
+          KeyValue nextResult = kv.nextResult();
+          if (nextResult.isPresent() && nextResult.getValue().equals(v2)) {
+            succ.countDown();
+          }
+        } else {
+          errs.incrementAndGet();
+          System.out.println("got error: " + kv.cause());
+        }
+      })
+      .start();
+
+    vertx.setTimer(TimeUnit.SECONDS.toMillis(15), th -> {
+      ctx.writeClient().putValue(key, v2, ignore -> {});
+    });
+
+    succ.await();
+    assertEquals(errs.get(), 0);
     watch.stop();
   }
 
