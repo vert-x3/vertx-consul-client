@@ -230,7 +230,7 @@ public class Watches extends ConsulTestBase {
 
     CountDownLatch succ = new CountDownLatch(1);
     AtomicInteger errs = new AtomicInteger();
-    Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions().setTimeout(TimeUnit.SECONDS.toMillis(10)))
+    Watch<KeyValue> watch = Watch.key(key, vertx, new ConsulClientOptions(ctx.readClientOptions()).setTimeout(TimeUnit.SECONDS.toMillis(10)))
       .setHandler(kv -> {
         if (kv.succeeded()) {
           KeyValue nextResult = kv.nextResult();
