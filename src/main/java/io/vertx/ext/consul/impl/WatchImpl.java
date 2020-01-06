@@ -16,10 +16,11 @@
 package io.vertx.ext.consul.impl;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.*;
+
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -197,13 +198,18 @@ public abstract class WatchImpl<T> implements Watch<T> {
       if (h.succeeded()) {
         result.handle(h.result());
       } else {
-        sendFail(current.value, h.cause());
-        long newCnt = cnt + 1;
-        long delay = newCnt * newCnt;
-        if (delay > DELAY_LIMIT_SECONDS) {
-          delay = DELAY_LIMIT_SECONDS;
+        Throwable cause = h.cause();
+        if (cause instanceof TimeoutException) {
+          vertx.runOnContext(v -> fetch(0, result));
+        } else {
+          sendFail(current.value, h.cause());
+          long newCnt = cnt + 1;
+          long delay = newCnt * newCnt;
+          if (delay > DELAY_LIMIT_SECONDS) {
+            delay = DELAY_LIMIT_SECONDS;
+          }
+          vertx.setTimer(delay * 1000, l -> fetch(newCnt, result));
         }
-        vertx.setTimer(delay * 1000, l -> fetch(newCnt, result));
       }
     });
   }
