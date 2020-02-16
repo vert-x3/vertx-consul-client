@@ -64,7 +64,7 @@ public class Services extends ChecksBase {
             .filter(i -> serviceName.equals(i.getServiceName()))
             .findFirst()
             .orElseThrow(NoSuchElementException::new);
-          tc.assertEquals(c.getId(), "service:" + serviceName);
+          tc.assertEquals(c.getId(), opts.getCheckOptions().getId());
           tc.assertEquals(c.getNotes(), opts.getCheckOptions().getNotes());
           ctx.writeClient().catalogNodeServices(ctx.nodeName(), tc.asyncAssertSuccess(nodeServices -> {
             tc.assertEquals(2, nodeServices.getList().size());
