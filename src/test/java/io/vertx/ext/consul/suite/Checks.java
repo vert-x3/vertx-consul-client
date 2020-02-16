@@ -60,6 +60,7 @@ public class Checks extends ChecksBase {
     List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
     Check c = checks.stream().filter(i -> "checkId".equals(i.getId())).findFirst().get();
     assertEquals(c.getServiceId(), serviceId);
+    assertEquals(c.getId(), "checkId");
     assertEquals(c.getStatus(), CheckStatus.PASSING);
     assertEquals(c.getNotes(), "checkNotes");
 

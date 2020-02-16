@@ -272,7 +272,7 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Address", serviceOptions.getAddress())
       .put("Port", serviceOptions.getPort());
     if (serviceOptions.getCheckOptions() != null) {
-      jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), false));
+      jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), "CheckID", false));
     }
     if (serviceOptions.getMeta() != null && !serviceOptions.getMeta().isEmpty()) {
       jsonOpts.put("Meta", serviceOptions.getMeta());
@@ -429,13 +429,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler) {
-    requestVoid(HttpMethod.PUT, "/v1/agent/check/register", null, checkOpts(checkOptions, true).encode(), resultHandler);
+    requestVoid(HttpMethod.PUT, "/v1/agent/check/register", null, checkOpts(checkOptions, "ID", true).encode(), resultHandler);
     return this;
   }
 
-  private static JsonObject checkOpts(CheckOptions checkOptions, boolean extended) {
+  private static JsonObject checkOpts(CheckOptions checkOptions, String checkIdKey, boolean extended) {
     JsonObject json = new JsonObject()
-      .put("ID", checkOptions.getId())
+      .put(checkIdKey, checkOptions.getId())
       .put("Name", checkOptions.getName())
       .put("Notes", checkOptions.getNotes())
       .put("ScriptArgs", checkOptions.getScriptArgs())
