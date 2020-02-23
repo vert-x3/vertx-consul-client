@@ -37,6 +37,7 @@ public class ServiceOptions {
   private Map<String, String> meta;
   private int port;
   private CheckOptions checkOptions;
+  private List<CheckOptions> checkListOptions;
 
   /**
    * Default constructor
@@ -57,6 +58,7 @@ public class ServiceOptions {
     this.meta = options.meta;
     this.port = options.port;
     this.checkOptions = options.checkOptions;
+    this.checkListOptions = options.checkListOptions;
   }
 
   /**
@@ -216,6 +218,26 @@ public class ServiceOptions {
    */
   public ServiceOptions setCheckOptions(CheckOptions checkOptions) {
     this.checkOptions = checkOptions;
+    return this;
+  }
+
+  /**
+   * Get checks options of service
+   *
+   * @return checks options
+   */
+  public List<CheckOptions> getCheckListOptions() {
+    return checkListOptions;
+  }
+
+  /**
+   * Set checks options of service
+   *
+   * @param checkListOptions check options
+   * @return reference to this, for fluency
+   */
+  public ServiceOptions setCheckListOptions(List<CheckOptions> checkListOptions) {
+    this.checkListOptions = checkListOptions;
     return this;
   }
 }

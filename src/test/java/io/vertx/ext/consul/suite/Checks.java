@@ -91,6 +91,59 @@ public class Checks extends ChecksBase {
   }
 
   @Test
+  public void healthStateListChecks() throws InterruptedException {
+    String serviceName = randomAlphaString(10);
+    ServiceOptions opts = new ServiceOptions()
+      .setName(serviceName)
+      .setId(serviceName)
+      .setCheckListOptions(Collections.singletonList(new CheckOptions().setTtl("1m")));
+    runAsync(h -> ctx.writeClient().registerService(opts, h));
+    CheckList list1 = getAsync(h -> ctx.readClient().healthState(HealthState.CRITICAL, h));
+    CountDownLatch latch = new CountDownLatch(1);
+    waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
+      CheckQueryOptions options = new CheckQueryOptions()
+        .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
+      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options, h -> {
+        List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
+        waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
+      });
+    });
+    runAsync(h -> ctx.writeClient().passCheck("service:" + serviceName, h));
+    awaitLatch(latch);
+    runAsync(h -> ctx.writeClient().deregisterService(serviceName, h));
+  }
+
+  @Test
+  public void healthStateListChecksWithSingleCheck() throws InterruptedException {
+    String serviceName = randomAlphaString(10);
+    ServiceOptions opts = new ServiceOptions()
+      .setName(serviceName)
+      .setId(serviceName)
+      .setCheckListOptions(Collections.singletonList(new CheckOptions()
+        .setId("firstCheckFromList")
+        .setTtl("20s")))
+      .setCheckOptions(new CheckOptions()
+        .setId("singleCheck")
+        .setTtl("10s"));
+    runAsync(h -> ctx.writeClient().registerService(opts, h));
+    CheckList list1 = getAsync(h -> ctx.readClient().healthState(HealthState.CRITICAL, h));
+    CountDownLatch latch = new CountDownLatch(1);
+    waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
+      CheckQueryOptions options = new CheckQueryOptions()
+        .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
+      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options, h -> {
+        List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
+        waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
+      });
+    });
+
+    runAsync(h -> ctx.writeClient().passCheck("firstCheckFromList", h));
+    runAsync(h -> ctx.writeClient().passCheck("singleCheck", h));
+    awaitLatch(latch);
+    runAsync(h -> ctx.writeClient().deregisterService(serviceName, h));
+  }
+
+  @Test
   public void healthChecks() throws InterruptedException {
     ServiceOptions opts = new ServiceOptions()
       .setName("serviceName")
