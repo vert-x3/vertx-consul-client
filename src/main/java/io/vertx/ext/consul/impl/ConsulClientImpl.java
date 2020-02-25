@@ -449,6 +449,9 @@ public class ConsulClientImpl implements ConsulClient {
     if (serviceOptions.getCheckOptions() != null) {
       jsonOpts.put("Check", checkOpts(serviceOptions.getCheckOptions(), "CheckID", false));
     }
+    if (serviceOptions.getCheckListOptions() != null) {
+      jsonOpts.put("Checks", checkListOpts(serviceOptions.getCheckListOptions(), "CheckID", false));
+    }
     if (serviceOptions.getMeta() != null && !serviceOptions.getMeta().isEmpty()) {
       jsonOpts.put("Meta", serviceOptions.getMeta());
     }
@@ -780,6 +783,12 @@ public class ConsulClientImpl implements ConsulClient {
       json.put("ServiceID", checkOptions.getServiceId());
     }
     return json;
+  }
+
+  private static JsonArray checkListOpts(List<CheckOptions> listChecks, String checkIdKey, boolean extended) {
+    JsonArray jsonArray = new JsonArray();
+    listChecks.stream().map(c -> checkOpts(c, checkIdKey,extended)).forEach(jsonArray::add);
+    return jsonArray;
   }
 
   @Override
