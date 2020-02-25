@@ -134,11 +134,23 @@ public class Services extends ChecksBase {
       .setName("service").setId("id2").setTags(Collections.singletonList("tag2"))
       .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
 
+    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions()
+      .setName("service").setId("id3").setTags(Collections.singletonList("tag3"))
+      .setCheckListOptions(new ArrayList(Arrays.asList(new CheckOptions()
+        .setId("firstCheck")
+        .setTtl("5s")
+        .setStatus(CheckStatus.PASSING),
+        new CheckOptions()
+          .setId("secondCheck")
+          .setTtl("15s")
+          .setStatus(CheckStatus.PASSING)))), h));
+
     ServiceEntryList list1 = getAsync(h -> ctx.readClient().healthServiceNodes("service", true, h));
-    assertEquals(list1.getList().size(), 2);
+    assertEquals(list1.getList().size(), 3);
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
     assertTrue(ids.contains("id1"));
     assertTrue(ids.contains("id2"));
+    assertTrue(ids.contains("id3"));
 
     ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
     ServiceEntryList list2 = getAsync(h -> ctx.readClient().healthServiceNodesWithOptions("service", true, opts2, h));
@@ -159,6 +171,7 @@ public class Services extends ChecksBase {
     awaitLatch(latch);
     runAsync(h -> ctx.writeClient().deregisterService("id1", h));
     runAsync(h -> ctx.writeClient().deregisterService("id2", h));
+    runAsync(h -> ctx.writeClient().deregisterService("id3", h));
   }
 
   @Test
