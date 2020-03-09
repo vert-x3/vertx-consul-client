@@ -59,7 +59,7 @@ public class Utils {
     if (maxAttempts > 0) {
       Promise<Long> promise = Promise.promise();
       runner.accept(startIndex, promise);
-      promise.future().setHandler(h -> {
+      promise.future().onComplete(h -> {
         if (h.succeeded()) {
           long nextIndex = h.result();
           if (nextIndex >= 0) {
