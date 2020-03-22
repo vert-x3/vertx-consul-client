@@ -111,6 +111,7 @@ public interface Watch<T> {
 
   /**
    * Creates {@code Watch} to monitoring the nodes providing the service.
+   * Nodes will be sorted by distance from the consul agent.
    * The underlying Consul client will be created with default options.
    * This maps to the <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> API internally.
    *
@@ -124,6 +125,7 @@ public interface Watch<T> {
 
   /**
    * Creates {@code Watch} to monitoring the nodes providing the service.
+   * Nodes will be sorted by distance from the consul agent.
    * This maps to the <a href="https://www.consul.io/docs/agent/http/health.html#health_service">/v1/health/service/&lt;service&gt;</a> API internally.
    *
    * @param service the service name
