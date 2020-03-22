@@ -90,7 +90,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
     @Override
     void wait(long index, Handler<AsyncResult<State<ServiceEntryList>>> handler) {
       BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
-      ServiceQueryOptions sOpts = new ServiceQueryOptions().setBlockingOptions(bOpts);
+      ServiceQueryOptions sOpts = new ServiceQueryOptions().setNear("_agent").setBlockingOptions(bOpts);
       consulClient.healthServiceNodesWithOptions(service, false, sOpts, h ->
         handler.handle(h.map(services -> new State<ServiceEntryList>(services, services.getIndex()))));
     }
