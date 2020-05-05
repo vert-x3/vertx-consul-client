@@ -15,6 +15,8 @@
  */
 package io.vertx.ext.consul;
 
+import io.vertx.codegen.annotations.VertxGen;
+
 /**
  * When a session is invalidated, it is destroyed and can no longer be used. What happens to the associated locks
  * depends on the behavior specified at creation time. Consul supports a release and delete behavior.
@@ -28,6 +30,7 @@ package io.vertx.ext.consul;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/internals/sessions.html">Consul sessions documentation</a>
  */
+@VertxGen
 public enum SessionBehavior {
 
   RELEASE("release"),
