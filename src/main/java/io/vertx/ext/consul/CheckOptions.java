@@ -19,6 +19,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Options used to register checks in Consul.
@@ -32,6 +33,7 @@ public class CheckOptions {
   private String name;
   private List<String> scriptArgs;
   private String http;
+  private Map<String, List<String>> header;
   private String ttl;
   private String tcp;
   private String grpc;
@@ -59,6 +61,7 @@ public class CheckOptions {
     this.name = options.name;
     this.scriptArgs = options.scriptArgs;
     this.http = options.http;
+    this.header = options.header;
     this.ttl = options.ttl;
     this.tcp = options.tcp;
     this.interval = options.interval;
@@ -162,6 +165,26 @@ public class CheckOptions {
    */
   public CheckOptions setHttp(String http) {
     this.http = http;
+    return this;
+  }
+
+  /**
+   * Get header map
+   *
+   * @return header map
+   */
+  public Map<String, List<String>> getHeaders() {
+    return header;
+  }
+
+  /**
+   * Set headers to check
+   *
+   * @param header header map
+   * @return reference to this, for fluency
+   */
+  public CheckOptions setHeaders(Map<String, List<String>> header) {
+    this.header = header;
     return this;
   }
 

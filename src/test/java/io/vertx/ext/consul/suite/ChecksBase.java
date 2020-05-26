@@ -19,16 +19,17 @@ import grpc.health.v1.HealthCheck;
 import grpc.health.v1.HealthGrpc;
 import io.grpc.stub.StreamObserver;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,9 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -90,11 +89,18 @@ public abstract class ChecksBase extends ConsulTestBase {
 
   @Test
   public void httpCheckLifecycle() {
-    HttpHealthReporter reporter = new HttpHealthReporter(vertx);
+    HttpHealthReporter reporter = new HttpHealthReporterWithHeaderCheck(vertx);
+
+    HashMap<String, List<String>> headers = new HashMap<>();
+    headers.put(
+      HttpHealthReporterWithHeaderCheck.TEST_HEADER_NAME,
+      Collections.singletonList(HttpHealthReporterWithHeaderCheck.TEST_HEADER_VALUE)
+    );
 
     CheckOptions opts = new CheckOptions()
       .setHttp("http://localhost:" + reporter.port())
       .setInterval("2s")
+      .setHeaders(headers)
       .setName("checkName");
     String checkId = createCheck(opts);
 
@@ -155,7 +161,7 @@ public abstract class ChecksBase extends ConsulTestBase {
 
   @Test
   public void tcpCheckLifecycle() {
-    HttpHealthReporter reporter = new HttpHealthReporter(vertx);
+    HttpHealthReporter reporter = new HttpHealthReporterImpl(vertx);
 
     CheckOptions opts = new CheckOptions()
       .setTcp("localhost:" + reporter.port())
@@ -275,19 +281,16 @@ public abstract class ChecksBase extends ConsulTestBase {
     }
   }
 
-  private static class HttpHealthReporter {
+  private static abstract class HttpHealthReporter {
 
     private final HttpServer server;
     private final int port;
-
-    private CheckStatus status = CheckStatus.PASSING;
+    protected CheckStatus status = CheckStatus.PASSING;
 
     HttpHealthReporter(Vertx vertx) {
       this.port = Utils.getFreePort();
       CountDownLatch latch = new CountDownLatch(1);
-      this.server = vertx.createHttpServer().requestHandler(h -> h.response()
-        .setStatusCode(statusCode(status))
-        .end(status.name())).listen(port, h -> latch.countDown());
+      this.server = vertx.createHttpServer().requestHandler(this::handle).listen(port, h -> latch.countDown());
       try {
         latch.await(10, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
@@ -295,19 +298,17 @@ public abstract class ChecksBase extends ConsulTestBase {
       }
     }
 
+    abstract void handle(HttpServerRequest request);
+
     int port() {
       return port;
-    }
-
-    void setStatus(CheckStatus status) {
-      this.status = status;
     }
 
     void close() {
       server.close();
     }
 
-    private int statusCode(CheckStatus status) {
+    protected int statusCode(CheckStatus status) {
       switch (status) {
         case PASSING:
           return 200;
@@ -316,6 +317,45 @@ public abstract class ChecksBase extends ConsulTestBase {
         default:
           return 500;
       }
+    }
+
+    void setStatus(CheckStatus status) {
+      this.status = status;
+    }
+
+  }
+
+  private static class HttpHealthReporterImpl extends HttpHealthReporter {
+
+    HttpHealthReporterImpl(Vertx vertx) {
+      super(vertx);
+    }
+
+    @Override
+    void handle(HttpServerRequest request) {
+      request.response()
+        .setStatusCode(statusCode(status))
+        .end(status.name());
+    }
+
+  }
+
+  private static class HttpHealthReporterWithHeaderCheck extends HttpHealthReporter {
+
+    final static String TEST_HEADER_NAME = "test";
+    final static String TEST_HEADER_VALUE = "foo";
+
+    HttpHealthReporterWithHeaderCheck(Vertx vertx) {
+      super(vertx);
+    }
+
+    @Override
+    void handle(HttpServerRequest request) {
+      String headerValue = request.getHeader(TEST_HEADER_NAME);
+      Assert.assertEquals(TEST_HEADER_VALUE, headerValue);
+      request.response()
+        .setStatusCode(statusCode(status))
+        .end(status.name());
     }
 
   }
