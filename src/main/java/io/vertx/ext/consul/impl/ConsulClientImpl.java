@@ -765,6 +765,7 @@ public class ConsulClientImpl implements ConsulClient {
       .put("Notes", checkOptions.getNotes())
       .put("ScriptArgs", checkOptions.getScriptArgs())
       .put("HTTP", checkOptions.getHttp())
+      .put("Header", checkOptions.getHeaders())
       .put("TLSSkipVerify", checkOptions.isTlsSkipVerify())
       .put("GRPC", checkOptions.getGrpc())
       .put("Interval", checkOptions.getInterval())
