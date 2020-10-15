@@ -15,7 +15,7 @@
     <stack.version>3.9.4-SNAPSHOT</stack.version>
     <embedded.consul.version>2.1.4</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
   </properties>
 
   <dependencyManagement>
