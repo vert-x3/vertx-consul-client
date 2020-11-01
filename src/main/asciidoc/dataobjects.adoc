@@ -374,6 +374,7 @@ Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 Sets the amount of time (in milliseconds) after which if the request does not return any data
  within the timeout period an failure will be passed to the handler and the request will be closed.
 +++
+|[[tracingPolicy]]`@tracingPolicy`|`link:enums.html#TracingPolicy[TracingPolicy]`|-
 |[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
