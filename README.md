@@ -1,6 +1,6 @@
 # Consul Client
 
-[![Build Status](https://travis-ci.org/vert-x3/vertx-consul-client.svg?branch=master)](https://travis-ci.org/vert-x3/vertx-consul-client)
+[![Build Status](https://github.com/vert-x3/vertx-consul-client/workflows/CI/badge.svg?branch=3.9)](https://github.com/vert-x3/vertx-consul-client/actions?query=workflow%3ACI)
 
 An asynchronous client for interacting with a Consul
 
