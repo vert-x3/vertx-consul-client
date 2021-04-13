@@ -226,10 +226,13 @@ public class CopyTest {
   private void checkNode(Node expected, Node actual) {
     assertEquals(expected, actual);
     assertEquals(expected.hashCode(), actual.hashCode());
+    assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getAddress(), actual.getAddress());
     assertEquals(expected.getName(), actual.getName());
     assertEquals(expected.getWanAddress(), actual.getWanAddress());
     assertEquals(expected.getLanAddress(), actual.getLanAddress());
+    assertEquals(expected.getDatacenter(), actual.getDatacenter());
+    assertEquals(expected.getNodeMeta(), actual.getNodeMeta());
   }
 
   @Test
