@@ -1296,7 +1296,7 @@ public interface ConsulClient {
    * @param serviceId         the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
-   * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity>/v1/catalog/deregister</a> endpoint
+   * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity">/v1/catalog/deregister</a> endpoint
    */
   @Fluent
   ConsulClient deregisterCatalogService(String nodeId, String serviceId, Handler<AsyncResult<Void>> resultHandler);
