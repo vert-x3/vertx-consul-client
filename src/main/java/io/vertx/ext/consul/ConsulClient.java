@@ -1279,6 +1279,29 @@ public interface ConsulClient {
   Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options);
 
   /**
+   * Register node with external service
+   * @param nodeOptions the options of new node
+   * @param serviceOptions the options of new service
+   * @param resultHandler will be provided with response
+   * @see <a href="https://www.consul.io/api-docs/catalog#register-entity">/v1/catalog/register</a> endpoint
+   * @return reference to this, for fluency
+   */
+  @Fluent
+  ConsulClient registerCatalogService(Node nodeOptions, ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
+   * Deregister entities from the node or deregister the node itself.
+   *
+   * @param nodeId            the ID of node
+   * @param serviceId         the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
+   * @param resultHandler will be called when complete
+   * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity">/v1/catalog/deregister</a> endpoint
+   */
+  @Fluent
+  ConsulClient deregisterCatalogService(String nodeId, String serviceId, Handler<AsyncResult<Void>> resultHandler);
+
+  /**
    * Close the client and release its resources
    */
   void close();

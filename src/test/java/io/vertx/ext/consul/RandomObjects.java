@@ -91,6 +91,17 @@ public class RandomObjects {
       .setAddress(randomAlphaString(10));
   }
 
+  public static Node randomNode(UUID uuid, String datacenterName) {
+    return new Node()
+      .setId(uuid.toString())
+      .setName(randomAlphaString(10))
+      .setAddress(randomIpV4())
+      .setLanAddress(randomIpV4())
+      .setWanAddress(randomIpV4())
+      .setDatacenter(datacenterName)
+      .setNodeMeta(randomMeta());
+  }
+
   public static Event randomEvent() {
     return new Event()
       .setId(randomAlphaString(10))
@@ -184,5 +195,10 @@ public class RandomObjects {
       list.add(s.get());
     }
     return list;
+  }
+
+  private static String randomIpV4() {
+    Random r = new Random();
+    return r.nextInt(256) + "." + r.nextInt(256) + "." + r.nextInt(256) + "." + r.nextInt(256);
   }
 }
