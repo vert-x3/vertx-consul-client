@@ -240,7 +240,7 @@ There are additional parameters for services queries
 The list can be filtered by tag using the `tag` query parameter
 `near`:: adding the optional `near` parameter with a node name will sort the node list in ascending order
 based on the estimated round trip time from that node. Passing `near`=`_agent` will use the agent's node for the sort.
-`blockingOptions`:: the blocking qyery options
+`blockingOptions`:: the blocking query options
 
 Then the request should look like
 
