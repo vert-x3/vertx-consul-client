@@ -1,0 +1,17 @@
+# How to generate new PEM files
+
+## Install consul CLI
+
+See https://www.consul.io/downloads
+
+## Generate files
+
+See https://learn.hashicorp.com/tutorials/consul/tls-encryption-secure
+
+consul tls ca create
+consul tls cert create -server
+mv dc1-server-consul-0-key.pem server-key.pem
+mv dc1-server-consul-0.pem server-cert.pem
+cp server-cert.pem server-cert-ca-chain.pem
+rm consul-agent-ca*
+
