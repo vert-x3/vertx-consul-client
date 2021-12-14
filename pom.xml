@@ -9,10 +9,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>vertx-consul-client</artifactId>
-  <version>4.1.7</version>
+  <version>4.1.8-SNAPSHOT</version>
 
   <properties>
-    <stack.version>4.1.7</stack.version>
+    <stack.version>4.1.8-SNAPSHOT</stack.version>
     <embedded.consul.version>2.1.4</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.13.1</junit.version>
