@@ -401,6 +401,7 @@ Set whether TCP no delay is enabled
 |[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
 Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[tcpUserTimeout]]`@tcpUserTimeout`|`Number (int)`|-
 |[[timeout]]`@timeout`|`Number (long)`|+++
 Sets the amount of time (in milliseconds) after which if the request does not return any data
  within the timeout period an failure will be passed to the handler and the request will be closed.
