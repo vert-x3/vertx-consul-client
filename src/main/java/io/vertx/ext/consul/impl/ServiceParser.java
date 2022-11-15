@@ -45,7 +45,7 @@ class ServiceParser {
       .setTags(listOf(tagsArr))
       .setMeta(mapStringString(jsonObject.getJsonObject(AGENT_SERVICE_META)))
       .setAddress(jsonObject.getString(AGENT_SERVICE_ADDRESS))
-      .setPort(jsonObject.getInteger(AGENT_SERVICE_PORT));
+      .setPort(jsonObject.getInteger(AGENT_SERVICE_PORT, 0));
   }
 
   static Service parseCatalogInfo(Map.Entry<String, Object> entry) {
