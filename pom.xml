@@ -13,9 +13,13 @@
 
   <properties>
     <stack.version>4.4.0-SNAPSHOT</stack.version>
-    <embedded.consul.version>2.1.4</embedded.consul.version>
+    <embedded.consul.version>2.2.1</embedded.consul.version>
     <slf4j.version>1.7.21</slf4j.version>
     <junit.version>4.13.1</junit.version>
+
+    <grpc.version>1.50.2</grpc.version>
+    <protoc.version>3.21.8</protoc.version>
+
     <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
   </properties>
 
@@ -102,9 +106,14 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>0.5.0</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.3.0:exe:${os.detected.classifier}</protocArtifact>
+          <!--
+            The version of protoc must match protobuf-java. If you don't depend on
+            protobuf-java directly, you will be transitively depending on the
+            protobuf-java version that grpc depends on.
+          -->
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
           <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.9.0:exe:${os.detected.classifier}</pluginArtifact>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
         </configuration>
         <executions>
           <execution>
