@@ -20,10 +20,12 @@ public final class HealthCheck {
 
     /**
      * <code>string service = 1;</code>
+     * @return The service.
      */
     java.lang.String getService();
     /**
      * <code>string service = 1;</code>
+     * @return The bytes for service.
      */
     com.google.protobuf.ByteString
         getServiceBytes();
@@ -31,10 +33,11 @@ public final class HealthCheck {
   /**
    * Protobuf type {@code grpc.health.v1.HealthCheckRequest}
    */
-  public  static final class HealthCheckRequest extends
+  public static final class HealthCheckRequest extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:grpc.health.v1.HealthCheckRequest)
       HealthCheckRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use HealthCheckRequest.newBuilder() to construct.
     private HealthCheckRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -44,52 +47,23 @@ public final class HealthCheck {
     }
 
     @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new HealthCheckRequest();
+    }
+
+    @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
-    }
-    private HealthCheckRequest(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      int mutable_bitField0_ = 0;
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!input.skipField(tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              service_ = s;
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        makeExtensionsImmutable();
-      }
+      return this.unknownFields;
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckRequest_fieldAccessorTable
@@ -101,7 +75,9 @@ public final class HealthCheck {
     private volatile java.lang.Object service_;
     /**
      * <code>string service = 1;</code>
+     * @return The service.
      */
+    @java.lang.Override
     public java.lang.String getService() {
       java.lang.Object ref = service_;
       if (ref instanceof java.lang.String) {
@@ -116,7 +92,9 @@ public final class HealthCheck {
     }
     /**
      * <code>string service = 1;</code>
+     * @return The bytes for service.
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getServiceBytes() {
       java.lang.Object ref = service_;
@@ -132,6 +110,7 @@ public final class HealthCheck {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -141,26 +120,29 @@ public final class HealthCheck {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getServiceBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(service_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, service_);
       }
+      getUnknownFields().writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
-      if (!getServiceBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(service_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, service_);
       }
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -171,10 +153,10 @@ public final class HealthCheck {
       }
       grpc.health.v1.HealthCheck.HealthCheckRequest other = (grpc.health.v1.HealthCheck.HealthCheckRequest) obj;
 
-      boolean result = true;
-      result = result && getService()
-          .equals(other.getService());
-      return result;
+      if (!getService()
+          .equals(other.getService())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -186,7 +168,7 @@ public final class HealthCheck {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + SERVICE_FIELD_NUMBER;
       hash = (53 * hash) + getService().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -261,6 +243,7 @@ public final class HealthCheck {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -268,6 +251,7 @@ public final class HealthCheck {
     public static Builder newBuilder(grpc.health.v1.HealthCheck.HealthCheckRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -291,6 +275,7 @@ public final class HealthCheck {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckRequest_fieldAccessorTable
@@ -300,19 +285,15 @@ public final class HealthCheck {
 
       // Construct using grpc.health.v1.HealthCheck.HealthCheckRequest.newBuilder()
       private Builder() {
-        maybeForceBuilderInitialization();
+
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
+
       }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         service_ = "";
@@ -320,15 +301,18 @@ public final class HealthCheck {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckRequest_descriptor;
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckRequest getDefaultInstanceForType() {
         return grpc.health.v1.HealthCheck.HealthCheckRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckRequest build() {
         grpc.health.v1.HealthCheck.HealthCheckRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -337,6 +321,7 @@ public final class HealthCheck {
         return result;
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckRequest buildPartial() {
         grpc.health.v1.HealthCheck.HealthCheckRequest result = new grpc.health.v1.HealthCheck.HealthCheckRequest(this);
         result.service_ = service_;
@@ -344,32 +329,39 @@ public final class HealthCheck {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
-        return (Builder) super.setField(field, value);
+          java.lang.Object value) {
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof grpc.health.v1.HealthCheck.HealthCheckRequest) {
           return mergeFrom((grpc.health.v1.HealthCheck.HealthCheckRequest)other);
@@ -385,35 +377,57 @@ public final class HealthCheck {
           service_ = other.service_;
           onChanged();
         }
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        grpc.health.v1.HealthCheck.HealthCheckRequest parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                service_ = input.readStringRequireUtf8();
+
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (grpc.health.v1.HealthCheck.HealthCheckRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private java.lang.Object service_ = "";
       /**
        * <code>string service = 1;</code>
+       * @return The service.
        */
       public java.lang.String getService() {
         java.lang.Object ref = service_;
@@ -429,6 +443,7 @@ public final class HealthCheck {
       }
       /**
        * <code>string service = 1;</code>
+       * @return The bytes for service.
        */
       public com.google.protobuf.ByteString
           getServiceBytes() {
@@ -445,6 +460,8 @@ public final class HealthCheck {
       }
       /**
        * <code>string service = 1;</code>
+       * @param value The service to set.
+       * @return This builder for chaining.
        */
       public Builder setService(
           java.lang.String value) {
@@ -458,6 +475,7 @@ public final class HealthCheck {
       }
       /**
        * <code>string service = 1;</code>
+       * @return This builder for chaining.
        */
       public Builder clearService() {
         
@@ -467,6 +485,8 @@ public final class HealthCheck {
       }
       /**
        * <code>string service = 1;</code>
+       * @param value The bytes for service to set.
+       * @return This builder for chaining.
        */
       public Builder setServiceBytes(
           com.google.protobuf.ByteString value) {
@@ -479,14 +499,16 @@ public final class HealthCheck {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -505,11 +527,23 @@ public final class HealthCheck {
 
     private static final com.google.protobuf.Parser<HealthCheckRequest>
         PARSER = new com.google.protobuf.AbstractParser<HealthCheckRequest>() {
+      @java.lang.Override
       public HealthCheckRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new HealthCheckRequest(input, extensionRegistry);
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
       }
     };
 
@@ -522,6 +556,7 @@ public final class HealthCheck {
       return PARSER;
     }
 
+    @java.lang.Override
     public grpc.health.v1.HealthCheck.HealthCheckRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -534,20 +569,23 @@ public final class HealthCheck {
 
     /**
      * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+     * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
     /**
      * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+     * @return The status.
      */
     grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus getStatus();
   }
   /**
    * Protobuf type {@code grpc.health.v1.HealthCheckResponse}
    */
-  public  static final class HealthCheckResponse extends
+  public static final class HealthCheckResponse extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:grpc.health.v1.HealthCheckResponse)
       HealthCheckResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use HealthCheckResponse.newBuilder() to construct.
     private HealthCheckResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -557,52 +595,23 @@ public final class HealthCheck {
     }
 
     @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new HealthCheckResponse();
+    }
+
+    @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
-    }
-    private HealthCheckResponse(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      int mutable_bitField0_ = 0;
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!input.skipField(tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              int rawValue = input.readEnum();
-
-              status_ = rawValue;
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        makeExtensionsImmutable();
-      }
+      return this.unknownFields;
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckResponse_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckResponse_fieldAccessorTable
@@ -653,6 +662,8 @@ public final class HealthCheck {
       }
 
       /**
+       * @param value The numeric wire value of the corresponding enum entry.
+       * @return The enum associated with the given numeric wire value.
        * @deprecated Use {@link #forNumber(int)} instead.
        */
       @java.lang.Deprecated
@@ -660,6 +671,10 @@ public final class HealthCheck {
         return forNumber(value);
       }
 
+      /**
+       * @param value The numeric wire value of the corresponding enum entry.
+       * @return The enum associated with the given numeric wire value.
+       */
       public static ServingStatus forNumber(int value) {
         switch (value) {
           case 0: return UNKNOWN;
@@ -683,6 +698,10 @@ public final class HealthCheck {
 
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalStateException(
+              "Can't get the descriptor of an unrecognized enum value.");
+        }
         return getDescriptor().getValues().get(ordinal());
       }
       public final com.google.protobuf.Descriptors.EnumDescriptor
@@ -721,19 +740,23 @@ public final class HealthCheck {
     private int status_;
     /**
      * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+     * @return The enum numeric value on the wire for status.
      */
-    public int getStatusValue() {
+    @java.lang.Override public int getStatusValue() {
       return status_;
     }
     /**
      * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+     * @return The status.
      */
-    public grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus getStatus() {
+    @java.lang.Override public grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus getStatus() {
+      @SuppressWarnings("deprecation")
       grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus result = grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus.valueOf(status_);
       return result == null ? grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus.UNRECOGNIZED : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -743,13 +766,16 @@ public final class HealthCheck {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (status_ != grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus.UNKNOWN.getNumber()) {
         output.writeEnum(1, status_);
       }
+      getUnknownFields().writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -759,11 +785,11 @@ public final class HealthCheck {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, status_);
       }
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -774,9 +800,9 @@ public final class HealthCheck {
       }
       grpc.health.v1.HealthCheck.HealthCheckResponse other = (grpc.health.v1.HealthCheck.HealthCheckResponse) obj;
 
-      boolean result = true;
-      result = result && status_ == other.status_;
-      return result;
+      if (status_ != other.status_) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -788,7 +814,7 @@ public final class HealthCheck {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + STATUS_FIELD_NUMBER;
       hash = (53 * hash) + status_;
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -863,6 +889,7 @@ public final class HealthCheck {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -870,6 +897,7 @@ public final class HealthCheck {
     public static Builder newBuilder(grpc.health.v1.HealthCheck.HealthCheckResponse prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -893,6 +921,7 @@ public final class HealthCheck {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckResponse_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckResponse_fieldAccessorTable
@@ -902,19 +931,15 @@ public final class HealthCheck {
 
       // Construct using grpc.health.v1.HealthCheck.HealthCheckResponse.newBuilder()
       private Builder() {
-        maybeForceBuilderInitialization();
+
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
+
       }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         status_ = 0;
@@ -922,15 +947,18 @@ public final class HealthCheck {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return grpc.health.v1.HealthCheck.internal_static_grpc_health_v1_HealthCheckResponse_descriptor;
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckResponse getDefaultInstanceForType() {
         return grpc.health.v1.HealthCheck.HealthCheckResponse.getDefaultInstance();
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckResponse build() {
         grpc.health.v1.HealthCheck.HealthCheckResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -939,6 +967,7 @@ public final class HealthCheck {
         return result;
       }
 
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckResponse buildPartial() {
         grpc.health.v1.HealthCheck.HealthCheckResponse result = new grpc.health.v1.HealthCheck.HealthCheckResponse(this);
         result.status_ = status_;
@@ -946,32 +975,39 @@ public final class HealthCheck {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
-        return (Builder) super.setField(field, value);
+          java.lang.Object value) {
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof grpc.health.v1.HealthCheck.HealthCheckResponse) {
           return mergeFrom((grpc.health.v1.HealthCheck.HealthCheckResponse)other);
@@ -986,56 +1022,86 @@ public final class HealthCheck {
         if (other.status_ != 0) {
           setStatusValue(other.getStatusValue());
         }
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        grpc.health.v1.HealthCheck.HealthCheckResponse parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                status_ = input.readEnum();
+
+                break;
+              } // case 8
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (grpc.health.v1.HealthCheck.HealthCheckResponse) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private int status_ = 0;
       /**
        * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+       * @return The enum numeric value on the wire for status.
        */
-      public int getStatusValue() {
+      @java.lang.Override public int getStatusValue() {
         return status_;
       }
       /**
        * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+       * @param value The enum numeric value on the wire for status to set.
+       * @return This builder for chaining.
        */
       public Builder setStatusValue(int value) {
+        
         status_ = value;
         onChanged();
         return this;
       }
       /**
        * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+       * @return The status.
        */
+      @java.lang.Override
       public grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus getStatus() {
+        @SuppressWarnings("deprecation")
         grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus result = grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus.valueOf(status_);
         return result == null ? grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus.UNRECOGNIZED : result;
       }
       /**
        * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+       * @param value The status to set.
+       * @return This builder for chaining.
        */
       public Builder setStatus(grpc.health.v1.HealthCheck.HealthCheckResponse.ServingStatus value) {
         if (value == null) {
@@ -1048,6 +1114,7 @@ public final class HealthCheck {
       }
       /**
        * <code>.grpc.health.v1.HealthCheckResponse.ServingStatus status = 1;</code>
+       * @return This builder for chaining.
        */
       public Builder clearStatus() {
         
@@ -1055,14 +1122,16 @@ public final class HealthCheck {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -1081,11 +1150,23 @@ public final class HealthCheck {
 
     private static final com.google.protobuf.Parser<HealthCheckResponse>
         PARSER = new com.google.protobuf.AbstractParser<HealthCheckResponse>() {
+      @java.lang.Override
       public HealthCheckResponse parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new HealthCheckResponse(input, extensionRegistry);
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
       }
     };
 
@@ -1098,6 +1179,7 @@ public final class HealthCheck {
       return PARSER;
     }
 
+    @java.lang.Override
     public grpc.health.v1.HealthCheck.HealthCheckResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1133,18 +1215,10 @@ public final class HealthCheck {
       "\032#.grpc.health.v1.HealthCheckResponseb\006p" +
       "roto3"
     };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
-    com.google.protobuf.Descriptors.FileDescriptor
+    descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+        });
     internal_static_grpc_health_v1_HealthCheckRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_grpc_health_v1_HealthCheckRequest_fieldAccessorTable = new
