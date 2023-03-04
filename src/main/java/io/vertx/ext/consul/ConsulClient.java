@@ -63,6 +63,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent.html#read-configuration">/v1/agent/self</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient agentInfo(Handler<AsyncResult<JsonObject>> resultHandler);
 
   /**
@@ -78,6 +79,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient coordinateNodes(Handler<AsyncResult<CoordinateList>> resultHandler);
 
   /**
@@ -95,6 +97,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler);
 
   /**
@@ -110,6 +113,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/coordinate.html#read-wan-coordinates">/v1/coordinate/datacenters</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient coordinateDatacenters(Handler<AsyncResult<List<DcCoordinates>>> resultHandler);
 
   /**
@@ -126,6 +130,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getKeys(String keyPrefix, Handler<AsyncResult<List<String>>> resultHandler);
 
   /**
@@ -143,6 +148,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getKeysWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<String>>> resultHandler);
 
   /**
@@ -160,6 +166,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getValue(String key, Handler<AsyncResult<KeyValue>> resultHandler);
 
   /**
@@ -179,6 +186,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
 
   /**
@@ -195,6 +203,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deleteValue(String key, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -212,6 +221,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getValues(String keyPrefix, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   /**
@@ -231,6 +241,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler);
 
   /**
@@ -247,6 +258,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deleteValues(String keyPrefix, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -264,6 +276,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient putValue(String key, String value, Handler<AsyncResult<Boolean>> resultHandler);
 
   /**
@@ -280,6 +293,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
 
   /**
@@ -296,6 +310,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/txn.html">/v1/txn</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient transaction(TxnRequest request, Handler<AsyncResult<TxnResponse>> resultHandler);
 
   /**
@@ -312,6 +327,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
@@ -328,6 +344,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
@@ -344,6 +361,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
 
   /**
@@ -359,6 +377,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
 
   /**
@@ -375,6 +394,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
   /**
@@ -391,6 +411,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -407,6 +428,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient fireEvent(String name, Handler<AsyncResult<Event>> resultHandler);
 
   /**
@@ -424,6 +446,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient fireEventWithOptions(String name, EventOptions options, Handler<AsyncResult<Event>> resultHandler);
 
   /**
@@ -439,6 +462,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/event.html#list-events">/v1/event/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listEvents(Handler<AsyncResult<EventList>> resultHandler);
 
   /**
@@ -462,6 +486,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/event.html#list-events">/v1/event/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listEventsWithOptions(EventListOptions options, Handler<AsyncResult<EventList>> resultHandler);
 
   /**
@@ -479,6 +504,7 @@ public interface ConsulClient {
    * @see ServiceOptions
    */
   @Fluent
+  @Deprecated
   ConsulClient registerService(ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -496,6 +522,7 @@ public interface ConsulClient {
    * @see MaintenanceOptions
    */
   @Fluent
+  @Deprecated
   ConsulClient maintenanceService(MaintenanceOptions maintenanceOptions, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -513,6 +540,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/service.html#deregister-service">/v1/agent/service/deregister/:service_id</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deregisterService(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -529,6 +557,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogServiceNodes(String service, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -546,6 +575,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -561,6 +591,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-datacenters">/v1/catalog/datacenters</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogDatacenters(Handler<AsyncResult<List<String>>> resultHandler);
 
   /**
@@ -576,6 +607,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogNodes(Handler<AsyncResult<NodeList>> resultHandler);
 
   /**
@@ -592,6 +624,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogNodesWithOptions(NodeQueryOptions options, Handler<AsyncResult<NodeList>> resultHandler);
 
   /**
@@ -608,6 +641,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthChecks(String service, Handler<AsyncResult<CheckList>> resultHandler);
 
   /**
@@ -625,6 +659,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthChecksWithOptions(String service, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
 
   /**
@@ -641,6 +676,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthState(HealthState healthState, Handler<AsyncResult<CheckList>> resultHandler);
 
   /**
@@ -658,6 +694,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthStateWithOptions(HealthState healthState, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
 
   /**
@@ -676,6 +713,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   /**
@@ -695,6 +733,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
 
   /**
@@ -710,6 +749,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogServices(Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -727,6 +767,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -743,6 +784,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogNodeServices(String node, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -761,6 +803,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
 
   /**
@@ -776,6 +819,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/service.html#list-services">/v1/agent/services</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient localServices(Handler<AsyncResult<List<Service>>> resultHandler);
 
   /**
@@ -791,6 +835,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#list-checks">/v1/agent/checks</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient localChecks(Handler<AsyncResult<List<Check>>> resultHandler);
 
   /**
@@ -808,6 +853,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#register-check">/v1/agent/check/register</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient registerCheck(CheckOptions checkOptions, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -824,6 +870,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#deregister-check">/v1/agent/check/deregister/:check_id</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deregisterCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -841,6 +888,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient passCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -859,6 +907,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient passCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -876,6 +925,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient warnCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -894,6 +944,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient warnCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -911,6 +962,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient failCheck(String checkId, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -929,6 +981,7 @@ public interface ConsulClient {
    * @see CheckStatus
    */
   @Fluent
+  @Deprecated
   ConsulClient failCheckWithNote(String checkId, String note, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -946,6 +999,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient updateCheck(String checkId, CheckStatus status, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -964,6 +1018,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -980,6 +1035,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/status.html#get-raft-leader">/v1/status/leader</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient leaderStatus(Handler<AsyncResult<String>> resultHandler);
 
   /**
@@ -998,6 +1054,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/status.html#list-raft-peers">/v1/status/peers</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient peersStatus(Handler<AsyncResult<List<String>>> resultHandler);
 
   /**
@@ -1013,6 +1070,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#create-session">/v1/session/create</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient createSession(Handler<AsyncResult<String>> idHandler);
 
   /**
@@ -1029,6 +1087,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#create-session">/v1/session/create</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient createSessionWithOptions(SessionOptions options, Handler<AsyncResult<String>> idHandler);
 
   /**
@@ -1045,6 +1104,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient infoSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
   /**
@@ -1063,6 +1123,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler);
 
   /**
@@ -1079,6 +1140,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#renew-session">/v1/session/renew/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient renewSession(String id, Handler<AsyncResult<Session>> resultHandler);
 
   /**
@@ -1094,6 +1156,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#list-sessions">/v1/session/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listSessions(Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
@@ -1111,6 +1174,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#list-sessions">/v1/session/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listSessionsWithOptions(BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
@@ -1127,6 +1191,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listNodeSessions(String nodeId, Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
@@ -1145,6 +1210,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
 
   /**
@@ -1161,6 +1227,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#delete-session">/v1/session/destroy/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient destroySession(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -1175,6 +1242,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#create-prepared-query">/v1/query</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient createPreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<String>> resultHandler);
 
   /**
@@ -1191,6 +1259,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#read-prepared-query-1">/v1/query/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getPreparedQuery(String id, Handler<AsyncResult<PreparedQueryDefinition>> resultHandler);
 
   /**
@@ -1206,6 +1275,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#read-prepared-query">/v1/query</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient getAllPreparedQueries(Handler<AsyncResult<List<PreparedQueryDefinition>>> resultHandler);
 
   /**
@@ -1220,6 +1290,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#update-prepared-query">/v1/query/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient updatePreparedQuery(PreparedQueryDefinition definition, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -1236,6 +1307,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#delete-prepared-query">/v1/query/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deletePreparedQuery(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -1253,6 +1325,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient executePreparedQuery(String query, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
 
   /**
@@ -1271,6 +1344,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
 
   /**
@@ -1287,6 +1361,7 @@ public interface ConsulClient {
    * @return reference to this, for fluency
    */
   @Fluent
+  @Deprecated
   ConsulClient registerCatalogService(Node nodeOptions, ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -1299,6 +1374,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity">/v1/catalog/deregister</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient deregisterCatalogService(String nodeId, String serviceId, Handler<AsyncResult<Void>> resultHandler);
 
   /**
