@@ -30,6 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -87,6 +88,24 @@ public class Utils {
     }
   }
 
+  public static void runAsync(Supplier<Future<Void>> runner) {
+    CountDownLatch latch = new CountDownLatch(1);
+    Promise<Void> promise = Promise.promise();
+    Future<Void> fut = runner.get();
+    fut.onComplete(ar -> {
+      promise.handle(ar);
+      latch.countDown();
+    });
+    try {
+      latch.await(10, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    if (promise.future().failed()) {
+      throw new RuntimeException(promise.future().cause());
+    }
+  }
+
   public static void runAsync(Consumer<Handler<AsyncResult<Void>>> runner) {
     CountDownLatch latch = new CountDownLatch(1);
     Promise<Void> promise = Promise.promise();
@@ -108,15 +127,12 @@ public class Utils {
     }
   }
 
-  public static <T> T getAsync(Consumer<Handler<AsyncResult<T>>> runner) {
+  public static <T> T getAsync(Supplier<Future<T>> runner) {
     CountDownLatch latch = new CountDownLatch(1);
     Promise<T> promise = Promise.promise();
-    runner.accept(h -> {
-      if (h.succeeded()) {
-        promise.complete(h.result());
-      } else {
-        promise.fail(h.cause());
-      }
+    Future<T> fut = runner.get();
+    fut.onComplete(ar -> {
+      promise.handle(ar);
       latch.countDown();
     });
     try {
