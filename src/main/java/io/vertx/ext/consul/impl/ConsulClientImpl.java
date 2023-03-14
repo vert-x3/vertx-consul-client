@@ -1314,30 +1314,16 @@ public class ConsulClientImpl implements ConsulClient {
       rq.timeout(timeoutMs);
     }
     try {
-      rq.sendBuffer(body == null ? Buffer.buffer() : Buffer.buffer(body), h -> {
-        if (h.succeeded()) {
-          HttpResponse<Buffer> resp = h.result();
+      rq.sendBuffer(body == null ? Buffer.buffer() : Buffer.buffer(body))
+        .map(resp -> {
           if (validCodes.contains(resp.statusCode())) {
-            T mapped;
-            try {
-              mapped = mapper.apply(resp);
-            } catch (Throwable throwable) {
-              resultHandler.handle(Future.failedFuture(throwable));
-              return;
-            }
-            resultHandler.handle(Future.succeededFuture(mapped));
+            return mapper.apply(resp);
           } else {
-            resultHandler.handle(Future.failedFuture(
-              String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()))
-            );
+            throw new VertxException(String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()), true);
           }
-        } else {
-          resultHandler.handle(Future.failedFuture(h.cause()));
-        }
-      });
+        }).onComplete(resultHandler);
     } catch (final IllegalStateException e) {
       resultHandler.handle(Future.failedFuture(e));
     }
   }
-
 }

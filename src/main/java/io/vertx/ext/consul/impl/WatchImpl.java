@@ -20,6 +20,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.consul.*;
 
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -42,8 +43,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     @Override
     void wait(long index, Handler<AsyncResult<State<KeyValue>>> handler) {
       BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
-      consulClient.getValueWithOptions(key, options, h ->
-        handler.handle(h.map(kv -> new State<KeyValue>(kv, kv.getModifyIndex()))));
+      consulClient.getValueWithOptions(key, options).onComplete(h ->
+        handler.handle(h.map(kv -> new State<>(kv, kv.getModifyIndex()))));
     }
   }
 
@@ -59,8 +60,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     @Override
     void wait(long index, Handler<AsyncResult<State<KeyValueList>>> handler) {
       BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
-      consulClient.getValuesWithOptions(keyPrefix, options, h ->
-        handler.handle(h.map(kv -> new State<KeyValueList>(kv, kv.getIndex()))));
+      consulClient.getValuesWithOptions(keyPrefix, options).onComplete(h ->
+        handler.handle(h.map(kv -> new State<>(kv, kv.getIndex()))));
     }
   }
 
@@ -73,8 +74,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     @Override
     void wait(long index, Handler<AsyncResult<State<ServiceList>>> handler) {
       BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
-      consulClient.catalogServicesWithOptions(options, h ->
-        handler.handle(h.map(services -> new State<ServiceList>(services, services.getIndex()))));
+      consulClient.catalogServicesWithOptions(options).onComplete(h ->
+        handler.handle(h.map(services -> new State<>(services, services.getIndex()))));
     }
   }
 
@@ -91,8 +92,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     void wait(long index, Handler<AsyncResult<State<ServiceEntryList>>> handler) {
       BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
       ServiceQueryOptions sOpts = new ServiceQueryOptions().setNear("_agent").setBlockingOptions(bOpts);
-      consulClient.healthServiceNodesWithOptions(service, false, sOpts, h ->
-        handler.handle(h.map(services -> new State<ServiceEntryList>(services, services.getIndex()))));
+      consulClient.healthServiceNodesWithOptions(service, false, sOpts).onComplete(h ->
+        handler.handle(h.map(services -> new State<>(services, services.getIndex()))));
     }
   }
 
@@ -109,8 +110,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     void wait(long index, Handler<AsyncResult<State<EventList>>> handler) {
       BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
       EventListOptions eOpts = new EventListOptions().setBlockingOptions(bOpts).setName(event);
-      consulClient.listEventsWithOptions(eOpts, h ->
-        handler.handle(h.map(events -> new State<EventList>(events, events.getIndex()))));
+      consulClient.listEventsWithOptions(eOpts).onComplete(h ->
+        handler.handle(h.map(events -> new State<>(events, events.getIndex()))));
     }
   }
 
@@ -124,8 +125,8 @@ public abstract class WatchImpl<T> implements Watch<T> {
     void wait(long index, Handler<AsyncResult<State<NodeList>>> handler) {
       BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
       NodeQueryOptions qOpts = new NodeQueryOptions().setBlockingOptions(bOpts);
-      consulClient.catalogNodesWithOptions(qOpts, h ->
-        handler.handle(h.map(nodes -> new State<NodeList>(nodes, nodes.getIndex()))));
+      consulClient.catalogNodesWithOptions(qOpts).onComplete(h ->
+        handler.handle(h.map(nodes -> new State<>(nodes, nodes.getIndex()))));
     }
   }
 
@@ -291,7 +292,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       State<?> state = (State<?>) o;
-      return index == state.index && (value != null ? value.equals(state.value) : state.value == null);
+      return index == state.index && Objects.equals(value, state.value);
     }
 
     @Override
