@@ -24,7 +24,7 @@ public class Events {
 
   public void sendWithName(ConsulClient consulClient) {
 
-    consulClient.fireEvent("eventName", res -> {
+    consulClient.fireEvent("eventName").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Event sent");
         System.out.println("id: " + res.result().getId());
@@ -41,7 +41,7 @@ public class Events {
       .setTag("tag")
       .setPayload("message");
 
-    consulClient.fireEventWithOptions("eventName", opts, res -> {
+    consulClient.fireEventWithOptions("eventName", opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Event sent");
         System.out.println("id: " + res.result().getId());
@@ -54,7 +54,7 @@ public class Events {
 
   public void list(ConsulClient consulClient) {
 
-    consulClient.listEvents(res -> {
+    consulClient.listEvents().onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Consul index: " + res.result().getIndex());
         for(Event event: res.result().getList()) {
@@ -75,7 +75,7 @@ public class Events {
       .setName("eventName")
       .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
 
-    consulClient.listEventsWithOptions(opts, res -> {
+    consulClient.listEventsWithOptions(opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Consul index: " + res.result().getIndex());
         for(Event event: res.result().getList()) {

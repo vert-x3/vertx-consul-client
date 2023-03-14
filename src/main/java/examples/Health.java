@@ -33,7 +33,7 @@ public class Health {
 
   public void tcpHealth(ConsulClient consulClient, CheckOptions opts) {
 
-    consulClient.registerCheck(opts, res -> {
+    consulClient.registerCheck(opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("check successfully registered");
       } else {
