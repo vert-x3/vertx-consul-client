@@ -32,7 +32,7 @@ public class Sessions {
 
   public void create(ConsulClient consulClient, SessionOptions opts) {
 
-    consulClient.createSessionWithOptions(opts, res -> {
+    consulClient.createSessionWithOptions(opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Session successfully created");
         System.out.println("id: " + res.result());
@@ -45,7 +45,7 @@ public class Sessions {
 
   public void destroy(ConsulClient consulClient, String sessionId) {
 
-    consulClient.destroySession(sessionId, res -> {
+    consulClient.destroySession(sessionId).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Session successfully destroyed");
       } else {
@@ -57,7 +57,7 @@ public class Sessions {
 
   public void nodeSessions(ConsulClient consulClient) {
 
-    consulClient.listNodeSessions("nodeId", res -> {
+    consulClient.listNodeSessions("nodeId").onComplete(res -> {
       if (res.succeeded()) {
         for(Session session: res.result().getList()) {
           System.out.println("Session id: " + session.getId());
@@ -76,7 +76,7 @@ public class Sessions {
     BlockingQueryOptions blockingOpts = new BlockingQueryOptions()
       .setIndex(lastIndex);
 
-    consulClient.listSessionsWithOptions(blockingOpts, res -> {
+    consulClient.listSessionsWithOptions(blockingOpts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Found " + res.result().getList().size() + " sessions");
       } else {

@@ -38,7 +38,7 @@ public class Services {
 
   public void register(ConsulClient consulClient, ServiceOptions opts) {
 
-    consulClient.registerService(opts, res -> {
+    consulClient.registerService(opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Service successfully registered");
       } else {
@@ -51,7 +51,7 @@ public class Services {
 
   public void discovery(ConsulClient consulClient) {
 
-    consulClient.catalogServiceNodes("serviceName", res -> {
+    consulClient.catalogServiceNodes("serviceName").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " services");
         System.out.println("consul state index: " + res.result().getIndex());
@@ -69,7 +69,7 @@ public class Services {
 
   public void health(ConsulClient consulClient, boolean passingOnly) {
 
-    consulClient.healthServiceNodes("serviceName", passingOnly, res -> {
+    consulClient.healthServiceNodes("serviceName", passingOnly).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " services");
         System.out.println("consul state index: " + res.result().getIndex());
@@ -96,7 +96,7 @@ public class Services {
 
   public void queryWithOptions(ConsulClient consulClient, boolean passingOnly, ServiceQueryOptions queryOpts) {
 
-    consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts, res -> {
+    consulClient.healthServiceNodesWithOptions("serviceName", passingOnly, queryOpts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " services");
       } else {
@@ -108,7 +108,7 @@ public class Services {
 
   public void deregister(ConsulClient consulClient) {
 
-    consulClient.deregisterService("serviceId", res -> {
+    consulClient.deregisterService("serviceId").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Service successfully deregistered");
       } else {

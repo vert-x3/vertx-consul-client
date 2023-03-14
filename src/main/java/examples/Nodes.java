@@ -26,7 +26,7 @@ public class Nodes {
 
   public void catalogNodes(ConsulClient consulClient) {
 
-    consulClient.catalogNodes(res -> {
+    consulClient.catalogNodes().onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " nodes");
         System.out.println("consul state index " + res.result().getIndex());
@@ -43,7 +43,7 @@ public class Nodes {
       .setNear("_agent")
       .setBlockingOptions(new BlockingQueryOptions().setIndex(lastIndex));
 
-    consulClient.catalogNodesWithOptions(opts, res -> {
+    consulClient.catalogNodesWithOptions(opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("found " + res.result().getList().size() + " nodes");
       } else {

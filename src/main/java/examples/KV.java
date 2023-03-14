@@ -24,7 +24,7 @@ public class KV {
 
   public void put(ConsulClient consulClient) {
 
-    consulClient.putValue("key", "value", res -> {
+    consulClient.putValue("key", "value").onComplete(res -> {
       if (res.succeeded()) {
         String opResult = res.result() ? "success" : "fail";
         System.out.println("result of the operation: " + opResult);
@@ -43,7 +43,7 @@ public class KV {
       .setAcquireSession("acquireSessionID")
       .setReleaseSession("releaseSessionID");
 
-    consulClient.putValueWithOptions("key", "value", opts, res -> {
+    consulClient.putValueWithOptions("key", "value", opts).onComplete(res -> {
       if (res.succeeded()) {
         String opResult = res.result() ? "success" : "fail";
         System.out.println("result of the operation: " + opResult);
@@ -56,7 +56,7 @@ public class KV {
 
   public void getValue(ConsulClient consulClient) {
 
-    consulClient.getValue("key", res -> {
+    consulClient.getValue("key").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("retrieved value: " + res.result().getValue());
         System.out.println("modify index: " + res.result().getModifyIndex());
@@ -69,7 +69,7 @@ public class KV {
 
   public void getValues(ConsulClient consulClient) {
 
-    consulClient.getValues("prefix", res -> {
+    consulClient.getValues("prefix").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("modify index: " + res.result().getIndex());
         for (KeyValue kv : res.result().getList()) {
@@ -84,7 +84,7 @@ public class KV {
 
   public void deleteValue(ConsulClient consulClient) {
 
-    consulClient.deleteValue("key", res -> {
+    consulClient.deleteValue("key").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("complete");
       } else {
@@ -96,7 +96,7 @@ public class KV {
 
   public void deleteValues(ConsulClient consulClient) {
 
-    consulClient.deleteValues("prefix", res -> {
+    consulClient.deleteValues("prefix").onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("complete");
       } else {
@@ -112,7 +112,7 @@ public class KV {
       .setIndex(modifyIndex)
       .setWait("1m");
 
-    consulClient.getValueWithOptions("key", opts, res -> {
+    consulClient.getValueWithOptions("key", opts).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("retrieved value: " + res.result().getValue());
         System.out.println("new modify index: " + res.result().getModifyIndex());
@@ -129,7 +129,7 @@ public class KV {
       .addOperation(new TxnKVOperation().setKey("key1").setValue("value1").setType(TxnKVVerb.SET))
       .addOperation(new TxnKVOperation().setKey("key2").setValue("value2").setType(TxnKVVerb.SET));
 
-    consulClient.transaction(request, res -> {
+    consulClient.transaction(request).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("succeeded results: " + res.result().getResults().size());
         System.out.println("errors: " + res.result().getErrors().size());

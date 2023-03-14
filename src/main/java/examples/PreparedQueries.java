@@ -39,7 +39,7 @@ public class PreparedQueries {
 
   public void createQuery(ConsulClient consulClient, PreparedQueryDefinition def) {
 
-    consulClient.createPreparedQuery(def, res -> {
+    consulClient.createPreparedQuery(def).onComplete(res -> {
       if (res.succeeded()) {
         String queryId = res.result();
         System.out.println("Query created: " + queryId);
@@ -52,7 +52,7 @@ public class PreparedQueries {
 
   public void executeQuery(ConsulClient consulClient) {
 
-    consulClient.executePreparedQuery("find_1_2", res -> {
+    consulClient.executePreparedQuery("find_1_2").onComplete(res -> {
       // matches template regexp "^find_(.+?)_(.+?)$"
       if (res.succeeded()) {
         PreparedQueryExecuteResponse response = res.result();
@@ -66,7 +66,7 @@ public class PreparedQueries {
 
   public void executeQueryId(ConsulClient consulClient, String id) {
 
-    consulClient.executePreparedQuery(id, res -> {
+    consulClient.executePreparedQuery(id).onComplete(res -> {
       if (res.succeeded()) {
         PreparedQueryExecuteResponse response = res.result();
         System.out.println("Found " + response.getNodes().size() + " nodes");
@@ -79,7 +79,7 @@ public class PreparedQueries {
 
   public void deleteQuery(ConsulClient consulClient, String query) {
 
-    consulClient.deletePreparedQuery(query, res -> {
+    consulClient.deletePreparedQuery(query).onComplete(res -> {
       if (res.succeeded()) {
         System.out.println("Query deleted");
       } else {
