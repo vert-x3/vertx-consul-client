@@ -45,7 +45,7 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void datacenters(TestContext tc) {
-    ctx.readClient().catalogDatacenters(tc.asyncAssertSuccess(datacenters -> {
+    ctx.readClient().catalogDatacenters().onComplete(tc.asyncAssertSuccess(datacenters -> {
       tc.assertEquals(datacenters.size(), 1);
       tc.assertEquals(datacenters.get(0), ctx.dc().getName());
     }));
@@ -53,7 +53,7 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void nodes(TestContext tc) {
-    ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes -> {
+    ctx.readClient().catalogNodes().onComplete(tc.asyncAssertSuccess(nodes -> {
       tc.assertEquals(nodes.getList().size(), 1);
       Node node = nodes.getList().get(0);
       tc.assertEquals(node.getName(), ctx.nodeName());
@@ -62,13 +62,13 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void blockingQuery(TestContext tc) throws InterruptedException {
-    ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes1 -> {
+    ctx.readClient().catalogNodes().onComplete(tc.asyncAssertSuccess(nodes1 -> {
       Async async1 = tc.async();
 
       System.out.println(">>>>>>> wait for new node");
       NodeQueryOptions blockingQueryOptions1 = new NodeQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(nodes1.getIndex()));
-      ctx.readClient().catalogNodesWithOptions(blockingQueryOptions1, h -> {
+      ctx.readClient().catalogNodesWithOptions(blockingQueryOptions1).onComplete(h -> {
         System.out.println(">>>>>>> new node event received");
         List<String> names = h.result().getList().stream().map(Node::getName).collect(Collectors.toList());
         tc.assertEquals(names.size(), 2);
@@ -79,15 +79,15 @@ public class Catalog extends ConsulTestBase {
       vertx.setTimer(1000, l -> {
         System.out.println(">>>>>>> new node is still not ready");
         tc.assertEquals(async1.count(), 1);
-        vertx.<ConsulAgent>executeBlocking(b1 -> b1.complete(ctx.attachAgent("attached_node")), tc.asyncAssertSuccess(attached -> {
+        vertx.<ConsulAgent>executeBlocking(b1 -> b1.complete(ctx.attachAgent("attached_node"))).onComplete(tc.asyncAssertSuccess(attached -> {
           System.out.println(">>>>>>> new node attached");
           async1.handler(v -> {
-            ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes2 -> {
+            ctx.readClient().catalogNodes().onComplete(tc.asyncAssertSuccess(nodes2 -> {
               NodeQueryOptions blockingQueryOptions2 = new NodeQueryOptions()
                 .setBlockingOptions(new BlockingQueryOptions().setIndex(nodes2.getIndex()));
               System.out.println(">>>>>>> wait for new node detaching");
-              ctx.readClient().catalogNodesWithOptions(blockingQueryOptions2, tc.asyncAssertSuccess());
-              vertx.executeBlocking(b2 -> ctx.detachAgent(attached), detached -> System.out.println(">>>>>>> new node detached"));
+              ctx.readClient().catalogNodesWithOptions(blockingQueryOptions2).onComplete(tc.asyncAssertSuccess());
+              vertx.executeBlocking(b2 -> ctx.detachAgent(attached)).onComplete(detached -> System.out.println(">>>>>>> new node detached"));
             }));
           });
         }));
@@ -105,13 +105,13 @@ public class Catalog extends ConsulTestBase {
     serviceOptions.setCheckOptions(null);
     serviceOptions.setCheckListOptions(null);
 
-    consulWriteClient.registerCatalogService(node, serviceOptions, tc.asyncAssertSuccess(unused -> {
-      consulWriteClient.catalogNodesWithOptions(null, tc.asyncAssertSuccess(nodes -> {
+    consulWriteClient.registerCatalogService(node, serviceOptions).onComplete(tc.asyncAssertSuccess(unused -> {
+      consulWriteClient.catalogNodesWithOptions(null).onComplete(tc.asyncAssertSuccess(nodes -> {
         Optional<Node> nodeOptional = nodes.getList().stream().filter(n -> nodeName.equals(n.getName())).findFirst();
         tc.assertTrue(nodeOptional.isPresent());
         tc.assertEquals(node, nodeOptional.get());
 
-        consulWriteClient.catalogNodeServices(node.getName(), tc.asyncAssertSuccess(serviceList -> {
+        consulWriteClient.catalogNodeServices(node.getName()).onComplete(tc.asyncAssertSuccess(serviceList -> {
           tc.assertEquals(serviceList.getList().size(), 1);
           Service service = serviceList.getList().get(0);
           tc.assertEquals(service.getNodeAddress(), node.getAddress());
@@ -125,20 +125,20 @@ public class Catalog extends ConsulTestBase {
 
           Async async = tc.async(2);
 
-          consulWriteClient.deregisterCatalogService(node.getName(), service.getId(), tc.asyncAssertSuccess(deregistered -> {
+          consulWriteClient.deregisterCatalogService(node.getName(), service.getId()).onComplete(tc.asyncAssertSuccess(deregistered -> {
 
-            consulWriteClient.catalogNodesWithOptions(null, tc.asyncAssertSuccess(nodes1 -> {
+            consulWriteClient.catalogNodesWithOptions(null).onComplete(tc.asyncAssertSuccess(nodes1 -> {
               Optional<Node> nodeOptional1 = nodes1.getList().stream().filter(n -> nodeName.equals(n.getName())).findFirst();
               tc.assertTrue(nodeOptional1.isPresent());
               async.countDown();
             }));
-            consulWriteClient.catalogNodeServices(node.getName(), tc.asyncAssertSuccess(serviceList1 -> {
+            consulWriteClient.catalogNodeServices(node.getName()).onComplete(tc.asyncAssertSuccess(serviceList1 -> {
               tc.assertTrue(serviceList1.getList().isEmpty());
               async.countDown();
             }));
           }));
 
-          async.handler(v -> consulWriteClient.deregisterCatalogService(node.getName(), null, tc.asyncAssertSuccess(deregistered -> consulWriteClient.catalogNodesWithOptions(null, tc.asyncAssertSuccess(nodes1 -> {
+          async.handler(v -> consulWriteClient.deregisterCatalogService(node.getName(), null).onComplete(tc.asyncAssertSuccess(deregistered -> consulWriteClient.catalogNodesWithOptions(null).onComplete(tc.asyncAssertSuccess(nodes1 -> {
             Optional<Node> nodeOptional1 = nodes1.getList().stream().filter(n -> nodeName.equals(n.getName())).findFirst();
             tc.assertFalse(nodeOptional1.isPresent());
           })))));

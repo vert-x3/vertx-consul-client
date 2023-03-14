@@ -1364,6 +1364,10 @@ public interface ConsulClient {
   @Deprecated
   ConsulClient registerCatalogService(Node nodeOptions, ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
 
+  default Future<Void> registerCatalogService(Node nodeOptions, ServiceOptions serviceOptions) {
+    return Future.future(h -> registerCatalogService(nodeOptions, serviceOptions, h));
+  }
+
   /**
    * Deregister entities from the node or deregister the node itself.
    *
@@ -1376,6 +1380,10 @@ public interface ConsulClient {
   @Fluent
   @Deprecated
   ConsulClient deregisterCatalogService(String nodeId, String serviceId, Handler<AsyncResult<Void>> resultHandler);
+
+  default Future<Void> deregisterCatalogService(String nodeId, String serviceId) {
+    return Future.future(h -> deregisterCatalogService(nodeId, serviceId, h));
+  }
 
   /**
    * Close the client and release its resources

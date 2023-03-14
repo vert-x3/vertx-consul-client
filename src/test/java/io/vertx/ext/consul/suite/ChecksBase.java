@@ -64,17 +64,17 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     Check check;
 
-    runAsync(h -> ctx.writeClient().warnCheckWithNote(checkId, "warn", h));
+    runAsync(() -> ctx.writeClient().warnCheckWithNote(checkId, "warn"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
     assertEquals("warn", check.getOutput());
 
-    runAsync(h -> ctx.writeClient().failCheckWithNote(checkId, "fail", h));
+    runAsync(() -> ctx.writeClient().failCheckWithNote(checkId, "fail"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
     assertEquals("fail", check.getOutput());
 
-    runAsync(h -> ctx.writeClient().passCheckWithNote(checkId, "pass", h));
+    runAsync(() -> ctx.writeClient().passCheckWithNote(checkId, "pass"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
     assertEquals("pass", check.getOutput());
@@ -84,7 +84,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
   }
 
   @Test
@@ -120,7 +120,7 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     reporter.close();
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
   }
 
   @Test
@@ -149,7 +149,7 @@ public abstract class ChecksBase extends ConsulTestBase {
               tc.assertEquals(CheckStatus.CRITICAL, c2.getStatus());
 
               reporter.close(tc.asyncAssertSuccess(v2 -> {
-                ctx.writeClient().deregisterCheck(checkId, tc.asyncAssertSuccess(v -> async.complete()));
+                ctx.writeClient().deregisterCheck(checkId).onComplete(tc.asyncAssertSuccess(v -> async.complete()));
               }));
             });
           });
@@ -178,7 +178,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
   }
 
   @Test
@@ -205,11 +205,11 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
   }
 
   Check getCheckInfo(String id) {
-    List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
+    List<Check> checks = getAsync(() -> ctx.writeClient().localChecks());
     return checks.stream()
       .filter(check -> check.getId().equals(id))
       .findFirst()
@@ -217,7 +217,7 @@ public abstract class ChecksBase extends ConsulTestBase {
   }
 
   void getCheckInfo(TestContext tc, String id, Handler<Check> resultHandler) {
-    ctx.writeClient().localChecks(tc.asyncAssertSuccess(list -> {
+    ctx.writeClient().localChecks().onComplete(tc.asyncAssertSuccess(list -> {
       resultHandler.handle(list.stream()
         .filter(check -> check.getId().equals(id))
         .findFirst()
@@ -290,7 +290,8 @@ public abstract class ChecksBase extends ConsulTestBase {
     HttpHealthReporter(Vertx vertx) {
       this.port = Utils.getFreePort();
       CountDownLatch latch = new CountDownLatch(1);
-      this.server = vertx.createHttpServer().requestHandler(this::handle).listen(port, h -> latch.countDown());
+      this.server = vertx.createHttpServer().requestHandler(this::handle);
+      server.listen(port).onComplete(h -> latch.countDown());
       try {
         latch.await(10, TimeUnit.SECONDS);
       } catch (InterruptedException e) {

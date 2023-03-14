@@ -43,7 +43,7 @@ public class BrokenConsul extends ConsulTestBase {
   public void timeout(TestContext tc) {
     SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
     ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(1000));
-    client.agentInfo(tc.asyncAssertFailure(t -> {
+    client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
       ctx.closeClient(client);
       slowConsul.close();
       tc.assertTrue(t.getMessage().contains("The timeout period of 1000ms"));
@@ -54,7 +54,7 @@ public class BrokenConsul extends ConsulTestBase {
   public void closedConnection(TestContext tc) {
     BrokenHttpServer brokenConsul = new BrokenHttpServer(vertx);
     ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(brokenConsul.port()));
-    client.agentInfo(tc.asyncAssertFailure(t -> {
+    client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
       ctx.closeClient(client);
       brokenConsul.close();
       tc.assertTrue(t.getMessage().contains("Connection was closed"));
@@ -86,8 +86,8 @@ public class BrokenConsul extends ConsulTestBase {
       this.port = Utils.getFreePort();
       CountDownLatch latch = new CountDownLatch(1);
       this.server = vertx.createHttpServer()
-        .requestHandler(handler)
-        .listen(port, h -> latch.countDown());
+        .requestHandler(handler);
+      server.listen(port).onComplete(h -> latch.countDown());
       try {
         latch.await(10, TimeUnit.SECONDS);
       } catch (InterruptedException e) {

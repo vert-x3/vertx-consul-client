@@ -128,11 +128,11 @@ public class Watches extends ConsulTestBase {
 
     consumer.await(EMPTY_MESSAGE);
 
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v1, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(key, v1)));
     consumer.await(v1);
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v2, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(key, v2)));
     consumer.await(v2);
-    runAsync(h -> ctx.writeClient().deleteValue(key, h));
+    runAsync(() -> ctx.writeClient().deleteValue(key));
     consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
@@ -146,7 +146,7 @@ public class Watches extends ConsulTestBase {
     String v1 = randomAlphaString(10);
     String v2 = randomAlphaString(10);
 
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v1, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(key, v1)));
 
     Watch<KeyValue> watch = Watch.key(key, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
@@ -159,9 +159,9 @@ public class Watches extends ConsulTestBase {
       .start();
 
     consumer.await(v1);
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v2, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(key, v2)));
     consumer.await(v2);
-    runAsync(h -> ctx.writeClient().deleteValue(key, h));
+    runAsync(() -> ctx.writeClient().deleteValue(key));
     consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
@@ -177,7 +177,7 @@ public class Watches extends ConsulTestBase {
     String v1 = randomAlphaString(10);
     String v2 = randomAlphaString(10);
 
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(k1, v1, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(k1, v1)));
 
     Watch<KeyValueList> watch = Watch.keyPrefix(keyPrefix, vertx, ctx.readClientOptions())
       .setHandler(kv -> {
@@ -194,9 +194,9 @@ public class Watches extends ConsulTestBase {
       .start();
 
     consumer.await(v1);
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(k2, v2, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(k2, v2)));
     consumer.await(Stream.of(v1, v2).sorted().collect(Collectors.joining("/")));
-    runAsync(h -> ctx.writeClient().deleteValues(keyPrefix, h));
+    runAsync(() -> ctx.writeClient().deleteValues(keyPrefix));
     consumer.await(EMPTY_MESSAGE);
     consumer.check();
 
@@ -226,7 +226,7 @@ public class Watches extends ConsulTestBase {
     String v1 = randomAlphaString(10);
     String v2 = randomAlphaString(10);
 
-    assertTrue(getAsync(h -> ctx.writeClient().putValue(key, v1, h)));
+    assertTrue(getAsync(() -> ctx.writeClient().putValue(key, v1)));
 
     CountDownLatch succ = new CountDownLatch(1);
     AtomicInteger errs = new AtomicInteger();
@@ -245,7 +245,7 @@ public class Watches extends ConsulTestBase {
       .start();
 
     vertx.setTimer(TimeUnit.SECONDS.toMillis(15), th -> {
-      ctx.writeClient().putValue(key, v2, ignore -> {});
+      ctx.writeClient().putValue(key, v2);
     });
 
     succ.await();
@@ -273,12 +273,12 @@ public class Watches extends ConsulTestBase {
 
     consumer.await("");
 
-    runAsync(h -> ctx.writeClient().registerService(service, h));
+    runAsync(() -> ctx.writeClient().registerService(service));
     consumer.await(service.getName());
     consumer.check();
 
     watch.stop();
-    runAsync(h -> ctx.writeClient().deregisterService(service.getId(), h));
+    runAsync(() -> ctx.writeClient().deregisterService(service.getId()));
   }
 
   @Test
@@ -308,13 +308,13 @@ public class Watches extends ConsulTestBase {
 
     consumer.await("");
 
-    runAsync(h -> ctx.writeClient().registerService(service, h));
+    runAsync(() -> ctx.writeClient().registerService(service));
     consumer.await(service.getName() + "/" + CheckStatus.PASSING.name());
     consumer.await(service.getName() + "/" + CheckStatus.CRITICAL.name());
     consumer.check();
 
     watch.stop();
-    runAsync(h -> ctx.writeClient().deregisterService(service.getId(), h));
+    runAsync(() -> ctx.writeClient().deregisterService(service.getId()));
   }
 
   @Test
@@ -335,9 +335,9 @@ public class Watches extends ConsulTestBase {
 
     consumer.await("");
 
-    Utils.<Event>getAsync(h -> ctx.writeClient().fireEventWithOptions(evName, new EventOptions().setPayload(p1), h));
-    Utils.<Event>getAsync(h -> ctx.writeClient().fireEventWithOptions(randomAlphaString(10), new EventOptions().setPayload(randomAlphaString(10)), h));
-    Utils.<Event>getAsync(h -> ctx.writeClient().fireEventWithOptions(evName, new EventOptions().setPayload(p2), h));
+    Utils.<Event>getAsync(() -> ctx.writeClient().fireEventWithOptions(evName, new EventOptions().setPayload(p1)));
+    Utils.<Event>getAsync(() -> ctx.writeClient().fireEventWithOptions(randomAlphaString(10), new EventOptions().setPayload(randomAlphaString(10))));
+    Utils.<Event>getAsync(() -> ctx.writeClient().fireEventWithOptions(evName, new EventOptions().setPayload(p2)));
 
     consumer.await(p1);
     consumer.await(p1 + "," + p2);

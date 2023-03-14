@@ -43,7 +43,7 @@ public class BrokenClient extends ConsulTestBase {
   }
 
   private void tryClient(TestContext tc, ConsulClient client, String expectedExceptionMessageSubstring) {
-    client.agentInfo(tc.asyncAssertFailure(t -> {
+    client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
       tc.assertTrue(t.getMessage().contains(expectedExceptionMessageSubstring));
       ctx.closeClient(client);
     }));

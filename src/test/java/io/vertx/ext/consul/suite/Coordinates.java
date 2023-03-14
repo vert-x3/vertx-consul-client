@@ -37,7 +37,7 @@ public class Coordinates extends ConsulTestBase {
     CoordinateList nodes1 = null;
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      nodes1 = getAsync(h -> ctx.readClient().coordinateNodes(h));
+      nodes1 = getAsync(() -> ctx.readClient().coordinateNodes());
       if (nodes1.getList().size() == 1) {
         break;
       }
@@ -55,7 +55,7 @@ public class Coordinates extends ConsulTestBase {
 
     waitBlockingQuery(latch, 10, nodes1.getIndex(), (idx, fut) -> {
       BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(idx);
-      ctx.readClient().coordinateNodesWithOptions(opts, h -> {
+      ctx.readClient().coordinateNodesWithOptions(opts).onComplete(h -> {
         boolean success = h.result().getList().size() == 2;
         waitComplete(vertx, fut, h.result().getIndex(), success);
       });
@@ -75,7 +75,7 @@ public class Coordinates extends ConsulTestBase {
   private boolean waitPeers() {
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      List<String> peers = getAsync(h -> ctx.readClient().peersStatus(h));
+      List<String> peers = getAsync(() -> ctx.readClient().peersStatus());
       if (peers.size() == 1) {
         return true;
       }
@@ -90,7 +90,7 @@ public class Coordinates extends ConsulTestBase {
     List<DcCoordinates> datacenters = null;
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      datacenters = getAsync(h -> ctx.readClient().coordinateDatacenters(h));
+      datacenters = getAsync(() -> ctx.readClient().coordinateDatacenters());
       if (datacenters.size() > 0) {
         break;
       }

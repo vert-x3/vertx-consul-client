@@ -16,6 +16,7 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.unit.Async;
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.RandomObjects.randomServiceOptions;
@@ -56,33 +58,33 @@ public class Services extends ChecksBase {
   public void createLocalService(TestContext tc) {
     String serviceName = randomAlphaString(10);
     ServiceOptions opts = randomServiceOptions().setName(serviceName).setId(null);
-    ctx.writeClient().registerService(opts, tc.asyncAssertSuccess(reg -> {
-      ctx.writeClient().localServices(tc.asyncAssertSuccess(services -> {
+    ctx.writeClient().registerService(opts).onComplete(tc.asyncAssertSuccess(reg -> {
+      ctx.writeClient().localServices().onComplete(tc.asyncAssertSuccess(services -> {
         String serviceId = checkService(tc, services, serviceName, opts);
-        ctx.writeClient().localChecks(tc.asyncAssertSuccess(checks -> {
+        ctx.writeClient().localChecks().onComplete(tc.asyncAssertSuccess(checks -> {
           Check c = checks.stream()
             .filter(i -> serviceName.equals(i.getServiceName()))
             .findFirst()
             .orElseThrow(NoSuchElementException::new);
           tc.assertEquals(c.getId(), opts.getCheckOptions().getId());
           tc.assertEquals(c.getNotes(), opts.getCheckOptions().getNotes());
-          ctx.writeClient().catalogNodeServices(ctx.nodeName(), tc.asyncAssertSuccess(nodeServices -> {
+          ctx.writeClient().catalogNodeServices(ctx.nodeName()).onComplete(tc.asyncAssertSuccess(nodeServices -> {
             tc.assertEquals(2, nodeServices.getList().size());
             checkService(tc, nodeServices.getList(), serviceName, opts);
             Async async = tc.async(2);
             ServiceQueryOptions knownOpts = new ServiceQueryOptions().setTag(opts.getTags().get(0));
-            ctx.writeClient().catalogServiceNodesWithOptions(serviceName, knownOpts, tc.asyncAssertSuccess(nodeServicesWithKnownTag -> {
+            ctx.writeClient().catalogServiceNodesWithOptions(serviceName, knownOpts).onComplete(tc.asyncAssertSuccess(nodeServicesWithKnownTag -> {
               tc.assertEquals(1, nodeServicesWithKnownTag.getList().size());
               async.countDown();
             }));
             ServiceQueryOptions unknownOpts = new ServiceQueryOptions().setTag("unknownTag");
-            ctx.writeClient().catalogServiceNodesWithOptions(serviceName, unknownOpts, tc.asyncAssertSuccess(nodeServicesWithUnknownTag -> {
+            ctx.writeClient().catalogServiceNodesWithOptions(serviceName, unknownOpts).onComplete(tc.asyncAssertSuccess(nodeServicesWithUnknownTag -> {
               tc.assertEquals(0, nodeServicesWithUnknownTag.getList().size());
               async.countDown();
             }));
             async.handler(v -> {
-              ctx.writeClient().deregisterService(serviceId, tc.asyncAssertSuccess(deregistered -> {
-                ctx.writeClient().localServices(tc.asyncAssertSuccess(cleaned -> {
+              ctx.writeClient().deregisterService(serviceId).onComplete(tc.asyncAssertSuccess(deregistered -> {
+                ctx.writeClient().localServices().onComplete(tc.asyncAssertSuccess(cleaned -> {
                   tc.assertEquals(cleaned.stream()
                     .filter(i -> serviceName.equals(i.getName()))
                     .count(), 0L);
@@ -114,7 +116,7 @@ public class Services extends ChecksBase {
           getCheckInfo(tc, checkId, critical -> {
             tc.assertEquals(CheckStatus.CRITICAL, critical.getStatus());
             vertx.setTimer(90000, l2 -> {
-              ctx.writeClient().localChecks(tc.asyncAssertSuccess(checks -> {
+              ctx.writeClient().localChecks().onComplete(tc.asyncAssertSuccess(checks -> {
                 tc.assertEquals(checks.stream().filter(c -> c.getName().equals("checkName")).count(), (long) 0);
                 async.complete();
               }));
@@ -127,14 +129,14 @@ public class Services extends ChecksBase {
 
   @Test
   public void healthServices() throws InterruptedException {
-    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions()
+    runAsync(() -> ctx.writeClient().registerService(new ServiceOptions()
       .setName("service").setId("id1").setTags(Collections.singletonList("tag1"))
-      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
-    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions()
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING))));
+    runAsync(() -> ctx.writeClient().registerService(new ServiceOptions()
       .setName("service").setId("id2").setTags(Collections.singletonList("tag2"))
-      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING)), h));
+      .setCheckOptions(new CheckOptions().setTtl("5s").setStatus(CheckStatus.PASSING))));
 
-    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions()
+    runAsync(() -> ctx.writeClient().registerService(new ServiceOptions()
       .setName("service").setId("id3").setTags(Collections.singletonList("tag3"))
       .setCheckListOptions(new ArrayList(Arrays.asList(new CheckOptions()
         .setId("firstCheck")
@@ -143,9 +145,9 @@ public class Services extends ChecksBase {
         new CheckOptions()
           .setId("secondCheck")
           .setTtl("15s")
-          .setStatus(CheckStatus.PASSING)))), h));
+          .setStatus(CheckStatus.PASSING))))));
 
-    ServiceEntryList list1 = getAsync(h -> ctx.readClient().healthServiceNodes("service", true, h));
+    ServiceEntryList list1 = getAsync(() -> ctx.readClient().healthServiceNodes("service", true));
     assertEquals(list1.getList().size(), 3);
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
     assertTrue(ids.contains("id1"));
@@ -153,7 +155,7 @@ public class Services extends ChecksBase {
     assertTrue(ids.contains("id3"));
 
     ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
-    ServiceEntryList list2 = getAsync(h -> ctx.readClient().healthServiceNodesWithOptions("service", true, opts2, h));
+    ServiceEntryList list2 = getAsync(() -> ctx.readClient().healthServiceNodesWithOptions("service", true, opts2));
     assertEquals(list2.getList().size(), 1);
     assertEquals(list2.getList().get(0).getService().getId(), "id2");
 
@@ -161,24 +163,24 @@ public class Services extends ChecksBase {
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       ServiceQueryOptions options = new ServiceQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthServiceNodesWithOptions("service", true, options, h -> {
+      ctx.readClient().healthServiceNodesWithOptions("service", true, options).onComplete(h -> {
         waitComplete(vertx, fut, h.result().getIndex(), h.result().getList().size() == 1);
       });
     });
     sleep(vertx, 2000);
     assertEquals(latch.getCount(), 1);
-    runAsync(h -> ctx.writeClient().failCheck("service:id1", h));
+    runAsync(() -> ctx.writeClient().failCheck("service:id1"));
     awaitLatch(latch);
-    runAsync(h -> ctx.writeClient().deregisterService("id1", h));
-    runAsync(h -> ctx.writeClient().deregisterService("id2", h));
-    runAsync(h -> ctx.writeClient().deregisterService("id3", h));
+    runAsync(() -> ctx.writeClient().deregisterService("id1"));
+    runAsync(() -> ctx.writeClient().deregisterService("id2"));
+    runAsync(() -> ctx.writeClient().deregisterService("id3"));
   }
 
   @Test
   public void findConsul() {
-    ServiceList localConsulList = getAsync(h -> ctx.writeClient().catalogServiceNodes("consul", h));
+    ServiceList localConsulList = getAsync(() -> ctx.writeClient().catalogServiceNodes("consul"));
     assertEquals(localConsulList.getList().size(), 1);
-    List<Service> catalogConsulList = Utils.<ServiceList>getAsync(h -> ctx.writeClient().catalogServices(h))
+    List<Service> catalogConsulList = Utils.<ServiceList>getAsync(() -> ctx.writeClient().catalogServices())
       .getList().stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
     assertEquals(1, catalogConsulList.size());
     assertEquals(0, catalogConsulList.get(0).getTags().size());
@@ -193,10 +195,10 @@ public class Services extends ChecksBase {
       .setAddress("10.0.0.1")
       .setCheckOptions(new CheckOptions().setTtl("1h"))
       .setPort(8080);
-    runAsync(h -> ctx.writeClient().registerService(service, h));
-    runAsync(h -> ctx.writeClient().passCheck("service:" + serviceId, h));
+    runAsync(() -> ctx.writeClient().registerService(service));
+    runAsync(() -> ctx.writeClient().passCheck("service:" + serviceId));
 
-    List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
+    List<Check> checks = getAsync(() -> ctx.writeClient().localChecks());
     assertEquals(1, checks.size());
 
     String reason = "special symbols like `&` are allowed (хорошо)";
@@ -204,39 +206,39 @@ public class Services extends ChecksBase {
       .setId(serviceId)
       .setReason(reason)
       .setEnable(true);
-    runAsync(h -> ctx.writeClient().maintenanceService(opts, h));
+    runAsync(() -> ctx.writeClient().maintenanceService(opts));
 
     // TODO undocumented (?) behavior
-    checks = getAsync(h -> ctx.writeClient().localChecks(h));
+    checks = getAsync(() -> ctx.writeClient().localChecks());
     assertEquals(2, checks.size());
     long cnt = checks.stream().filter(info -> info.getStatus() == CheckStatus.CRITICAL).count();
     assertEquals(1, cnt);
     assertEquals(reason, checks.get(0).getNotes());
 
     opts.setEnable(false);
-    runAsync(h -> ctx.writeClient().maintenanceService(opts, h));
+    runAsync(() -> ctx.writeClient().maintenanceService(opts));
 
-    checks = getAsync(h -> ctx.writeClient().localChecks(h));
+    checks = getAsync(() -> ctx.writeClient().localChecks());
     assertEquals(1, checks.size());
 
-    runAsync(h -> ctx.writeClient().deregisterService(serviceId, h));
+    runAsync(() -> ctx.writeClient().deregisterService(serviceId));
   }
 
   @Test
   public void catalogServicesBlocking() throws InterruptedException {
-    testServicesBlocking(h -> ctx.readClient().catalogServices(h),
-      (opts, h) -> ctx.readClient().catalogServicesWithOptions(opts, h));
+    testServicesBlocking(() -> ctx.readClient().catalogServices(),
+      (opts, h) -> ctx.readClient().catalogServicesWithOptions(opts).onComplete(h));
   }
 
   @Test
   public void catalogNodeServicesBlocking() throws InterruptedException {
-    testServicesBlocking(h -> ctx.readClient().catalogNodeServices(ctx.nodeName(), h),
-      (opts, h) -> ctx.readClient().catalogNodeServicesWithOptions(ctx.nodeName(), opts, h));
+    testServicesBlocking(() -> ctx.readClient().catalogNodeServices(ctx.nodeName()),
+      (opts, h) -> ctx.readClient().catalogNodeServicesWithOptions(ctx.nodeName(), opts).onComplete(h));
   }
 
-  private void testServicesBlocking(Consumer<Handler<AsyncResult<ServiceList>>> runner,
+  private void testServicesBlocking(Supplier<Future<ServiceList>> runner,
                                     BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request) throws InterruptedException {
-    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions().setName("service1").setId("id1"), h));
+    runAsync(() -> ctx.writeClient().registerService(new ServiceOptions().setName("service1").setId("id1")));
     ServiceList list1 = getAsync(runner);
     list1.getList().forEach(s -> System.out.println("--- " + s.toJson().encode()));
     CountDownLatch latch = new CountDownLatch(1);
@@ -249,10 +251,10 @@ public class Services extends ChecksBase {
     });
     sleep(vertx, 4000);
     assertEquals(latch.getCount(), 1);
-    runAsync(h -> ctx.writeClient().registerService(new ServiceOptions().setName("service2").setId("id2"), h));
+    runAsync(() -> ctx.writeClient().registerService(new ServiceOptions().setName("service2").setId("id2")));
     awaitLatch(latch);
-    runAsync(h -> ctx.writeClient().deregisterService("id1", h));
-    runAsync(h -> ctx.writeClient().deregisterService("id2", h));
+    runAsync(() -> ctx.writeClient().deregisterService("id1"));
+    runAsync(() -> ctx.writeClient().deregisterService("id2"));
   }
 
   @Override
@@ -265,13 +267,13 @@ public class Services extends ChecksBase {
       .setCheckOptions(opts)
       .setAddress("10.0.0.1")
       .setPort(8080);
-    runAsync(h -> ctx.writeClient().registerService(service, h));
+    runAsync(() -> ctx.writeClient().registerService(service));
     return "service:" + serviceId;
   }
 
   @Override
   void createCheck(TestContext tc, CheckOptions opts, Handler<String> idHandler) {
     ServiceOptions options = randomServiceOptions().setCheckOptions(opts);
-    ctx.writeClient().registerService(options, tc.asyncAssertSuccess(v -> idHandler.handle("service:" + options.getId())));
+    ctx.writeClient().registerService(options).onComplete(tc.asyncAssertSuccess(v -> idHandler.handle("service:" + options.getId())));
   }
 }
