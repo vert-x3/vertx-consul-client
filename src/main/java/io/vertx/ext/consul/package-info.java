@@ -1,4 +1,4 @@
-@ModuleGen(name = "vertx-consul", groupPackage = "io.vertx", checkCallbackDeprecation = true)
+@ModuleGen(name = "vertx-consul", groupPackage = "io.vertx", useFutures = true)
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.ModuleGen;
