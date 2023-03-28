@@ -361,7 +361,7 @@ public abstract class ChecksBase extends ConsulTestBase {
 
   }
 
-  private static class GrpcHealthReporter {
+  private class GrpcHealthReporter {
 
     private final VertxServer server;
     private final int port;
@@ -398,7 +398,16 @@ public abstract class ChecksBase extends ConsulTestBase {
     }
 
     void close(Handler<AsyncResult<Void>> h) {
-      server.shutdown(h);
+      server.shutdown();
+      vertx.<Void>executeBlocking(p -> {
+        try {
+          server.awaitTermination();
+        } catch (InterruptedException e) {
+          p.fail(e);
+          return;
+        }
+        p.complete();
+      }).onComplete(h);
     }
 
   }
