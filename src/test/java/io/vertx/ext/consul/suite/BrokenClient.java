@@ -32,20 +32,20 @@ public class BrokenClient extends ConsulTestBase {
 
   @Test
   public void unknownHost(TestContext tc) {
-    ConsulClient unknownHost = ctx.createClient(new ConsulClientOptions().setHost("unknownConsulHost"));
+    ConsulClient unknownHost = consul.createClient(vertx, new ConsulClientOptions().setHost("unknownConsulHost"));
     tryClient(tc, unknownHost, "unknownConsulHost");
   }
 
   @Test
   public void unknownPort(TestContext tc) {
-    ConsulClient unknownPort = ctx.createClient(new ConsulClientOptions().setPort(Utils.getFreePort()));
+    ConsulClient unknownPort = consul.createClient(vertx, new ConsulClientOptions().setPort(Utils.getFreePort()));
     tryClient(tc, unknownPort, "Connection refused");
   }
 
   private void tryClient(TestContext tc, ConsulClient client, String expectedExceptionMessageSubstring) {
     client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
       tc.assertTrue(t.getMessage().contains(expectedExceptionMessageSubstring));
-      ctx.closeClient(client);
+      client.close();
     }));
   }
 }

@@ -36,11 +36,11 @@ public class Sessions extends ConsulTestBase {
 
   @Test
   public void createDefaultSession(TestContext tc) {
-    ctx.writeClient().createSession().onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
+    writeClient.createSession().onComplete(tc.asyncAssertSuccess(id -> {
+      writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
         tc.assertEquals(id, session.getId());
-        tc.assertEquals(ctx.nodeName(), session.getNode());
-        ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
   }
@@ -52,14 +52,14 @@ public class Sessions extends ConsulTestBase {
       .setLockDelay(42)
       .setName("optName")
       .setTtl(442);
-    ctx.writeClient().createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
+    writeClient.createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
+      writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
 //        List<String> checks = session.getChecks();
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(opt.getLockDelay(), session.getLockDelay());
-        tc.assertEquals(ctx.nodeName(), session.getNode());
-        ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
   }
@@ -71,14 +71,14 @@ public class Sessions extends ConsulTestBase {
       .setLockDelay(0L)
       .setName("optName")
       .setTtl(442);
-    ctx.writeClient().createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
+    writeClient.createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
+      writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
 //        List<String> checks = session.getChecks();
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(0L, session.getLockDelay());
-        tc.assertEquals(ctx.nodeName(), session.getNode());
-        ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
   }
@@ -89,37 +89,39 @@ public class Sessions extends ConsulTestBase {
       .setBehavior(SessionBehavior.DELETE)
       .setName("optName")
       .setTtl(442);
-    ctx.writeClient().createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
+    writeClient.createSessionWithOptions(opt).onComplete(tc.asyncAssertSuccess(id -> {
+      writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
 //        List<String> checks = session.getChecks();
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(15L, session.getLockDelay());
-        tc.assertEquals(ctx.nodeName(), session.getNode());
-        ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
   }
 
   @Test
   public void unknownNode(TestContext tc) {
-    ctx.writeClient().createSessionWithOptions(new SessionOptions().setNode("unknownNode")).onComplete(tc.asyncAssertFailure());
+    writeClient
+      .createSessionWithOptions(new SessionOptions().setNode("unknownNode"))
+      .onComplete(tc.asyncAssertFailure());
   }
 
   @Test
   public void unknownSession(TestContext tc) {
-    ctx.writeClient().infoSession("00000000-0000-0000-0000-000000000000").onComplete(tc.asyncAssertFailure());
+    writeClient.infoSession("00000000-0000-0000-0000-000000000000").onComplete(tc.asyncAssertFailure());
   }
 
   @Test
   public void listSessions(TestContext tc) {
-    ctx.writeClient().createSession().onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
-        ctx.writeClient().listSessions().onComplete(tc.asyncAssertSuccess(list -> {
+    writeClient.createSession().onComplete(tc.asyncAssertSuccess(id -> {
+      writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
+        writeClient.listSessions().onComplete(tc.asyncAssertSuccess(list -> {
           tc.assertEquals(session.getId(), list.getList().get(0).getId());
-          ctx.writeClient().listNodeSessions(session.getNode()).onComplete(tc.asyncAssertSuccess(nodeSesions -> {
+          writeClient.listNodeSessions(session.getNode()).onComplete(tc.asyncAssertSuccess(nodeSesions -> {
             tc.assertEquals(session.getId(), nodeSesions.getList().get(0).getId());
-            ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+            writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
           }));
         }));
       }));
@@ -128,17 +130,22 @@ public class Sessions extends ConsulTestBase {
 
   @Test
   public void listSessionsBlocking(TestContext tc) throws InterruptedException {
-    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listSessionsWithOptions(opts).onComplete(h));
+    testSessionsBlocking(tc, (opts, h) -> readClient.listSessionsWithOptions(opts).onComplete(h));
   }
 
   @Test
   public void listNodeSessionsBlocking(TestContext tc) throws InterruptedException {
-    testSessionsBlocking(tc, (opts, h) -> ctx.readClient().listNodeSessionsWithOptions(ctx.nodeName(), opts).onComplete(h));
+    testSessionsBlocking(tc, (opts, h) ->
+      readClient.listNodeSessionsWithOptions(consul.container.getNodeName(), opts).onComplete(h)
+    );
   }
 
-  private void testSessionsBlocking(TestContext tc, BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request) {
-    ctx.writeClient().createSession().onComplete(tc.asyncAssertSuccess(id1 -> {
-      ctx.readClient().listSessions().onComplete(tc.asyncAssertSuccess(list1 -> {
+  private void testSessionsBlocking(
+    TestContext tc,
+    BiConsumer<BlockingQueryOptions, Handler<AsyncResult<SessionList>>> request
+  ) {
+    writeClient.createSession().onComplete(tc.asyncAssertSuccess(id1 -> {
+      readClient.listSessions().onComplete(tc.asyncAssertSuccess(list1 -> {
         Async async = tc.async();
         request.accept(new BlockingQueryOptions().setIndex(list1.getIndex()), h -> {
           List<String> ids = h.result().getList().stream().map(Session::getId).collect(Collectors.toList());
@@ -147,10 +154,10 @@ public class Sessions extends ConsulTestBase {
         });
         vertx.setTimer(1000, l -> {
           assertEquals(async.count(), 1);
-          ctx.writeClient().createSession().onComplete(tc.asyncAssertSuccess(id2 -> {
+          writeClient.createSession().onComplete(tc.asyncAssertSuccess(id2 -> {
             async.handler(a -> {
-              ctx.writeClient().destroySession(id1).onComplete(tc.asyncAssertSuccess(d1 -> {
-                ctx.writeClient().destroySession(id2).onComplete(tc.asyncAssertSuccess());
+              writeClient.destroySession(id1).onComplete(tc.asyncAssertSuccess(d1 -> {
+                writeClient.destroySession(id2).onComplete(tc.asyncAssertSuccess());
               }));
             });
           }));
@@ -161,13 +168,15 @@ public class Sessions extends ConsulTestBase {
 
   @Test
   public void sessionInfoBlocking(TestContext tc) {
-    ctx.writeClient().createSession().onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.readClient().infoSession(id).onComplete(tc.asyncAssertSuccess(s1 -> {
+    writeClient.createSession().onComplete(tc.asyncAssertSuccess(id -> {
+      readClient.infoSession(id).onComplete(tc.asyncAssertSuccess(s1 -> {
         Async async = tc.async();
-        ctx.readClient().infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex())).onComplete(h -> async.countDown());
+        readClient
+          .infoSessionWithOptions(id, new BlockingQueryOptions().setIndex(s1.getIndex()))
+          .onComplete(h -> async.countDown());
         vertx.setTimer(1000, l -> {
           assertEquals(async.count(), 1);
-          ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess());
+          writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
         });
       }));
     }));
@@ -175,19 +184,23 @@ public class Sessions extends ConsulTestBase {
 
   @Test
   public void deleteBehavior(TestContext tc) {
-    ctx.writeClient().createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE)).onComplete(tc.asyncAssertSuccess(id -> {
-      ctx.writeClient().putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id)).onComplete(tc.asyncAssertSuccess(b -> {
-        tc.assertTrue(b);
-        ctx.writeClient().getValue("foo/bar").onComplete(tc.asyncAssertSuccess(pair -> {
-          tc.assertEquals("value1", pair.getValue());
-          tc.assertEquals(id, pair.getSession());
-          ctx.writeClient().destroySession(id).onComplete(tc.asyncAssertSuccess(v -> {
-            ctx.writeClient().getValue("foo/bar").onComplete(tc.asyncAssertSuccess(notfound -> {
-              tc.assertFalse(notfound.isPresent());
+    writeClient
+      .createSessionWithOptions(new SessionOptions().setTtl(442).setBehavior(SessionBehavior.DELETE))
+      .onComplete(tc.asyncAssertSuccess(id -> {
+        writeClient
+          .putValueWithOptions("foo/bar", "value1", new KeyValueOptions().setAcquireSession(id))
+          .onComplete(tc.asyncAssertSuccess(b -> {
+            tc.assertTrue(b);
+            writeClient.getValue("foo/bar").onComplete(tc.asyncAssertSuccess(pair -> {
+              tc.assertEquals("value1", pair.getValue());
+              tc.assertEquals(id, pair.getSession());
+              writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess(v -> {
+                writeClient.getValue("foo/bar").onComplete(tc.asyncAssertSuccess(notfound -> {
+                  tc.assertFalse(notfound.isPresent());
+                }));
+              }));
             }));
           }));
-        }));
       }));
-    }));
   }
 }

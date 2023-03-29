@@ -40,9 +40,9 @@ public class Checks extends ChecksBase {
       .setName(serviceName)
       .setAddress("10.0.0.1")
       .setPort(8080);
-    runAsync(() -> ctx.writeClient().registerService(service));
+    runAsync(() -> writeClient.registerService(service));
 
-    List<Service> services = getAsync(() -> ctx.writeClient().localServices());
+    List<Service> services = getAsync(() -> writeClient.localServices());
     Service s = services.stream().filter(i -> "serviceName".equals(i.getName())).findFirst().get();
     String serviceId = s.getId();
     assertEquals(s.getAddress(), "10.0.0.1");
@@ -55,16 +55,16 @@ public class Checks extends ChecksBase {
       .setServiceId(serviceId)
       .setStatus(CheckStatus.PASSING)
       .setTtl("10s");
-    runAsync(() -> ctx.writeClient().registerCheck(check));
+    runAsync(() -> masterClient.registerCheck(check));
 
-    List<Check> checks = getAsync(() -> ctx.writeClient().localChecks());
+    List<Check> checks = getAsync(() -> masterClient.localChecks());
     Check c = checks.stream().filter(i -> "checkId".equals(i.getId())).findFirst().get();
     assertEquals(c.getServiceId(), serviceId);
     assertEquals(c.getId(), "checkId");
     assertEquals(c.getStatus(), CheckStatus.PASSING);
     assertEquals(c.getNotes(), "checkNotes");
 
-    runAsync(() -> ctx.writeClient().deregisterService(serviceId));
+    runAsync(() -> masterClient.deregisterService(serviceId));
   }
 
   @Test
@@ -74,20 +74,20 @@ public class Checks extends ChecksBase {
       .setName(serviceName)
       .setId(serviceName)
       .setCheckOptions(new CheckOptions().setTtl("1m"));
-    runAsync(() -> ctx.writeClient().registerService(opts));
-    CheckList list1 = getAsync(() -> ctx.readClient().healthState(HealthState.CRITICAL));
+    runAsync(() -> masterClient.registerService(opts));
+    CheckList list1 = getAsync(() -> masterClient.healthState(HealthState.CRITICAL));
     CountDownLatch latch = new CountDownLatch(1);
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
+      masterClient.healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
         List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
       });
     });
-    runAsync(() -> ctx.writeClient().passCheck("service:" + serviceName));
+    runAsync(() -> masterClient.passCheck("service:" + serviceName));
     awaitLatch(latch);
-    runAsync(() -> ctx.writeClient().deregisterService(serviceName));
+    runAsync(() -> masterClient.deregisterService(serviceName));
   }
 
   @Test
@@ -97,20 +97,20 @@ public class Checks extends ChecksBase {
       .setName(serviceName)
       .setId(serviceName)
       .setCheckListOptions(Collections.singletonList(new CheckOptions().setTtl("1m")));
-    runAsync(() -> ctx.writeClient().registerService(opts));
-    CheckList list1 = getAsync(() -> ctx.readClient().healthState(HealthState.CRITICAL));
+    runAsync(() -> writeClient.registerService(opts));
+    CheckList list1 = getAsync(() -> readClient.healthState(HealthState.CRITICAL));
     CountDownLatch latch = new CountDownLatch(1);
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
+      readClient.healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
         List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
       });
     });
-    runAsync(() -> ctx.writeClient().passCheck("service:" + serviceName));
+    runAsync(() -> writeClient.passCheck("service:" + serviceName));
     awaitLatch(latch);
-    runAsync(() -> ctx.writeClient().deregisterService(serviceName));
+    runAsync(() -> writeClient.deregisterService(serviceName));
   }
 
   @Test
@@ -125,22 +125,22 @@ public class Checks extends ChecksBase {
       .setCheckOptions(new CheckOptions()
         .setId("singleCheck")
         .setTtl("10s"));
-    runAsync(() -> ctx.writeClient().registerService(opts));
-    CheckList list1 = getAsync(() -> ctx.readClient().healthState(HealthState.CRITICAL));
+    runAsync(() -> writeClient.registerService(opts));
+    CheckList list1 = getAsync(() -> readClient.healthState(HealthState.CRITICAL));
     CountDownLatch latch = new CountDownLatch(1);
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
+      readClient.healthStateWithOptions(HealthState.PASSING, options).onComplete(h -> {
         List<String> names = h.result().getList().stream().map(Check::getServiceName).collect(Collectors.toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains(serviceName));
       });
     });
 
-    runAsync(() -> ctx.writeClient().passCheck("firstCheckFromList"));
-    runAsync(() -> ctx.writeClient().passCheck("singleCheck"));
+    runAsync(() -> writeClient.passCheck("firstCheckFromList"));
+    runAsync(() -> writeClient.passCheck("singleCheck"));
     awaitLatch(latch);
-    runAsync(() -> ctx.writeClient().deregisterService(serviceName));
+    runAsync(() -> writeClient.deregisterService(serviceName));
   }
 
   @Test
@@ -149,14 +149,14 @@ public class Checks extends ChecksBase {
       .setName("serviceName")
       .setId("serviceId")
       .setTags(Collections.singletonList("tag1"));
-    runAsync(() -> ctx.writeClient().registerService(opts));
-    runAsync(() -> ctx.writeClient().registerCheck(new CheckOptions()
+    runAsync(() -> writeClient.registerService(opts));
+    runAsync(() -> writeClient.registerCheck(new CheckOptions()
       .setTtl("10s")
       .setServiceId("serviceId")
       .setId("checkId1")
       .setName("checkName1")));
 
-    CheckList list1 = getAsync(() -> ctx.readClient().healthChecks("serviceName"));
+    CheckList list1 = getAsync(() -> readClient.healthChecks("serviceName"));
     assertEquals(list1.getList().size(), 1);
     assertEquals(list1.getList().get(0).getId(), "checkId1");
 
@@ -164,7 +164,7 @@ public class Checks extends ChecksBase {
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       CheckQueryOptions options = new CheckQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(idx));
-      ctx.readClient().healthChecksWithOptions("serviceName", options).onComplete(h -> {
+      readClient.healthChecksWithOptions("serviceName", options).onComplete(h -> {
         List<String> ids = h.result().getList().stream().map(Check::getId).collect(Collectors.toList());
         boolean success = h.result().getList().size() == 2;
         success &= ids.contains("checkId1");
@@ -175,7 +175,7 @@ public class Checks extends ChecksBase {
     sleep(vertx, 2000);
     assertEquals(latch.getCount(), 1);
 
-    runAsync(() -> ctx.writeClient().registerCheck(new CheckOptions()
+    runAsync(() -> writeClient.registerCheck(new CheckOptions()
       .setTtl("10s")
       .setServiceId("serviceId")
       .setId("checkId2")
@@ -183,9 +183,9 @@ public class Checks extends ChecksBase {
 
     awaitLatch(latch);
 
-    runAsync(() -> ctx.writeClient().deregisterCheck("checkId1"));
-    runAsync(() -> ctx.writeClient().deregisterCheck("checkId2"));
-    runAsync(() -> ctx.writeClient().deregisterService("serviceId"));
+    runAsync(() -> writeClient.deregisterCheck("checkId1"));
+    runAsync(() -> writeClient.deregisterCheck("checkId2"));
+    runAsync(() -> writeClient.deregisterService("serviceId"));
   }
 
   @Override
@@ -195,7 +195,7 @@ public class Checks extends ChecksBase {
       id = "checkId";
       opts.setId(id);
     }
-    runAsync(() -> ctx.writeClient().registerCheck(opts));
+    runAsync(() -> writeClient.registerCheck(opts));
     return id;
   }
 
@@ -203,7 +203,7 @@ public class Checks extends ChecksBase {
   void createCheck(TestContext tc, CheckOptions opts, Handler<String> idHandler) {
     String id = opts.getId() == null ? randomAlphaString(10) : opts.getId();
     opts.setId(id);
-    ctx.writeClient().registerCheck(opts).onComplete(tc.asyncAssertSuccess(v -> idHandler.handle(id)));
+    writeClient.registerCheck(opts).onComplete(tc.asyncAssertSuccess(v -> idHandler.handle(id)));
   }
 
 }

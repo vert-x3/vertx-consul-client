@@ -29,14 +29,14 @@ public class Status extends ConsulTestBase {
 
   @Test
   public void leader(TestContext tc) {
-    ctx.readClient().leaderStatus().onComplete(tc.asyncAssertSuccess(leader -> {
+    readClient.leaderStatus().onComplete(tc.asyncAssertSuccess(leader -> {
       tc.assertEquals(leader.substring(0, leader.indexOf(':')), "127.0.0.1");
     }));
   }
 
   @Test
   public void peers(TestContext tc) {
-    ctx.readClient().peersStatus().onComplete(tc.asyncAssertSuccess(peers -> {
+    readClient.peersStatus().onComplete(tc.asyncAssertSuccess(peers -> {
       tc.assertEquals(peers.size(), 1);
     }));
   }

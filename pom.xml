@@ -14,6 +14,7 @@
   <properties>
     <stack.version>5.0.0-SNAPSHOT</stack.version>
     <embedded.consul.version>2.2.1</embedded.consul.version>
+    <testcontainersVersion>1.17.5</testcontainersVersion>
     <junit.version>4.13.1</junit.version>
 
     <grpc.version>1.50.2</grpc.version>
@@ -48,6 +49,16 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-docgen</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainersVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>consul</artifactId>
+      <version>${testcontainersVersion}</version>
     </dependency>
     <dependency>
       <groupId>com.pszymczyk.consul</groupId>

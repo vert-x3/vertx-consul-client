@@ -29,12 +29,12 @@ public class SecureClient extends ConsulTestBase {
   }
 
   private void go(TestContext tc, boolean trustAll, PemTrustOptions trustOptions) {
-    ConsulClient secureClient = ctx.createSecureClient(trustAll, trustOptions);
+    ConsulClient secureClient = consul.createSecureClient(vertx, consul.dc().getMasterToken(), trustAll, trustOptions);
     secureClient.putValue("foo/bars42", "value42").onComplete(tc.asyncAssertSuccess(b -> {
       tc.assertTrue(b);
       secureClient.getValue("foo/bars42").onComplete(tc.asyncAssertSuccess(pair -> {
         tc.assertEquals(pair.getValue(), "value42");
-        ctx.closeClient(secureClient);
+        secureClient.close();
       }));
     }));
   }

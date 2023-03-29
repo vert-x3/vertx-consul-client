@@ -42,9 +42,9 @@ public class BrokenConsul extends ConsulTestBase {
   @Test
   public void timeout(TestContext tc) {
     SlowHttpServer slowConsul = new SlowHttpServer(vertx, 10000);
-    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(1000));
+    ConsulClient client = consul.createClient(vertx, new ConsulClientOptions().setPort(slowConsul.port()).setTimeout(1000));
     client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
-      ctx.closeClient(client);
+      client.close();
       slowConsul.close();
       tc.assertTrue(t.getMessage().contains("The timeout period of 1000ms"));
     }));
@@ -53,9 +53,9 @@ public class BrokenConsul extends ConsulTestBase {
   @Test
   public void closedConnection(TestContext tc) {
     BrokenHttpServer brokenConsul = new BrokenHttpServer(vertx);
-    ConsulClient client = ctx.createClient(new ConsulClientOptions().setPort(brokenConsul.port()));
+    ConsulClient client = consul.createClient(vertx, new ConsulClientOptions().setPort(brokenConsul.port()));
     client.agentInfo().onComplete(tc.asyncAssertFailure(t -> {
-      ctx.closeClient(client);
+      client.close();
       brokenConsul.close();
       tc.assertTrue(t.getMessage().contains("Connection was closed"));
     }));

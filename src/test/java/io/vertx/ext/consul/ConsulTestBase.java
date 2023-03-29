@@ -15,13 +15,15 @@
  */
 package io.vertx.ext.consul;
 
-import io.vertx.core.Vertx;
-import io.vertx.ext.consul.impl.ConsulClientImpl;
+import io.vertx.ext.consul.dc.ConsulDatacenter;
+import io.vertx.ext.consul.instance.ConsulInstance;
 import io.vertx.test.core.VertxTestBase;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,30 +33,56 @@ import static io.vertx.test.core.TestUtils.randomAlphaString;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class ConsulTestBase extends VertxTestBase {
+  private static final ConsulDatacenter dc = ConsulDatacenter.create();
+  public static ConsulInstance consul;
 
-  static Function<Vertx, ConsulContext> ctxFactory = vertx ->
-    new ConsulContext(
-      opts -> new ConsulClientImpl(vertx, opts),
-      ConsulClient::close
-    );
-  protected ConsulContext ctx;
+  protected ConsulClient masterClient;
+  protected ConsulClient writeClient;
+  protected ConsulClient readClient;
+
+  public static final String KEY_RW_PREFIX = "foo/";
 
   @BeforeClass
   public static void startConsul() throws Exception {
-    ConsulCluster.start();
+    consul = defaultConsulBuilder().build();
+  }
+
+  public static ConsulInstance.Builder defaultConsulBuilder() {
+    return ConsulInstance.builder()
+      .datacenter(dc)
+      .keyFile("server-key.pem")
+      .certFile("server-cert.pem")
+      .caFile("server-cert-ca-chain.pem");
+  }
+
+  @AfterClass
+  public static void shutdownConsul() {
+    consul.shutdown();
   }
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    ctx = ctxFactory.apply(vertx);
-    ctx.start();
+    masterClient = consul.createClient(vertx, dc.getMasterToken(), false);
+    AclToken writeTokenRequest = new AclToken().setType(AclTokenType.CLIENT)
+      .setRules(Utils.readResource("write_rules.hcl"));
+    masterClient.createAclToken(writeTokenRequest).onSuccess(writeToken -> {
+      consul.dc().setWriteToken(writeToken);
+      writeClient = consul.createClient(vertx, writeToken, false);
+    });
+    AclToken readTokenRequest = new AclToken().setType(AclTokenType.CLIENT)
+      .setRules(Utils.readResource("read_rules.hcl"));
+    masterClient.createAclToken(readTokenRequest).onSuccess(readToken ->{
+      consul.dc().setReadToken(readToken);
+      readClient = consul.createClient(vertx, readToken, false);
+    }).wait(500);
   }
 
   @Override
   public void tearDown() throws Exception {
-    ctx.stop();
-    ctx = null;
+    masterClient.close();
+    readClient.close();
+    writeClient.close();
     super.tearDown();
   }
 
@@ -138,4 +166,16 @@ public class ConsulTestBase extends VertxTestBase {
     Character.FINAL_QUOTE_PUNCTUATION
   ).map(Integer::valueOf).collect(Collectors.toSet());
 
+  private static String copyFileFromResources(String fName, String toName) {
+    try {
+      String body = Utils.readResource(fName);
+      File temp = File.createTempFile(toName, ".pem");
+      PrintWriter out = new PrintWriter(temp.getAbsoluteFile());
+      out.print(body);
+      out.close();
+      return temp.getAbsolutePath();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

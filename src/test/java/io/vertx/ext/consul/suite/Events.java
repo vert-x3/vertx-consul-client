@@ -47,17 +47,17 @@ public class Events extends ConsulTestBase {
     String name1 = randomAlphaString(10);
     String name2 = randomAlphaString(10);
     EventOptions opts = new EventOptions().setPayload(randomAlphaString(10));
-    ctx.writeClient().fireEventWithOptions(name1, opts).onComplete(tc.asyncAssertSuccess(event -> {
+    writeClient.fireEventWithOptions(name1, opts).onComplete(tc.asyncAssertSuccess(event -> {
       tc.assertEquals(name1, event.getName());
       tc.assertEquals(opts.getPayload(), event.getPayload());
       String evId1 = event.getId();
-      ctx.writeClient().listEvents().onComplete(tc.asyncAssertSuccess(list1 -> {
+      writeClient.listEvents().onComplete(tc.asyncAssertSuccess(list1 -> {
         long cnt1 = list1.getList().stream()
           .map(Event::getId)
           .filter(id -> id.equals(evId1))
           .count();
         tc.assertEquals(cnt1, (long) 1);
-        ctx.writeClient().listEventsWithOptions(new EventListOptions().setName(name2)).onComplete(tc.asyncAssertSuccess(list2 -> {
+        writeClient.listEventsWithOptions(new EventListOptions().setName(name2)).onComplete(tc.asyncAssertSuccess(list2 -> {
           tc.assertEquals(list2.getList().size(), 0);
           Async async = tc.async(2);
           BlockingQueryOptions blockingQueryOptions = new BlockingQueryOptions()
@@ -65,7 +65,7 @@ public class Events extends ConsulTestBase {
           if (timeout) {
             blockingQueryOptions.setWait("2s");
           }
-          ctx.writeClient().listEventsWithOptions(new EventListOptions().setBlockingOptions(blockingQueryOptions)).onComplete(tc.asyncAssertSuccess(h -> {
+          writeClient.listEventsWithOptions(new EventListOptions().setBlockingOptions(blockingQueryOptions)).onComplete(tc.asyncAssertSuccess(h -> {
             List<String> names = h.getList().stream().map(Event::getName).collect(Collectors.toList());
             if (timeout) {
               tc.assertTrue(names.contains(name1));
@@ -79,8 +79,8 @@ public class Events extends ConsulTestBase {
           tc.assertEquals(async.count(), 2);
           vertx.setTimer(4000, l -> {
             tc.assertEquals(async.count(), timeout ? 1 : 2);
-            ctx.writeClient().fireEvent(name2).onComplete(tc.asyncAssertSuccess(ev -> {
-              ctx.writeClient().listEventsWithOptions(new EventListOptions().setName(name2)).onComplete(tc.asyncAssertSuccess(list3 -> {
+            writeClient.fireEvent(name2).onComplete(tc.asyncAssertSuccess(ev -> {
+              writeClient.listEventsWithOptions(new EventListOptions().setName(name2)).onComplete(tc.asyncAssertSuccess(list3 -> {
                 tc.assertEquals(list3.getList().size(), 1);
                 async.complete();
               }));

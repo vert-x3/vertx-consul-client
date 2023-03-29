@@ -16,7 +16,7 @@
 package io.vertx.ext.consul.suite;
 
 import io.vertx.ext.consul.*;
-import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.consul.instance.ConsulInstance;
 import org.junit.Test;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class Coordinates extends ConsulTestBase {
     CoordinateList nodes1 = null;
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      nodes1 = getAsync(() -> ctx.readClient().coordinateNodes());
+      nodes1 = getAsync(() -> readClient.coordinateNodes());
       if (nodes1.getList().size() == 1) {
         break;
       }
@@ -49,24 +49,24 @@ public class Coordinates extends ConsulTestBase {
       return;
     }
     Coordinate coordinate = nodes1.getList().get(0);
-    assertEquals(coordinate.getNode(), ctx.nodeName());
+    assertEquals(coordinate.getNode(), consul.container.getNodeName());
 
     CountDownLatch latch = new CountDownLatch(1);
 
     waitBlockingQuery(latch, 10, nodes1.getIndex(), (idx, fut) -> {
       BlockingQueryOptions opts = new BlockingQueryOptions().setIndex(idx);
-      ctx.readClient().coordinateNodesWithOptions(opts).onComplete(h -> {
+      readClient.coordinateNodesWithOptions(opts).onComplete(h -> {
         boolean success = h.result().getList().size() == 2;
         waitComplete(vertx, fut, h.result().getIndex(), success);
       });
     });
 
     sleep(vertx, 2000);
-    ConsulAgent attached = ctx.attachAgent("new_node");
+    ConsulInstance attached = defaultConsulBuilder().join(consul).nodeName("new_node").build();
     latch.await(2, TimeUnit.MINUTES);
     assertEquals(latch.getCount(), 0);
 
-    ctx.detachAgent(attached);
+    attached.shutdown();
 
     // wait until the second consul will leave
     assertTrue(waitPeers());
@@ -75,7 +75,7 @@ public class Coordinates extends ConsulTestBase {
   private boolean waitPeers() {
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      List<String> peers = getAsync(() -> ctx.readClient().peersStatus());
+      List<String> peers = getAsync(() -> readClient.peersStatus());
       if (peers.size() == 1) {
         return true;
       }
@@ -90,7 +90,7 @@ public class Coordinates extends ConsulTestBase {
     List<DcCoordinates> datacenters = null;
     int requests = MAX_REQUESTS;
     while (requests --> 0) {
-      datacenters = getAsync(() -> ctx.readClient().coordinateDatacenters());
+      datacenters = getAsync(() -> readClient.coordinateDatacenters());
       if (datacenters.size() > 0) {
         break;
       }
@@ -102,7 +102,7 @@ public class Coordinates extends ConsulTestBase {
       return;
     }
     DcCoordinates coordinate = datacenters.get(0);
-    assertEquals(coordinate.getDatacenter(), ctx.dc().getName());
+    assertEquals(coordinate.getDatacenter(), consul.dc().getName());
   }
 
 }
