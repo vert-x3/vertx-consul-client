@@ -22,7 +22,7 @@ import io.vertx.ext.consul.Node;
 import io.vertx.ext.consul.NodeQueryOptions;
 import io.vertx.ext.consul.Service;
 import io.vertx.ext.consul.ServiceOptions;
-import io.vertx.ext.consul.dc.ConsulAgent;
+import io.vertx.ext.consul.instance.ConsulInstance;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -45,30 +45,30 @@ public class Catalog extends ConsulTestBase {
 
   @Test
   public void datacenters(TestContext tc) {
-    ctx.readClient().catalogDatacenters(tc.asyncAssertSuccess(datacenters -> {
+    readClient.catalogDatacenters(tc.asyncAssertSuccess(datacenters -> {
       tc.assertEquals(datacenters.size(), 1);
-      tc.assertEquals(datacenters.get(0), ctx.dc().getName());
+      tc.assertEquals(datacenters.get(0), consul.dc().getName());
     }));
   }
 
   @Test
   public void nodes(TestContext tc) {
-    ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes -> {
+    readClient.catalogNodes(tc.asyncAssertSuccess(nodes -> {
       tc.assertEquals(nodes.getList().size(), 1);
       Node node = nodes.getList().get(0);
-      tc.assertEquals(node.getName(), ctx.nodeName());
+      tc.assertEquals(node.getName(), consul.container.getNodeName());
     }));
   }
 
   @Test
   public void blockingQuery(TestContext tc) throws InterruptedException {
-    ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes1 -> {
+    readClient.catalogNodes(tc.asyncAssertSuccess(nodes1 -> {
       Async async1 = tc.async();
 
       System.out.println(">>>>>>> wait for new node");
       NodeQueryOptions blockingQueryOptions1 = new NodeQueryOptions()
         .setBlockingOptions(new BlockingQueryOptions().setIndex(nodes1.getIndex()));
-      ctx.readClient().catalogNodesWithOptions(blockingQueryOptions1, h -> {
+      readClient.catalogNodesWithOptions(blockingQueryOptions1, h -> {
         System.out.println(">>>>>>> new node event received");
         List<String> names = h.result().getList().stream().map(Node::getName).collect(Collectors.toList());
         tc.assertEquals(names.size(), 2);
@@ -79,15 +79,16 @@ public class Catalog extends ConsulTestBase {
       vertx.setTimer(1000, l -> {
         System.out.println(">>>>>>> new node is still not ready");
         tc.assertEquals(async1.count(), 1);
-        vertx.<ConsulAgent>executeBlocking(b1 -> b1.complete(ctx.attachAgent("attached_node")), tc.asyncAssertSuccess(attached -> {
+        vertx.<ConsulInstance>executeBlocking(b1 ->
+          b1.complete(defaultConsulBuilder().nodeName("attached_node").join(consul).build()), tc.asyncAssertSuccess(attached -> {
           System.out.println(">>>>>>> new node attached");
           async1.handler(v -> {
-            ctx.readClient().catalogNodes(tc.asyncAssertSuccess(nodes2 -> {
+            readClient.catalogNodes(tc.asyncAssertSuccess(nodes2 -> {
               NodeQueryOptions blockingQueryOptions2 = new NodeQueryOptions()
                 .setBlockingOptions(new BlockingQueryOptions().setIndex(nodes2.getIndex()));
               System.out.println(">>>>>>> wait for new node detaching");
-              ctx.readClient().catalogNodesWithOptions(blockingQueryOptions2, tc.asyncAssertSuccess());
-              vertx.executeBlocking(b2 -> ctx.detachAgent(attached), detached -> System.out.println(">>>>>>> new node detached"));
+              readClient.catalogNodesWithOptions(blockingQueryOptions2, tc.asyncAssertSuccess());
+              vertx.executeBlocking(b2 -> attached.shutdown(), detached -> System.out.println(">>>>>>> new node detached"));
             }));
           });
         }));
@@ -98,8 +99,8 @@ public class Catalog extends ConsulTestBase {
   @Test
   public void testRegisterAndDeregisterCatalogService(TestContext tc) {
 
-    ConsulClient consulWriteClient = ctx.writeClient();
-    Node node = randomNode(UUID.randomUUID(), ctx.dc().getName());
+    ConsulClient consulWriteClient = writeClient;
+    Node node = randomNode(UUID.randomUUID(), consul.dc().getName());
     String nodeName = node.getName();
     ServiceOptions serviceOptions = randomServiceOptions();
     serviceOptions.setCheckOptions(null);

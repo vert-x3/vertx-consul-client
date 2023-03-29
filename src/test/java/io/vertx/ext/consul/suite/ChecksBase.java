@@ -20,9 +20,11 @@ import grpc.health.v1.HealthGrpc;
 import io.grpc.stub.StreamObserver;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.impl.future.PromiseImpl;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -64,17 +66,17 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     Check check;
 
-    runAsync(h -> ctx.writeClient().warnCheckWithNote(checkId, "warn", h));
+    runAsync(h -> writeClient.warnCheckWithNote(checkId, "warn", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
     assertEquals("warn", check.getOutput());
 
-    runAsync(h -> ctx.writeClient().failCheckWithNote(checkId, "fail", h));
+    runAsync(h -> writeClient.failCheckWithNote(checkId, "fail", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
     assertEquals("fail", check.getOutput());
 
-    runAsync(h -> ctx.writeClient().passCheckWithNote(checkId, "pass", h));
+    runAsync(h -> writeClient.passCheckWithNote(checkId, "pass", h));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
     assertEquals("pass", check.getOutput());
@@ -84,7 +86,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
   @Test
@@ -120,13 +122,13 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     reporter.close();
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
   @Test
   public void grpcCheckLifecycle(TestContext tc) {
-    if (ctx.consulVersion().compareTo("1.0.3") < 0) {
-      System.out.println("skip " + ctx.consulVersion() + " version");
+    if (consul.container.getVersion().compareTo("1.0.3") < 0) {
+      System.out.println("skip " + consul.container.getVersion() + " version");
       return;
     }
     GrpcHealthReporter reporter = new GrpcHealthReporter(vertx);
@@ -149,7 +151,7 @@ public abstract class ChecksBase extends ConsulTestBase {
               tc.assertEquals(CheckStatus.CRITICAL, c2.getStatus());
 
               reporter.close(tc.asyncAssertSuccess(v2 -> {
-                ctx.writeClient().deregisterCheck(checkId, tc.asyncAssertSuccess(v -> async.complete()));
+                writeClient.deregisterCheck(checkId, tc.asyncAssertSuccess(v -> async.complete()));
               }));
             });
           });
@@ -178,7 +180,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
   @Test
@@ -205,11 +207,11 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(h -> ctx.writeClient().deregisterCheck(checkId, h));
+    runAsync(h -> writeClient.deregisterCheck(checkId, h));
   }
 
   Check getCheckInfo(String id) {
-    List<Check> checks = getAsync(h -> ctx.writeClient().localChecks(h));
+    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
     return checks.stream()
       .filter(check -> check.getId().equals(id))
       .findFirst()
@@ -217,7 +219,7 @@ public abstract class ChecksBase extends ConsulTestBase {
   }
 
   void getCheckInfo(TestContext tc, String id, Handler<Check> resultHandler) {
-    ctx.writeClient().localChecks(tc.asyncAssertSuccess(list -> {
+    writeClient.localChecks(tc.asyncAssertSuccess(list -> {
       resultHandler.handle(list.stream()
         .filter(check -> check.getId().equals(id))
         .findFirst()
@@ -371,7 +373,10 @@ public abstract class ChecksBase extends ConsulTestBase {
       this.port = Utils.getFreePort();
       HealthGrpc.HealthImplBase service = new HealthGrpc.HealthImplBase() {
         @Override
-        public void check(HealthCheck.HealthCheckRequest request, StreamObserver<HealthCheck.HealthCheckResponse> response) {
+        public void check(
+          HealthCheck.HealthCheckRequest request,
+          StreamObserver<HealthCheck.HealthCheckResponse> response
+        ) {
           response.onNext(HealthCheck.HealthCheckResponse.newBuilder()
             .setStatus(status)
             .build());
