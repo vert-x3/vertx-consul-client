@@ -15,20 +15,16 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.Node;
-import io.vertx.ext.consul.NodeQueryOptions;
-import io.vertx.ext.consul.Service;
-import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.instance.ConsulInstance;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,7 +89,10 @@ public class Catalog extends ConsulTestBase {
                   .catalogNodesWithOptions(blockingQueryOptions2)
                   .onComplete(tc.asyncAssertSuccess());
                 vertx
-                  .executeBlocking(b2 -> attached.shutdown())
+                  .executeBlocking(b2 -> {
+                    attached.leave();
+                    b2.complete();
+                  })
                   .onComplete(detached -> System.out.println(">>>>>>> new node detached"));
               }));
             });

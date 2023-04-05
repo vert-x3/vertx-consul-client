@@ -21,19 +21,18 @@ import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import java.io.File;
-import java.io.PrintWriter;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 public class ConsulTestBase extends VertxTestBase {
-  private static final ConsulDatacenter dc = ConsulDatacenter.create();
+  public static ConsulDatacenter dc = ConsulDatacenter.create();
   public static ConsulInstance consul;
 
   protected ConsulClient masterClient;
@@ -63,19 +62,20 @@ public class ConsulTestBase extends VertxTestBase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    masterClient = consul.createClient(vertx, dc.getMasterToken(), false);
-    AclToken writeTokenRequest = new AclToken().setType(AclTokenType.CLIENT)
-      .setRules(Utils.readResource("write_rules.hcl"));
-    masterClient.createAclToken(writeTokenRequest).onSuccess(writeToken -> {
-      consul.dc().setWriteToken(writeToken);
-      writeClient = consul.createClient(vertx, writeToken, false);
-    });
-    AclToken readTokenRequest = new AclToken().setType(AclTokenType.CLIENT)
-      .setRules(Utils.readResource("read_rules.hcl"));
-    masterClient.createAclToken(readTokenRequest).onSuccess(readToken ->{
-      consul.dc().setReadToken(readToken);
-      readClient = consul.createClient(vertx, readToken, false);
-    }).wait(500);
+    masterClient = consul.createClient(vertx, consul.dc().getMasterToken(), false);
+    String writeToken = createAclToken(Utils.readResource("write_rules.hcl"));
+    consul.dc().setWriteToken(writeToken);
+    String readToken = createAclToken(Utils.readResource("read_rules.hcl"));
+    consul.dc().setReadToken(readToken);
+    writeClient = consul.createClient(vertx, consul.dc().writeToken(), false);
+    readClient = consul.createClient(vertx, consul.dc().readToken(), false);
+  }
+
+  public String createAclToken(String rules) {
+    AclToken request = new AclToken()
+      .setRules(rules)
+      .setType(AclTokenType.CLIENT);
+    return getAsync(() -> masterClient.createAclToken(request));
   }
 
   @Override
@@ -165,17 +165,4 @@ public class ConsulTestBase extends VertxTestBase {
     // General category "Pf" in the Unicode specification.
     Character.FINAL_QUOTE_PUNCTUATION
   ).map(Integer::valueOf).collect(Collectors.toSet());
-
-  private static String copyFileFromResources(String fName, String toName) {
-    try {
-      String body = Utils.readResource(fName);
-      File temp = File.createTempFile(toName, ".pem");
-      PrintWriter out = new PrintWriter(temp.getAbsoluteFile());
-      out.print(body);
-      out.close();
-      return temp.getAbsolutePath();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
 }

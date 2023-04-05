@@ -251,7 +251,11 @@ public class Services extends ChecksBase {
     Supplier<Future<ServiceList>> runner,
     BiConsumer<BlockingQueryOptions, Handler<AsyncResult<ServiceList>>> request
   ) throws InterruptedException {
-    runAsync(() -> writeClient.registerService(new ServiceOptions().setName("service1").setId("id1")));
+    runAsync(() -> writeClient.registerService(new ServiceOptions()
+      .setName("service1")
+      .setId("id1")
+      .setPort(Utils.getFreePort()))
+    );
     ServiceList list1 = getAsync(runner);
     list1.getList().forEach(s -> System.out.println("--- " + s.toJson().encode()));
     CountDownLatch latch = new CountDownLatch(1);
@@ -264,7 +268,10 @@ public class Services extends ChecksBase {
     });
     sleep(vertx, 4000);
     assertEquals(latch.getCount(), 1);
-    runAsync(() -> writeClient.registerService(new ServiceOptions().setName("service2").setId("id2")));
+    runAsync(() -> writeClient.registerService(new ServiceOptions()
+      .setName("service2")
+      .setId("id2")
+      .setPort(Utils.getFreePort())));
     awaitLatch(latch);
     runAsync(() -> writeClient.deregisterService("id1"));
     runAsync(() -> writeClient.deregisterService("id2"));
