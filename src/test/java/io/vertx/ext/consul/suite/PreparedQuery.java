@@ -33,21 +33,23 @@ public class PreparedQuery extends ConsulTestBase {
 
   @Test
   public void createUpdateAndDestroy(TestContext tc) {
-    String service1 = randomFooBarAlpha();
-    String service2 = randomFooBarAlpha();
-    writeClient
-      .createPreparedQuery(new PreparedQueryDefinition().setService(service1), tc.asyncAssertSuccess(id -> {
-        readClient
-          .getPreparedQuery(id, tc.asyncAssertSuccess(def1 -> {
-            tc.assertTrue(def1.getService().equals(service1));
-            writeClient.updatePreparedQuery(def1.setService(service2), tc.asyncAssertSuccess(updated -> {
-              readClient.getPreparedQuery(id, tc.asyncAssertSuccess(def2 -> {
-                tc.assertTrue(def2.getService().equals(service2));
-                writeClient.deletePreparedQuery(id, tc.asyncAssertSuccess());
+    writeClient.createSession(tc.asyncAssertSuccess(sessId -> {
+      String service1 = randomFooBarAlpha();
+      String service2 = randomFooBarAlpha();
+      writeClient
+        .createPreparedQuery(new PreparedQueryDefinition().setService(service1).setSession(sessId), tc.asyncAssertSuccess(id -> {
+          readClient
+            .getPreparedQuery(id, tc.asyncAssertSuccess(def1 -> {
+              tc.assertTrue(def1.getService().equals(service1));
+              writeClient.updatePreparedQuery(def1.setService(service2), tc.asyncAssertSuccess(updated -> {
+                readClient.getPreparedQuery(id, tc.asyncAssertSuccess(def2 -> {
+                  tc.assertTrue(def2.getService().equals(service2));
+                  writeClient.deletePreparedQuery(id, tc.asyncAssertSuccess());
+                }));
               }));
             }));
-          }));
-      }));
+        }));
+    }));
   }
 
   @Test

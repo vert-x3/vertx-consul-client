@@ -30,7 +30,7 @@ public class Status extends ConsulTestBase {
   @Test
   public void leader(TestContext tc) {
     readClient.leaderStatus(tc.asyncAssertSuccess(leader -> {
-      tc.assertEquals(leader.substring(0, leader.indexOf(':')), "127.0.0.1");
+      tc.assertEquals(leader.substring(0, leader.indexOf(':')), consul.container.address());
     }));
   }
 

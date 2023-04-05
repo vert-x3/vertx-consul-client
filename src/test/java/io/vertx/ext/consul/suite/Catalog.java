@@ -15,13 +15,7 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.consul.ConsulClient;
-import io.vertx.ext.consul.ConsulTestBase;
-import io.vertx.ext.consul.Node;
-import io.vertx.ext.consul.NodeQueryOptions;
-import io.vertx.ext.consul.Service;
-import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.instance.ConsulInstance;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -88,7 +82,10 @@ public class Catalog extends ConsulTestBase {
                 .setBlockingOptions(new BlockingQueryOptions().setIndex(nodes2.getIndex()));
               System.out.println(">>>>>>> wait for new node detaching");
               readClient.catalogNodesWithOptions(blockingQueryOptions2, tc.asyncAssertSuccess());
-              vertx.executeBlocking(b2 -> attached.shutdown(), detached -> System.out.println(">>>>>>> new node detached"));
+              vertx.executeBlocking(b2 -> {
+                attached.shutdown();
+                b2.complete();
+              }, detached -> System.out.println(">>>>>>> new node detached"));
             }));
           });
         }));

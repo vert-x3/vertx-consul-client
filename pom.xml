@@ -56,17 +56,6 @@
       <version>${testcontainersVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>consul</artifactId>
-      <version>${testcontainersVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.pszymczyk.consul</groupId>
-      <artifactId>embedded-consul</artifactId>
-      <version>${embedded.consul.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
       <type>test-jar</type>

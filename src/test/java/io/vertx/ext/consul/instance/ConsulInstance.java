@@ -40,6 +40,14 @@ public class ConsulInstance {
     }
   }
 
+  public void leave() {
+    try {
+      container.execInContainer("consul", "leave");
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -64,7 +72,8 @@ public class ConsulInstance {
   }
 
   public String address() {
-    return container.gateway();
+    if (isMacOS()) return container.getHost();
+    else return container.gateway();
   }
 
   public String target() {
@@ -73,6 +82,12 @@ public class ConsulInstance {
 
   public ConsulDatacenter dc() {
     return container.datacenter();
+  }
+
+  public static boolean isMacOS() {
+    String osName = System.getProperty("os.name");
+    return osName != null
+      && (osName.toLowerCase().contains("mac") || osName.toLowerCase().contains("darwin"));
   }
 
   public void putValue(String key, String value) throws IOException, InterruptedException {
@@ -106,6 +121,7 @@ public class ConsulInstance {
     Vertx vertx, String token, boolean trustAll, PemTrustOptions trustOptions
   ) {
     ConsulClientOptions options = consulClientOptions(token, true)
+      .setHost("127.0.0.1")
       .setTrustAll(trustAll)
       .setPemTrustOptions(trustOptions);
     return ConsulClient.create(vertx, options);
@@ -117,8 +133,7 @@ public class ConsulInstance {
     private static final String CONSUL_LOCAL_CONFIG_ENV = "CONSUL_LOCAL_CONFIG";
 
     private static final String DEFAULT_IMAGE = "consul";
-    private static final String DEFAULT_VERSION = "1.7.0";
-    private static final String DEFAULT_ADDRESS = "127.0.0.1";
+    private static final String DEFAULT_VERSION = "1.10.12";
 
     private ConsulPorts exposedPorts;
     private String image;
@@ -142,7 +157,6 @@ public class ConsulInstance {
     private static final Random random = new Random();
 
     private Builder() {
-      this.address = DEFAULT_ADDRESS;
       this.version = DEFAULT_VERSION;
       this.image = DEFAULT_IMAGE;
       this.exposedPorts = ConsulPorts.builder().build();
@@ -152,7 +166,6 @@ public class ConsulInstance {
     }
 
     private Builder(int mappedHttpPort) {
-      this.address = DEFAULT_ADDRESS;
       this.version = DEFAULT_VERSION;
       this.image = DEFAULT_IMAGE;
       this.exposedPorts = ConsulPorts.builder().build();
@@ -215,11 +228,6 @@ public class ConsulInstance {
       return this;
     }
 
-    public ConsulInstance.Builder address(String address) {
-      this.address = Objects.requireNonNull(address);
-      return this;
-    }
-
     public ConsulInstance.Builder join(ConsulInstance other) {
       Objects.requireNonNull(other);
       this.join = true;
@@ -252,13 +260,10 @@ public class ConsulInstance {
       );
 
       JsonObject cfg = new JsonObject();
-      cfg.put("server", true);
-      cfg.put("advertise_addr", address);
-      cfg.put("client_addr", address);
-      cfg.put("leave_on_terminate", true);
       cfg.put("node_name", nodeName);
       cfg.put("node_id", nodeId);
       cfg.put("datacenter", datacenter.getName());
+      cfg.put("bind_addr", "0.0.0.0");
 
       SemVer semVer = new SemVer(version);
 
@@ -269,12 +274,10 @@ public class ConsulInstance {
         } else master = new JsonObject().put("master", datacenter.getMasterToken());
         cfg.put("acl", new JsonObject()
           .put("enabled", true)
-          .put("default_policy", "deny")
           .put("tokens", master)
         );
         cfg.put("primary_datacenter", datacenter.getName());
       } else {
-        cfg.put("acl_default_policy", "deny");
         cfg.put("acl_master_token", datacenter.getMasterToken());
         cfg.put("acl_datacenter", datacenter.getName());
       }
@@ -333,6 +336,9 @@ public class ConsulInstance {
 
       if (join) {
         logger.info("This agent will join an agent with address {} port {}", serverAddr, serverSerfLanPort);
+
+        cfg.put("server", false);
+        cfg.put("leave_on_terminate", true);
 
         if (encrypt == null) {
           logger.warn("*** This agent will use plaintext to communicate with an agent {}. " +
