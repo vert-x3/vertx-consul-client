@@ -50,7 +50,7 @@ public class Catalog extends ConsulTestBase {
     readClient.catalogNodes(tc.asyncAssertSuccess(nodes -> {
       tc.assertEquals(nodes.getList().size(), 1);
       Node node = nodes.getList().get(0);
-      tc.assertEquals(node.getName(), consul.container.getNodeName());
+      tc.assertEquals(node.getName(), consul.getConfig("node_name"));
     }));
   }
 
@@ -74,7 +74,7 @@ public class Catalog extends ConsulTestBase {
         System.out.println(">>>>>>> new node is still not ready");
         tc.assertEquals(async1.count(), 1);
         vertx.<ConsulInstance>executeBlocking(b1 ->
-          b1.complete(defaultConsulBuilder().nodeName("attached_node").join(consul).build()), tc.asyncAssertSuccess(attached -> {
+          b1.complete(ConsulInstance.defaultConsulBuilder(dc).nodeName("attached_node").join(consul).build()), tc.asyncAssertSuccess(attached -> {
           System.out.println(">>>>>>> new node attached");
           async1.handler(v -> {
             readClient.catalogNodes(tc.asyncAssertSuccess(nodes2 -> {
@@ -83,7 +83,7 @@ public class Catalog extends ConsulTestBase {
               System.out.println(">>>>>>> wait for new node detaching");
               readClient.catalogNodesWithOptions(blockingQueryOptions2, tc.asyncAssertSuccess());
               vertx.executeBlocking(b2 -> {
-                attached.shutdown();
+                attached.stop();
                 b2.complete();
               }, detached -> System.out.println(">>>>>>> new node detached"));
             }));

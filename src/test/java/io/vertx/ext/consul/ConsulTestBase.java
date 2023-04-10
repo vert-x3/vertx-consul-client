@@ -43,20 +43,12 @@ public class ConsulTestBase extends VertxTestBase {
 
   @BeforeClass
   public static void startConsul() throws Exception {
-    consul = defaultConsulBuilder().build();
-  }
-
-  public static ConsulInstance.Builder defaultConsulBuilder() {
-    return ConsulInstance.builder()
-      .datacenter(dc)
-      .keyFile("server-key.pem")
-      .certFile("server-cert.pem")
-      .caFile("server-cert-ca-chain.pem");
+    consul = ConsulInstance.defaultConsulBuilder(dc).build();
   }
 
   @AfterClass
   public static void shutdownConsul() {
-    consul.shutdown();
+    consul.stop();
   }
 
   @Override
@@ -75,7 +67,7 @@ public class ConsulTestBase extends VertxTestBase {
     AclToken request = new AclToken()
       .setRules(rules)
       .setType(AclTokenType.CLIENT);
-    return getAsync(() -> masterClient.createAclToken(request));
+    return getAsync(h -> masterClient.createAclToken(request, h));
   }
 
   @Override

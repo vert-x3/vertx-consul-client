@@ -20,10 +20,8 @@ import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.common.StateConsumer;
 import io.vertx.ext.consul.impl.WatchKeyPrefixCnt;
 import io.vertx.ext.consul.instance.ConsulInstance;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -365,8 +363,8 @@ public class Watches extends ConsulTestBase {
 
     consumer.await("");
 
-    ConsulInstance attached = defaultConsulBuilder().nodeName(nodeName).join(consul).build();
-    attached.leave();
+    ConsulInstance attached = ConsulInstance.defaultConsulBuilder(dc).nodeName(nodeName).join(consul).build();
+    attached.stop();
 
     consumer.await(nodeName);
     consumer.await(nodeName);
