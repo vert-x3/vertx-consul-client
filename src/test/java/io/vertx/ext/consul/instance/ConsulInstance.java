@@ -29,7 +29,7 @@ public class ConsulInstance extends ConsulContainer {
     this.dc = dc;
   }
 
-  public static ConsulInstance.Builder builder(){
+  public static ConsulInstance.Builder builder() {
     return new Builder();
   }
 
@@ -48,6 +48,7 @@ public class ConsulInstance extends ConsulContainer {
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);
     }
+    super.stop();
   }
 
   public String getConfig(String name) {
@@ -105,7 +106,7 @@ public class ConsulInstance extends ConsulContainer {
       .orElseThrow(() -> new IllegalStateException("Container network is unknown"));
   }
 
-  private boolean isMacOS() {
+  private static boolean isMacOS() {
     String osName = System.getProperty("os.name");
     return osName != null
       && (osName.toLowerCase().contains("mac") || osName.toLowerCase().contains("darwin"));
@@ -167,9 +168,14 @@ public class ConsulInstance extends ConsulContainer {
     public Builder join(ConsulInstance other) {
       Objects.requireNonNull(other);
       this.join = true;
-      //подключение по адерсу gateway и внешнему порту
-      this.serverAddr = other.address();
-      this.serverSerfLanPort = other.getMappedPort(SERF_LAN_PORT);
+      if (isMacOS()) {
+        this.serverAddr = other.getContainerNetwork().getIpAddress();
+        this.serverSerfLanPort = Builder.SERF_LAN_PORT;
+      } else {
+        //подключение по адерсу gateway и внешнему порту
+        this.serverAddr = other.address();
+        this.serverSerfLanPort = other.getMappedPort(Builder.SERF_LAN_PORT);
+      }
       return this;
     }
 

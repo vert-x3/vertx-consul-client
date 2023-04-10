@@ -8,8 +8,10 @@ import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.utility.MountableFile;
 
+import java.time.Duration;
+
 public class VertxHttpServer extends GenericContainer<VertxHttpServer> {
-  private static String IMAGE = "vertx/vertx3";
+  private static final String IMAGE = "vertx/vertx4";
   private final String VERTICLE_HOME = "/usr/verticles";
   private final String STATUS_FILE = "health_status.txt";
   private final String HEALTH_HTTP_VERTICLE = "health_http_verticale.groovy";
@@ -20,27 +22,45 @@ public class VertxHttpServer extends GenericContainer<VertxHttpServer> {
 
   @Override
   protected void configure() {
-    addEnv("VERTICLE_NAME", HEALTH_HTTP_VERTICLE);
-    addEnv("VERTICLE_HOME", VERTICLE_HOME);
-    addExposedPort(8080);
+    String version;
+    if (isArm64()) {
+      version = "4.4.1";
+    } else version = "4.4.0";
+    this.setDockerImageName(IMAGE + ":" + version);
+    this.withEnv("VERTICLE_NAME", HEALTH_HTTP_VERTICLE);
+    this.withEnv("VERTICLE_HOME", VERTICLE_HOME);
+    this.withExposedPorts(8080);
     this.withWorkingDirectory(VERTICLE_HOME);
     this.withCopyFileToContainer(MountableFile.forClasspathResource(HEALTH_HTTP_VERTICLE), VERTICLE_HOME + "/");
     this.withCopyFileToContainer(MountableFile.forClasspathResource(STATUS_FILE), VERTICLE_HOME + "/");
     this.withCommand("vertx run " + HEALTH_HTTP_VERTICLE + " -cp " + VERTICLE_HOME + "/*");
     WaitStrategy wait = Wait.forHttp("/")
       .forStatusCode(200)
-      .forPort(8080);
+      .forPort(8080)
+      .withStartupTimeout(Duration.ofSeconds(90));
     setWaitStrategy(wait);
   }
 
   public String address() {
-    return getContainerNetwork().getIpAddress();
+    if (isMacOS()) return getContainerNetwork().getIpAddress();
+    else return getContainerNetwork().getGateway();
   }
 
-  public String gateway() {
-    return getContainerNetwork().getGateway();
+  public int port() {
+    if (isMacOS()) return 8080;
+    else return getMappedPort(8080);
   }
 
+  private boolean isMacOS() {
+    String osName = System.getProperty("os.name");
+    return osName != null
+      && (osName.toLowerCase().contains("mac") || osName.toLowerCase().contains("darwin"));
+  }
+
+  private boolean isArm64() {
+    String osArch = System.getProperty("os.arch");
+    return osArch != null && isMacOS() && osArch.equalsIgnoreCase("aarch64");
+  }
 
   private ContainerNetwork getContainerNetwork() {
     return getContainerInfo()

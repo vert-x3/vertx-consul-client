@@ -87,7 +87,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     headers.put(TEST_HEADER_NAME, Collections.singletonList(TEST_HEADER_VALUE));
 
     CheckOptions opts = new CheckOptions()
-      .setHttp("http://" + vertxServer.gateway() + ":" + vertxServer.getMappedPort(8080))
+      .setHttp("http://" + vertxServer.address() + ":" + vertxServer.port())
       .setInterval("2s")
       .setHeaders(headers)
       .setName("checkName");
@@ -117,7 +117,7 @@ public abstract class ChecksBase extends ConsulTestBase {
     reporter.start();
 
     CheckOptions opts = new CheckOptions()
-      .setTcp(reporter.gateway() + ":" + reporter.getMappedPort(8080))
+      .setTcp(reporter.address() + ":" + reporter.port())
       .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
@@ -126,10 +126,18 @@ public abstract class ChecksBase extends ConsulTestBase {
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
-    reporter.close();
-    sleep(vertx, 3000);
-    check = getCheckInfo(checkId);
+    reporter.stop();
+    int maxRequestCount = 20;
+    while (maxRequestCount-- > 0) {
+      check = getCheckInfo(checkId);
+      if (check.getStatus() == CheckStatus.CRITICAL) {
+        break;
+      }
+      sleep(vertx, 1000);
+      System.out.println("Waiting for container to stop...");
+    }
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
+    System.out.println("Vertx container is stopped");
 
     runAsync(() -> writeClient.deregisterCheck(checkId));
   }
