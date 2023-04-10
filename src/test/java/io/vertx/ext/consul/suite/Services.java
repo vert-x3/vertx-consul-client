@@ -68,7 +68,7 @@ public class Services extends ChecksBase {
           tc.assertEquals(c.getId(), opts.getCheckOptions().getId());
           tc.assertEquals(c.getNotes(), opts.getCheckOptions().getNotes());
           writeClient
-            .catalogNodeServices(consul.container.getNodeName())
+            .catalogNodeServices(consul.getConfig("node_name"))
             .onComplete(tc.asyncAssertSuccess(nodeServices -> {
               tc.assertEquals(2, nodeServices.getList().size());
               checkService(tc, nodeServices.getList(), serviceName, opts);
@@ -242,8 +242,8 @@ public class Services extends ChecksBase {
   @Test
   public void catalogNodeServicesBlocking() throws InterruptedException {
     testServicesBlocking(
-      () -> readClient.catalogNodeServices(consul.container.getNodeName()),
-      (opts, h) -> readClient.catalogNodeServicesWithOptions(consul.container.getNodeName(), opts).onComplete(h)
+      () -> readClient.catalogNodeServices(consul.getConfig("node_name")),
+      (opts, h) -> readClient.catalogNodeServicesWithOptions(consul.getConfig("node_name"), opts).onComplete(h)
     );
   }
 

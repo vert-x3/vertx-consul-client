@@ -20,11 +20,10 @@ import io.vertx.ext.consul.instance.ConsulInstance;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.testcontainers.consul.ConsulContainer;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,7 +51,7 @@ public class Catalog extends ConsulTestBase {
     readClient.catalogNodes().onComplete(tc.asyncAssertSuccess(nodes -> {
       tc.assertEquals(nodes.getList().size(), 1);
       Node node = nodes.getList().get(0);
-      tc.assertEquals(node.getName(), consul.container.getNodeName());
+      tc.assertEquals(node.getName(), consul.getConfig("node_name"));
     }));
   }
 
@@ -75,8 +74,8 @@ public class Catalog extends ConsulTestBase {
       vertx.setTimer(1000, l -> {
         System.out.println(">>>>>>> new node is still not ready");
         tc.assertEquals(async1.count(), 1);
-        vertx.<ConsulInstance>executeBlocking(b1 ->
-            b1.complete(defaultConsulBuilder().nodeName("attached_node").join(consul).build())
+        vertx.<ConsulContainer>executeBlocking(b1 ->
+            b1.complete(ConsulInstance.defaultConsulBuilder(dc).nodeName("attached_node").join(consul).build())
           )
           .onComplete(tc.asyncAssertSuccess(attached -> {
             System.out.println(">>>>>>> new node attached");
@@ -90,7 +89,7 @@ public class Catalog extends ConsulTestBase {
                   .onComplete(tc.asyncAssertSuccess());
                 vertx
                   .executeBlocking(b2 -> {
-                    attached.leave();
+                    attached.stop();
                     b2.complete();
                   })
                   .onComplete(detached -> System.out.println(">>>>>>> new node detached"));

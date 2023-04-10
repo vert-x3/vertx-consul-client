@@ -15,11 +15,6 @@
  */
 package io.vertx.ext.consul.dc;
 
-import io.vertx.ext.consul.instance.ConsulInstance;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */

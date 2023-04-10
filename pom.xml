@@ -13,8 +13,7 @@
 
   <properties>
     <stack.version>5.0.0-SNAPSHOT</stack.version>
-    <embedded.consul.version>2.2.1</embedded.consul.version>
-    <testcontainersVersion>1.17.5</testcontainersVersion>
+    <testcontainersVersion>1.17.6</testcontainersVersion>
     <junit.version>4.13.1</junit.version>
 
     <grpc.version>1.50.2</grpc.version>
@@ -54,6 +53,13 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainersVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>consul</artifactId>
+      <version>${testcontainersVersion}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>

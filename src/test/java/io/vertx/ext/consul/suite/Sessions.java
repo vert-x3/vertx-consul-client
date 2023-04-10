@@ -39,7 +39,7 @@ public class Sessions extends ConsulTestBase {
     writeClient.createSession().onComplete(tc.asyncAssertSuccess(id -> {
       writeClient.infoSession(id).onComplete(tc.asyncAssertSuccess(session -> {
         tc.assertEquals(id, session.getId());
-        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        tc.assertEquals(consul.getConfig("node_name"), session.getNode());
         writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
@@ -58,7 +58,7 @@ public class Sessions extends ConsulTestBase {
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(opt.getLockDelay(), session.getLockDelay());
-        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        tc.assertEquals(consul.getConfig("node_name"), session.getNode());
         writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
@@ -77,7 +77,7 @@ public class Sessions extends ConsulTestBase {
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(0L, session.getLockDelay());
-        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        tc.assertEquals(consul.getConfig("node_name"), session.getNode());
         writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
@@ -95,7 +95,7 @@ public class Sessions extends ConsulTestBase {
 //        tc.assertEquals(1, checks.size());
 //        tc.assertTrue("serfHealth".equals(checks.get(0)));
         tc.assertEquals(15L, session.getLockDelay());
-        tc.assertEquals(consul.container.getNodeName(), session.getNode());
+        tc.assertEquals(consul.getConfig("node_name"), session.getNode());
         writeClient.destroySession(id).onComplete(tc.asyncAssertSuccess());
       }));
     }));
@@ -136,7 +136,7 @@ public class Sessions extends ConsulTestBase {
   @Test
   public void listNodeSessionsBlocking(TestContext tc) throws InterruptedException {
     testSessionsBlocking(tc, (opts, h) ->
-      readClient.listNodeSessionsWithOptions(consul.container.getNodeName(), opts).onComplete(h)
+      readClient.listNodeSessionsWithOptions(consul.getConfig("node_name"), opts).onComplete(h)
     );
   }
 

@@ -43,20 +43,12 @@ public class ConsulTestBase extends VertxTestBase {
 
   @BeforeClass
   public static void startConsul() throws Exception {
-    consul = defaultConsulBuilder().build();
-  }
-
-  public static ConsulInstance.Builder defaultConsulBuilder() {
-    return ConsulInstance.builder()
-      .datacenter(dc)
-      .keyFile("server-key.pem")
-      .certFile("server-cert.pem")
-      .caFile("server-cert-ca-chain.pem");
+    consul = ConsulInstance.defaultConsulBuilder(dc).build();
   }
 
   @AfterClass
   public static void shutdownConsul() {
-    consul.shutdown();
+    consul.stop();
   }
 
   @Override

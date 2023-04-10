@@ -49,7 +49,7 @@ public class Coordinates extends ConsulTestBase {
       return;
     }
     Coordinate coordinate = nodes1.getList().get(0);
-    assertEquals(coordinate.getNode(), consul.container.getNodeName());
+    assertEquals(coordinate.getNode(), consul.getConfig("node_name"));
 
     CountDownLatch latch = new CountDownLatch(1);
 
@@ -62,11 +62,11 @@ public class Coordinates extends ConsulTestBase {
     });
 
     sleep(vertx, 2000);
-    ConsulInstance attached = defaultConsulBuilder().join(consul).nodeName("new_node").build();
+    ConsulInstance attached = ConsulInstance.defaultConsulBuilder(dc).join(consul).nodeName("new_node").build();
     latch.await(2, TimeUnit.MINUTES);
     assertEquals(latch.getCount(), 0);
 
-    attached.shutdown();
+    attached.stop();
 
     // wait until the second consul will leave
     assertTrue(waitPeers());
