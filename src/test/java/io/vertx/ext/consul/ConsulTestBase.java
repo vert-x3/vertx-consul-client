@@ -54,13 +54,13 @@ public class ConsulTestBase extends VertxTestBase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    masterClient = consul.createClient(vertx, consul.dc().getMasterToken(), false);
+    masterClient = consul.createClient(vertx, consul.dc().getMasterToken());
     String writeToken = createAclToken(Utils.readResource("write_rules.hcl"));
     consul.dc().setWriteToken(writeToken);
     String readToken = createAclToken(Utils.readResource("read_rules.hcl"));
     consul.dc().setReadToken(readToken);
-    writeClient = consul.createClient(vertx, consul.dc().writeToken(), false);
-    readClient = consul.createClient(vertx, consul.dc().readToken(), false);
+    writeClient = consul.createClient(vertx, consul.dc().writeToken());
+    readClient = consul.createClient(vertx, consul.dc().readToken());
   }
 
   public String createAclToken(String rules) {

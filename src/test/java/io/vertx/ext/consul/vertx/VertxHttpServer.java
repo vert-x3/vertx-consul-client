@@ -14,7 +14,7 @@ public class VertxHttpServer extends GenericContainer<VertxHttpServer> {
   private static final String IMAGE = "vertx/vertx4";
   private final String VERTICLE_HOME = "/usr/verticles";
   private final String STATUS_FILE = "health_status.txt";
-  private final String HEALTH_HTTP_VERTICLE = "health_http_verticale.groovy";
+  private final String HEALTH_HTTP_VERTICLE = "health_http_verticle.groovy";
 
   public VertxHttpServer() {
     super(IMAGE);

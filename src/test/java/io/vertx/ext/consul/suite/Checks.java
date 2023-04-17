@@ -55,16 +55,16 @@ public class Checks extends ChecksBase {
       .setServiceId(serviceId)
       .setStatus(CheckStatus.PASSING)
       .setTtl("10s");
-    runAsync(() -> masterClient.registerCheck(check));
+    runAsync(() -> writeClient.registerCheck(check));
 
-    List<Check> checks = getAsync(() -> masterClient.localChecks());
+    List<Check> checks = getAsync(() -> writeClient.localChecks());
     Check c = checks.stream().filter(i -> "checkId".equals(i.getId())).findFirst().get();
     assertEquals(c.getServiceId(), serviceId);
     assertEquals(c.getId(), "checkId");
     assertEquals(c.getStatus(), CheckStatus.PASSING);
     assertEquals(c.getNotes(), "checkNotes");
 
-    runAsync(() -> masterClient.deregisterService(serviceId));
+    runAsync(() -> writeClient.deregisterService(serviceId));
   }
 
   @Test
