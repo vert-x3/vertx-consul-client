@@ -40,7 +40,7 @@ public class KVStore extends ConsulTestBase {
   public void handleExceptions() {
     CountDownLatch latch = new CountDownLatch(2);
     String unknownKey = randomFooBarAlpha();
-    ctx.readClient().getValue(unknownKey).onComplete(kv -> {
+    readClient.getValue(unknownKey).onComplete(kv -> {
       latch.countDown();
       throw new RuntimeException();
     });
@@ -54,19 +54,19 @@ public class KVStore extends ConsulTestBase {
 
   @Test
   public void readClientCantWriteOneValue(TestContext tc) {
-    ctx.readClient().putValue("foo/bar1", "value1").onComplete(tc.asyncAssertFailure());
+    readClient.putValue("foo/bar1", "value1").onComplete(tc.asyncAssertFailure());
   }
 
   @Test
   public void readClientEmptyValue(TestContext tc) {
     String key = randomFooBarAlpha();
-    ctx.writeClient()
+    writeClient
       .putValue(key, "").onComplete(tc.asyncAssertSuccess(b -> {
         tc.assertTrue(b);
-        ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
+        readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
           tc.assertEquals(key, pair.getKey());
           tc.assertEquals("", pair.getValue());
-          ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess());
         }));
       }));
   }
@@ -75,13 +75,13 @@ public class KVStore extends ConsulTestBase {
   public void readClientCanReadOneValue(TestContext tc) {
     String key = randomFooBarUnicode();
     String value = randomUnicodeString(10);
-    ctx.writeClient()
+    writeClient
       .putValue(key, value).onComplete(tc.asyncAssertSuccess(b -> {
         tc.assertTrue(b);
-        ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
+        readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
           tc.assertEquals(key, pair.getKey());
           tc.assertEquals(value, pair.getValue());
-          ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess());
         }));
       }));
   }
@@ -89,7 +89,7 @@ public class KVStore extends ConsulTestBase {
   @Test
   public void keyNotFound(TestContext tc) {
     String key = randomFooBarUnicode();
-    ctx.readClient()
+    readClient
       .getValue(key).onComplete(tc.asyncAssertSuccess(kv -> {
         tc.assertFalse(kv.isPresent());
       }));
@@ -98,7 +98,7 @@ public class KVStore extends ConsulTestBase {
   @Test
   public void keysNotFound(TestContext tc) {
     String key = randomFooBarUnicode();
-    ctx.readClient()
+    readClient
       .getValues(key).onComplete(tc.asyncAssertSuccess(list -> {
         tc.assertFalse(list.isPresent());
       }));
@@ -109,26 +109,26 @@ public class KVStore extends ConsulTestBase {
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
     KeyValueOptions opts = new KeyValueOptions().setFlags(randomLong());
-    ctx.writeClient()
+    writeClient
       .putValueWithOptions(key, value, opts).onComplete(tc.asyncAssertSuccess(b -> {
         tc.assertTrue(b);
-        ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
+        readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
           tc.assertEquals(key, pair.getKey());
           tc.assertEquals(value, pair.getValue());
           assertEquals(opts.getFlags(), pair.getFlags());
-          ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess());
         }));
       }));
   }
 
   @Test
   public void readClientCanReadValues(TestContext tc) {
-    valuesAccess(tc, ctx.readClient());
+    valuesAccess(tc, readClient);
   }
 
   @Test
   public void writeClientHaveFullAccessToValues(TestContext tc) {
-    valuesAccess(tc, ctx.writeClient());
+    valuesAccess(tc, writeClient);
   }
 
   private void valuesAccess(TestContext tc, ConsulClient accessClient) {
@@ -136,9 +136,9 @@ public class KVStore extends ConsulTestBase {
     String value1 = randomAlphaString(10);
     String key2 = randomFooBarAlpha();
     String value2 = randomAlphaString(10);
-    ctx.writeClient().putValue(key1, value1).onComplete(tc.asyncAssertSuccess(b1 -> {
+    writeClient.putValue(key1, value1).onComplete(tc.asyncAssertSuccess(b1 -> {
       tc.assertTrue(b1);
-      ctx.writeClient().putValue(key2, value2).onComplete(tc.asyncAssertSuccess(b2 -> {
+      writeClient.putValue(key2, value2).onComplete(tc.asyncAssertSuccess(b2 -> {
         tc.assertTrue(b2);
         accessClient.getValues("foo/bar").onComplete(tc.asyncAssertSuccess(kvList -> {
           List<KeyValue> list = kvList.getList();
@@ -149,7 +149,7 @@ public class KVStore extends ConsulTestBase {
           tc.assertTrue(list.stream()
             .filter(kv -> kv.getKey().equals(key2) && kv.getValue().equals(value2))
             .count() == 1);
-          ctx.writeClient().deleteValues("foo/bar").onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValues("foo/bar").onComplete(tc.asyncAssertSuccess());
         }));
       }));
     }));
@@ -160,14 +160,14 @@ public class KVStore extends ConsulTestBase {
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
     KeyValueOptions opts = new KeyValueOptions().setFlags(-1);
-    ctx.writeClient()
+    writeClient
       .putValueWithOptions(key, value, opts).onComplete(tc.asyncAssertSuccess(b -> {
         tc.assertTrue(b);
-        ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
+        readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
           tc.assertEquals(key, pair.getKey());
           tc.assertEquals(value, pair.getValue());
           assertEquals(opts.getFlags(), pair.getFlags());
-          ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess());
         }));
       }));
   }
@@ -175,19 +175,19 @@ public class KVStore extends ConsulTestBase {
   @Test
   public void checkAndSet(TestContext tc) {
     String key = randomFooBarAlpha();
-    ctx.writeClient()
+    writeClient
       .putValue(key, randomAlphaString(10)).onComplete(tc.asyncAssertSuccess(b1 -> {
         tc.assertTrue(b1);
-        ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair1 -> {
-          ctx.writeClient().putValue(key, randomAlphaString(10)).onComplete(tc.asyncAssertSuccess(b2 -> {
+        readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair1 -> {
+          writeClient.putValue(key, randomAlphaString(10)).onComplete(tc.asyncAssertSuccess(b2 -> {
             tc.assertTrue(b2);
-            ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(pair2 -> {
+            readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair2 -> {
               tc.assertTrue(pair1.getModifyIndex() < pair2.getModifyIndex());
-              ctx.writeClient().putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair1.getModifyIndex())).onComplete(tc.asyncAssertSuccess(b3 -> {
+              writeClient.putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair1.getModifyIndex())).onComplete(tc.asyncAssertSuccess(b3 -> {
                 tc.assertFalse(b3);
-                ctx.writeClient().putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair2.getModifyIndex())).onComplete(tc.asyncAssertSuccess(b4 -> {
+                writeClient.putValueWithOptions(key, randomAlphaString(10), new KeyValueOptions().setCasIndex(pair2.getModifyIndex())).onComplete(tc.asyncAssertSuccess(b4 -> {
                   tc.assertTrue(b4);
-                  ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess());
+                  writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess());
                 }));
               }));
             }));
@@ -198,29 +198,29 @@ public class KVStore extends ConsulTestBase {
 
   @Test
   public void clientCantDeleteUnknownKey(TestContext tc) {
-    ctx.readClient().deleteValue("unknown").onComplete(tc.asyncAssertFailure());
+    readClient.deleteValue("unknown").onComplete(tc.asyncAssertFailure());
   }
 
   @Test
   public void canGetValueBlocking(TestContext tc) {
-    blockingQuery(tc, (key, h) -> ctx.readClient().getValue(key).onComplete(tc.asyncAssertSuccess(list -> h.handle(list.getModifyIndex()))));
+    blockingQuery(tc, (key, h) -> readClient.getValue(key).onComplete(tc.asyncAssertSuccess(list -> h.handle(list.getModifyIndex()))));
   }
 
   @Test
   public void canGetValuesBlocking(TestContext tc) {
-    blockingQuery(tc, (key, h) -> ctx.readClient().getValues(key).onComplete(tc.asyncAssertSuccess(list -> h.handle(list.getIndex()))));
+    blockingQuery(tc, (key, h) -> readClient.getValues(key).onComplete(tc.asyncAssertSuccess(list -> h.handle(list.getIndex()))));
   }
 
   @Test
   public void canGetKeysList(TestContext tc) {
     String keyPrefix = randomFooBarAlpha();
     String key = keyPrefix + randomAlphaString(10);
-    ctx.writeClient()
+    writeClient
       .putValue(key, randomAlphaString(10)).onComplete(tc.asyncAssertSuccess(b -> {
         tc.assertTrue(b);
-        ctx.readClient().getKeys(keyPrefix).onComplete(tc.asyncAssertSuccess(list -> {
+        readClient.getKeys(keyPrefix).onComplete(tc.asyncAssertSuccess(list -> {
           tc.assertTrue(list.contains(key));
-          ctx.writeClient().deleteValues(keyPrefix).onComplete(tc.asyncAssertSuccess());
+          writeClient.deleteValues(keyPrefix).onComplete(tc.asyncAssertSuccess());
         }));
       }));
   }
@@ -228,27 +228,27 @@ public class KVStore extends ConsulTestBase {
   private void blockingQuery(TestContext tc, BiConsumer<String, Handler<Long>> indexSupplier) {
     String key = randomFooBarAlpha();
     String value = randomAlphaString(10);
-    ctx.writeClient()
+    writeClient
       .putValue(key, randomAlphaString(10)).onComplete(tc.asyncAssertSuccess(b1 -> {
         tc.assertTrue(b1);
         indexSupplier.accept(key, consulIndex -> {
           Async async = tc.async(2);
           vertx.setTimer(TimeUnit.SECONDS.toMillis(2), l -> {
-            ctx.writeClient().putValue(key, value).onComplete(tc.asyncAssertSuccess(b2 -> {
+            writeClient.putValue(key, value).onComplete(tc.asyncAssertSuccess(b2 -> {
               tc.assertTrue(b2);
-              ctx.readClient().getValueWithOptions(key, new BlockingQueryOptions().setIndex(consulIndex)).onComplete(tc.asyncAssertSuccess(kv -> {
+              readClient.getValueWithOptions(key, new BlockingQueryOptions().setIndex(consulIndex)).onComplete(tc.asyncAssertSuccess(kv -> {
                 tc.assertTrue(kv.getModifyIndex() > consulIndex);
                 tc.assertEquals(kv.getValue(), value);
                 async.countDown();
               }));
-              ctx.readClient().getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(consulIndex)).onComplete(tc.asyncAssertSuccess(kv -> {
+              readClient.getValuesWithOptions("foo/bar", new BlockingQueryOptions().setIndex(consulIndex)).onComplete(tc.asyncAssertSuccess(kv -> {
                 tc.assertTrue(kv.getIndex() > consulIndex);
                 tc.assertTrue(kv.getList().size() == 1);
                 async.countDown();
               }));
             }));
           });
-          async.handler(v -> ctx.writeClient().deleteValue(key).onComplete(tc.asyncAssertSuccess()));
+          async.handler(v -> writeClient.deleteValue(key).onComplete(tc.asyncAssertSuccess()));
         });
       }));
   }

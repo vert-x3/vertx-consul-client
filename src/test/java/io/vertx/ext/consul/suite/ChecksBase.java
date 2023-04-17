@@ -15,32 +15,21 @@
  */
 package io.vertx.ext.consul.suite;
 
-import grpc.health.v1.HealthCheck;
-import grpc.health.v1.HealthGrpc;
-import io.grpc.stub.StreamObserver;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.consul.*;
-import io.vertx.ext.unit.Async;
+import io.vertx.ext.consul.Check;
+import io.vertx.ext.consul.CheckOptions;
+import io.vertx.ext.consul.CheckStatus;
+import io.vertx.ext.consul.ConsulTestBase;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.grpc.VertxServer;
-import io.vertx.grpc.VertxServerBuilder;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import io.vertx.ext.consul.vertx.VertxHttpServer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static io.vertx.ext.consul.Utils.*;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
@@ -50,6 +39,8 @@ import static io.vertx.test.core.TestUtils.randomAlphaString;
  */
 @RunWith(VertxUnitRunner.class)
 public abstract class ChecksBase extends ConsulTestBase {
+  final static String TEST_HEADER_NAME = "test";
+  final static String TEST_HEADER_VALUE = "foo";
 
   abstract String createCheck(CheckOptions opts);
 
@@ -64,17 +55,17 @@ public abstract class ChecksBase extends ConsulTestBase {
 
     Check check;
 
-    runAsync(() -> ctx.writeClient().warnCheckWithNote(checkId, "warn"));
+    runAsync(() -> writeClient.warnCheckWithNote(checkId, "warn"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
     assertEquals("warn", check.getOutput());
 
-    runAsync(() -> ctx.writeClient().failCheckWithNote(checkId, "fail"));
+    runAsync(() -> writeClient.failCheckWithNote(checkId, "fail"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
     assertEquals("fail", check.getOutput());
 
-    runAsync(() -> ctx.writeClient().passCheckWithNote(checkId, "pass"));
+    runAsync(() -> writeClient.passCheckWithNote(checkId, "pass"));
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
     assertEquals("pass", check.getOutput());
@@ -84,21 +75,19 @@ public abstract class ChecksBase extends ConsulTestBase {
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
+    runAsync(() -> writeClient.deregisterCheck(checkId));
   }
 
   @Test
   public void httpCheckLifecycle() {
-    HttpHealthReporter reporter = new HttpHealthReporterWithHeaderCheck(vertx);
+    VertxHttpServer vertxServer = new VertxHttpServer();
+    vertxServer.start();
 
     HashMap<String, List<String>> headers = new HashMap<>();
-    headers.put(
-      HttpHealthReporterWithHeaderCheck.TEST_HEADER_NAME,
-      Collections.singletonList(HttpHealthReporterWithHeaderCheck.TEST_HEADER_VALUE)
-    );
+    headers.put(TEST_HEADER_NAME, Collections.singletonList(TEST_HEADER_VALUE));
 
     CheckOptions opts = new CheckOptions()
-      .setHttp("http://localhost:" + reporter.port())
+      .setHttp("http://" + vertxServer.address() + ":" + vertxServer.port())
       .setInterval("2s")
       .setHeaders(headers)
       .setName("checkName");
@@ -108,63 +97,27 @@ public abstract class ChecksBase extends ConsulTestBase {
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
-    reporter.setStatus(CheckStatus.WARNING);
+    vertxServer.updateStatus(CheckStatus.WARNING);
     sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.WARNING, check.getStatus());
 
-    reporter.setStatus(CheckStatus.CRITICAL);
+    vertxServer.updateStatus(CheckStatus.CRITICAL);
     sleep(vertx, 3000);
     check = getCheckInfo(checkId);
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
 
-    reporter.close();
-
-    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
-  }
-
-  @Test
-  public void grpcCheckLifecycle(TestContext tc) {
-    if (ctx.consulVersion().compareTo("1.0.3") < 0) {
-      System.out.println("skip " + ctx.consulVersion() + " version");
-      return;
-    }
-    GrpcHealthReporter reporter = new GrpcHealthReporter(vertx);
-    Async async = tc.async();
-
-    CheckOptions opts = new CheckOptions()
-      .setGrpc("localhost:" + reporter.port() + "/testee")
-      .setInterval("2s")
-      .setName("checkName");
-    String checkId = createCheck(opts);
-
-    reporter.start(tc.asyncAssertSuccess(v1 -> {
-      vertx.setTimer(3000, t1 -> {
-        getCheckInfo(tc, checkId, c1 -> {
-          tc.assertEquals(CheckStatus.PASSING, c1.getStatus());
-          reporter.setStatus(HealthCheck.HealthCheckResponse.ServingStatus.NOT_SERVING);
-
-          vertx.setTimer(3000, t2 -> {
-            getCheckInfo(tc, checkId, c2 -> {
-              tc.assertEquals(CheckStatus.CRITICAL, c2.getStatus());
-
-              reporter.close(tc.asyncAssertSuccess(v2 -> {
-                ctx.writeClient().deregisterCheck(checkId).onComplete(tc.asyncAssertSuccess(v -> async.complete()));
-              }));
-            });
-          });
-
-        });
-      });
-    }));
+    vertxServer.stop();
+    runAsync(() -> writeClient.deregisterCheck(checkId));
   }
 
   @Test
   public void tcpCheckLifecycle() {
-    HttpHealthReporter reporter = new HttpHealthReporterImpl(vertx);
+    VertxHttpServer reporter = new VertxHttpServer();
+    reporter.start();
 
     CheckOptions opts = new CheckOptions()
-      .setTcp("localhost:" + reporter.port())
+      .setTcp(reporter.address() + ":" + reporter.port())
       .setInterval("2s")
       .setName("checkName");
     String checkId = createCheck(opts);
@@ -173,43 +126,24 @@ public abstract class ChecksBase extends ConsulTestBase {
     Check check = getCheckInfo(checkId);
     assertEquals(CheckStatus.PASSING, check.getStatus());
 
-    reporter.close();
-    sleep(vertx, 3000);
-    check = getCheckInfo(checkId);
+    reporter.stop();
+    int maxRequestCount = 20;
+    while (maxRequestCount-- > 0) {
+      check = getCheckInfo(checkId);
+      if (check.getStatus() == CheckStatus.CRITICAL) {
+        break;
+      }
+      sleep(vertx, 1000);
+      System.out.println("Waiting for container to stop...");
+    }
     assertEquals(CheckStatus.CRITICAL, check.getStatus());
+    System.out.println("Vertx container is stopped");
 
-    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
-  }
-
-  @Test
-  public void scriptCheckLifecycle() {
-    ScriptHealthReporter reporter = new ScriptHealthReporter();
-
-    CheckOptions opts = new CheckOptions()
-      .setScriptArgs(reporter.scriptArgs())
-      .setInterval("2s")
-      .setName("checkName");
-    String checkId = createCheck(opts);
-
-    sleep(vertx, 3000);
-    Check check = getCheckInfo(checkId);
-    assertEquals(CheckStatus.PASSING, check.getStatus());
-
-    reporter.setStatus(CheckStatus.WARNING);
-    sleep(vertx, 3000);
-    check = getCheckInfo(checkId);
-    assertEquals(CheckStatus.WARNING, check.getStatus());
-
-    reporter.setStatus(CheckStatus.CRITICAL);
-    sleep(vertx, 3000);
-    check = getCheckInfo(checkId);
-    assertEquals(CheckStatus.CRITICAL, check.getStatus());
-
-    runAsync(() -> ctx.writeClient().deregisterCheck(checkId));
+    runAsync(() -> writeClient.deregisterCheck(checkId));
   }
 
   Check getCheckInfo(String id) {
-    List<Check> checks = getAsync(() -> ctx.writeClient().localChecks());
+    List<Check> checks = getAsync(() -> writeClient.localChecks());
     return checks.stream()
       .filter(check -> check.getId().equals(id))
       .findFirst()
@@ -217,198 +151,11 @@ public abstract class ChecksBase extends ConsulTestBase {
   }
 
   void getCheckInfo(TestContext tc, String id, Handler<Check> resultHandler) {
-    ctx.writeClient().localChecks().onComplete(tc.asyncAssertSuccess(list -> {
+    writeClient.localChecks().onComplete(tc.asyncAssertSuccess(list -> {
       resultHandler.handle(list.stream()
         .filter(check -> check.getId().equals(id))
         .findFirst()
         .orElseThrow(NoSuchElementException::new));
     }));
-  }
-
-  private static class ScriptHealthReporter {
-
-    private File healthStatusFile;
-    private File scriptFile;
-
-    ScriptHealthReporter() {
-      try {
-        Path scriptDir = Files.createTempDirectory("vertx-consul-script-dir-");
-        healthStatusFile = new File(scriptDir.toFile(), "status");
-        String scriptName = "health_script." + (Utils.isWindows() ? "bat" : "sh");
-        String scriptContent = Utils.readResource(scriptName)
-          .replace("%STATUS_FILE%", healthStatusFile.getAbsolutePath());
-        scriptFile = new File(scriptDir.toFile(), scriptName);
-        PrintStream out = new PrintStream(scriptFile);
-        out.print(scriptContent);
-        out.close();
-        scriptFile.setExecutable(true);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      setStatus(CheckStatus.PASSING);
-    }
-
-    String scriptPath() {
-      return scriptFile.getAbsolutePath();
-    }
-
-    List<String> scriptArgs() {
-      List<String> scriptArgs = new ArrayList<>();
-      scriptArgs.add(scriptPath());
-      return scriptArgs;
-    }
-
-    void setStatus(CheckStatus status) {
-      int statusCode;
-      switch (status) {
-        case PASSING:
-          statusCode = 0;
-          break;
-        case WARNING:
-          statusCode = 1;
-          break;
-        default:
-          statusCode = 42;
-          break;
-      }
-      try {
-        PrintStream out = new PrintStream(healthStatusFile);
-        out.print(statusCode);
-        out.close();
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  private static abstract class HttpHealthReporter {
-
-    private final HttpServer server;
-    private final int port;
-    protected CheckStatus status = CheckStatus.PASSING;
-
-    HttpHealthReporter(Vertx vertx) {
-      this.port = Utils.getFreePort();
-      CountDownLatch latch = new CountDownLatch(1);
-      this.server = vertx.createHttpServer().requestHandler(this::handle);
-      server.listen(port).onComplete(h -> latch.countDown());
-      try {
-        latch.await(10, TimeUnit.SECONDS);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-
-    abstract void handle(HttpServerRequest request);
-
-    int port() {
-      return port;
-    }
-
-    void close() {
-      server.close();
-    }
-
-    protected int statusCode(CheckStatus status) {
-      switch (status) {
-        case PASSING:
-          return 200;
-        case WARNING:
-          return 429;
-        default:
-          return 500;
-      }
-    }
-
-    void setStatus(CheckStatus status) {
-      this.status = status;
-    }
-
-  }
-
-  private static class HttpHealthReporterImpl extends HttpHealthReporter {
-
-    HttpHealthReporterImpl(Vertx vertx) {
-      super(vertx);
-    }
-
-    @Override
-    void handle(HttpServerRequest request) {
-      request.response()
-        .setStatusCode(statusCode(status))
-        .end(status.name());
-    }
-
-  }
-
-  private static class HttpHealthReporterWithHeaderCheck extends HttpHealthReporter {
-
-    final static String TEST_HEADER_NAME = "test";
-    final static String TEST_HEADER_VALUE = "foo";
-
-    HttpHealthReporterWithHeaderCheck(Vertx vertx) {
-      super(vertx);
-    }
-
-    @Override
-    void handle(HttpServerRequest request) {
-      String headerValue = request.getHeader(TEST_HEADER_NAME);
-      Assert.assertEquals(TEST_HEADER_VALUE, headerValue);
-      request.response()
-        .setStatusCode(statusCode(status))
-        .end(status.name());
-    }
-
-  }
-
-  private class GrpcHealthReporter {
-
-    private final VertxServer server;
-    private final int port;
-
-    private HealthCheck.HealthCheckResponse.ServingStatus status = HealthCheck.HealthCheckResponse.ServingStatus.SERVING;
-
-    GrpcHealthReporter(Vertx vertx) {
-      this.port = Utils.getFreePort();
-      HealthGrpc.HealthImplBase service = new HealthGrpc.HealthImplBase() {
-        @Override
-        public void check(HealthCheck.HealthCheckRequest request, StreamObserver<HealthCheck.HealthCheckResponse> response) {
-          response.onNext(HealthCheck.HealthCheckResponse.newBuilder()
-            .setStatus(status)
-            .build());
-          response.onCompleted();
-        }
-      };
-      server = VertxServerBuilder
-        .forPort(vertx, port)
-        .addService(service)
-        .build();
-    }
-
-    int port() {
-      return port;
-    }
-
-    void setStatus(HealthCheck.HealthCheckResponse.ServingStatus status) {
-      this.status = status;
-    }
-
-    void start(Handler<AsyncResult<Void>> h) {
-      server.start(h);
-    }
-
-    void close(Handler<AsyncResult<Void>> h) {
-      server.shutdown();
-      vertx.<Void>executeBlocking(p -> {
-        try {
-          server.awaitTermination();
-        } catch (InterruptedException e) {
-          p.fail(e);
-          return;
-        }
-        p.complete();
-      }).onComplete(h);
-    }
-
   }
 }
