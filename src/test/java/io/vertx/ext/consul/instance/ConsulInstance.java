@@ -69,30 +69,31 @@ public class ConsulInstance extends ConsulContainer {
   }
 
 
-  public ConsulClient createClient(Vertx vertx, String token, boolean secure) {
-    return ConsulClient.create(vertx, consulClientOptions(token, secure));
+  public ConsulClient createClient(Vertx vertx, String token) {
+    return ConsulClient.create(vertx, consulClientOptions(token));
   }
 
   public ConsulClient createClient(Vertx vertx, ConsulClientOptions options) {
     return ConsulClient.create(vertx, options);
   }
 
-  public ConsulClientOptions consulClientOptions(String token, boolean secure) {
+  public ConsulClientOptions consulClientOptions(String token) {
     return new ConsulClientOptions()
       .setAclToken(token)
       .setDc(dc.getName())
       .setHost(address())
-      .setPort(secure ? getMappedPort(Builder.HTTPS_PORT) : getMappedPort(Builder.HTTP_PORT))
-      .setSsl(secure);
+      .setPort(getMappedPort(Builder.HTTP_PORT));
   }
 
   public ConsulClient createSecureClient(
     Vertx vertx, String token, boolean trustAll, PemTrustOptions trustOptions
   ) {
-    ConsulClientOptions options = consulClientOptions(token, true)
-      .setHost("127.0.0.1")
+    ConsulClientOptions options = consulClientOptions(token)
+      .setPort(getMappedPort(Builder.HTTPS_PORT))
       .setTrustAll(trustAll)
-      .setPemTrustOptions(trustOptions);
+      .setPemTrustOptions(trustOptions)
+      .setVerifyHost(false)
+      .setSsl(true);
     return ConsulClient.create(vertx, options);
   }
 
@@ -172,7 +173,7 @@ public class ConsulInstance extends ConsulContainer {
         this.serverAddr = other.getContainerNetwork().getIpAddress();
         this.serverSerfLanPort = Builder.SERF_LAN_PORT;
       } else {
-        //подключение по адерсу gateway и внешнему порту
+        //connection by gateway address and external port
         this.serverAddr = other.address();
         this.serverSerfLanPort = other.getMappedPort(Builder.SERF_LAN_PORT);
       }
