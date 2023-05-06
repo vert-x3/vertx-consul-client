@@ -110,6 +110,56 @@ public class Watches extends ConsulTestBase {
   }
 
   @Test
+  public void clientWithTimeout() throws InterruptedException {
+    String key = KEY_RW_PREFIX + randomAlphaString(10);
+    String v1 = randomAlphaString(10);
+    String v2 = randomAlphaString(10);
+    String v3 = randomAlphaString(10);
+
+    ConsulClientOptions clientOptions = new ConsulClientOptions()
+      .setHost(consul.getHost())
+      .setPort(consul.getMappedPort(8500))
+      .setSsl(false)
+      .setTrustAll(true)
+      .setVerifyHost(false)
+      .setAclToken(dc.getMasterToken())
+      .setKeepAlive(false)
+      .setTimeout(5_000);
+    CountDownLatch latch = new CountDownLatch(1);
+    CountDownLatch latch2 = new CountDownLatch(2);
+    CountDownLatch latch3 = new CountDownLatch(3);
+    Watch<KeyValue> watch = Watch.key(key, vertx, clientOptions)
+      .setHandler(kv -> {
+        if (kv.succeeded()) {
+          KeyValue state = kv.nextResult();
+          if (state.isPresent()) {
+            System.out.println("State " + state.getValue());
+            latch.countDown();
+            latch2.countDown();
+            latch3.countDown();
+          }
+        }
+      })
+      .start();
+
+    System.out.println("Send update: " + v1);
+    assertTrue(getAsync(() -> writeClient.putValue(key, v1)));
+    latch.await(10, TimeUnit.SECONDS);
+    System.out.println("Send update: " + v2);
+    assertTrue(getAsync(() -> writeClient.putValue(key, v2)));
+    latch2.await(10, TimeUnit.SECONDS);
+
+    System.out.println("Waiting for more than the timeout value");
+    Utils.sleep(vertx, 8_000);
+
+    System.out.println("Send update: " + v3);
+    assertTrue(getAsync(() -> writeClient.putValue(key, v3)));
+    latch3.await(10, TimeUnit.SECONDS);
+
+    watch.stop();
+  }
+
+  @Test
   public void watchCreatedKey() throws InterruptedException {
     StateConsumer<String> consumer = new StateConsumer<>();
     String key = KEY_RW_PREFIX + randomAlphaString(10);
@@ -183,7 +233,13 @@ public class Watches extends ConsulTestBase {
       .setHandler(kv -> {
         if (kv.succeeded()) {
           if (kv.nextResult().isPresent()) {
-            consumer.consume(kv.nextResult().getList().stream().map(KeyValue::getValue).sorted().collect(Collectors.joining("/")));
+            consumer.consume(kv
+              .nextResult()
+              .getList()
+              .stream()
+              .map(KeyValue::getValue)
+              .sorted()
+              .collect(Collectors.joining("/")));
           } else {
             consumer.consume(EMPTY_MESSAGE);
           }
@@ -208,7 +264,11 @@ public class Watches extends ConsulTestBase {
     String keyPrefix = KEY_RW_PREFIX + randomAlphaString(10);
     AtomicInteger eventCnt = new AtomicInteger();
 
-    WatchKeyPrefixCnt watch = new WatchKeyPrefixCnt(keyPrefix, vertx, consul.consulClientOptions(consul.dc().readToken()));
+    WatchKeyPrefixCnt watch = new WatchKeyPrefixCnt(
+      keyPrefix,
+      vertx,
+      consul.consulClientOptions(consul.dc().readToken())
+    );
     watch.setHandler(kv -> eventCnt.incrementAndGet());
     watch.start();
 
@@ -230,7 +290,14 @@ public class Watches extends ConsulTestBase {
 
     CountDownLatch succ = new CountDownLatch(1);
     AtomicInteger errs = new AtomicInteger();
-    Watch<KeyValue> watch = Watch.key(key, vertx, new ConsulClientOptions(consul.consulClientOptions(consul.dc().readToken())).setTimeout(TimeUnit.SECONDS.toMillis(10)))
+    Watch<KeyValue> watch = Watch
+      .key(
+        key,
+        vertx,
+        new ConsulClientOptions(consul.consulClientOptions(consul
+          .dc()
+          .readToken())).setTimeout(TimeUnit.SECONDS.toMillis(10))
+      )
       .setHandler(kv -> {
         if (kv.succeeded()) {
           KeyValue nextResult = kv.nextResult();
@@ -293,7 +360,8 @@ public class Watches extends ConsulTestBase {
       .setId(randomAlphaString(10))
       .setName(randomAlphaString(10));
 
-    Watch<ServiceEntryList> watch = Watch.service(service.getName(), vertx, consul.consulClientOptions(consul.dc().readToken()))
+    Watch<ServiceEntryList> watch = Watch
+      .service(service.getName(), vertx, consul.consulClientOptions(consul.dc().readToken()))
       .setHandler(list -> {
         if (list.succeeded()) {
           consumer.consume(list.nextResult().getList()
@@ -336,7 +404,10 @@ public class Watches extends ConsulTestBase {
     consumer.await("");
 
     Utils.<Event>getAsync(() -> writeClient.fireEventWithOptions(evName, new EventOptions().setPayload(p1)));
-    Utils.<Event>getAsync(() -> writeClient.fireEventWithOptions(randomAlphaString(10), new EventOptions().setPayload(randomAlphaString(10))));
+    Utils.<Event>getAsync(() -> writeClient.fireEventWithOptions(
+      randomAlphaString(10),
+      new EventOptions().setPayload(randomAlphaString(10))
+    ));
     Utils.<Event>getAsync(() -> writeClient.fireEventWithOptions(evName, new EventOptions().setPayload(p2)));
 
     consumer.await(p1);
