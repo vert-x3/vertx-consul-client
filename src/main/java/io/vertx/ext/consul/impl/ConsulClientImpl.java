@@ -172,6 +172,63 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<String> createAclPolicy(AclPolicy policy) {
+    if (policy.getRules() == null) {
+      return Future.failedFuture(new RuntimeException("Missing required request parameter: 'rules'"));
+    }
+    if (policy.getName() == null) {
+      return Future.failedFuture(new RuntimeException("Missing required request parameter: 'name'"));
+    }
+    return requestObject(HttpMethod.PUT, "/v1/acl/policy", null, policy.toJson().encode(), (obj, headers) ->
+      obj.getString("ID")
+    );
+  }
+
+  @Override
+  public Future<NewAclToken> createAclToken(NewAclToken token) {
+    return requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), (obj, headers) ->
+      new NewAclToken(obj)
+    );
+  }
+
+  @Override
+  public Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token) {
+    return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId), null, token.toJson().encode(),
+      (obj, headers) -> new NewAclToken(obj)
+    );
+  }
+
+  @Override
+  public Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken) {
+    return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId) + "/clone", null,
+      cloneAclToken.toJson().encode(),
+      (obj, headers) -> new NewAclToken(obj)
+    );
+  }
+
+  @Override
+  public Future<List<NewAclToken>> getAclTokens() {
+    return requestArray(HttpMethod.GET, "/v1/acl/tokens", null, null, (arr, headers) ->
+      arr.stream()
+        .map(obj -> new NewAclToken((JsonObject) obj))
+        .collect(Collectors.toList()));
+  }
+
+  @Override
+  public Future<NewAclToken> readAclToken(String accessorId) {
+    return requestObject(HttpMethod.GET, "/v1/acl/token/" + urlEncode(accessorId), null, null,
+      (obj, headers) -> new NewAclToken(obj)
+    );
+  }
+
+  @Override
+  public Future<Boolean> deleteAclToken(String accessorId) {
+    return requestString(HttpMethod.DELETE, "/v1/acl/token/" + urlEncode(accessorId), null, null,
+      (str, headers) -> Boolean.parseBoolean(str)
+    );
+  }
+
+  @Override
   public Future<String> createAclToken(AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/create", null, token.toJson().encode(), (obj, headers) ->
       obj.getString("ID"));

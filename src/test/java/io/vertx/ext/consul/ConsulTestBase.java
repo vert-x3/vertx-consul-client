@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static io.vertx.ext.consul.Utils.getAsync;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
+import static io.vertx.test.core.TestUtils.randomInt;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -44,6 +45,7 @@ public class ConsulTestBase extends VertxTestBase {
   @BeforeClass
   public static void startConsul() throws Exception {
     consul = ConsulInstance.defaultConsulBuilder(dc).build();
+
   }
 
   @AfterClass
@@ -55,19 +57,22 @@ public class ConsulTestBase extends VertxTestBase {
   public void setUp() throws Exception {
     super.setUp();
     masterClient = consul.createClient(vertx, consul.dc().getMasterToken());
-    String writeToken = createAclToken(Utils.readResource("write_rules.hcl"));
+    String writeToken = createAclToken("write_rules_" + randomInt(), Utils.readResource("write_rules.hcl"));
     consul.dc().setWriteToken(writeToken);
-    String readToken = createAclToken(Utils.readResource("read_rules.hcl"));
+    String readToken = createAclToken("read_rules_" + randomInt(), Utils.readResource("read_rules.hcl"));
     consul.dc().setReadToken(readToken);
     writeClient = consul.createClient(vertx, consul.dc().writeToken());
     readClient = consul.createClient(vertx, consul.dc().readToken());
   }
 
-  public String createAclToken(String rules) {
-    AclToken request = new AclToken()
-      .setRules(rules)
-      .setType(AclTokenType.CLIENT);
-    return getAsync(() -> masterClient.createAclToken(request));
+  public String createAclToken(String name, String rules) {
+    AclPolicy policy = new AclPolicy()
+      .setName(name)
+      .setRules(rules);
+    String id = getAsync(() -> masterClient.createAclPolicy(policy));
+    NewAclToken request = new NewAclToken()
+      .addPolicy(new PolicyLink().setId(id));
+    return getAsync(() -> masterClient.createAclToken(request)).getSecretId();
   }
 
   @Override
