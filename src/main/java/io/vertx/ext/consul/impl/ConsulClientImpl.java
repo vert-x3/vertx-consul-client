@@ -291,6 +291,131 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public ConsulClient createAclPolicy(AclPolicy policy, Handler<AsyncResult<String>> resultHandler) {
+    if (policy.getRules() == null) {
+      resultHandler.handle(Future.failedFuture(new RuntimeException("Missing required request parameter: 'rules'")));
+    }
+    if (policy.getName() == null) {
+      resultHandler.handle(Future.failedFuture(new RuntimeException("Missing required request parameter: 'name'")));
+    }
+    requestObject(HttpMethod.PUT, "/v1/acl/policy", null, policy.toJson().encode(), resultHandler,
+      (obj, headers) -> obj.getString("ID")
+    );
+    return this;
+  }
+
+  @Override
+  public Future<String> createAclPolicy(AclPolicy policy) {
+    Promise<String> promise = Promise.promise();
+    createAclPolicy(policy, promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient createAclToken(NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler) {
+    requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), resultHandler, (obj, headers) ->
+      new NewAclToken(obj)
+    );
+    return this;
+  }
+
+  @Override
+  public Future<NewAclToken> createAclToken(NewAclToken token) {
+    Promise<NewAclToken> promise = Promise.promise();
+    createAclToken(token, promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient updateAclToken(
+    String accessorId,
+    NewAclToken token,
+    Handler<AsyncResult<NewAclToken>> resultHandler
+  ) {
+    requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId), null, token.toJson().encode(),
+      resultHandler,
+      (obj, headers) -> new NewAclToken(obj)
+    );
+    return this;
+  }
+
+  @Override
+  public Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token) {
+    Promise<NewAclToken> promise = Promise.promise();
+    updateAclToken(accessorId, token, promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient cloneAclToken(
+    String accessorId,
+    CloneAclToken cloneAclToken,
+    Handler<AsyncResult<NewAclToken>> resultHandler
+  ) {
+    requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId) + "/clone", null,
+      cloneAclToken.toJson().encode(),
+      resultHandler,
+      (obj, headers) -> new NewAclToken(obj)
+    );
+    return this;
+  }
+
+  @Override
+  public Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken) {
+    Promise<NewAclToken> promise = Promise.promise();
+    cloneAclToken(accessorId, cloneAclToken, promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient getAclTokens(Handler<AsyncResult<List<NewAclToken>>> resultHandler) {
+    requestArray(HttpMethod.GET, "/v1/acl/tokens", null, null, resultHandler, (arr, headers) ->
+      arr.stream()
+        .map(obj -> new NewAclToken((JsonObject) obj))
+        .collect(Collectors.toList()));
+    return this;
+  }
+
+  @Override
+  public Future<List<NewAclToken>> getAclTokens() {
+    Promise<List<NewAclToken>> promise = Promise.promise();
+    getAclTokens(promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient readAclToken(String accessorId, Handler<AsyncResult<NewAclToken>> resultHandler) {
+    requestObject(HttpMethod.GET, "/v1/acl/token/" + urlEncode(accessorId), null, null,
+      resultHandler,
+      (obj, headers) -> new NewAclToken(obj)
+    );
+    return this;
+  }
+
+  @Override
+  public Future<NewAclToken> readAclToken(String accessorId) {
+    Promise<NewAclToken> promise = Promise.promise();
+    readAclToken(accessorId, promise);
+    return promise.future();
+  }
+
+  @Override
+  public ConsulClient deleteAclToken(String accessorId, Handler<AsyncResult<Boolean>> resultHandler) {
+    requestString(HttpMethod.DELETE, "/v1/acl/token/" + urlEncode(accessorId), null, null,
+      resultHandler,
+      (str, headers) -> Boolean.parseBoolean(str)
+    );
+    return this;
+  }
+
+  @Override
+  public Future<Boolean> deleteAclToken(String accessorId) {
+    Promise<Boolean> promise = Promise.promise();
+    deleteAclToken(accessorId, promise);
+    return promise.future();
+  }
+
+  @Override
   public ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler) {
     requestObject(HttpMethod.PUT, "/v1/acl/create", null, token.toJson().encode(), idHandler, (obj, headers) ->
       obj.getString("ID"));

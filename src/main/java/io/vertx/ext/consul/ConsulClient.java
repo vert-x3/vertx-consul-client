@@ -95,7 +95,10 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
   @Fluent
-  ConsulClient coordinateNodesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<CoordinateList>> resultHandler);
+  ConsulClient coordinateNodesWithOptions(
+    BlockingQueryOptions options,
+    Handler<AsyncResult<CoordinateList>> resultHandler
+  );
 
   /**
    * Like {@link #coordinateNodesWithOptions(BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -143,7 +146,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
-  ConsulClient getKeysWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<List<String>>> resultHandler);
+  ConsulClient getKeysWithOptions(
+    String keyPrefix,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<List<String>>> resultHandler
+  );
 
   /**
    * Like {@link #getKeysWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -179,7 +186,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
-  ConsulClient getValueWithOptions(String key, BlockingQueryOptions options, Handler<AsyncResult<KeyValue>> resultHandler);
+  ConsulClient getValueWithOptions(
+    String key,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<KeyValue>> resultHandler
+  );
 
   /**
    * Like {@link #getValueWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -231,7 +242,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
-  ConsulClient getValuesWithOptions(String keyPrefix, BlockingQueryOptions options, Handler<AsyncResult<KeyValueList>> resultHandler);
+  ConsulClient getValuesWithOptions(
+    String keyPrefix,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<KeyValueList>> resultHandler
+  );
 
   /**
    * Like {@link #getValuesWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -280,7 +295,12 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   @Fluent
-  ConsulClient putValueWithOptions(String key, String value, KeyValueOptions options, Handler<AsyncResult<Boolean>> resultHandler);
+  ConsulClient putValueWithOptions(
+    String key,
+    String value,
+    KeyValueOptions options,
+    Handler<AsyncResult<Boolean>> resultHandler
+  );
 
   /**
    * Like {@link #putValueWithOptions(String, String, KeyValueOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -304,7 +324,151 @@ public interface ConsulClient {
   Future<TxnResponse> transaction(TxnRequest request);
 
   /**
-   * Create new Acl token
+   * Creates a new ACL policy
+   *
+   * @param policy        properties of policy
+   * @param resultHandler will be provided with result of policy
+   * @return reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#create-a-policy">/acl/policy</a>
+   */
+  @Fluent
+  ConsulClient createAclPolicy(AclPolicy policy, Handler<AsyncResult<String>> resultHandler);
+
+  /**
+   * Creates a new ACL policy
+   *
+   * @param policy properties of policy
+   * @return a future provided with ID of created policy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#create-a-policy">/acl/policy</a>
+   */
+  Future<String> createAclPolicy(AclPolicy policy);
+
+  /**
+   * Create an Acl token
+   *
+   * @param token         properties of the token
+   * @param resultHandler will be provided with result of token
+   * @return reference to this, for fluency
+   * {@link NewAclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
+   * {@link NewAclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
+   */
+  @Fluent
+  ConsulClient createAclToken(NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler);
+
+  /**
+   * Create an Acl token
+   *
+   * @param token properties of the token
+   * @return a future NewAclToken in which two fields accessorId and secretId.
+   * {@link NewAclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
+   * {@link NewAclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
+   */
+  Future<NewAclToken> createAclToken(NewAclToken token);
+
+  /**
+   * Update an existing Acl token
+   *
+   * @param accessorId    uuid of the token
+   * @param token         properties of the token
+   * @param resultHandler will be provided with result of token
+   * @return reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#update-a-token">/acl/token/:accessorId</a> endpoint
+   */
+  @Fluent
+  ConsulClient updateAclToken(String accessorId, NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler);
+
+  /**
+   * Update an existing Acl token
+   *
+   * @param accessorId uuid of the token
+   * @param token      properties of the token
+   * @return a future NewAclToken like in {@link #createAclToken(NewAclToken)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#update-a-token">/acl/token/:accessorId</a> endpoint
+   */
+  Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token);
+
+  /**
+   * Clones an existing ACL token
+   *
+   * @param accessorId    uuid of the token
+   * @param cloneAclToken properties of cloned token
+   * @param resultHandler will be provided with result of token
+   * @return reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
+   */
+  @Fluent
+  ConsulClient cloneAclToken(String accessorId, CloneAclToken cloneAclToken, Handler<AsyncResult<NewAclToken>> resultHandler);
+
+  /**
+   * Clones an existing ACL token
+   *
+   * @param accessorId    uuid of the token
+   * @param cloneAclToken properties of cloned token
+   * @return a future NewAclToken like in {@link #createAclToken(NewAclToken)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
+   */
+  Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken);
+
+  /**
+   * Get list of Acl token
+   *
+   * @param resultHandler will be provided with result of tokens
+   * @return reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#list-tokens">/v1/acl/tokens</a> endpoint
+   */
+  @Fluent
+  ConsulClient getAclTokens(Handler<AsyncResult<List<NewAclToken>>> resultHandler);
+
+  /**
+   * Get list of Acl token
+   *
+   * @return a future provided with list of tokens
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#list-tokens">/v1/acl/tokens</a> endpoint
+   */
+  Future<List<NewAclToken>> getAclTokens();
+
+  /**
+   * Reads an ACL token with the given Accessor ID
+   *
+   * @param accessorId    uuid of token
+   * @param resultHandler will be provided with result of token
+   * @return reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#read-a-token">/v1/acl/token/:AccessorID</a> endpoint
+   */
+  @Fluent
+  ConsulClient readAclToken(String accessorId, Handler<AsyncResult<NewAclToken>> resultHandler);
+
+  /**
+   * Reads an ACL token with the given Accessor ID
+   *
+   * @param accessorId uuid of token
+   * @return a future provided with token
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#read-a-token">/v1/acl/token/:AccessorID</a> endpoint
+   */
+  Future<NewAclToken> readAclToken(String accessorId);
+
+  /**
+   * Deletes an ACL token
+   *
+   * @param accessorId    uuid of token
+   * @param resultHandler will be provided with result of token deleting
+   * @return reference to this, for fluency
+   */
+  @Fluent
+  ConsulClient deleteAclToken(String accessorId, Handler<AsyncResult<Boolean>> resultHandler);
+
+  /**
+   * Deletes an ACL token
+   *
+   * @param accessorId uuid of token
+   * @return a future boolean value: true or false, indicating whether the deletion was successful.
+   */
+  Future<Boolean> deleteAclToken(String accessorId);
+
+  /**
+   * Legacy create new Acl token
    *
    * @param token     properties of the token
    * @param idHandler will be provided with ID of created token
@@ -312,11 +476,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #createAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<String> createAclToken(AclToken token);
 
   /**
@@ -328,11 +494,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #updateAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<String> updateAclToken(AclToken token);
 
   /**
@@ -344,11 +512,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #cloneAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<String> cloneAclToken(String id);
 
   /**
@@ -359,11 +529,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
 
   /**
    * Like {@link #listAclTokens(Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<List<AclToken>> listAclTokens();
 
   /**
@@ -375,11 +547,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
   /**
    * Like {@link #infoAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<AclToken> infoAclToken(String id);
 
   /**
@@ -391,11 +565,13 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
    */
   @Fluent
+  @Deprecated
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Like {@link #destroyAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
+  @Deprecated
   Future<Void> destroyAclToken(String id);
 
   /**
@@ -546,7 +722,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServiceNodesWithOptions(String service, ServiceQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulClient catalogServiceNodesWithOptions(
+    String service,
+    ServiceQueryOptions options,
+    Handler<AsyncResult<ServiceList>> resultHandler
+  );
 
   /**
    * Like {@link #catalogServiceNodesWithOptions(String, ServiceQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -625,7 +805,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
   @Fluent
-  ConsulClient healthChecksWithOptions(String service, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
+  ConsulClient healthChecksWithOptions(
+    String service,
+    CheckQueryOptions options,
+    Handler<AsyncResult<CheckList>> resultHandler
+  );
 
   /**
    * Like {@link #healthChecksWithOptions(String, CheckQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -658,7 +842,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
   @Fluent
-  ConsulClient healthStateWithOptions(HealthState healthState, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
+  ConsulClient healthStateWithOptions(
+    HealthState healthState,
+    CheckQueryOptions options,
+    Handler<AsyncResult<CheckList>> resultHandler
+  );
 
   /**
    * Like {@link #healthStateWithOptions(HealthState, CheckQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -676,7 +864,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
-  ConsulClient healthServiceNodes(String service, boolean passing, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+  ConsulClient healthServiceNodes(
+    String service,
+    boolean passing,
+    Handler<AsyncResult<ServiceEntryList>> resultHandler
+  );
 
   /**
    * Like {@link #healthServiceNodes(String, boolean, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -695,7 +887,12 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
   @Fluent
-  ConsulClient healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options, Handler<AsyncResult<ServiceEntryList>> resultHandler);
+  ConsulClient healthServiceNodesWithOptions(
+    String service,
+    boolean passing,
+    ServiceQueryOptions options,
+    Handler<AsyncResult<ServiceEntryList>> resultHandler
+  );
 
   /**
    * Like {@link #healthServiceNodesWithOptions(String, boolean, ServiceQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -727,7 +924,10 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   @Fluent
-  ConsulClient catalogServicesWithOptions(BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulClient catalogServicesWithOptions(
+    BlockingQueryOptions options,
+    Handler<AsyncResult<ServiceList>> resultHandler
+  );
 
   /**
    * Like {@link #catalogServicesWithOptions(BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -761,7 +961,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
   @Fluent
-  ConsulClient catalogNodeServicesWithOptions(String node, BlockingQueryOptions options, Handler<AsyncResult<ServiceList>> resultHandler);
+  ConsulClient catalogNodeServicesWithOptions(
+    String node,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<ServiceList>> resultHandler
+  );
 
   /**
    * Like {@link #catalogNodeServicesWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -964,7 +1168,12 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
   @Fluent
-  ConsulClient updateCheckWithNote(String checkId, CheckStatus status, String note, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient updateCheckWithNote(
+    String checkId,
+    CheckStatus status,
+    String note,
+    Handler<AsyncResult<Void>> resultHandler
+  );
 
   /**
    * Like {@link #updateCheckWithNote(String, CheckStatus, String, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -1063,7 +1272,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
   @Fluent
-  ConsulClient infoSessionWithOptions(String id, BlockingQueryOptions options, Handler<AsyncResult<Session>> resultHandler);
+  ConsulClient infoSessionWithOptions(
+    String id,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<Session>> resultHandler
+  );
 
   /**
    * Like {@link #infoSessionWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -1145,7 +1358,11 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
   @Fluent
-  ConsulClient listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options, Handler<AsyncResult<SessionList>> resultHandler);
+  ConsulClient listNodeSessionsWithOptions(
+    String nodeId,
+    BlockingQueryOptions options,
+    Handler<AsyncResult<SessionList>> resultHandler
+  );
 
   /**
    * Like {@link #listNodeSessionsWithOptions(String, BlockingQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result.
@@ -1271,29 +1488,41 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
    */
   @Fluent
-  ConsulClient executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options, Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler);
+  ConsulClient executePreparedQueryWithOptions(
+    String query,
+    PreparedQueryExecuteOptions options,
+    Handler<AsyncResult<PreparedQueryExecuteResponse>> resultHandler
+  );
 
   /**
    * Like {@link #executePreparedQueryWithOptions(String, PreparedQueryExecuteOptions, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options);
+  Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(
+    String query,
+    PreparedQueryExecuteOptions options
+  );
 
   /**
    * Register node with external service
-   * @param nodeOptions the options of new node
+   *
+   * @param nodeOptions    the options of new node
    * @param serviceOptions the options of new service
-   * @param resultHandler will be provided with response
-   * @see <a href="https://www.consul.io/api-docs/catalog#register-entity">/v1/catalog/register</a> endpoint
+   * @param resultHandler  will be provided with response
    * @return reference to this, for fluency
+   * @see <a href="https://www.consul.io/api-docs/catalog#register-entity">/v1/catalog/register</a> endpoint
    */
   @Fluent
-  ConsulClient registerCatalogService(Node nodeOptions, ServiceOptions serviceOptions, Handler<AsyncResult<Void>> resultHandler);
+  ConsulClient registerCatalogService(
+    Node nodeOptions,
+    ServiceOptions serviceOptions,
+    Handler<AsyncResult<Void>> resultHandler
+  );
 
   /**
    * Deregister entities from the node or deregister the node itself.
    *
-   * @param nodeId            the ID of node
-   * @param serviceId         the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
+   * @param nodeId        the ID of node
+   * @param serviceId     the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
    * @param resultHandler will be called when complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity">/v1/catalog/deregister</a> endpoint
