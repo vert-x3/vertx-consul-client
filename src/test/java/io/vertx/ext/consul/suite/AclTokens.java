@@ -15,7 +15,11 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.AclToken;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
+import io.vertx.ext.consul.token.PolicyLink;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
@@ -34,7 +38,8 @@ public class AclTokens extends ConsulTestBase {
         .setName("tokenName")
         .setRules("key \"bar/\" { policy = \"read\" }");
       masterClient.createAclPolicy(policy).onComplete(tc.asyncAssertSuccess(policyId -> {
-        NewAclToken init = new NewAclToken().addPolicy(new PolicyLink().setId(policyId));
+        AclToken init = new AclToken()
+          .addPolicy(new PolicyLink().setId(policyId));
         masterClient.createAclToken(init).onComplete(tc.asyncAssertSuccess(aclToken -> {
           String id = aclToken.getAccessorId();
           masterClient.readAclToken(id).onComplete(tc.asyncAssertSuccess(token -> {
@@ -42,7 +47,7 @@ public class AclTokens extends ConsulTestBase {
               .orElse(new PolicyLink());
             tc.assertEquals(id, token.getAccessorId());
             tc.assertEquals(policy.getName(), receivedPolicy.getName());
-            masterClient.cloneAclToken(id, new CloneAclToken()).onComplete(tc.asyncAssertSuccess(clonedToken -> {
+            masterClient.cloneAclToken(id, new CloneAclTokenOptions()).onComplete(tc.asyncAssertSuccess(clonedToken -> {
               String clonedId = clonedToken.getAccessorId();
               masterClient.readAclToken(clonedId).onComplete(tc.asyncAssertSuccess(receivedClonedToken -> {
                 PolicyLink receivedClonedPolicy = receivedClonedToken.getPolicies().stream().findFirst()
@@ -53,7 +58,7 @@ public class AclTokens extends ConsulTestBase {
                   .setName("updatedName")
                   .setRules("key \"bar/\" { policy = \"write\" }");
                 masterClient.createAclPolicy(policy2).onComplete(tc.asyncAssertSuccess(policyId2 -> {
-                  NewAclToken token2 = new NewAclToken()
+                  AclToken token2 = new AclToken()
                     .addPolicy(new PolicyLink().setId(policyId2));
                   masterClient.updateAclToken(clonedToken.getAccessorId(), token2).onComplete(tc.asyncAssertSuccess(updatedId -> {
                     masterClient.readAclToken(updatedId.getAccessorId()).onComplete(tc.asyncAssertSuccess(updatedToken -> {

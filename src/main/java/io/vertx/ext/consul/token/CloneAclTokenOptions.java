@@ -1,10 +1,10 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject
-public class CloneAclToken {
+public class CloneAclTokenOptions {
   private static final String DESCRIPTION_KEY = "Description";
   private static final String NAMESPACE_KEY = "Namespace";
   /**
@@ -13,10 +13,10 @@ public class CloneAclToken {
   private String description;
   private String namespace;
 
-  public CloneAclToken() {
+  public CloneAclTokenOptions() {
   }
 
-  public CloneAclToken(JsonObject json){
+  public CloneAclTokenOptions(JsonObject json){
     this.description = json.getString(DESCRIPTION_KEY);
     this.namespace = json.getString(NAMESPACE_KEY);
   }
@@ -37,7 +37,7 @@ public class CloneAclToken {
    *
    * @param description Free form human-readable description
    */
-  public CloneAclToken setDescription(String description) {
+  public CloneAclTokenOptions setDescription(String description) {
     this.description = description;
     return this;
   }
@@ -48,7 +48,7 @@ public class CloneAclToken {
    *
    * @param namespace
    */
-  public CloneAclToken setNamespace(String namespace) {
+  public CloneAclTokenOptions setNamespace(String namespace) {
     this.namespace = namespace;
     return this;
   }

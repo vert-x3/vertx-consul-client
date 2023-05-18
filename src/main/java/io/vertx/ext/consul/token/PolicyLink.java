@@ -1,4 +1,4 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
@@ -27,7 +27,7 @@ public class PolicyLink {
     this.name = json.getString(NAME_KEY);
   }
 
-  JsonObject toJson() {
+  public JsonObject toJson() {
     JsonObject json = new JsonObject();
     if (id != null) {
       json.put(ID_KEY, id);

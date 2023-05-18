@@ -17,6 +17,8 @@ package io.vertx.ext.consul;
 
 import io.vertx.ext.consul.dc.ConsulDatacenter;
 import io.vertx.ext.consul.instance.ConsulInstance;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.PolicyLink;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -70,7 +72,7 @@ public class ConsulTestBase extends VertxTestBase {
       .setName(name)
       .setRules(rules);
     String id = getAsync(() -> masterClient.createAclPolicy(policy));
-    NewAclToken request = new NewAclToken()
+    io.vertx.ext.consul.token.AclToken request = new io.vertx.ext.consul.token.AclToken()
       .addPolicy(new PolicyLink().setId(id));
     return getAsync(() -> masterClient.createAclToken(request)).getSecretId();
   }

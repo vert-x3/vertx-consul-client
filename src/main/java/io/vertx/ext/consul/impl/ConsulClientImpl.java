@@ -22,6 +22,8 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
@@ -184,40 +186,39 @@ public class ConsulClientImpl implements ConsulClient {
     );
   }
 
-  @Override
-  public Future<NewAclToken> createAclToken(NewAclToken token) {
+  public Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), (obj, headers) ->
-      new NewAclToken(obj)
+      new io.vertx.ext.consul.token.AclToken(obj)
     );
   }
 
   @Override
-  public Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token) {
+  public Future<io.vertx.ext.consul.token.AclToken> updateAclToken(String accessorId, io.vertx.ext.consul.token.AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId), null, token.toJson().encode(),
-      (obj, headers) -> new NewAclToken(obj)
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
   }
 
   @Override
-  public Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken) {
+  public Future<io.vertx.ext.consul.token.AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclTokenOptions) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId) + "/clone", null,
-      cloneAclToken.toJson().encode(),
-      (obj, headers) -> new NewAclToken(obj)
+      cloneAclTokenOptions.toJson().encode(),
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
   }
 
   @Override
-  public Future<List<NewAclToken>> getAclTokens() {
+  public Future<List<io.vertx.ext.consul.token.AclToken>> getAclTokens() {
     return requestArray(HttpMethod.GET, "/v1/acl/tokens", null, null, (arr, headers) ->
       arr.stream()
-        .map(obj -> new NewAclToken((JsonObject) obj))
+        .map(obj -> new io.vertx.ext.consul.token.AclToken((JsonObject) obj))
         .collect(Collectors.toList()));
   }
 
   @Override
-  public Future<NewAclToken> readAclToken(String accessorId) {
+  public Future<io.vertx.ext.consul.token.AclToken> readAclToken(String accessorId) {
     return requestObject(HttpMethod.GET, "/v1/acl/token/" + urlEncode(accessorId), null, null,
-      (obj, headers) -> new NewAclToken(obj)
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
   }
 
@@ -279,7 +280,13 @@ public class ConsulClientImpl implements ConsulClient {
       query.put("node", options.getNode()).put("service", options.getService()).put("tag", options.getTag());
     }
     String body = options == null || options.getPayload() == null ? "" : options.getPayload();
-    return requestObject(HttpMethod.PUT, "/v1/event/fire/" + urlEncode(name), query, body, (jsonObject, headers) -> EventParser.parse(jsonObject));
+    return requestObject(
+      HttpMethod.PUT,
+      "/v1/event/fire/" + urlEncode(name),
+      query,
+      body,
+      (jsonObject, headers) -> EventParser.parse(jsonObject)
+    );
   }
 
   @Override
@@ -291,7 +298,10 @@ public class ConsulClientImpl implements ConsulClient {
   public Future<EventList> listEventsWithOptions(EventListOptions options) {
     Query query = options == null ? null : Query.of(options.getBlockingOptions()).put("name", options.getName());
     return requestArray(HttpMethod.GET, "/v1/event/list", query, null, (jsonArray, headers) -> {
-      List<Event> list = jsonArray.stream().map(obj -> EventParser.parse(((JsonObject) obj))).collect(Collectors.toList());
+      List<Event> list = jsonArray
+        .stream()
+        .map(obj -> EventParser.parse(((JsonObject) obj)))
+        .collect(Collectors.toList());
       return new EventList().setList(list).setIndex(Long.parseUnsignedLong(headers.get(INDEX_HEADER)));
     });
   }
@@ -334,7 +344,10 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<ServiceList> catalogServiceNodesWithOptions(String service, ServiceQueryOptions options) {
-    Query query = options == null ? null : Query.of("tag", options.getTag()).put("near", options.getNear()).put(options.getBlockingOptions());
+    Query query = options == null ? null : Query
+      .of("tag", options.getTag())
+      .put("near", options.getNear())
+      .put(options.getBlockingOptions());
     return requestArray(HttpMethod.GET, "/v1/catalog/service/" + urlEncode(service), query, null, (arr, headers) -> {
       List<Service> list = arr.stream().map(obj -> new Service((JsonObject) obj)).collect(Collectors.toList());
       return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
@@ -390,17 +403,24 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<ServiceEntryList> healthServiceNodes(String service, boolean passing) {
-    return healthServiceNodesWithOptions(service ,passing, null);
+    return healthServiceNodesWithOptions(service, passing, null);
   }
 
   @Override
-  public Future<ServiceEntryList> healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options) {
+  public Future<ServiceEntryList> healthServiceNodesWithOptions(
+    String service,
+    boolean passing,
+    ServiceQueryOptions options
+  ) {
     Query query = new Query().put("passing", passing ? 1 : null);
     if (options != null) {
       query.put(options.getBlockingOptions()).put("near", options.getNear()).put("tag", options.getTag());
     }
     return requestArray(HttpMethod.GET, "/v1/health/service/" + urlEncode(service), query, null, (arr, headers) -> {
-      List<ServiceEntry> list = arr.stream().map(obj -> ServiceEntryParser.parse((JsonObject) obj)).collect(Collectors.toList());
+      List<ServiceEntry> list = arr
+        .stream()
+        .map(obj -> ServiceEntryParser.parse((JsonObject) obj))
+        .collect(Collectors.toList());
       return new ServiceEntryList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
     });
   }
@@ -439,15 +459,21 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<ServiceList> catalogNodeServicesWithOptions(String node, BlockingQueryOptions options) {
-    return requestObject(HttpMethod.GET, "/v1/catalog/node/" + urlEncode(node), Query.of(options), null, (json, headers) -> {
-      JsonObject nodeInfo = json.getJsonObject("Node");
-      String nodeName = nodeInfo.getString("Node");
-      String nodeAddress = nodeInfo.getString("Address");
-      List<Service> list = json.getJsonObject("Services").stream()
-        .map(obj -> ServiceParser.parseNodeInfo(nodeName, nodeAddress, (JsonObject) obj.getValue()))
-        .collect(Collectors.toList());
-      return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
-    });
+    return requestObject(
+      HttpMethod.GET,
+      "/v1/catalog/node/" + urlEncode(node),
+      Query.of(options),
+      null,
+      (json, headers) -> {
+        JsonObject nodeInfo = json.getJsonObject("Node");
+        String nodeName = nodeInfo.getString("Node");
+        String nodeAddress = nodeInfo.getString("Address");
+        List<Service> list = json.getJsonObject("Services").stream()
+          .map(obj -> ServiceParser.parseNodeInfo(nodeName, nodeAddress, (JsonObject) obj.getValue()))
+          .collect(Collectors.toList());
+        return new ServiceList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+      }
+    );
   }
 
   @Override
@@ -485,7 +511,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   private static JsonArray checkListOpts(List<CheckOptions> listChecks, String checkIdKey, boolean extended) {
     JsonArray jsonArray = new JsonArray();
-    listChecks.stream().map(c -> checkOpts(c, checkIdKey,extended)).forEach(jsonArray::add);
+    listChecks.stream().map(c -> checkOpts(c, checkIdKey, extended)).forEach(jsonArray::add);
     return jsonArray;
   }
 
@@ -569,13 +595,19 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<Session> infoSessionWithOptions(String id, BlockingQueryOptions options) {
-    return requestArray(HttpMethod.GET, "/v1/session/info/" + urlEncode(id), Query.of(options), null, (sessions, headers) -> {
-      if (sessions.size() == 0) {
-        throw new RuntimeException("Unknown session ID: " + id);
-      } else {
-        return SessionParser.parse(sessions.getJsonObject(0), Long.parseLong(headers.get(INDEX_HEADER)));
+    return requestArray(
+      HttpMethod.GET,
+      "/v1/session/info/" + urlEncode(id),
+      Query.of(options),
+      null,
+      (sessions, headers) -> {
+        if (sessions.size() == 0) {
+          throw new RuntimeException("Unknown session ID: " + id);
+        } else {
+          return SessionParser.parse(sessions.getJsonObject(0), Long.parseLong(headers.get(INDEX_HEADER)));
+        }
       }
-    });
+    );
   }
 
   @Override
@@ -604,10 +636,19 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<SessionList> listNodeSessionsWithOptions(String nodeId, BlockingQueryOptions options) {
-    return requestArray(HttpMethod.GET, "/v1/session/node/" + urlEncode(nodeId), Query.of(options), null, (arr, headers) -> {
-      List<Session> list = arr.stream().map(obj -> SessionParser.parse((JsonObject) obj)).collect(Collectors.toList());
-      return new SessionList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
-    });
+    return requestArray(
+      HttpMethod.GET,
+      "/v1/session/node/" + urlEncode(nodeId),
+      Query.of(options),
+      null,
+      (arr, headers) -> {
+        List<Session> list = arr
+          .stream()
+          .map(obj -> SessionParser.parse((JsonObject) obj))
+          .collect(Collectors.toList());
+        return new SessionList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+      }
+    );
   }
 
   @Override
@@ -617,7 +658,13 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<String> createPreparedQuery(PreparedQueryDefinition definition) {
-    return requestObject(HttpMethod.POST, "/v1/query", null, definition.toJson().encode(), (obj, headers) -> obj.getString("ID"));
+    return requestObject(
+      HttpMethod.POST,
+      "/v1/query",
+      null,
+      definition.toJson().encode(),
+      (obj, headers) -> obj.getString("ID")
+    );
   }
 
   @Override
@@ -653,7 +700,10 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options) {
+  public Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(
+    String query,
+    PreparedQueryExecuteOptions options
+  ) {
     String path = "/v1/query/" + urlEncode(query) + "/execute";
     Query q = new Query();
     if (options != null) {
@@ -676,7 +726,7 @@ public class ConsulClientImpl implements ConsulClient {
     JsonObject nodeJsonOpts = new JsonObject()
       .put("Node", nodeOptions.getName())
       .put("Address", nodeOptions.getAddress());
-    if(notEmptyString(nodeOptions.getId())) {
+    if (notEmptyString(nodeOptions.getId())) {
       nodeJsonOpts.put("ID", nodeOptions.getId());
     }
 
@@ -695,13 +745,13 @@ public class ConsulClientImpl implements ConsulClient {
       nodeJsonOpts.put("TaggedAddresses", taggedAddresses);
     }
 
-    if(notEmptyString(nodeOptions.getDatacenter())) {
+    if (notEmptyString(nodeOptions.getDatacenter())) {
       nodeJsonOpts.put("Datacenter", nodeOptions.getDatacenter());
     }
-    if(nodeOptions.getNodeMeta() != null && !nodeOptions.getNodeMeta().isEmpty())
+    if (nodeOptions.getNodeMeta() != null && !nodeOptions.getNodeMeta().isEmpty())
       nodeJsonOpts.put("NodeMeta", nodeOptions.getNodeMeta());
 
-    if(serviceOptions != null) {
+    if (serviceOptions != null) {
       JsonObject serviceJsonOpts = new JsonObject()
         .put("ID", serviceOptions.getId())
         .put("Service", serviceOptions.getName())
@@ -740,27 +790,56 @@ public class ConsulClientImpl implements ConsulClient {
     webClient.close();
   }
 
-  private <T> Future<T> requestArray(HttpMethod method, String path, Query query, String body,
-                                BiFunction<JsonArray, MultiMap, T> mapper) {
-    return request(DEFAULT_VALID_CODES, method, path, query, body, resp -> mapper.apply(resp.bodyAsJsonArray(), resp.headers()));
+  private <T> Future<T> requestArray(
+    HttpMethod method, String path, Query query, String body,
+    BiFunction<JsonArray, MultiMap, T> mapper
+  ) {
+    return request(
+      DEFAULT_VALID_CODES,
+      method,
+      path,
+      query,
+      body,
+      resp -> mapper.apply(resp.bodyAsJsonArray(), resp.headers())
+    );
   }
 
-  private <T> Future<T> requestObject(HttpMethod method, String path, Query query, String body,
-                                 BiFunction<JsonObject, MultiMap, T> mapper) {
-    return request(DEFAULT_VALID_CODES, method, path, query, body, resp -> mapper.apply(resp.bodyAsJsonObject(), resp.headers()));
+  private <T> Future<T> requestObject(
+    HttpMethod method, String path, Query query, String body,
+    BiFunction<JsonObject, MultiMap, T> mapper
+  ) {
+    return request(
+      DEFAULT_VALID_CODES,
+      method,
+      path,
+      query,
+      body,
+      resp -> mapper.apply(resp.bodyAsJsonObject(), resp.headers())
+    );
   }
 
-  private <T> Future<T> requestString(HttpMethod method, String path, Query query, String body,
-                                 BiFunction<String, MultiMap, T> mapper) {
-    return request(DEFAULT_VALID_CODES, method, path, query, body, resp -> mapper.apply(resp.bodyAsString().trim(), resp.headers()));
+  private <T> Future<T> requestString(
+    HttpMethod method, String path, Query query, String body,
+    BiFunction<String, MultiMap, T> mapper
+  ) {
+    return request(
+      DEFAULT_VALID_CODES,
+      method,
+      path,
+      query,
+      body,
+      resp -> mapper.apply(resp.bodyAsString().trim(), resp.headers())
+    );
   }
 
   private <T> Future<T> requestVoid(HttpMethod method, String path, Query query, String body) {
     return request(DEFAULT_VALID_CODES, method, path, query, body, resp -> null);
   }
 
-  private <T> Future<T> request(List<Integer> validCodes, HttpMethod method, String path, Query query, String body,
-                           Function<HttpResponse<Buffer>, T> mapper) {
+  private <T> Future<T> request(
+    List<Integer> validCodes, HttpMethod method, String path, Query query, String body,
+    Function<HttpResponse<Buffer>, T> mapper
+  ) {
     if (query == null) {
       query = new Query();
     }
@@ -780,7 +859,11 @@ public class ConsulClientImpl implements ConsulClient {
         if (validCodes.contains(resp.statusCode())) {
           return mapper.apply(resp);
         } else {
-          throw new VertxException(String.format("Status message: '%s'. Body: '%s' ", resp.statusMessage(), resp.bodyAsString()), true);
+          throw new VertxException(String.format(
+            "Status message: '%s'. Body: '%s' ",
+            resp.statusMessage(),
+            resp.bodyAsString()
+          ), true);
         }
       });
   }
