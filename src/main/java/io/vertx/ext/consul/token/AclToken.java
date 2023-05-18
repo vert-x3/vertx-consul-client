@@ -1,20 +1,14 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-/**
- * Properties for creating acl token
- *
- * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#parameters">Create a ACL Token properties</a>
- */
 @DataObject
-public class NewAclToken {
+public class AclToken {
   private static final String ACCESSOR_ID_KEY = "AccessorID";
   private static final String SECRET_ID_KEY = "SecretID";
   private static final String DESCRIPTION_KEY = "Description";
@@ -53,12 +47,12 @@ public class NewAclToken {
   /**
    * The list of service identities that should be applied to the token
    */
-  private List<ServiceIdentity> serviceIdentities;
+  private List<ServiceTokenApplyingOptions> serviceIdentities;
 
   /**
    * The list of node identities that should be applied to the token
    */
-  private List<NodeIdentity> nodeIdentities;
+  private List<NodeTokenApplyingOptions> nodeIdentities;
 
   /**
    * Represents the point after which a token should be considered revoked and is eligible for destruction
@@ -70,10 +64,10 @@ public class NewAclToken {
    */
   private String namespace;
 
-  public NewAclToken() {
+  public AclToken() {
   }
 
-  public NewAclToken(JsonObject json) {
+  public AclToken(JsonObject json) {
     this.accessorId = json.getString(ACCESSOR_ID_KEY);
     this.secretId = json.getString(SECRET_ID_KEY);
     this.policies = new ArrayList<>();
@@ -100,14 +94,14 @@ public class NewAclToken {
     }
     if (serviceIdentities != null && !serviceIdentities.isEmpty()) {
       JsonArray array = new JsonArray();
-      for (ServiceIdentity s : serviceIdentities) {
+      for (ServiceTokenApplyingOptions s : serviceIdentities) {
         array.add(s.toJson());
       }
       json.put(SERVICE_IDENTITIES_KEY, array);
     }
     if (nodeIdentities != null && !nodeIdentities.isEmpty()) {
       JsonArray array = new JsonArray();
-      for (NodeIdentity n : nodeIdentities) {
+      for (NodeTokenApplyingOptions n : nodeIdentities) {
         array.add(n.toJson());
       }
       json.put(NODE_IDENTITIES_KEY, array);
@@ -158,7 +152,7 @@ public class NewAclToken {
    * @param description
    * @see #description
    */
-  public NewAclToken setDescription(String description) {
+  public AclToken setDescription(String description) {
     this.description = description;
     return this;
   }
@@ -169,7 +163,7 @@ public class NewAclToken {
    * @param policies
    * @see PolicyLink
    */
-  public NewAclToken setPolicies(List<PolicyLink> policies) {
+  public AclToken setPolicies(List<PolicyLink> policies) {
     this.policies = policies;
     return this;
   }
@@ -179,7 +173,7 @@ public class NewAclToken {
    *
    * @param policyLink
    */
-  public NewAclToken addPolicy(PolicyLink policyLink) {
+  public AclToken addPolicy(PolicyLink policyLink) {
     if (this.policies == null) {
       this.policies = new ArrayList<>();
     }
@@ -190,9 +184,9 @@ public class NewAclToken {
   /**
    * Indicates that it is a local token
    *
-   * @see NewAclToken#local
+   * @see AclToken#local
    */
-  public NewAclToken local() {
+  public AclToken local() {
     this.local = true;
     return this;
   }
@@ -201,9 +195,9 @@ public class NewAclToken {
    * Sets the expiration time. Optional, by default NO expiration.
    *
    * @param expirationTime must be between 1 minute and 24 hours in the future
-   * @see NewAclToken#expirationTime
+   * @see AclToken#expirationTime
    */
-  public NewAclToken setExpirationTime(String expirationTime) {
+  public AclToken setExpirationTime(String expirationTime) {
     this.expirationTime = expirationTime;
     return this;
   }
@@ -215,7 +209,7 @@ public class NewAclToken {
    * @param namespace
    * @see #namespace
    */
-  public NewAclToken setNamespace(String namespace) {
+  public AclToken setNamespace(String namespace) {
     this.namespace = namespace;
     return this;
   }
@@ -223,9 +217,9 @@ public class NewAclToken {
   /**
    * Sets a list of nodes
    *
-   * @see NodeIdentity
+   * @see NodeTokenApplyingOptions
    */
-  public NewAclToken setNodeIdentities(List<NodeIdentity> nodeIdentities) {
+  public AclToken setNodeIdentities(List<NodeTokenApplyingOptions> nodeIdentities) {
     this.nodeIdentities = nodeIdentities;
     return this;
   }
@@ -233,9 +227,9 @@ public class NewAclToken {
   /**
    * Sets a list of services
    *
-   * @see ServiceIdentity
+   * @see ServiceTokenApplyingOptions
    */
-  public NewAclToken setServiceIdentities(List<ServiceIdentity> serviceIdentities) {
+  public AclToken setServiceIdentities(List<ServiceTokenApplyingOptions> serviceIdentities) {
     this.serviceIdentities = serviceIdentities;
     return this;
   }

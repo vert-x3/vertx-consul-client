@@ -22,6 +22,8 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
@@ -312,16 +314,16 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
-  public ConsulClient createAclToken(NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler) {
+  public ConsulClient createAclToken(io.vertx.ext.consul.token.AclToken token, Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler) {
     requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), resultHandler, (obj, headers) ->
-      new NewAclToken(obj)
+      new io.vertx.ext.consul.token.AclToken(obj)
     );
     return this;
   }
 
   @Override
-  public Future<NewAclToken> createAclToken(NewAclToken token) {
-    Promise<NewAclToken> promise = Promise.promise();
+  public Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token) {
+    Promise<io.vertx.ext.consul.token.AclToken> promise = Promise.promise();
     createAclToken(token, promise);
     return promise.future();
   }
@@ -329,19 +331,19 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient updateAclToken(
     String accessorId,
-    NewAclToken token,
-    Handler<AsyncResult<NewAclToken>> resultHandler
+    io.vertx.ext.consul.token.AclToken token,
+    Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler
   ) {
     requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId), null, token.toJson().encode(),
       resultHandler,
-      (obj, headers) -> new NewAclToken(obj)
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
     return this;
   }
 
   @Override
-  public Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token) {
-    Promise<NewAclToken> promise = Promise.promise();
+  public Future<io.vertx.ext.consul.token.AclToken> updateAclToken(String accessorId, io.vertx.ext.consul.token.AclToken token) {
+    Promise<io.vertx.ext.consul.token.AclToken> promise = Promise.promise();
     updateAclToken(accessorId, token, promise);
     return promise.future();
   }
@@ -349,52 +351,52 @@ public class ConsulClientImpl implements ConsulClient {
   @Override
   public ConsulClient cloneAclToken(
     String accessorId,
-    CloneAclToken cloneAclToken,
-    Handler<AsyncResult<NewAclToken>> resultHandler
+    CloneAclTokenOptions cloneAclToken,
+    Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler
   ) {
     requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId) + "/clone", null,
       cloneAclToken.toJson().encode(),
       resultHandler,
-      (obj, headers) -> new NewAclToken(obj)
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
     return this;
   }
 
   @Override
-  public Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken) {
-    Promise<NewAclToken> promise = Promise.promise();
+  public Future<io.vertx.ext.consul.token.AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclToken) {
+    Promise<io.vertx.ext.consul.token.AclToken> promise = Promise.promise();
     cloneAclToken(accessorId, cloneAclToken, promise);
     return promise.future();
   }
 
   @Override
-  public ConsulClient getAclTokens(Handler<AsyncResult<List<NewAclToken>>> resultHandler) {
+  public ConsulClient getAclTokens(Handler<AsyncResult<List<io.vertx.ext.consul.token.AclToken>>> resultHandler) {
     requestArray(HttpMethod.GET, "/v1/acl/tokens", null, null, resultHandler, (arr, headers) ->
       arr.stream()
-        .map(obj -> new NewAclToken((JsonObject) obj))
+        .map(obj -> new io.vertx.ext.consul.token.AclToken((JsonObject) obj))
         .collect(Collectors.toList()));
     return this;
   }
 
   @Override
-  public Future<List<NewAclToken>> getAclTokens() {
-    Promise<List<NewAclToken>> promise = Promise.promise();
+  public Future<List<io.vertx.ext.consul.token.AclToken>> getAclTokens() {
+    Promise<List<io.vertx.ext.consul.token.AclToken>> promise = Promise.promise();
     getAclTokens(promise);
     return promise.future();
   }
 
   @Override
-  public ConsulClient readAclToken(String accessorId, Handler<AsyncResult<NewAclToken>> resultHandler) {
+  public ConsulClient readAclToken(String accessorId, Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler) {
     requestObject(HttpMethod.GET, "/v1/acl/token/" + urlEncode(accessorId), null, null,
       resultHandler,
-      (obj, headers) -> new NewAclToken(obj)
+      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
     );
     return this;
   }
 
   @Override
-  public Future<NewAclToken> readAclToken(String accessorId) {
-    Promise<NewAclToken> promise = Promise.promise();
+  public Future<io.vertx.ext.consul.token.AclToken> readAclToken(String accessorId) {
+    Promise<io.vertx.ext.consul.token.AclToken> promise = Promise.promise();
     readAclToken(accessorId, promise);
     return promise.future();
   }
@@ -913,7 +915,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   private static JsonArray checkListOpts(List<CheckOptions> listChecks, String checkIdKey, boolean extended) {
     JsonArray jsonArray = new JsonArray();
-    listChecks.stream().map(c -> checkOpts(c, checkIdKey,extended)).forEach(jsonArray::add);
+    listChecks.stream().map(c -> checkOpts(c, checkIdKey, extended)).forEach(jsonArray::add);
     return jsonArray;
   }
 
@@ -1321,7 +1323,7 @@ public class ConsulClientImpl implements ConsulClient {
     JsonObject nodeJsonOpts = new JsonObject()
       .put("Node", nodeOptions.getName())
       .put("Address", nodeOptions.getAddress());
-    if(notEmptyString(nodeOptions.getId())) {
+    if (notEmptyString(nodeOptions.getId())) {
       nodeJsonOpts.put("ID", nodeOptions.getId());
     }
 
@@ -1340,13 +1342,13 @@ public class ConsulClientImpl implements ConsulClient {
       nodeJsonOpts.put("TaggedAddresses", taggedAddresses);
     }
 
-    if(notEmptyString(nodeOptions.getDatacenter())) {
+    if (notEmptyString(nodeOptions.getDatacenter())) {
       nodeJsonOpts.put("Datacenter", nodeOptions.getDatacenter());
     }
-    if(nodeOptions.getNodeMeta() != null && !nodeOptions.getNodeMeta().isEmpty())
+    if (nodeOptions.getNodeMeta() != null && !nodeOptions.getNodeMeta().isEmpty())
       nodeJsonOpts.put("NodeMeta", nodeOptions.getNodeMeta());
 
-    if(serviceOptions != null) {
+    if (serviceOptions != null) {
       JsonObject serviceJsonOpts = new JsonObject()
         .put("ID", serviceOptions.getId())
         .put("Service", serviceOptions.getName())

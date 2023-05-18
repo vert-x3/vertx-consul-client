@@ -1,13 +1,12 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public abstract class Identity {
+public abstract class TokenApplyingOptions {
   private static final String DATACENTERS_KEY = "Datacenters";
 
   /**
@@ -29,7 +28,7 @@ public abstract class Identity {
    * @param name - must be no longer than 256 characters, must start and end with a lowercase alphanumeric character,
    *             and can only contain lowercase alphanumeric characters as well as '-' and '_'.
    */
-  public Identity setName(String name) {
+  public TokenApplyingOptions setName(String name) {
     this.name = name;
     return this;
   }
@@ -44,7 +43,7 @@ public abstract class Identity {
    * @param datacenters list of datacenters
    * @see #datacenters
    */
-  public Identity setDatacenters(List<String> datacenters) {
+  public TokenApplyingOptions setDatacenters(List<String> datacenters) {
     this.datacenters = datacenters;
     return this;
   }
@@ -54,7 +53,7 @@ public abstract class Identity {
    *
    * @see #datacenters
    */
-  public Identity addDatacenter(String datacenter) {
+  public TokenApplyingOptions addDatacenter(String datacenter) {
     if (datacenters == null) {
       datacenters = new ArrayList<>();
     }

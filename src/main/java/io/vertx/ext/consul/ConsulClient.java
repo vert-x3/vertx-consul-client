@@ -23,6 +23,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.ConsulClientImpl;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
 
 import java.util.List;
 
@@ -349,23 +351,23 @@ public interface ConsulClient {
    * @param token         properties of the token
    * @param resultHandler will be provided with result of token
    * @return reference to this, for fluency
-   * {@link NewAclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
-   * {@link NewAclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
+   * {@link io.vertx.ext.consul.token.AclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
+   * {@link io.vertx.ext.consul.token.AclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
    */
   @Fluent
-  ConsulClient createAclToken(NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler);
+  ConsulClient createAclToken(io.vertx.ext.consul.token.AclToken token, Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler);
 
   /**
    * Create an Acl token
    *
    * @param token properties of the token
    * @return a future NewAclToken in which two fields accessorId and secretId.
-   * {@link NewAclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
-   * {@link NewAclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
+   * {@link io.vertx.ext.consul.token.AclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
+   * {@link io.vertx.ext.consul.token.AclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
    */
-  Future<NewAclToken> createAclToken(NewAclToken token);
+  Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token);
 
   /**
    * Update an existing Acl token
@@ -377,17 +379,19 @@ public interface ConsulClient {
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#update-a-token">/acl/token/:accessorId</a> endpoint
    */
   @Fluent
-  ConsulClient updateAclToken(String accessorId, NewAclToken token, Handler<AsyncResult<NewAclToken>> resultHandler);
+  ConsulClient updateAclToken(String accessorId,
+                              io.vertx.ext.consul.token.AclToken token,
+                              Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler);
 
   /**
    * Update an existing Acl token
    *
    * @param accessorId uuid of the token
    * @param token      properties of the token
-   * @return a future NewAclToken like in {@link #createAclToken(NewAclToken)}
+   * @return a future NewAclToken like in {@link #createAclToken(io.vertx.ext.consul.token.AclToken)}
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#update-a-token">/acl/token/:accessorId</a> endpoint
    */
-  Future<NewAclToken> updateAclToken(String accessorId, NewAclToken token);
+  Future<io.vertx.ext.consul.token.AclToken> updateAclToken(String accessorId, io.vertx.ext.consul.token.AclToken token);
 
   /**
    * Clones an existing ACL token
@@ -399,17 +403,19 @@ public interface ConsulClient {
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
    */
   @Fluent
-  ConsulClient cloneAclToken(String accessorId, CloneAclToken cloneAclToken, Handler<AsyncResult<NewAclToken>> resultHandler);
+  ConsulClient cloneAclToken(String accessorId,
+                             CloneAclTokenOptions cloneAclToken,
+                             Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler);
 
   /**
    * Clones an existing ACL token
    *
    * @param accessorId    uuid of the token
-   * @param cloneAclToken properties of cloned token
-   * @return a future NewAclToken like in {@link #createAclToken(NewAclToken)}
+   * @param cloneAclTokenOptions properties of cloned token
+   * @return a future NewAclToken like in {@link #createAclToken(io.vertx.ext.consul.token.AclToken)}
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
    */
-  Future<NewAclToken> cloneAclToken(String accessorId, CloneAclToken cloneAclToken);
+  Future<io.vertx.ext.consul.token.AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclTokenOptions);
 
   /**
    * Get list of Acl token
@@ -419,7 +425,7 @@ public interface ConsulClient {
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#list-tokens">/v1/acl/tokens</a> endpoint
    */
   @Fluent
-  ConsulClient getAclTokens(Handler<AsyncResult<List<NewAclToken>>> resultHandler);
+  ConsulClient getAclTokens(Handler<AsyncResult<List<io.vertx.ext.consul.token.AclToken>>> resultHandler);
 
   /**
    * Get list of Acl token
@@ -427,7 +433,7 @@ public interface ConsulClient {
    * @return a future provided with list of tokens
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#list-tokens">/v1/acl/tokens</a> endpoint
    */
-  Future<List<NewAclToken>> getAclTokens();
+  Future<List<io.vertx.ext.consul.token.AclToken>> getAclTokens();
 
   /**
    * Reads an ACL token with the given Accessor ID
@@ -438,7 +444,7 @@ public interface ConsulClient {
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#read-a-token">/v1/acl/token/:AccessorID</a> endpoint
    */
   @Fluent
-  ConsulClient readAclToken(String accessorId, Handler<AsyncResult<NewAclToken>> resultHandler);
+  ConsulClient readAclToken(String accessorId, Handler<AsyncResult<io.vertx.ext.consul.token.AclToken>> resultHandler);
 
   /**
    * Reads an ACL token with the given Accessor ID
@@ -447,7 +453,7 @@ public interface ConsulClient {
    * @return a future provided with token
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#read-a-token">/v1/acl/token/:AccessorID</a> endpoint
    */
-  Future<NewAclToken> readAclToken(String accessorId);
+  Future<io.vertx.ext.consul.token.AclToken> readAclToken(String accessorId);
 
   /**
    * Deletes an ACL token
@@ -474,15 +480,16 @@ public interface ConsulClient {
    * @param idHandler will be provided with ID of created token
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
+   * @deprecated Use {@link #createAclToken(io.vertx.ext.consul.token.AclToken)} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #createAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<String> createAclToken(AclToken token);
 
   /**
@@ -492,15 +499,16 @@ public interface ConsulClient {
    * @param idHandler will be provided with ID of updated
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
+   * @deprecated Use {@link #updateAclToken(String, io.vertx.ext.consul.token.AclToken)} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #updateAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<String> updateAclToken(AclToken token);
 
   /**
@@ -510,15 +518,16 @@ public interface ConsulClient {
    * @param idHandler will be provided with ID of cloned token
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
+   * @deprecated Use {@link #cloneAclToken(String, CloneAclTokenOptions)} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #cloneAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<String> cloneAclToken(String id);
 
   /**
@@ -527,15 +536,16 @@ public interface ConsulClient {
    * @param resultHandler will be provided with list of tokens
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
+   * @deprecated Use {@link #getAclTokens()} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
 
   /**
    * Like {@link #listAclTokens(Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<List<AclToken>> listAclTokens();
 
   /**
@@ -545,15 +555,16 @@ public interface ConsulClient {
    * @param tokenHandler will be provided with token
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
+   * @deprecated Use {@link #readAclToken(String)} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
   /**
    * Like {@link #infoAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<AclToken> infoAclToken(String id);
 
   /**
@@ -563,15 +574,16 @@ public interface ConsulClient {
    * @param resultHandler will be called on complete
    * @return reference to this, for fluency
    * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
+   * @deprecated Use {@link #deleteAclToken(String)} instead
    */
   @Fluent
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Like {@link #destroyAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated
+  @Deprecated(since = "Consul version 1.11")
   Future<Void> destroyAclToken(String id);
 
   /**

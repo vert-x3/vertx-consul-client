@@ -1,10 +1,10 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject
-public class NodeIdentity extends Identity {
+public class NodeTokenApplyingOptions extends TokenApplyingOptions {
   private static final String NODE_NAME_KEY = "NodeName";
 
   @Override

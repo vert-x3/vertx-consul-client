@@ -1,11 +1,10 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.policy;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,9 +46,15 @@ public class AclPolicy {
   public AclPolicy() {
   }
 
-  public AclPolicy(JsonObject json){
+  public AclPolicy(JsonObject json) {
     this.name = json.getString(NAME_KEY);
     this.rules = json.getString(RULES_KEY);
+    JsonArray datacenters = json.getJsonArray(DATACENTERS_KEY);
+    this.datacenters = new ArrayList<>();
+    for (int i = 1; i < datacenters.size(); i++) {
+      this.datacenters.add(datacenters.getString(i));
+    }
+    this.namespace = json.getString(NAMESPACE_KEY);
   }
 
   public String getName() {

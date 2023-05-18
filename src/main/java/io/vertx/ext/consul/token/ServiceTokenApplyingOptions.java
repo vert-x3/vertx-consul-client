@@ -1,10 +1,10 @@
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.token;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject
-public class ServiceIdentity extends Identity {
+public class ServiceTokenApplyingOptions extends TokenApplyingOptions {
   private static final String SERVICE_NAME_KEY = "ServiceName";
 
   @Override

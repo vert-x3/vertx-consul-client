@@ -24,6 +24,7 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
+@Deprecated(since = "Consul version 1.11")
 public class AclToken {
 
   private static final String ID_KEY = "ID";
