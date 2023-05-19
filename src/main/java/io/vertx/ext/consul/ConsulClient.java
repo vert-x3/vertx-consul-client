@@ -346,6 +346,107 @@ public interface ConsulClient {
   Future<String> createAclPolicy(AclPolicy policy);
 
   /**
+   * This endpoint reads an ACL policy with the given ID
+   *
+   * @param id uuid policy
+   * @param resultHandler will be provided with result of policy
+   * @return a reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy">GET /v1/acl/policy/:id</a>
+   */
+  @Fluent
+  ConsulClient readPolicy(String id, Handler<AsyncResult<AclPolicy>> resultHandler);
+
+  /**
+   * This endpoint reads an ACL policy with the given ID
+   *
+   * @param id uuid policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy">GET /v1/acl/policy/:id</a>
+   */
+
+  Future<AclPolicy> readPolicy(String id);
+
+  /**
+   * This endpoint reads an ACL policy with the given name
+   *
+   * @param name unique name of created policy
+   * @param resultHandler will be provided with result of policy
+   * @return a reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy-by-name">GET /v1/acl/policy/name/:name</a>
+   */
+  @Fluent
+  ConsulClient readPolicyByName(String name, Handler<AsyncResult<AclPolicy>> resultHandler);
+
+  /**
+   * This endpoint reads an ACL policy with the given name
+   *
+   * @param name unique name of created policy
+   * @return a future of AclPolicy like in {@link #readPolicy(String)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy-by-name">GET /v1/acl/policy/name/:name</a>
+   */
+  Future<AclPolicy> readPolicyByName(String name);
+
+  /**
+   * This endpoint updates an existing ACL policy
+   *
+   * @param id uuid of existing policy
+   * @param policy options that will be applied to the existing policy
+   * @param resultHandler will be provided with result of policy
+   * @return a reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#update-a-policy">PUT /acl/policy/:id</a>
+   */
+  @Fluent
+  ConsulClient updatePolicy(String id, AclPolicy policy, Handler<AsyncResult<AclPolicy>> resultHandler);
+
+  /**
+   * This endpoint updates an existing ACL policy
+   *
+   * @param id uuid of existing policy
+   * @param policy options that will be applied to the existing policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#update-a-policy">PUT /acl/policy/:id</a>
+   */
+  Future<AclPolicy> updatePolicy(String id, AclPolicy policy);
+
+  /**
+   * This endpoint deletes an ACL policy
+   *
+   * @param id uuid of existing policy
+   * @param resultHandler will be provided with result of policy deleting
+   * @return a reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#delete-a-policy">DELETE /acl/policy/:id</a>
+   */
+  ConsulClient deletePolicy(String id, Handler<AsyncResult<Boolean>> resultHandler);
+
+  /**
+   * This endpoint deletes an ACL policy
+   *
+   * @param id uuid of existing policy
+   * @return a future boolean value: true or false, indicating whether the deletion was successful
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#delete-a-policy">DELETE /acl/policy/:id</a>
+   */
+  Future<Boolean> deletePolicy(String id);
+
+  /**
+   * This endpoint lists all the ACL policies.
+   * Note - The policies rules are not included in the listing and must be retrieved by the policy reading endpoint
+   *
+   * @param resultHandler will be provided with result of policy deleting
+   * @return a reference to this, for fluency
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#list-policies">GET /acl/policies</a>
+   */
+  ConsulClient getAclPolicies(Handler<AsyncResult<List<AclPolicy>>> resultHandler);
+
+  /**
+   * This endpoint lists all the ACL policies.
+   * Note - The policies rules are not included in the listing and must be retrieved by the policy reading endpoint
+   *
+   * @return a future of all acl policies
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#list-policies">GET /acl/policies</a>
+   */
+  Future<List<AclPolicy>> getAclPolicies();
+
+  /**
    * Create an Acl token
    *
    * @param token         properties of the token
@@ -483,13 +584,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #createAclToken(io.vertx.ext.consul.token.AclToken)} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient createAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #createAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> createAclToken(AclToken token);
 
   /**
@@ -502,13 +603,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #updateAclToken(String, io.vertx.ext.consul.token.AclToken)} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient updateAclToken(AclToken token, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #updateAclToken(AclToken, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> updateAclToken(AclToken token);
 
   /**
@@ -521,13 +622,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #cloneAclToken(String, CloneAclTokenOptions)} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient cloneAclToken(String id, Handler<AsyncResult<String>> idHandler);
 
   /**
    * Like {@link #cloneAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> cloneAclToken(String id);
 
   /**
@@ -539,13 +640,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #getAclTokens()} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient listAclTokens(Handler<AsyncResult<List<AclToken>>> resultHandler);
 
   /**
    * Like {@link #listAclTokens(Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<List<AclToken>> listAclTokens();
 
   /**
@@ -558,13 +659,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #readAclToken(String)} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient infoAclToken(String id, Handler<AsyncResult<AclToken>> tokenHandler);
 
   /**
    * Like {@link #infoAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<AclToken> infoAclToken(String id);
 
   /**
@@ -577,13 +678,13 @@ public interface ConsulClient {
    * @deprecated Use {@link #deleteAclToken(String)} instead
    */
   @Fluent
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   ConsulClient destroyAclToken(String id, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * Like {@link #destroyAclToken(String, Handler)} but returns a {@code Future} of the asynchronous result.
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<Void> destroyAclToken(String id);
 
   /**

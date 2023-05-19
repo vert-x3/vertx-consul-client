@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TokenApplyingOptions {
-  private static final String DATACENTERS_KEY = "Datacenters";
+  protected static final String DATACENTERS_KEY = "Datacenters";
 
   /**
    * The name of the service/node
@@ -17,6 +17,10 @@ public abstract class TokenApplyingOptions {
    * Specifies the datacenters the policy is valid within
    */
   protected List<String> datacenters;
+
+  public TokenApplyingOptions() {
+
+  }
 
   public String getName() {
     return name;

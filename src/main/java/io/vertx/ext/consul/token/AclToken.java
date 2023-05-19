@@ -78,6 +78,22 @@ public class AclToken {
       }
     }
     this.local = json.getBoolean(LOCAL_KEY);
+    this.nodeIdentities = new ArrayList<>();
+    JsonArray nodes = json.getJsonArray(NODE_IDENTITIES_KEY);
+    if (nodes != null && !nodes.isEmpty()) {
+      for (int i = 0; i < nodes.size(); i++) {
+        nodeIdentities.add(new NodeTokenApplyingOptions(nodes.getJsonObject(i)));
+      }
+    }
+    this.serviceIdentities = new ArrayList<>();
+    JsonArray services = json.getJsonArray(SERVICE_IDENTITIES_KEY);
+    if (services != null && !services.isEmpty()) {
+      for (int i = 0; i < services.size(); i++) {
+        serviceIdentities.add(new ServiceTokenApplyingOptions(services.getJsonObject(i)));
+      }
+    }
+    expirationTime = json.getString(EXPIRATION_TIME_KEY);
+    namespace = json.getString(NAMESPACE_KEY);
   }
 
   public JsonObject toJson() {
