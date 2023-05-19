@@ -15,11 +15,17 @@ import java.util.List;
 @DataObject
 public class AclPolicy {
 
+  private static final String ID_KEY = "ID";
   private static final String NAME_KEY = "Name";
   private static final String DESCRIPTION_KEY = "Description";
   private static final String RULES_KEY = "Rules";
   private static final String DATACENTERS_KEY = "Datacenters";
   private static final String NAMESPACE_KEY = "Namespace";
+
+  /**
+   * Specifies the UUID of the ACL policy to read
+   */
+  private String id;
 
   /**
    * Specifies a name for the ACL policy
@@ -47,14 +53,17 @@ public class AclPolicy {
   }
 
   public AclPolicy(JsonObject json) {
+    this.id = json.getString(ID_KEY);
     this.name = json.getString(NAME_KEY);
     this.rules = json.getString(RULES_KEY);
+    this.description = json.getString(DESCRIPTION_KEY);
     JsonArray datacenters = json.getJsonArray(DATACENTERS_KEY);
-    this.datacenters = new ArrayList<>();
-    for (int i = 1; i < datacenters.size(); i++) {
-      this.datacenters.add(datacenters.getString(i));
+    if (datacenters != null && !datacenters.isEmpty()) {
+      this.datacenters = new ArrayList<>();
+      for (int i = 1; i < datacenters.size(); i++) {
+        this.datacenters.add(datacenters.getString(i));
+      }
     }
-    this.namespace = json.getString(NAMESPACE_KEY);
   }
 
   public String getName() {
@@ -75,6 +84,10 @@ public class AclPolicy {
 
   public String getNamespace() {
     return namespace;
+  }
+
+  public String getId() {
+    return id;
   }
 
   public JsonObject toJson() {

@@ -207,6 +207,53 @@ public interface ConsulClient {
   Future<String> createAclPolicy(AclPolicy policy);
 
   /**
+   * This endpoint reads an ACL policy with the given ID
+   *
+   * @param id uuid policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy">GET /v1/acl/policy/:id</a>
+   */
+
+  Future<AclPolicy> readPolicy(String id);
+
+  /**
+   * This endpoint reads an ACL policy with the given name
+   *
+   * @param name unique name of created policy
+   * @return a future of AclPolicy like in {@link #readPolicy(String)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy-by-name">GET /v1/acl/policy/name/:name</a>
+   */
+  Future<AclPolicy> readPolicyByName(String name);
+
+  /**
+   * This endpoint updates an existing ACL policy
+   *
+   * @param id uuid of existing policy
+   * @param policy options that will be applied to the existing policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#update-a-policy">PUT /acl/policy/:id</a>
+   */
+  Future<AclPolicy> updatePolicy(String id, AclPolicy policy);
+
+  /**
+   * This endpoint deletes an ACL policy
+   *
+   * @param id uuid of existing policy
+   * @return a future boolean value: true or false, indicating whether the deletion was successful
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#delete-a-policy">DELETE /acl/policy/:id</a>
+   */
+  Future<Boolean> deletePolicy(String id);
+
+  /**
+   * This endpoint lists all the ACL policies.
+   * Note - The policies rules are not included in the listing and must be retrieved by the policy reading endpoint
+   *
+   * @return a future of all acl policies
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#list-policies">GET /acl/policies</a>
+   */
+  Future<List<AclPolicy>> getAclPolicies();
+
+  /**
    * Create an Acl token
    *
    * @param token properties of the token
@@ -269,7 +316,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
    * @deprecated Use {@link #createAclToken(io.vertx.ext.consul.token.AclToken)} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> createAclToken(AclToken token);
 
   /**
@@ -280,7 +327,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
    * @deprecated Use {@link #updateAclToken(String, io.vertx.ext.consul.token.AclToken)} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> updateAclToken(AclToken token);
 
   /**
@@ -291,7 +338,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
    * @deprecated Use {@link #cloneAclToken(String, CloneAclTokenOptions)} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<String> cloneAclToken(String id);
 
   /**
@@ -301,7 +348,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
    * @deprecated Use {@link #getAclTokens()} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<List<AclToken>> listAclTokens();
 
   /**
@@ -312,7 +359,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
    * @deprecated Use {@link #readAclToken(String)} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<AclToken> infoAclToken(String id);
 
   /**
@@ -323,7 +370,7 @@ public interface ConsulClient {
    * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
    * @deprecated Use {@link #deleteAclToken(String)} instead
    */
-  @Deprecated(since = "Consul version 1.11")
+  @Deprecated
   Future<Void> destroyAclToken(String id);
 
   /**

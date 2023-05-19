@@ -186,6 +186,43 @@ public class ConsulClientImpl implements ConsulClient {
     );
   }
 
+  @Override
+  public Future<AclPolicy> readPolicy(String id) {
+    return requestObject(HttpMethod.GET, "/v1/acl/policy/" + urlEncode(id), null, null, (obj, headers) ->
+      new AclPolicy(obj)
+    );
+  }
+
+  @Override
+  public Future<AclPolicy> readPolicyByName(String name) {
+    return requestObject(HttpMethod.GET, "/v1/acl/policy/name/" + urlEncode(name), null, null, (obj, headers) ->
+      new AclPolicy(obj)
+    );
+  }
+
+  @Override
+  public Future<AclPolicy> updatePolicy(String id, AclPolicy policy) {
+    return requestObject(HttpMethod.PUT, "/v1/acl/policy/" + urlEncode(id), null, policy.toJson().encode(), (obj, headers) ->
+      new AclPolicy(obj)
+    );
+  }
+
+  @Override
+  public Future<Boolean> deletePolicy(String id) {
+    return requestString(HttpMethod.DELETE, "/v1/acl/policy/" + urlEncode(id), null, null, (str, headers) ->
+      Boolean.parseBoolean(str)
+    );
+  }
+
+  @Override
+  public Future<List<AclPolicy>> getAclPolicies() {
+    return requestArray(HttpMethod.GET, "/v1/acl/policies", null, null, (array, header) ->
+      array.stream()
+        .map(obj -> new AclPolicy((JsonObject) obj))
+        .collect(Collectors.toList())
+    );
+  }
+
   public Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), (obj, headers) ->
       new io.vertx.ext.consul.token.AclToken(obj)
