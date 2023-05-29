@@ -116,7 +116,7 @@ public class ConsulInstance extends ConsulContainer {
   public static class Builder {
     private static final String CONSUL_LOCAL_CONFIG_ENV = "CONSUL_LOCAL_CONFIG";
     private static final String DEFAULT_IMAGE = "consul";
-    private static final String DEFAULT_VERSION = "1.10.12";
+    private static final String DEFAULT_VERSION = "1.13.7";
     private static final int DNS_PORT = 8600;
     private static final int HTTP_PORT = 8500;
     private static final int HTTPS_PORT = 8501;
