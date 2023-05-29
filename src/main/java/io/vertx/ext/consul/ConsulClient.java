@@ -20,6 +20,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.ConsulClientImpl;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
 
 import java.util.List;
 
@@ -72,7 +74,7 @@ public interface ConsulClient {
    * Returns the LAN network coordinates for all nodes in a given DC
    * This is blocking query unlike {@link ConsulClient#coordinateNodes()}
    *
-   * @param options       the blocking options
+   * @param options the blocking options
    * @return a future provided with network coordinates of nodes in datacenter
    * @see <a href="https://www.consul.io/api/coordinate.html#read-lan-coordinates">/v1/coordinate/nodes</a> endpoint
    */
@@ -89,7 +91,7 @@ public interface ConsulClient {
   /**
    * Returns the list of keys that corresponding to the specified key prefix.
    *
-   * @param keyPrefix     the prefix
+   * @param keyPrefix the prefix
    * @return a future provided with keys list
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -98,8 +100,8 @@ public interface ConsulClient {
   /**
    * Returns the list of keys that corresponding to the specified key prefix.
    *
-   * @param keyPrefix     the prefix
-   * @param options       the blocking options
+   * @param keyPrefix the prefix
+   * @param options   the blocking options
    * @return a future provided with keys list
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -109,7 +111,7 @@ public interface ConsulClient {
    * Returns key/value pair that corresponding to the specified key.
    * An empty {@link KeyValue} object will be returned if no such key is found.
    *
-   * @param key           the key
+   * @param key the key
    * @return a future provided with key/value pair
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -120,8 +122,8 @@ public interface ConsulClient {
    * An empty {@link KeyValue} object will be returned if no such key is found.
    * This is blocking query unlike {@link ConsulClient#getValue(String)}
    *
-   * @param key           the key
-   * @param options       the blocking options
+   * @param key     the key
+   * @param options the blocking options
    * @return a future provided with key/value pair
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -130,7 +132,7 @@ public interface ConsulClient {
   /**
    * Remove the key/value pair that corresponding to the specified key
    *
-   * @param key           the key
+   * @param key the key
    * @return a future notified on complete
    * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
@@ -140,7 +142,7 @@ public interface ConsulClient {
    * Returns the list of key/value pairs that corresponding to the specified key prefix.
    * An empty {@link KeyValueList} object will be returned if no such key prefix is found.
    *
-   * @param keyPrefix     the prefix
+   * @param keyPrefix the prefix
    * @return a future provided with list of key/value pairs
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -151,8 +153,8 @@ public interface ConsulClient {
    * An empty {@link KeyValueList} object will be returned if no such key prefix is found.
    * This is blocking query unlike {@link ConsulClient#getValues(String)}
    *
-   * @param keyPrefix     the prefix
-   * @param options       the blocking options
+   * @param keyPrefix the prefix
+   * @param options   the blocking options
    * @return a future provided with list of key/value pairs
    * @see <a href="https://www.consul.io/api/kv.html#read-key">/v1/kv/:key</a> endpoint
    */
@@ -161,7 +163,7 @@ public interface ConsulClient {
   /**
    * Removes all the key/value pair that corresponding to the specified key prefix
    *
-   * @param keyPrefix     the prefix
+   * @param keyPrefix the prefix
    * @return a future notified on complete
    * @see <a href="https://www.consul.io/api/kv.html#delete-key">/v1/kv/:key</a> endpoint
    */
@@ -170,17 +172,17 @@ public interface ConsulClient {
   /**
    * Adds specified key/value pair
    *
-   * @param key           the key
-   * @param value         the value
+   * @param key   the key
+   * @param value the value
    * @return a future provided with success of operation
    * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
   Future<Boolean> putValue(String key, String value);
 
   /**
-   * @param key           the key
-   * @param value         the value
-   * @param options       options used to push pair
+   * @param key     the key
+   * @param value   the value
+   * @param options options used to push pair
    * @return a future provided with success of operation
    * @see <a href="https://www.consul.io/api/kv.html#create-update-key">/v1/kv/:key</a> endpoint
    */
@@ -189,37 +191,154 @@ public interface ConsulClient {
   /**
    * Manages multiple operations inside a single, atomic transaction.
    *
-   * @param request       transaction request
+   * @param request transaction request
    * @return a future provided with result of transaction
    * @see <a href="https://www.consul.io/api/txn.html">/v1/txn</a> endpoint
    */
   Future<TxnResponse> transaction(TxnRequest request);
 
   /**
-   * Create new Acl token
+   * Creates a new ACL policy
    *
-   * @param token     properties of the token
+   * @param policy properties of policy
+   * @return a future provided with ID of created policy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#create-a-policy">/acl/policy</a>
+   */
+  Future<String> createAclPolicy(AclPolicy policy);
+
+  /**
+   * This endpoint reads an ACL policy with the given ID
+   *
+   * @param id uuid policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy">GET /v1/acl/policy/:id</a>
+   */
+
+  Future<AclPolicy> readPolicy(String id);
+
+  /**
+   * This endpoint reads an ACL policy with the given name
+   *
+   * @param name unique name of created policy
+   * @return a future of AclPolicy like in {@link #readPolicy(String)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#read-a-policy-by-name">GET /v1/acl/policy/name/:name</a>
+   */
+  Future<AclPolicy> readPolicyByName(String name);
+
+  /**
+   * This endpoint updates an existing ACL policy
+   *
+   * @param id uuid of existing policy
+   * @param policy options that will be applied to the existing policy
+   * @return a future of AclPolicy
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#update-a-policy">PUT /acl/policy/:id</a>
+   */
+  Future<AclPolicy> updatePolicy(String id, AclPolicy policy);
+
+  /**
+   * This endpoint deletes an ACL policy
+   *
+   * @param id uuid of existing policy
+   * @return a future boolean value: true or false, indicating whether the deletion was successful
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#delete-a-policy">DELETE /acl/policy/:id</a>
+   */
+  Future<Boolean> deletePolicy(String id);
+
+  /**
+   * This endpoint lists all the ACL policies.
+   * Note - The policies rules are not included in the listing and must be retrieved by the policy reading endpoint
+   *
+   * @return a future of all acl policies
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#list-policies">GET /acl/policies</a>
+   */
+  Future<List<AclPolicy>> getAclPolicies();
+
+  /**
+   * Create an Acl token
+   *
+   * @param token properties of the token
+   * @return a future NewAclToken in which two fields accessorId and secretId.
+   * {@link AclToken} accessorId - required in the URL path or JSON body for getting, updating and cloning token.
+   * {@link AclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
+   */
+  Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token);
+
+  /**
+   * Update an existing Acl token
+   *
+   * @param accessorId uuid of the token
+   * @param token      properties of the token
+   * @return a future NewAclToken like in {@link #createAclToken(io.vertx.ext.consul.token.AclToken)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#update-a-token">/acl/token/:accessorId</a> endpoint
+   */
+  Future<io.vertx.ext.consul.token.AclToken> updateAclToken(String accessorId, io.vertx.ext.consul.token.AclToken token);
+
+  /**
+   * Clones an existing ACL token
+   *
+   * @param accessorId    uuid of the token
+   * @param cloneAclTokenOptions properties of cloned token
+   * @return a future NewAclToken like in {@link #createAclToken(io.vertx.ext.consul.token.AclToken)}
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
+   */
+  Future<io.vertx.ext.consul.token.AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclTokenOptions);
+
+  /**
+   * Get list of Acl token
+   *
+   * @return a future provided with list of tokens
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#list-tokens">/v1/acl/tokens</a> endpoint
+   */
+  Future<List<io.vertx.ext.consul.token.AclToken>> getAclTokens();
+
+  /**
+   * Reads an ACL token with the given Accessor ID
+   *
+   * @param accessorId uuid of token
+   * @return a future provided with token
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#read-a-token">/v1/acl/token/:AccessorID</a> endpoint
+   */
+  Future<io.vertx.ext.consul.token.AclToken> readAclToken(String accessorId);
+
+  /**
+   * Deletes an ACL token
+   * @param accessorId uuid of token
+   * @return a future boolean value: true or false, indicating whether the deletion was successful.
+   */
+  Future<Boolean> deleteAclToken(String accessorId);
+
+  /**
+   * Legacy create new Acl token
+   *
+   * @param token properties of the token
    * @return a future provided with ID of created token
    * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
+   * @deprecated Use {@link #createAclToken(io.vertx.ext.consul.token.AclToken)} instead
    */
+  @Deprecated
   Future<String> createAclToken(AclToken token);
 
   /**
    * Update Acl token
    *
-   * @param token     properties of the token to be updated
+   * @param token properties of the token to be updated
    * @return a future provided with ID of updated
    * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
+   * @deprecated Use {@link #updateAclToken(String, io.vertx.ext.consul.token.AclToken)} instead
    */
+  @Deprecated
   Future<String> updateAclToken(AclToken token);
 
   /**
    * Clone Acl token
    *
-   * @param id        the ID of token to be cloned
+   * @param id the ID of token to be cloned
    * @return a future provided with ID of cloned token
    * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
+   * @deprecated Use {@link #cloneAclToken(String, CloneAclTokenOptions)} instead
    */
+  @Deprecated
   Future<String> cloneAclToken(String id);
 
   /**
@@ -227,31 +346,37 @@ public interface ConsulClient {
    *
    * @return a future provided with list of tokens
    * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
+   * @deprecated Use {@link #getAclTokens()} instead
    */
+  @Deprecated
   Future<List<AclToken>> listAclTokens();
 
   /**
    * Get info of Acl token
    *
-   * @param id           the ID of token
+   * @param id the ID of token
    * @return a future provided with token
    * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
+   * @deprecated Use {@link #readAclToken(String)} instead
    */
+  @Deprecated
   Future<AclToken> infoAclToken(String id);
 
   /**
    * Destroy Acl token
    *
-   * @param id            the ID of token
+   * @param id the ID of token
    * @return a future notified on complete
    * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
+   * @deprecated Use {@link #deleteAclToken(String)} instead
    */
+  @Deprecated
   Future<Void> destroyAclToken(String id);
 
   /**
    * Fires a new user event
    *
-   * @param name          name of event
+   * @param name name of event
    * @return a future provided with properties of event
    * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
@@ -260,8 +385,8 @@ public interface ConsulClient {
   /**
    * Fires a new user event
    *
-   * @param name          name of event
-   * @param options       options used to create event
+   * @param name    name of event
+   * @param options options used to create event
    * @return a future provided with properties of event
    * @see <a href="https://www.consul.io/api/event.html#fire-event">/v1/event/fire/:name</a> endpoint
    */
@@ -285,8 +410,8 @@ public interface ConsulClient {
    * In practice, this means the index is only useful when used against a single agent and has no meaning globally.
    * Because Consul defines the index as being opaque, clients should not be expecting a natural ordering either.
    *
+   * @param options the blocking options
    * @return a future provided with list of events
-   * @param options       the blocking options
    * @see <a href="https://www.consul.io/api/event.html#list-events">/v1/event/list</a> endpoint
    */
   Future<EventList> listEventsWithOptions(EventListOptions options);
@@ -315,7 +440,7 @@ public interface ConsulClient {
    * Remove a service from the local agent. The agent will take care of deregistering the service with the Catalog.
    * If there is an associated check, that is also deregistered.
    *
-   * @param id            the ID of service
+   * @param id the ID of service
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/service.html#deregister-service">/v1/agent/service/deregister/:service_id</a> endpoint
    */
@@ -324,7 +449,7 @@ public interface ConsulClient {
   /**
    * Returns the nodes providing a service
    *
-   * @param service       name of service
+   * @param service name of service
    * @return a future provided with list of nodes providing given service
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
@@ -333,8 +458,8 @@ public interface ConsulClient {
   /**
    * Returns the nodes providing a service
    *
-   * @param service       name of service
-   * @param options       options used to request services
+   * @param service name of service
+   * @param options options used to request services
    * @return a future provided with list of nodes providing given service
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes-for-service">/v1/catalog/service/:service</a> endpoint
    */
@@ -359,8 +484,8 @@ public interface ConsulClient {
   /**
    * Returns the nodes registered in a datacenter
    *
+   * @param options options used to request nodes
    * @return a future provided with list of nodes
-   * @param options       options used to request nodes
    * @see <a href="https://www.consul.io/api/catalog.html#list-nodes">/v1/catalog/nodes</a> endpoint
    */
   Future<NodeList> catalogNodesWithOptions(NodeQueryOptions options);
@@ -368,7 +493,7 @@ public interface ConsulClient {
   /**
    * Returns the checks associated with the service
    *
-   * @param service       the service name
+   * @param service the service name
    * @return a future provided with list of checks
    * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
@@ -377,8 +502,8 @@ public interface ConsulClient {
   /**
    * Returns the checks associated with the service
    *
-   * @param service       the service name
-   * @param options       options used to request checks
+   * @param service the service name
+   * @param options options used to request checks
    * @return a future provided with list of checks
    * @see <a href="https://www.consul.io/api/health.html#list-checks-for-service">/v1/health/checks/:service</a> endpoint
    */
@@ -387,7 +512,7 @@ public interface ConsulClient {
   /**
    * Returns the checks in the specified status
    *
-   * @param healthState   the health state
+   * @param healthState the health state
    * @return a future provided with list of checks
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
@@ -396,8 +521,8 @@ public interface ConsulClient {
   /**
    * Returns the checks in the specified status
    *
-   * @param healthState   the health state
-   * @param options       options used to request checks
+   * @param healthState the health state
+   * @param options     options used to request checks
    * @return a future provided with list of checks
    * @see <a href="https://www.consul.io/api/health.html#list-checks-in-state">/v1/health/state/:state</a> endpoint
    */
@@ -407,8 +532,8 @@ public interface ConsulClient {
    * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodes} endpoint;
    * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
    *
-   * @param service       the service name
-   * @param passing       if true, filter results to only nodes with all checks in the passing state
+   * @param service the service name
+   * @param passing if true, filter results to only nodes with all checks in the passing state
    * @return a future provided with list of services
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
@@ -418,9 +543,9 @@ public interface ConsulClient {
    * Returns the nodes providing the service. This endpoint is very similar to the {@link ConsulClient#catalogServiceNodesWithOptions} endpoint;
    * however, this endpoint automatically returns the status of the associated health check as well as any system level health checks.
    *
-   * @param service       the service name
-   * @param passing       if true, filter results to only nodes with all checks in the passing state
-   * @param options       options used to request services
+   * @param service the service name
+   * @param passing if true, filter results to only nodes with all checks in the passing state
+   * @param options options used to request services
    * @return a future provided with list of services
    * @see <a href="https://www.consul.io/api/health.html#list-nodes-for-service">/v1/health/service/:service</a> endpoint
    */
@@ -438,8 +563,8 @@ public interface ConsulClient {
    * Returns the services registered in a datacenter
    * This is blocking query unlike {@link ConsulClient#catalogServices()}
    *
+   * @param options the blocking options
    * @return a future provided with list of services
-   * @param options       the blocking options
    * @see <a href="https://www.consul.io/api/catalog.html#list-services">/v1/catalog/services</a> endpoint
    */
   Future<ServiceList> catalogServicesWithOptions(BlockingQueryOptions options);
@@ -447,7 +572,7 @@ public interface ConsulClient {
   /**
    * Returns the node's registered services
    *
-   * @param node          node name
+   * @param node node name
    * @return a future provided with list of services
    * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
@@ -457,8 +582,8 @@ public interface ConsulClient {
    * Returns the node's registered services
    * This is blocking query unlike {@link ConsulClient#catalogNodeServices(String)}
    *
-   * @param node          node name
-   * @param options       the blocking options
+   * @param node    node name
+   * @param options the blocking options
    * @return a future provided with list of services
    * @see <a href="https://www.consul.io/api/catalog.html#list-services-for-node">/v1/catalog/node/:node</a> endpoint
    */
@@ -484,7 +609,7 @@ public interface ConsulClient {
    * Add a new check to the local agent. The agent is responsible for managing the status of the check
    * and keeping the Catalog in sync.
    *
-   * @param checkOptions  options used to register new check
+   * @param checkOptions options used to register new check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#register-check">/v1/agent/check/register</a> endpoint
    */
@@ -493,7 +618,7 @@ public interface ConsulClient {
   /**
    * Remove a check from the local agent. The agent will take care of deregistering the check from the Catalog.
    *
-   * @param checkId       the ID of check
+   * @param checkId the ID of check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#deregister-check">/v1/agent/check/deregister/:check_id</a> endpoint
    */
@@ -502,7 +627,7 @@ public interface ConsulClient {
   /**
    * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
+   * @param checkId the ID of check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-pass">/v1/agent/check/pass/:check_id</a> endpoint
    * @see CheckStatus
@@ -512,8 +637,8 @@ public interface ConsulClient {
   /**
    * Set status of the check to "passing". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
-   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
+   * @param checkId the ID of check
+   * @param note    specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-pass">/v1/agent/check/pass/:check_id</a> endpoint
    * @see CheckStatus
@@ -523,7 +648,7 @@ public interface ConsulClient {
   /**
    * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
+   * @param checkId the ID of check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-warn">/v1/agent/check/warn/:check_id</a> endpoint
    * @see CheckStatus
@@ -533,8 +658,8 @@ public interface ConsulClient {
   /**
    * Set status of the check to "warning". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
-   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
+   * @param checkId the ID of check
+   * @param note    specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-warn">/v1/agent/check/warn/:check_id</a> endpoint
    * @see CheckStatus
@@ -544,7 +669,7 @@ public interface ConsulClient {
   /**
    * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
+   * @param checkId the ID of check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-fail">/v1/agent/check/fail/:check_id</a> endpoint
    * @see CheckStatus
@@ -554,8 +679,8 @@ public interface ConsulClient {
   /**
    * Set status of the check to "critical". Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
-   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
+   * @param checkId the ID of check
+   * @param note    specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-fail">/v1/agent/check/fail/:check_id</a> endpoint
    * @see CheckStatus
@@ -565,8 +690,8 @@ public interface ConsulClient {
   /**
    * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
-   * @param status        new status of check
+   * @param checkId the ID of check
+   * @param status  new status of check
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
@@ -575,9 +700,9 @@ public interface ConsulClient {
   /**
    * Set status of the check to given status. Used with a check that is of the TTL type. The TTL clock will be reset.
    *
-   * @param checkId       the ID of check
-   * @param status        new status of check
-   * @param note          specifies a human-readable message. This will be passed through to the check's {@code Output} field.
+   * @param checkId the ID of check
+   * @param status  new status of check
+   * @param note    specifies a human-readable message. This will be passed through to the check's {@code Output} field.
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/agent/check.html#ttl-check-update">/v1/agent/check/update/:check_id</a> endpoint
    */
@@ -612,7 +737,7 @@ public interface ConsulClient {
   /**
    * Initialize a new session
    *
-   * @param options   options used to create session
+   * @param options options used to create session
    * @return a future provided with ID of new session
    * @see <a href="https://www.consul.io/api/session.html#create-session">/v1/session/create</a> endpoint
    */
@@ -621,7 +746,7 @@ public interface ConsulClient {
   /**
    * Returns the requested session information
    *
-   * @param id            the ID of requested session
+   * @param id the ID of requested session
    * @return a future provided with info of requested session
    * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
@@ -631,8 +756,8 @@ public interface ConsulClient {
    * Returns the requested session information
    * This is blocking query unlike {@link ConsulClient#infoSession(String)}
    *
-   * @param id            the ID of requested session
-   * @param options       the blocking options
+   * @param id      the ID of requested session
+   * @param options the blocking options
    * @return a future provided with info of requested session
    * @see <a href="https://www.consul.io/api/session.html#read-session">/v1/session/info/:uuid</a> endpoint
    */
@@ -641,7 +766,7 @@ public interface ConsulClient {
   /**
    * Renews the given session. This is used with sessions that have a TTL, and it extends the expiration by the TTL
    *
-   * @param id            the ID of session that should be renewed
+   * @param id the ID of session that should be renewed
    * @return a future provided with info of renewed session
    * @see <a href="https://www.consul.io/api/session.html#renew-session">/v1/session/renew/:uuid</a> endpoint
    */
@@ -659,7 +784,7 @@ public interface ConsulClient {
    * Returns the active sessions
    * This is blocking query unlike {@link ConsulClient#listSessions()}
    *
-   * @param options       the blocking options
+   * @param options the blocking options
    * @return a future provided with list of sessions
    * @see <a href="https://www.consul.io/api/session.html#list-sessions">/v1/session/list</a> endpoint
    */
@@ -668,7 +793,7 @@ public interface ConsulClient {
   /**
    * Returns the active sessions for a given node
    *
-   * @param nodeId        the ID of node
+   * @param nodeId the ID of node
    * @return a future provided with list of sessions
    * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
@@ -678,8 +803,8 @@ public interface ConsulClient {
    * Returns the active sessions for a given node
    * This is blocking query unlike {@link ConsulClient#listNodeSessions(String)}
    *
-   * @param nodeId        the ID of node
-   * @param options       the blocking options
+   * @param nodeId  the ID of node
+   * @param options the blocking options
    * @return a future provided with list of sessions
    * @see <a href="https://www.consul.io/api/session.html#list-sessions-for-node">/v1/session/node/:node</a> endpoint
    */
@@ -688,14 +813,14 @@ public interface ConsulClient {
   /**
    * Destroys the given session
    *
-   * @param id            the ID of session
+   * @param id the ID of session
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/session.html#delete-session">/v1/session/destroy/:uuid</a> endpoint
    */
   Future<Void> destroySession(String id);
 
   /**
-   * @param definition    definition of the prepare query
+   * @param definition definition of the prepare query
    * @return a future provided with id of created prepare query
    * @see <a href="https://www.consul.io/api/query.html#create-prepared-query">/v1/query</a> endpoint
    */
@@ -704,7 +829,7 @@ public interface ConsulClient {
   /**
    * Returns an existing prepared query
    *
-   * @param id            the id of the query to read
+   * @param id the id of the query to read
    * @return a future provided with definition of the prepare query
    * @see <a href="https://www.consul.io/api/query.html#read-prepared-query-1">/v1/query/:uuid</a> endpoint
    */
@@ -719,7 +844,7 @@ public interface ConsulClient {
   Future<List<PreparedQueryDefinition>> getAllPreparedQueries();
 
   /**
-   * @param definition    definition of the prepare query
+   * @param definition definition of the prepare query
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/query.html#update-prepared-query">/v1/query/:uuid</a> endpoint
    */
@@ -728,7 +853,7 @@ public interface ConsulClient {
   /**
    * Deletes an existing prepared query
    *
-   * @param id            the id of the query to delete
+   * @param id the id of the query to delete
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api/query.html#delete-prepared-query">/v1/query/:uuid</a> endpoint
    */
@@ -737,8 +862,8 @@ public interface ConsulClient {
   /**
    * Executes an existing prepared query.
    *
-   * @param query         the ID of the query to execute. This can also be the name of an existing prepared query,
-   *                      or a name that matches a prefix name for a prepared query template.
+   * @param query the ID of the query to execute. This can also be the name of an existing prepared query,
+   *              or a name that matches a prefix name for a prepared query template.
    * @return a future provided with response
    * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
    */
@@ -747,17 +872,21 @@ public interface ConsulClient {
   /**
    * Executes an existing prepared query.
    *
-   * @param query         the ID of the query to execute. This can also be the name of an existing prepared query,
-   *                      or a name that matches a prefix name for a prepared query template.
-   * @param options       the options used to execute prepared query
+   * @param query   the ID of the query to execute. This can also be the name of an existing prepared query,
+   *                or a name that matches a prefix name for a prepared query template.
+   * @param options the options used to execute prepared query
    * @return a future provided with response
    * @see <a href="https://www.consul.io/api/query.html#execute-prepared-query">/v1/query/:uuid/execute</a> endpoint
    */
-  Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(String query, PreparedQueryExecuteOptions options);
+  Future<PreparedQueryExecuteResponse> executePreparedQueryWithOptions(
+    String query,
+    PreparedQueryExecuteOptions options
+  );
 
   /**
    * Register node with external service
-   * @param nodeOptions the options of new node
+   *
+   * @param nodeOptions    the options of new node
    * @param serviceOptions the options of new service
    * @return a future provided with response
    * @see <a href="https://www.consul.io/api-docs/catalog#register-entity">/v1/catalog/register</a> endpoint
@@ -767,8 +896,8 @@ public interface ConsulClient {
   /**
    * Deregister entities from the node or deregister the node itself.
    *
-   * @param nodeId            the ID of node
-   * @param serviceId         the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
+   * @param nodeId    the ID of node
+   * @param serviceId the ID of the service to de-registered; if it is null, the node itself will be de-registered (as well as the entities that belongs to that node)
    * @return a future notified when complete
    * @see <a href="https://www.consul.io/api-docs/catalog#deregister-entity">/v1/catalog/deregister</a> endpoint
    */
