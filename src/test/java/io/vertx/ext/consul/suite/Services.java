@@ -159,9 +159,19 @@ public class Services extends ChecksBase {
     ServiceEntryList list1 = getAsync(h -> readClient.healthServiceNodes("service", true, h));
     assertEquals(list1.getList().size(), 3);
     List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
+    Optional<String> nodeId = list1
+      .getList()
+      .stream()
+      .map(entry -> entry.getNode().getName())
+      .findFirst();
     assertTrue(ids.contains("id1"));
     assertTrue(ids.contains("id2"));
     assertTrue(ids.contains("id3"));
+
+    assertTrue(nodeId.isPresent());
+    CheckList nodeHealthChecks = getAsync(h -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions(), h));
+    assertEquals(5, nodeHealthChecks.getList().size());
+    assertTrue(nodeHealthChecks.getList().stream().allMatch(it -> it.getStatus() == CheckStatus.PASSING));
 
     ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
     ServiceEntryList list2 = getAsync(h -> readClient.healthServiceNodesWithOptions("service", true, opts2, h));
@@ -180,6 +190,13 @@ public class Services extends ChecksBase {
     assertEquals(latch.getCount(), 1);
     runAsync(h -> writeClient.failCheck("service:id1", h));
     awaitLatch(latch);
+    CheckList checksWithFailed = getAsync(h -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions(), h));
+    assertEquals(5, nodeHealthChecks.getList().size());
+    Optional<Check> failedCheck = checksWithFailed.getList().stream()
+      .filter(it -> Objects.equals(it.getId(), "service:id1"))
+      .findFirst();
+    assertTrue(failedCheck.isPresent());
+    assertEquals(CheckStatus.CRITICAL, failedCheck.get().getStatus());
     runAsync(h -> writeClient.deregisterService("id1", h));
     runAsync(h -> writeClient.deregisterService("id2", h));
     runAsync(h -> writeClient.deregisterService("id3", h));
