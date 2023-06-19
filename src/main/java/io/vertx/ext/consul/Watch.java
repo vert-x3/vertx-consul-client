@@ -188,6 +188,30 @@ public interface Watch<T> {
   }
 
   /**
+   * Creates {@code Watch} to monitoring the health checks of the nodes.
+   * @param node node name or ID
+   * @param opt options like namespace, datacenter and filter
+   * @param vertx the {@code Vertx} instance
+   * @param options the options to create underlying Consul client
+   * @return the {@code Watch} instance
+   */
+  static Watch<CheckList> nodeHealthChecks(String node, CheckQueryOptions opt, Vertx vertx, ConsulClientOptions options){
+    return new WatchImpl.NodeHealthCheck(node, opt, vertx, options);
+  }
+
+  /**
+   * Creates {@code Watch} to monitoring the health checks of the nodes.
+   *
+   * @param service           the service name
+   * @param checkQueryOptions options used to request checks
+   * @param vertx             the {@code Vertx} instance
+   * @param options           the options to create underlying Consul client
+   * @return the {@code Watch} instance
+   */
+  static Watch<CheckList> serviceHealthChecks(String service, CheckQueryOptions checkQueryOptions, Vertx vertx, ConsulClientOptions options){
+    return new WatchImpl.ServiceHealthCheck(service, checkQueryOptions, vertx, options);
+  }
+  /**
    * Set the result handler. As data is changed, the handler will be called with the result.
    *
    * @param handler the result handler

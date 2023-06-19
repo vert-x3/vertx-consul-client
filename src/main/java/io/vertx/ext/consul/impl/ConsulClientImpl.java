@@ -463,6 +463,24 @@ public class ConsulClientImpl implements ConsulClient {
   }
 
   @Override
+  public Future<CheckList> healthNodesWithOptions(String node, CheckQueryOptions options) {
+    Query query = new Query().put("dc", options.getDc());
+    if (options.getBlockingOptions() != null) {
+      query.put(options.getBlockingOptions());
+    }
+    if (options.getDc() != null && !options.getDc().isEmpty()) {
+      query.put("dc", options.getDc());
+    }
+    return requestArray(HttpMethod.GET, "/v1/health/node/" + urlEncode(node), query,
+      options.toJson().encode(),
+      (arr, headers) -> {
+        List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
+        return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+      }
+    );
+  }
+
+  @Override
   public Future<ServiceList> catalogServices() {
     return catalogServicesWithOptions(null);
   }
@@ -803,7 +821,7 @@ public class ConsulClientImpl implements ConsulClient {
     Map<String, Object> map = nodeJsonOpts.getMap();
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       if (entry.getValue() == null) {
-        map.remove(entry.getKey());
+        nodeJsonOpts.remove(entry.getKey());
       }
     }
 
