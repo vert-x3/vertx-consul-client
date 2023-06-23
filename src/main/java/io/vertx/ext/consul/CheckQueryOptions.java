@@ -72,8 +72,9 @@ public class CheckQueryOptions {
    *
    * @param dc datacenter
    */
-  public void setDc(String dc) {
+  public CheckQueryOptions setDc(String dc) {
     this.dc = dc;
+    return this;
   }
 
   /**
@@ -92,8 +93,9 @@ public class CheckQueryOptions {
    * @param expression string of selectors and filter operations
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/health#filtering">Supported selectors and operations</a>
    */
-  public void setFilter(String expression) {
+  public CheckQueryOptions setFilter(String expression) {
     this.filter = expression;
+    return this;
   }
 
   /**
@@ -112,8 +114,9 @@ public class CheckQueryOptions {
    *
    * @param namespace
    */
-  public void setNs(String namespace) {
+  public CheckQueryOptions setNs(String namespace) {
     this.ns = namespace;
+    return this;
   }
 
   /**
