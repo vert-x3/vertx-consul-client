@@ -566,6 +566,7 @@ public class Watches extends ConsulTestBase {
     passing.await(16_100);
     failed.await(21_000);
     watch.stop();
+    runAsync(h -> writeClient.deregisterService(opts.getId(), h));
   }
 
   @Test
@@ -617,5 +618,6 @@ public class Watches extends ConsulTestBase {
     passing.await(16_000);
     failed.await(21_000);
     watch.stop();
+    runAsync(h -> writeClient.deregisterService(opts.getId(), h));
   }
 }
