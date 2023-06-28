@@ -28,11 +28,26 @@ public class CheckQueryOptions {
 
   private String near;
   private BlockingQueryOptions options;
+  /**
+   * Specifies the datacenter to query
+   */
+  private String dc;
+  /**
+   * Specifies the expression used to filter the queries results prior to returning the data
+   *
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/health#filtering">Filtering</a>
+   */
+  private String filter;
+  /**
+   * Specifies the namespace to list checks
+   */
+  private String ns;
 
   /**
    * Default constructor
    */
-  public CheckQueryOptions() {}
+  public CheckQueryOptions() {
+  }
 
   /**
    * Constructor from JSON
@@ -41,6 +56,67 @@ public class CheckQueryOptions {
    */
   public CheckQueryOptions(JsonObject json) {
     CheckQueryOptionsConverter.fromJson(json, this);
+  }
+
+  /**
+   * Returns the datacenter that ultimately provided the list of nodes
+   *
+   * @return the datacenter that ultimately provided the list of nodes
+   */
+  public String getDc() {
+    return dc;
+  }
+
+  /**
+   * Set an optional datacenter. This will default to the datacenter of the agent being queried
+   *
+   * @param dc datacenter
+   */
+  public CheckQueryOptions setDc(String dc) {
+    this.dc = dc;
+    return this;
+  }
+
+  /**
+   * Returns the expression used to filter the queries results prior to returning the data
+   *
+   * @return string of selectors and filter operations
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/health#filtering">Filtering</a>
+   */
+  public String getFilter() {
+    return filter;
+  }
+
+  /**
+   * Set the expression to filter the queries results prior to returning the data
+   *
+   * @param expression string of selectors and filter operations
+   * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/health#filtering">Supported selectors and operations</a>
+   */
+  public CheckQueryOptions setFilter(String expression) {
+    this.filter = expression;
+    return this;
+  }
+
+  /**
+   * Returns the namespace to list checks
+   *
+   * @return namespace
+   */
+
+  public String getNs() {
+    return ns;
+  }
+
+  /**
+   * Sets the optional namespace to list checks. By default, the namespace will be inherited from the request's ACL token
+   * or will default to the default namespace.
+   *
+   * @param namespace
+   */
+  public CheckQueryOptions setNs(String namespace) {
+    this.ns = namespace;
+    return this;
   }
 
   /**

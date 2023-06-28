@@ -1013,6 +1013,22 @@ public interface ConsulClient {
   Future<ServiceEntryList> healthServiceNodesWithOptions(String service, boolean passing, ServiceQueryOptions options);
 
   /**
+   * Returns the checks specific to the node provided on the path.
+   *
+   * @param node    the node name or ID
+   * @param options options used to request node health checks
+   * @return a future provided with list of services
+   * @see <a href="https://www.consul.io/api/health.html#list-checks-for-node">/v1/health/node/:node</a> endpoint
+   */
+  @Fluent
+  ConsulClient healthNodesWithOptions(String node, CheckQueryOptions options, Handler<AsyncResult<CheckList>> resultHandler);
+
+  /**
+   * Like {@link #healthNodesWithOptions(String, CheckQueryOptions, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<CheckList> healthNodesWithOptions(String node, CheckQueryOptions options);
+
+  /**
    * Returns the services registered in a datacenter
    *
    * @param resultHandler will be provided with list of services
