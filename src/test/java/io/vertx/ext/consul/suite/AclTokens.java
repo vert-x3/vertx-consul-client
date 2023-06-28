@@ -15,8 +15,11 @@
  */
 package io.vertx.ext.consul.suite;
 
-import io.vertx.ext.consul.AclToken;
 import io.vertx.ext.consul.ConsulTestBase;
+import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.AclToken;
+import io.vertx.ext.consul.token.CloneAclTokenOptions;
+import io.vertx.ext.consul.token.PolicyLink;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
@@ -30,33 +33,45 @@ public class AclTokens extends ConsulTestBase {
 
   @Test
   public void lifecycle(TestContext tc) {
-    ctx.masterClient().listAclTokens(tc.asyncAssertSuccess(backupTokens -> {
-      AclToken init = new AclToken()
+    masterClient.getAclTokens().onComplete(tc.asyncAssertSuccess(backupTokens -> {
+      AclPolicy policy = new AclPolicy()
         .setName("tokenName")
         .setRules("key \"bar/\" { policy = \"read\" }");
-      ctx.masterClient().createAclToken(init, tc.asyncAssertSuccess(id -> {
-        ctx.masterClient().infoAclToken(id, tc.asyncAssertSuccess(token -> {
-          tc.assertEquals(id, token.getId());
-          tc.assertEquals(init.getName(), token.getName());
-          tc.assertEquals(init.getRules(), token.getRules());
-          ctx.masterClient().cloneAclToken(id, tc.asyncAssertSuccess(clonedId -> {
-            ctx.masterClient().infoAclToken(clonedId, tc.asyncAssertSuccess(clonedToken -> {
-              tc.assertEquals(clonedId, clonedToken.getId());
-              tc.assertEquals(token.getName(), clonedToken.getName());
-              tc.assertEquals(token.getRules(), clonedToken.getRules());
-              AclToken token2 = new AclToken()
-                .setId(clonedToken.getId())
-                .setName("updatedName")
-                .setRules("key \"bar/\" { policy = \"write\" }");
-              ctx.masterClient().updateAclToken(token2, tc.asyncAssertSuccess(updatedId -> {
-                ctx.masterClient().infoAclToken(updatedId, tc.asyncAssertSuccess(updatedToken -> {
-                  tc.assertEquals(token2.getId(), updatedToken.getId());
-                  tc.assertEquals(token2.getName(), updatedToken.getName());
-                  tc.assertEquals(token2.getRules(), updatedToken.getRules());
-                  ctx.masterClient().destroyAclToken(id, tc.asyncAssertSuccess(v1 -> {
-                    ctx.masterClient().destroyAclToken(clonedId, tc.asyncAssertSuccess(v2 -> {
-                      ctx.masterClient().listAclTokens(tc.asyncAssertSuccess(aliveTokens -> {
-                        tc.assertEquals(backupTokens.size(), aliveTokens.size());
+      masterClient.createAclPolicy(policy).onComplete(tc.asyncAssertSuccess(policyId -> {
+        AclToken init = new AclToken()
+          .addPolicy(new PolicyLink().setId(policyId));
+        masterClient.createAclToken(init).onComplete(tc.asyncAssertSuccess(aclToken -> {
+          String id = aclToken.getAccessorId();
+          masterClient.readAclToken(id).onComplete(tc.asyncAssertSuccess(token -> {
+            PolicyLink receivedPolicy = token.getPolicies().stream().findFirst()
+              .orElse(new PolicyLink());
+            tc.assertEquals(id, token.getAccessorId());
+            tc.assertEquals(policy.getName(), receivedPolicy.getName());
+            masterClient.cloneAclToken(id, new CloneAclTokenOptions()).onComplete(tc.asyncAssertSuccess(clonedToken -> {
+              String clonedId = clonedToken.getAccessorId();
+              masterClient.readAclToken(clonedId).onComplete(tc.asyncAssertSuccess(receivedClonedToken -> {
+                PolicyLink receivedClonedPolicy = receivedClonedToken.getPolicies().stream().findFirst()
+                  .orElse(new PolicyLink());
+                tc.assertEquals(clonedId, receivedClonedToken.getAccessorId());
+                tc.assertEquals(receivedPolicy.getName(), receivedClonedPolicy.getName());
+                AclPolicy policy2 = new AclPolicy()
+                  .setName("updatedName")
+                  .setRules("key \"bar/\" { policy = \"write\" }");
+                masterClient.createAclPolicy(policy2).onComplete(tc.asyncAssertSuccess(policyId2 -> {
+                  AclToken token2 = new AclToken()
+                    .addPolicy(new PolicyLink().setId(policyId2));
+                  masterClient.updateAclToken(clonedToken.getAccessorId(), token2).onComplete(tc.asyncAssertSuccess(updatedId -> {
+                    masterClient.readAclToken(updatedId.getAccessorId()).onComplete(tc.asyncAssertSuccess(updatedToken -> {
+                      PolicyLink receivedPolicy2 = updatedToken.getPolicies().stream().findFirst()
+                        .orElse(new PolicyLink());
+                      tc.assertEquals(clonedToken.getAccessorId(), updatedToken.getAccessorId());
+                      tc.assertEquals(policy2.getName(), receivedPolicy2.getName());
+                      masterClient.deleteAclToken(id).onComplete(tc.asyncAssertSuccess(v1 -> {
+                        masterClient.deleteAclToken(clonedId).onComplete(tc.asyncAssertSuccess(v2 -> {
+                          masterClient.getAclTokens().onComplete(tc.asyncAssertSuccess(aliveTokens -> {
+                            tc.assertEquals(backupTokens.size(), aliveTokens.size());
+                          }));
+                        }));
                       }));
                     }));
                   }));

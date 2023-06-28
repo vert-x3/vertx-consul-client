@@ -15,9 +15,6 @@
  */
 package io.vertx.ext.consul.dc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
@@ -25,7 +22,9 @@ public class ConsulDatacenter {
 
   private final String name;
   private final String masterToken;
-  private final List<ConsulAgent> agents;
+  private String writeToken;
+  private String readToken;
+
 
   public static ConsulDatacenter create() {
     return new ConsulDatacenter(new ConsulDatacenterOptions());
@@ -38,31 +37,6 @@ public class ConsulDatacenter {
   private ConsulDatacenter(ConsulDatacenterOptions options) {
     name = options.getName();
     masterToken = options.getMasterToken();
-    agents = new ArrayList<>();
-  }
-
-  public ConsulAgent attachAgent() {
-    return attachAgent(new ConsulAgentOptions());
-  }
-
-  public ConsulAgent attachAgent(ConsulAgentOptions options) {
-    ConsulAgent agent = new ConsulAgent(this, options);
-    agents.add(agent);
-    return agent;
-  }
-
-  public void detachAgent(ConsulAgent agent) {
-    agents.remove(agent);
-    agent.stop();
-  }
-
-  public void stop() {
-    agents.forEach(ConsulAgent::stop);
-    agents.clear();
-  }
-
-  public List<ConsulAgent> getAgents() {
-    return agents;
   }
 
   public String getName() {
@@ -71,5 +45,21 @@ public class ConsulDatacenter {
 
   public String getMasterToken() {
     return masterToken;
+  }
+
+  public void setWriteToken(String token) {
+    writeToken = token;
+  }
+
+  public void setReadToken(String token) {
+    readToken = token;
+  }
+
+  public String writeToken() {
+    return writeToken;
+  }
+
+  public String readToken() {
+    return readToken;
   }
 }

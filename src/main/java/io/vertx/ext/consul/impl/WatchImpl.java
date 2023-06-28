@@ -33,63 +33,80 @@ public abstract class WatchImpl<T> implements Watch<T> {
   public static class Key extends WatchImpl<KeyValue> {
 
     private final String key;
+    private final String timeout;
 
     public Key(String key, Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
       this.key = key;
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<KeyValue>>> handler) {
-      BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions options = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       consulClient.getValueWithOptions(key, options, h ->
-        handler.handle(h.map(kv -> new State<KeyValue>(kv, kv.getModifyIndex()))));
+        handler.handle(h.map(kv -> new State<>(kv, kv.getModifyIndex()))));
     }
   }
 
   public static class KeyPrefix extends WatchImpl<KeyValueList> {
 
     private final String keyPrefix;
+    private final String timeout;
 
     public KeyPrefix(String keyPrefix, Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
       this.keyPrefix = keyPrefix;
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<KeyValueList>>> handler) {
-      BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions options = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       consulClient.getValuesWithOptions(keyPrefix, options, h ->
-        handler.handle(h.map(kv -> new State<KeyValueList>(kv, kv.getIndex()))));
+        handler.handle(h.map(kv -> new State<>(kv, kv.getIndex()))));
     }
   }
 
   public static class Services extends WatchImpl<ServiceList> {
 
+    private final String timeout;
+
     public Services(Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<ServiceList>>> handler) {
-      BlockingQueryOptions options = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions options = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       consulClient.catalogServicesWithOptions(options, h ->
-        handler.handle(h.map(services -> new State<ServiceList>(services, services.getIndex()))));
+        handler.handle(h.map(services -> new State<>(services, services.getIndex()))));
     }
   }
 
   public static class Service extends WatchImpl<ServiceEntryList> {
 
     private final String service;
+    private String timeout = BLOCKING_WAIT;
 
     public Service(String service, Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
       this.service = service;
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<ServiceEntryList>>> handler) {
-      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       ServiceQueryOptions sOpts = new ServiceQueryOptions().setNear("_agent").setBlockingOptions(bOpts);
       consulClient.healthServiceNodesWithOptions(service, false, sOpts, h ->
         handler.handle(h.map(services -> new State<ServiceEntryList>(services, services.getIndex()))));
@@ -99,15 +116,19 @@ public abstract class WatchImpl<T> implements Watch<T> {
   public static class Events extends WatchImpl<EventList> {
 
     private final String event;
+    private final String timeout;
 
     public Events(String event, Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
       this.event = event;
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<EventList>>> handler) {
-      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       EventListOptions eOpts = new EventListOptions().setBlockingOptions(bOpts).setName(event);
       consulClient.listEventsWithOptions(eOpts, h ->
         handler.handle(h.map(events -> new State<EventList>(events, events.getIndex()))));
@@ -115,14 +136,18 @@ public abstract class WatchImpl<T> implements Watch<T> {
   }
 
   public static class Nodes extends WatchImpl<NodeList> {
+    private final String timeout;
 
     public Nodes(Vertx vertx, ConsulClientOptions options) {
       super(vertx, ConsulClient.create(vertx, options));
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
     }
 
     @Override
     void wait(long index, Handler<AsyncResult<State<NodeList>>> handler) {
-      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(BLOCKING_WAIT).setIndex(index);
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       NodeQueryOptions qOpts = new NodeQueryOptions().setBlockingOptions(bOpts);
       consulClient.catalogNodesWithOptions(qOpts, h ->
         handler.handle(h.map(nodes -> new State<NodeList>(nodes, nodes.getIndex()))));
