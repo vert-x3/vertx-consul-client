@@ -155,6 +155,50 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
+  public static class NodeHealthCheck extends WatchImpl<CheckList> {
+    CheckQueryOptions options;
+    String node;
+    private final String timeout;
+
+    public NodeHealthCheck(String node, CheckQueryOptions check, Vertx vertx, ConsulClientOptions options) {
+      super(vertx, ConsulClient.create(vertx, options));
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
+      this.node = node;
+      this.options = check;
+    }
+
+    @Override
+    void wait(long index, Handler<AsyncResult<State<CheckList>>> handler) {
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(timeout).setIndex(index);
+      consulClient.healthNodesWithOptions(node, options.setBlockingOptions(bOpts)).onComplete(h ->
+        handler.handle(h.map(nodes -> new State<>(nodes, nodes.getIndex()))));
+    }
+  }
+
+  public static class ServiceHealthCheck extends WatchImpl<CheckList> {
+    CheckQueryOptions options;
+    String serviceName;
+    private final String timeout;
+
+    public ServiceHealthCheck(String service, CheckQueryOptions check, Vertx vertx, ConsulClientOptions options) {
+      super(vertx, ConsulClient.create(vertx, options));
+      if (options.getTimeout() > 0) {
+        this.timeout = options.getTimeout() + "ms";
+      } else this.timeout = BLOCKING_WAIT;
+      this.serviceName = service;
+      this.options = check;
+    }
+
+    @Override
+    void wait(long index, Handler<AsyncResult<State<CheckList>>> handler) {
+      BlockingQueryOptions bOpts = new BlockingQueryOptions().setWait(timeout).setIndex(index);
+      consulClient.healthChecksWithOptions(serviceName, options.setBlockingOptions(bOpts)).onComplete(h ->
+        handler.handle(h.map(nodes -> new State<>(nodes, nodes.getIndex()))));
+    }
+  }
+
   private volatile boolean started = false;
   private volatile boolean stopped = false;
   private Handler<WatchResult<T>> handler;

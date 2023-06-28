@@ -25,9 +25,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -508,5 +506,115 @@ public class Watches extends ConsulTestBase {
     System.out.println("New node disconnected");
 
     watch.stop();
+  }
+
+  @Test
+  public void watchNodeHealthChecks(TestContext tc) {
+    String serviceName = randomAlphaString(10);
+    ServiceOptions opts = new ServiceOptions()
+      .setName(serviceName)
+      .setId(serviceName)
+      .setCheckListOptions(Collections.singletonList(new CheckOptions()
+        .setId("firstCheckFromList")
+        .setName("firstCheckFromList")
+        .setStatus(CheckStatus.PASSING)
+        .setServiceId(serviceName)
+        .setTtl("20s")))
+      .setCheckOptions(new CheckOptions()
+        .setId("singleCheck")
+        .setName("singleCheck")
+        .setStatus(CheckStatus.PASSING)
+        .setServiceId(serviceName)
+        .setTtl("15s"));
+    runAsync(() -> writeClient.registerService(opts));
+    List<Service> serviceList = getAsync(() -> writeClient.catalogServiceNodes(serviceName)).getList();
+    tc.assertFalse(serviceList.isEmpty());
+    Service service = serviceList.get(0);
+    tc.assertNotNull(service);
+    String nodeName = service.getNode();
+    tc.assertNotNull(nodeName);
+    Async passing = tc.async(1);
+    Async failed = tc.async(2);
+    Watch<CheckList> watch = Watch.nodeHealthChecks(
+      nodeName, new CheckQueryOptions(), vertx, consul.consulClientOptions(consul.dc().readToken())
+    ).setHandler(result -> {
+      if (result.succeeded()) {
+        List<Check> list = result.nextResult().getList();
+        tc.assertEquals(3, list.size());
+        if (list.stream().anyMatch(it -> it.getStatus() != CheckStatus.PASSING)) {
+          failed.countDown();
+          if (!failed.isCompleted()) {
+            Optional<Check> singleCheck = list.stream()
+              .filter(it -> Objects.equals(it.getId(), "singleCheck"))
+              .findFirst();
+            tc.assertTrue(singleCheck.isPresent());
+            tc.assertEquals(CheckStatus.CRITICAL, singleCheck.get().getStatus());
+          } else {
+            Optional<Check> singleCheck = list.stream()
+              .filter(it -> Objects.equals(it.getId(), "firstCheckFromList"))
+              .findFirst();
+            tc.assertTrue(singleCheck.isPresent());
+            tc.assertEquals(CheckStatus.CRITICAL, singleCheck.get().getStatus());
+          }
+        } else passing.countDown();
+      }
+    });
+    watch.start();
+    passing.await(16_100);
+    failed.await(21_000);
+    watch.stop();
+    runAsync(() -> writeClient.deregisterService(opts.getId()));
+  }
+
+  @Test
+  public void watchServiceHealthChecks(TestContext tc) {
+    String serviceName = randomAlphaString(10);
+    ServiceOptions opts = new ServiceOptions()
+      .setName(serviceName)
+      .setId(serviceName)
+      .setCheckListOptions(Collections.singletonList(new CheckOptions()
+        .setId("firstCheckFromList")
+        .setName("firstCheckFromList")
+        .setStatus(CheckStatus.PASSING)
+        .setServiceId(serviceName)
+        .setTtl("20s")))
+      .setCheckOptions(new CheckOptions()
+        .setId("singleCheck")
+        .setName("singleCheck")
+        .setStatus(CheckStatus.PASSING)
+        .setServiceId(serviceName)
+        .setTtl("15s"));
+    runAsync(() -> writeClient.registerService(opts));
+    Async passing = tc.async(1);
+    Async failed = tc.async(2);
+    Watch<CheckList> watch = Watch.serviceHealthChecks(
+      serviceName, new CheckQueryOptions(), vertx, consul.consulClientOptions(consul.dc().readToken())
+    ).setHandler(result -> {
+      if (result.succeeded()) {
+        List<Check> list = result.nextResult().getList();
+        tc.assertEquals(2, list.size());
+        if (list.stream().anyMatch(it -> it.getStatus() != CheckStatus.PASSING)) {
+          failed.countDown();
+          if (!failed.isCompleted()) {
+            Optional<Check> singleCheck = list.stream()
+              .filter(it -> Objects.equals(it.getId(), "singleCheck"))
+              .findFirst();
+            tc.assertTrue(singleCheck.isPresent());
+            tc.assertEquals(CheckStatus.CRITICAL, singleCheck.get().getStatus());
+          } else {
+            Optional<Check> singleCheck = list.stream()
+              .filter(it -> Objects.equals(it.getId(), "firstCheckFromList"))
+              .findFirst();
+            tc.assertTrue(singleCheck.isPresent());
+            tc.assertEquals(CheckStatus.CRITICAL, singleCheck.get().getStatus());
+          }
+        } else passing.countDown();
+      }
+    });
+    watch.start();
+    passing.await(16_000);
+    failed.await(21_000);
+    watch.stop();
+    runAsync(() -> writeClient.deregisterService(opts.getId()));
   }
 }
