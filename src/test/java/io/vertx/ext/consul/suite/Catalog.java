@@ -74,9 +74,7 @@ public class Catalog extends ConsulTestBase {
       vertx.setTimer(1000, l -> {
         System.out.println(">>>>>>> new node is still not ready");
         tc.assertEquals(async1.count(), 1);
-        vertx.<ConsulContainer>executeBlocking(b1 ->
-            b1.complete(ConsulInstance.defaultConsulBuilder(dc).nodeName("attached_node").join(consul).build())
-          )
+        vertx.<ConsulContainer>executeBlocking(() -> ConsulInstance.defaultConsulBuilder(dc).nodeName("attached_node").join(consul).build())
           .onComplete(tc.asyncAssertSuccess(attached -> {
             System.out.println(">>>>>>> new node attached");
             async1.handler(v -> {
@@ -88,9 +86,9 @@ public class Catalog extends ConsulTestBase {
                   .catalogNodesWithOptions(blockingQueryOptions2)
                   .onComplete(tc.asyncAssertSuccess());
                 vertx
-                  .executeBlocking(b2 -> {
+                  .executeBlocking(() -> {
                     attached.stop();
-                    b2.complete();
+                    return null;
                   })
                   .onComplete(detached -> System.out.println(">>>>>>> new node detached"));
               }));
