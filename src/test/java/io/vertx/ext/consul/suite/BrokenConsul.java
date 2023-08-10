@@ -72,7 +72,7 @@ public class BrokenConsul extends ConsulTestBase {
       super(vertx, h -> {
         HttpServerResponse resp = h.response();
         resp.putHeader(HttpHeaders.CONTENT_LENGTH, "10000").write("start and ... ");
-        resp.close();
+        h.connection().close();
       });
     }
   }
