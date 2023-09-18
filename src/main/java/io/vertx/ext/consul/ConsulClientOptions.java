@@ -520,17 +520,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set the maximum pool size for connections
-   *
-   * @param maxPoolSize  the maximum pool size
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setMaxPoolSize(int maxPoolSize) {
-    return (ConsulClientOptions) super.setMaxPoolSize(maxPoolSize);
-  }
-
-  /**
    * Set a client limit of the number concurrent streams for each HTTP/2 connection, this limits the number
    * of streams the client can create for a connection. The effective number of streams for a
    * connection is the min of this value and the server's initial settings.
@@ -544,17 +533,6 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setHttp2MultiplexingLimit(int limit) {
     return (ConsulClientOptions) super.setHttp2MultiplexingLimit(limit);
-  }
-
-  /**
-   * Set the maximum pool size for HTTP/2 connections
-   *
-   * @param max  the maximum pool size
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setHttp2MaxPoolSize(int max) {
-    return (ConsulClientOptions) super.setHttp2MaxPoolSize(max);
   }
 
   /**
@@ -628,30 +606,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set true when the client wants to skip frame masking.
-   * You may want to set it true on server by server websocket communication: In this case you are by passing RFC6455 protocol.
-   * It's false as default.
-   *
-   * @param sendUnmaskedFrames  true if enabled
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setSendUnmaskedFrames(boolean sendUnmaskedFrames) {
-    return (ConsulClientOptions) super.setSendUnmaskedFrames(sendUnmaskedFrames);
-  }
-
-  /**
-   * Set the max websocket frame size
-   *
-   * @param maxWebsocketFrameSize  the max frame size, in bytes
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setMaxWebSocketFrameSize(int maxWebsocketFrameSize) {
-    return (ConsulClientOptions) super.setMaxWebSocketFrameSize(maxWebsocketFrameSize);
-  }
-
-  /**
    * Set the default host name to be used by this client in requests if none is provided when making the request.
    *
    * @return a reference to this, so the API can be used fluently
@@ -712,17 +666,6 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setMaxHeaderSize(int maxHeaderSize) {
     return (ConsulClientOptions) super.setMaxHeaderSize(maxHeaderSize);
-  }
-
-  /**
-   * Set the maximum requests allowed in the wait queue, any requests beyond the max size will result in
-   * a ConnectionPoolTooBusyException.  If the value is set to a negative number then the queue will be unbounded.
-   * @param maxWaitQueueSize the maximum number of waiting requests
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setMaxWaitQueueSize(int maxWaitQueueSize) {
-    return (ConsulClientOptions) super.setMaxWaitQueueSize(maxWaitQueueSize);
   }
 
   /**
@@ -887,17 +830,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set the max websocket message size
-   *
-   * @param maxWebsocketMessageSize  the max message size, in bytes
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setMaxWebSocketMessageSize(int maxWebsocketMessageSize) {
-    return (ConsulClientOptions) super.setMaxWebSocketMessageSize(maxWebsocketMessageSize);
-  }
-
-  /**
    * Add an enabled cipher suite, appended to the ordered suites.
    *
    * @param suite  the suite
@@ -980,11 +912,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   @Override
-  public ConsulClientOptions setPoolCleanerPeriod(int poolCleanerPeriod) {
-    return (ConsulClientOptions) super.setPoolCleanerPeriod(poolCleanerPeriod);
-  }
-
-  @Override
   public ConsulClientOptions setEnabledSecureTransportProtocols(Set<String> enabledSecureTransportProtocols) {
     return (ConsulClientOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
   }
@@ -997,25 +924,5 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setSslHandshakeTimeoutUnit(TimeUnit sslHandshakeTimeoutUnit) {
     return (ConsulClientOptions) super.setSslHandshakeTimeoutUnit(sslHandshakeTimeoutUnit);
-  }
-
-  @Override
-  public ConsulClientOptions setTryUsePerMessageWebSocketCompression(boolean offer) {
-    return (ConsulClientOptions) super.setTryUsePerMessageWebSocketCompression(offer);
-  }
-
-  @Override
-  public ConsulClientOptions setWebSocketCompressionLevel(int compressionLevel) {
-    return (ConsulClientOptions) super.setWebSocketCompressionLevel(compressionLevel);
-  }
-
-  @Override
-  public ConsulClientOptions setWebSocketCompressionAllowClientNoContext(boolean offer) {
-    return (ConsulClientOptions) super.setWebSocketCompressionAllowClientNoContext(offer);
-  }
-
-  @Override
-  public ConsulClientOptions setWebSocketCompressionRequestServerNoContext(boolean offer) {
-    return (ConsulClientOptions) super.setWebSocketCompressionRequestServerNoContext(offer);
   }
 }
