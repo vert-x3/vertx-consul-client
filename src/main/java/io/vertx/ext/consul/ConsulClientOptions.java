@@ -601,8 +601,8 @@ public class ConsulClientOptions extends WebClientOptions {
    * @return a reference to this, so the API can be used fluently
    */
   @Override
-  public ConsulClientOptions setTryUseCompression(boolean tryUseCompression) {
-    return (ConsulClientOptions) super.setTryUseCompression(tryUseCompression);
+  public WebClientOptions setDecompressionSupported(boolean tryUseCompression) {
+    return super.setDecompressionSupported(tryUseCompression);
   }
 
   /**
