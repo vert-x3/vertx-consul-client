@@ -907,7 +907,7 @@ public class ConsulClientImpl implements ConsulClient {
       rq.putHeader(TOKEN_HEADER, aclToken);
     }
     if (timeoutMs > 0) {
-      rq.timeout(timeoutMs);
+      rq.idleTimeout(timeoutMs);
     }
     return rq.sendBuffer(body == null ? Buffer.buffer() : Buffer.buffer(body))
       .map(resp -> {
