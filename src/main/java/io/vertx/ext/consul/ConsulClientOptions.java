@@ -427,26 +427,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set the key/cert options in jks format, aka Java keystore.
-   * @param options the key store in jks format
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setKeyStoreOptions(JksOptions options) {
-    return (ConsulClientOptions) super.setKeyStoreOptions(options);
-  }
-
-  /**
-   * Set the key/cert options in pfx format.
-   * @param options the key cert options in pfx format
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setPfxKeyCertOptions(PfxOptions options) {
-    return (ConsulClientOptions) super.setPfxKeyCertOptions(options);
-  }
-
-  /**
    * Set the trust options.
    * @param options the trust options
    * @return a reference to this, so the API can be used fluently
@@ -457,36 +437,6 @@ public class ConsulClientOptions extends WebClientOptions {
   }
 
   /**
-   * Set the key/cert store options in pem format.
-   * @param options the options in pem format
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setPemKeyCertOptions(PemKeyCertOptions options) {
-    return (ConsulClientOptions) super.setPemKeyCertOptions(options);
-  }
-
-  /**
-   * Set the trust options in jks format, aka Java truststore
-   * @param options the trust options in jks format
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setTrustStoreOptions(JksOptions options) {
-    return (ConsulClientOptions) super.setTrustStoreOptions(options);
-  }
-
-  /**
-   * Set the trust options in pfx format
-   * @param options the trust options in pfx format
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Override
-  public ConsulClientOptions setPfxTrustOptions(PfxOptions options) {
-    return (ConsulClientOptions) super.setPfxTrustOptions(options);
-  }
-
-  /**
    * Set whether all server certificates should be trusted
    *
    * @param trustAll true if all should be trusted
@@ -494,17 +444,6 @@ public class ConsulClientOptions extends WebClientOptions {
    */
   public ConsulClientOptions setTrustAll(boolean trustAll) {
     super.setTrustAll(trustAll);
-    return this;
-  }
-
-  /**
-   * Set the trust options.
-   *
-   * @param pemTrustOptions the trust options
-   * @return reference to this, for fluency
-   */
-  public ConsulClientOptions setPemTrustOptions(PemTrustOptions pemTrustOptions) {
-    super.setPemTrustOptions(pemTrustOptions);
     return this;
   }
 
@@ -698,16 +637,6 @@ public class ConsulClientOptions extends WebClientOptions {
   @Override
   public ConsulClientOptions setSslEngineOptions(SSLEngineOptions sslEngineOptions) {
     return (ConsulClientOptions) super.setSslEngineOptions(sslEngineOptions);
-  }
-
-  @Override
-  public ConsulClientOptions setJdkSslEngineOptions(JdkSSLEngineOptions sslEngineOptions) {
-    return (ConsulClientOptions) super.setJdkSslEngineOptions(sslEngineOptions);
-  }
-
-  @Override
-  public ConsulClientOptions setOpenSslEngineOptions(OpenSSLEngineOptions sslEngineOptions) {
-    return (ConsulClientOptions) super.setOpenSslEngineOptions(sslEngineOptions);
   }
 
   /**

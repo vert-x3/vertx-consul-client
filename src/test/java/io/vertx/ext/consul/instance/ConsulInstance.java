@@ -91,7 +91,7 @@ public class ConsulInstance extends ConsulContainer {
     ConsulClientOptions options = consulClientOptions(token)
       .setPort(getMappedPort(Builder.HTTPS_PORT))
       .setTrustAll(trustAll)
-      .setPemTrustOptions(trustOptions)
+      .setTrustOptions(trustOptions)
       .setVerifyHost(false)
       .setSsl(true);
     return ConsulClient.create(vertx, options);
