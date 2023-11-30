@@ -17,6 +17,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.JsonGen;
 import io.vertx.core.VertxException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.Http2Settings;
@@ -35,7 +36,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class ConsulClientOptions extends WebClientOptions {
 
   private static final String CONSUL_DEFAULT_HOST = "localhost";

@@ -17,6 +17,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -24,7 +25,8 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class TxnKVOperation implements TxnOperation {
 
   private TxnKVVerb type;

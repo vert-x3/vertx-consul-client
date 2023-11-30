@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ import java.util.List;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class Session {
 
   private long lockDelay;
