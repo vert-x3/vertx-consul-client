@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -25,7 +26,8 @@ import java.util.List;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class PreparedQueryExecuteResponse {
 
   private String service;

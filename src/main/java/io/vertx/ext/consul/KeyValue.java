@@ -17,6 +17,7 @@ package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -25,7 +26,8 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  * @see <a href="https://www.consul.io/docs/agent/http/kv.html">Consul key/value store</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class KeyValue implements TxnResult {
 
   private String key;

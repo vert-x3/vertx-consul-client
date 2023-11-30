@@ -16,6 +16,7 @@
 package io.vertx.ext.consul;
 
 import io.vertx.codegen.annotations.DataObject;
+import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.Utils;
 
@@ -29,7 +30,8 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class ServiceEntry {
 
   private Node node;
