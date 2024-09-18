@@ -11,6 +11,7 @@ import io.vertx.ext.consul.dc.ConsulDatacenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.consul.ConsulContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class ConsulInstance extends ConsulContainer {
 
   private JsonObject configuration = new JsonObject();
 
-  private ConsulInstance(String image, String version, ConsulDatacenter dc) {
-    super(image + ":" + version);
+  private ConsulInstance(DockerImageName consulImage, ConsulDatacenter dc) {
+    super(consulImage);
     this.dc = dc;
   }
 
@@ -36,6 +37,7 @@ public class ConsulInstance extends ConsulContainer {
   public static ConsulInstance.Builder defaultConsulBuilder(ConsulDatacenter dc) {
     return ConsulInstance.builder()
       .datacenter(dc)
+      .consulImage(System.getProperty("openet.consul.image.registry"))
       .keyFile("server-key.pem")
       .certFile("server-cert.pem")
       .caFile("server-cert-ca-chain.pem");
@@ -197,7 +199,9 @@ public class ConsulInstance extends ConsulContainer {
 
     public ConsulInstance build() {
       logger.info("Building a Consul container (version: {}))", version);
-      ConsulInstance container = new ConsulInstance(image, version, datacenter);
+      DockerImageName consulImage = DockerImageName.parse(image + ":" + version)
+        .asCompatibleSubstituteFor("consul");
+      ConsulInstance container = new ConsulInstance(consulImage, datacenter);
 
       JsonObject cfg = new JsonObject();
       cfg.put("node_name", nodeName);

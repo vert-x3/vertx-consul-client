@@ -11,7 +11,7 @@ import org.testcontainers.utility.MountableFile;
 import java.time.Duration;
 
 public class VertxHttpServer extends GenericContainer<VertxHttpServer> {
-  private static final String IMAGE = "vertx/vertx4";
+  private static final String IMAGE = System.getProperty("openet.vertx4.image.registry");
   private final String VERTICLE_HOME = "/usr/verticles";
   private final String STATUS_FILE = "health_status.txt";
   private final String HEALTH_HTTP_VERTICLE = "health_http_verticle.groovy";
