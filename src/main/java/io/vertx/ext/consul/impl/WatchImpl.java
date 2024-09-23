@@ -66,7 +66,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
 
     @Override
-    void wait(long index, Handler<AsyncResult<State<KeyValueList>>> handler) {
+    protected void wait(long index, Handler<AsyncResult<State<KeyValueList>>> handler) {
       BlockingQueryOptions options = new BlockingQueryOptions().setWait(timeout).setIndex(index);
       consulClient.getValuesWithOptions(keyPrefix, options).onComplete(h ->
         handler.handle(h.map(kv -> new State<>(kv, kv.getIndex()))));
@@ -346,7 +346,7 @@ public abstract class WatchImpl<T> implements Watch<T> {
     }
   }
 
-  static class State<T> {
+  public static class State<T> {
 
     final T value;
     final long index;
