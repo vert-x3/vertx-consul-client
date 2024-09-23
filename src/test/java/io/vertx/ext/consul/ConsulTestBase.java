@@ -47,7 +47,6 @@ public class ConsulTestBase extends VertxTestBase {
   @BeforeClass
   public static void startConsul() throws Exception {
     consul = ConsulInstance.defaultConsulBuilder(dc).build();
-
   }
 
   @AfterClass
@@ -67,14 +66,18 @@ public class ConsulTestBase extends VertxTestBase {
     readClient = consul.createClient(vertx, consul.dc().readToken());
   }
 
+  public String getNodeName() {
+    return consul.getConfig("node_name");
+  }
+
   public String createAclToken(String name, String rules) {
     AclPolicy policy = new AclPolicy()
       .setName(name)
       .setRules(rules);
-    String id = getAsync(() -> masterClient.createAclPolicy(policy));
+    String id = getAsync(h -> masterClient.createAclPolicy(policy, h));
     io.vertx.ext.consul.token.AclToken request = new io.vertx.ext.consul.token.AclToken()
       .addPolicy(new PolicyLink().setId(id));
-    return getAsync(() -> masterClient.createAclToken(request)).getSecretId();
+    return Utils.<io.vertx.ext.consul.token.AclToken>getAsync(h -> masterClient.createAclToken(request, h)).getSecretId();
   }
 
   @Override
