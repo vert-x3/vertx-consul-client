@@ -37,7 +37,6 @@ public class ConsulInstance extends ConsulContainer {
   public static ConsulInstance.Builder defaultConsulBuilder(ConsulDatacenter dc) {
     return ConsulInstance.builder()
       .datacenter(dc)
-      .consulImage(System.getProperty("openet.consul.image.registry"))
       .keyFile("server-key.pem")
       .certFile("server-cert.pem")
       .caFile("server-cert-ca-chain.pem");
