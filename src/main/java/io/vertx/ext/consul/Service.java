@@ -97,7 +97,7 @@ public class Service implements TxnResult {
     this.meta = mapStringString(service.getJsonObject(SERVICE_META));
     this.port = service.getInteger(SERVICE_PORT, 0);
     this.createIndex = service.getLong(CREATE_INDEX, 0l);
-    this.modifyIndex = service.getLong(CREATE_INDEX, 0l);
+    this.modifyIndex = service.getLong(MODIFY_INDEX, 0l);
   }
 
   /**
@@ -132,7 +132,7 @@ public class Service implements TxnResult {
       jsonObject.put(SERVICE_PORT, port);
     }
     if (createIndex != 0l) {
-      jsonObject.put(CREATE_INDEX, modifyIndex);
+      jsonObject.put(CREATE_INDEX, createIndex);
     }
     if (modifyIndex != 0l) {
       jsonObject.put(MODIFY_INDEX, modifyIndex);
