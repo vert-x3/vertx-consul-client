@@ -33,6 +33,9 @@ class TxnResponseParser {
         if (obj.containsKey("KV")) {
           response.addResult(KVParser.parse(obj.getJsonObject("KV")));
         }
+        else if (obj.containsKey("Service")) {
+          response.addResult(ServiceParser.parseAgentInfo(obj.getJsonObject("Service")));
+        }
       });
     }
     if (json.getValue("Errors") instanceof JsonArray) {

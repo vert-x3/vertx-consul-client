@@ -1,308 +1,167 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-      
-    <parent>
-            
-        <groupId>io.vertx</groupId>
-            
-        <artifactId>vertx-ext-parent</artifactId>
-            
-        <version>38</version>
-          
-    </parent>
-      
-    <modelVersion>4.0.0</modelVersion>
-      
-    <artifactId>vertx-consul-client</artifactId>
-      
-    <version>4.5.11-SNAPSHOT</version>
-      
-    <properties>
-            
-        <stack.version>4.5.11-SNAPSHOT</stack.version>
-            
-        <testcontainersVersion>1.17.5</testcontainersVersion>
-            
-        <junit.version>4.13.1</junit.version>
-            
-        <grpc.version>1.50.2</grpc.version>
-            
-        <protoc.version>3.21.8</protoc.version>
-            
-        <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
-          
-    </properties>
-      
-    <dependencyManagement>
-            
-        <dependencies>
-                  
-            <dependency>
-                        
-                <groupId>io.vertx</groupId>
-                        
-                <artifactId>vertx-dependencies</artifactId>
-                        
-                <version>${stack.version}</version>
-                        
-                <type>pom</type>
-                        
-                <scope>import</scope>
-                      
-            </dependency>
-                
-        </dependencies>
-          
-    </dependencyManagement>
-      
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>io.vertx</groupId>
+    <artifactId>vertx-ext-parent</artifactId>
+    <version>38</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>vertx-consul-client</artifactId>
+  <version>4.5.11-SNAPSHOT</version>
+  <properties>
+    <stack.version>4.5.11-SNAPSHOT</stack.version>
+    <testcontainersVersion>1.17.5</testcontainersVersion>
+    <junit.version>4.13.1</junit.version>
+    <grpc.version>1.50.2</grpc.version>
+    <protoc.version>3.21.8</protoc.version>
+    <jar.manifest>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</jar.manifest>
+    <testcontainers.ryuk.version>0.8.1</testcontainers.ryuk.version>
+    <testcontainers.ryuk.image>testcontainers/ryuk:${testcontainers.ryuk.version}</testcontainers.ryuk.image>
+  </properties>
+  <dependencyManagement>
     <dependencies>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-web-client</artifactId>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-codegen</artifactId>
-                  
-            <optional>true</optional>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-docgen</artifactId>
-                  
-            <optional>true</optional>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.testcontainers</groupId>
-                  
-            <artifactId>testcontainers</artifactId>
-                  
-            <version>${testcontainersVersion}</version>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.testcontainers</groupId>
-                  
-            <artifactId>consul</artifactId>
-                  
-            <version>${testcontainersVersion}</version>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-core</artifactId>
-                  
-            <type>test-jar</type>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-unit</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>io.vertx</groupId>
-                  
-            <artifactId>vertx-grpc</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>junit</groupId>
-                  
-            <artifactId>junit</artifactId>
-                  
-            <scope>test</scope>
-                  
-            <version>${junit.version}</version>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.slf4j</groupId>
-                  
-            <artifactId>slf4j-api</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-            
-        <dependency>
-                  
-            <groupId>org.slf4j</groupId>
-                  
-            <artifactId>slf4j-jdk14</artifactId>
-                  
-            <scope>test</scope>
-                
-        </dependency>
-          
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-dependencies</artifactId>
+        <version>${stack.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
-      
-    <build>
-            
-        <extensions>
-                  
-            <extension>
-                        
-                <groupId>kr.motd.maven</groupId>
-                        
-                <artifactId>os-maven-plugin</artifactId>
-                        
-                <version>1.4.1.Final</version>
-                      
-            </extension>
-                
-        </extensions>
-            
-        <plugins>
-                  
-            <plugin>
-                        
-                <groupId>org.xolstice.maven.plugins</groupId>
-                        
-                <artifactId>protobuf-maven-plugin</artifactId>
-                        
-                <version>0.5.0</version>
-                        
-                <configuration>
-                              
-                    <!--
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-codegen</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-docgen</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainersVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>consul</artifactId>
+      <version>${testcontainersVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-unit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-grpc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.4.1.Final</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.5.0</version>
+        <configuration>
+          <!--
             The version of protoc must match protobuf-java. If you don't depend on
             protobuf-java directly, you will be transitively depending on the
             protobuf-java version that grpc depends on.
           -->
-                              
-                    <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
-                              
-                    <pluginId>grpc-java</pluginId>
-                              
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
-                            
-                </configuration>
-                        
-                <executions>
-                              
-                    <execution>
-                                    
-                        <id>test-compile</id>
-                                    
-                        <configuration>
-                                          
-                            <outputDirectory>${project.basedir}/src/test/java</outputDirectory>
-                                          
-                            <clearOutputDirectory>false</clearOutputDirectory>
-                                        
-                        </configuration>
-                                    
-                        <goals>
-                                          
-                            <goal>test-compile</goal>
-                                          
-                            <goal>test-compile-custom</goal>
-                                        
-                        </goals>
-                                  
-                    </execution>
-                            
-                </executions>
-                      
-            </plugin>
-                
-        </plugins>
-          
-    </build>
-      
-    <profiles>
-            
-        <profile>
-                  
-            <id>java-17</id>
-                  
-            <activation>
-                        
-                <jdk>[17,)</jdk>
-                      
-            </activation>
-                  
-            <properties>
-                        
-                <maven.test.skip>true</maven.test.skip>
-                      
-            </properties>
-                
-        </profile>
-            
-        <profile>
-                  
-            <id>macos-m1</id>
-                  
-            <activation>
-                        
-                <os>
-                              
-                    <family>mac</family>
-                              
-                    <arch>aarch64</arch>
-                            
-                </os>
-                      
-            </activation>
-                  
-            <dependencies>
-                        
-                <dependency>
-                              
-                    <groupId>io.netty</groupId>
-                              
-                    <artifactId>netty-resolver-dns-native-macos</artifactId>
-                              
-                    <classifier>osx-aarch_64</classifier>
-                              
-                    <scope>test</scope>
-                            
-                </dependency>
-                      
-            </dependencies>
-                
-        </profile>
-          
-    </profiles>
-    
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test-compile</id>
+            <configuration>
+              <outputDirectory>${project.basedir}/src/test/java</outputDirectory>
+              <clearOutputDirectory>false</clearOutputDirectory>
+            </configuration>
+            <goals>
+              <goal>test-compile</goal>
+              <goal>test-compile-custom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>java-17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>macos-m1</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-resolver-dns-native-macos</artifactId>
+          <classifier>osx-aarch_64</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
