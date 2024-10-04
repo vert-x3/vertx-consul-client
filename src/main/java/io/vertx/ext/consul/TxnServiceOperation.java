@@ -3,11 +3,13 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.json.JsonObject;
+import io.vertx.codegen.json.annotations.JsonGen;
 
 /**
  * Holds the operation to apply to the service inside a transaction
  */
-@DataObject(generateConverter = true)
+@DataObject
+@JsonGen(publicConverter = false)
 public class TxnServiceOperation implements TxnOperation {
 
   private TxnServiceVerb type;

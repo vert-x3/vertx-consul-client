@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
-@DataObject(generateConverter = true)
+@DataObject
 @JsonGen(publicConverter = false)
 public class ServiceOptions {
 
