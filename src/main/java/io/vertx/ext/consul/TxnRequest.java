@@ -59,6 +59,14 @@ public class TxnRequest {
             .setIndex(txn.getLong("Index"))
             .setSession(txn.getString("Session"))
             .setType(TxnKVVerb.ofVerb(txn.getString("Verb"))));
+        } else if (obj.containsKey("Service")) {
+          JsonObject txn = obj.getJsonObject("Service");
+          ServiceOptions serviceOptions = new ServiceOptions(txn.getJsonObject("Service"));
+          serviceOptions.setName(txn.getJsonObject("Service").getString("Service"));
+          operations.add(new TxnServiceOperation()
+            .setServiceOptions(serviceOptions)
+            .setNode(txn.getString("Node"))
+            .setType(TxnServiceVerb.ofVerb(txn.getString("Verb"))));
         }
       });
     }
@@ -82,6 +90,16 @@ public class TxnRequest {
           .put("Index", kvOp.getIndex())
           .put("Session", kvOp.getSession());
         arr.add(new JsonObject().put("KV", obj));
+      } else if (op instanceof TxnServiceOperation) {
+        TxnServiceOperation serviceOp = (TxnServiceOperation) op;
+        JsonObject serviceObj = serviceOp.getServiceOptions().toJson();
+        serviceObj.put("Service", serviceObj.getValue("name"));
+        serviceObj.remove("name");
+        JsonObject obj = new JsonObject()
+          .put("Verb", serviceOp.getType().getVerb())
+          .put("Service", serviceObj)
+          .put("Node", serviceOp.getNode());
+        arr.add(new JsonObject().put("Service", obj));
       }
     });
     return new JsonObject().put("operations", arr);
