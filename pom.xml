@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>io.vertx</groupId>
     <artifactId>vertx5-parent</artifactId>
     <version>6</version>
   </parent>
-
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>vertx-consul-client</artifactId>
   <version>5.0.0-SNAPSHOT</version>
-
   <scm>
     <connection>scm:git:git@github.com:vert-x3/vertx-consul-client.git</connection>
     <developerConnection>scm:git:git@github.com:vert-x3/vertx-consul-client.git</developerConnection>
     <url>git@github.com:vert-x3/vertx-consul-client.git</url>
   </scm>
-
   <properties>
     <testcontainersVersion>1.20.1</testcontainersVersion>
     <junit.version>4.13.1</junit.version>
   </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -33,9 +30,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <dependencies>
-
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-codegen-api</artifactId>
@@ -51,7 +46,6 @@
       <artifactId>vertx-docgen-api</artifactId>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-codegen-api</artifactId>
@@ -95,6 +89,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-grpc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -111,16 +110,45 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.4.1.Final</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.5.0</version>
+        <configuration>
+          <!--
+            The version of protoc must match protobuf-java. If you don't depend on
+            protobuf-java directly, you will be transitively depending on the
+            protobuf-java version that grpc depends on.
+          -->
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
         <executions>
           <execution>
-            <id>package-docs</id>
+            <id>test-compile</id>
+            <configuration>
+              <outputDirectory>${project.basedir}/src/test/java</outputDirectory>
+              <clearOutputDirectory>false</clearOutputDirectory>
+            </configuration>
             <goals>
-              <goal>single</goal>
+              <goal>test-compile</goal>
+              <goal>test-compile-custom</goal>
             </goals>
           </execution>
         </executions>
@@ -153,8 +181,16 @@
       </plugins>
     </pluginManagement>
   </build>
-
   <profiles>
+    <profile>
+      <id>java-17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+    </profile>
     <profile>
       <id>macos-m1</id>
       <activation>

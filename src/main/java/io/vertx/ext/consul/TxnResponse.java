@@ -50,6 +50,10 @@ public class TxnResponse {
         JsonObject obj = (JsonObject) entry;
         if (obj.containsKey("KV")) {
           results.add(new KeyValue(obj.getJsonObject("KV")));
+        } else if (obj.containsKey("Service")) {
+          Service service = new Service(obj.getJsonObject("Service"));
+          service.setName(obj.getJsonObject("Service").getString("Service"));
+          results.add(service);
         }
       });
     }
@@ -68,6 +72,11 @@ public class TxnResponse {
     results.forEach(op -> {
       if (op instanceof KeyValue) {
         jsonResults.add(new JsonObject().put("KV", ((KeyValue) op).toJson()));
+      } else if (op instanceof Service) {
+        JsonObject jsonObject = ((Service) op).toJson();
+        jsonObject.put("Service", jsonObject.getString("ServiceName"));
+        jsonObject.remove("ServiceName");
+        jsonResults.add(new JsonObject().put("Service", jsonObject));
       }
     });
     JsonArray jsonErrors = new JsonArray();
