@@ -101,12 +101,6 @@
   </dependencies>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
     <extensions>
       <extension>
         <groupId>kr.motd.maven</groupId>
