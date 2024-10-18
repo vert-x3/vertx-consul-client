@@ -183,9 +183,9 @@
   </build>
   <profiles>
     <profile>
-      <id>java-11</id>
+      <id>java-17</id>
       <activation>
-        <jdk>[11,)</jdk>
+        <jdk>[17,)</jdk>
       </activation>
       <properties>
         <maven.test.skip>true</maven.test.skip>
