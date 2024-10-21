@@ -1,4 +1,4 @@
-package io.vertx.ext.consul.instance;
+package io.vertx.ext.consul.tests.instance;
 
 import com.github.dockerjava.api.model.ContainerNetwork;
 import io.vertx.core.Vertx;
@@ -7,11 +7,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
-import io.vertx.ext.consul.dc.ConsulDatacenter;
+import io.vertx.ext.consul.tests.dc.ConsulDatacenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.consul.ConsulContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
@@ -25,8 +24,8 @@ public class ConsulInstance extends ConsulContainer {
 
   private JsonObject configuration = new JsonObject();
 
-  private ConsulInstance(DockerImageName consulImage, ConsulDatacenter dc) {
-    super(consulImage);
+  private ConsulInstance(String image, String version, ConsulDatacenter dc) {
+    super(image + ":" + version);
     this.dc = dc;
   }
 
@@ -92,7 +91,7 @@ public class ConsulInstance extends ConsulContainer {
     ConsulClientOptions options = consulClientOptions(token)
       .setPort(getMappedPort(Builder.HTTPS_PORT))
       .setTrustAll(trustAll)
-      .setPemTrustOptions(trustOptions)
+      .setTrustOptions(trustOptions)
       .setVerifyHost(false)
       .setSsl(true);
     return ConsulClient.create(vertx, options);
@@ -198,9 +197,7 @@ public class ConsulInstance extends ConsulContainer {
 
     public ConsulInstance build() {
       logger.info("Building a Consul container (version: {}))", version);
-      DockerImageName consulImage = DockerImageName.parse(image + ":" + version)
-        .asCompatibleSubstituteFor("consul");
-      ConsulInstance container = new ConsulInstance(consulImage, datacenter);
+      ConsulInstance container = new ConsulInstance(image, version, datacenter);
 
       JsonObject cfg = new JsonObject();
       cfg.put("node_name", nodeName);

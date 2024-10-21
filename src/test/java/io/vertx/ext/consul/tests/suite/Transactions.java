@@ -13,11 +13,22 @@
  *
  * You may elect to redistribute this code under either of these licenses.
  */
-package io.vertx.ext.consul.suite;
+package io.vertx.ext.consul.tests.suite;
 
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.KeyValue;
+import io.vertx.ext.consul.Service;
+import io.vertx.ext.consul.ServiceOptions;
+import io.vertx.ext.consul.TxnError;
+import io.vertx.ext.consul.TxnKVOperation;
+import io.vertx.ext.consul.TxnKVVerb;
+import io.vertx.ext.consul.TxnOperationType;
+import io.vertx.ext.consul.TxnRequest;
+import io.vertx.ext.consul.TxnResponse;
+import io.vertx.ext.consul.TxnServiceOperation;
+import io.vertx.ext.consul.TxnServiceVerb;
+import io.vertx.ext.consul.tests.ConsulTestBase;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
@@ -43,7 +54,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest request = new TxnRequest()
       .addOperation(new TxnKVOperation().setKey("foo/bar/t1").setValue("val1").setType(TxnKVVerb.SET))
       .addOperation(new TxnKVOperation().setKey("foo/bar/t2").setValue("val2").setType(TxnKVVerb.SET));
-    writeClient.transaction(request, tc.asyncAssertSuccess(response -> {
+    writeClient.transaction(request).onComplete(tc.asyncAssertSuccess(response -> {
       tc.assertEquals(0, response.getErrorsSize());
       tc.assertEquals(2, response.getResultsSize());
       List<String> keys = getKeys(response);
@@ -52,7 +63,7 @@ public class Transactions extends ConsulTestBase {
       getEntries(tc, "foo/bar/t", entries -> {
         tc.assertTrue(entries.contains("foo/bar/t1/val1"));
         tc.assertTrue(entries.contains("foo/bar/t2/val2"));
-        writeClient.deleteValues("foo/bar/t", tc.asyncAssertSuccess());
+        writeClient.deleteValues("foo/bar/t").onComplete(tc.asyncAssertSuccess());
       });
     }));
   }
@@ -64,14 +75,14 @@ public class Transactions extends ConsulTestBase {
         TxnRequest req1 = new TxnRequest()
           .addOperation(new TxnKVOperation().setKey("foo/bar1").setValue("newVal1").setIndex(idx1).setType(TxnKVVerb.CAS))
           .addOperation(new TxnKVOperation().setKey("foo/bar2").setValue("newVal2").setIndex(idx2 - 1).setType(TxnKVVerb.CAS));
-        writeClient.transaction(req1, tc.asyncAssertSuccess(resp1 -> {
+        writeClient.transaction(req1).onComplete(tc.asyncAssertSuccess(resp1 -> {
           tc.assertEquals(1, resp1.getErrorsSize());
           tc.assertEquals(1, resp1.getErrors().get(0).getOpIndex());
           tc.assertEquals(0, resp1.getResultsSize());
           TxnRequest req2 = new TxnRequest()
             .addOperation(new TxnKVOperation().setKey("foo/bar1").setValue("newVal1").setIndex(idx1).setType(TxnKVVerb.CAS))
             .addOperation(new TxnKVOperation().setKey("foo/bar2").setValue("newVal2").setIndex(idx2).setType(TxnKVVerb.CAS));
-          writeClient.transaction(req2, tc.asyncAssertSuccess(resp2 -> {
+          writeClient.transaction(req2).onComplete(tc.asyncAssertSuccess(resp2 -> {
             tc.assertEquals(0, resp2.getErrorsSize());
             tc.assertEquals(2, resp2.getResultsSize());
             List<String> keys = getKeys(resp2);
@@ -80,7 +91,7 @@ public class Transactions extends ConsulTestBase {
             getEntries(tc, "foo/bar", entries -> {
               tc.assertTrue(entries.contains("foo/bar1/newVal1"));
               tc.assertTrue(entries.contains("foo/bar2/newVal2"));
-              writeClient.deleteValues("foo/bar", tc.asyncAssertSuccess());
+              writeClient.deleteValues("foo/bar").onComplete(tc.asyncAssertSuccess());
             });
           }));
         }));
@@ -95,7 +106,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest request = new TxnRequest()
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions1).setType(TxnServiceVerb.SET))
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions2).setType(TxnServiceVerb.SET));
-    writeClient.transaction(request, tc.asyncAssertSuccess(response -> {
+    writeClient.transaction(request).onComplete(tc.asyncAssertSuccess(response -> {
       tc.assertEquals(0, response.getErrorsSize());
       tc.assertEquals(2, response.getResultsSize());
       List<Service> services = getServices(response);
@@ -104,8 +115,8 @@ public class Transactions extends ConsulTestBase {
       getRegistrations(tc, SERVICE_NAME, registrations -> {
         checkService(tc, registrations, serviceOptions1);
         checkService(tc, registrations, serviceOptions2);
-        writeClient.deregisterService(serviceOptions1.getId(), tc.asyncAssertSuccess());
-        writeClient.deregisterService(serviceOptions2.getId(), tc.asyncAssertSuccess());
+        writeClient.deregisterService(serviceOptions1.getId()).onComplete(tc.asyncAssertSuccess());
+        writeClient.deregisterService(serviceOptions2.getId()).onComplete(tc.asyncAssertSuccess());
       });
     }));
   }
@@ -117,7 +128,7 @@ public class Transactions extends ConsulTestBase {
     TxnRequest getRequest = new TxnRequest()
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions1).setType(TxnServiceVerb.GET))
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions2).setType(TxnServiceVerb.GET));
-    writeClient.transaction(getRequest, tc.asyncAssertSuccess(resp1 -> {
+    writeClient.transaction(getRequest).onComplete(tc.asyncAssertSuccess(resp1 -> {
       tc.assertEquals(2, resp1.getErrorsSize());
       tc.assertEquals(0, resp1.getResultsSize());
       registerServiceAndGet(tc, serviceOptions1, getRequest, resp2 -> {
@@ -129,8 +140,8 @@ public class Transactions extends ConsulTestBase {
           List<Service> services = getServices(resp3);
           checkService(tc, services, serviceOptions1);
           checkService(tc, services, serviceOptions2);
-          writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId(), tc.asyncAssertSuccess());
-          writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId(), tc.asyncAssertSuccess());
+          writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId()).onComplete(tc.asyncAssertSuccess());
+          writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId()).onComplete(tc.asyncAssertSuccess());
         });
       });
     }));
@@ -143,13 +154,13 @@ public class Transactions extends ConsulTestBase {
     TxnRequest deleteRequest = new TxnRequest()
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions1).setType(TxnServiceVerb.DELETE))
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions2).setType(TxnServiceVerb.DELETE));
-    writeClient.transaction(deleteRequest, tc.asyncAssertSuccess(resp1 -> {
+    writeClient.transaction(deleteRequest).onComplete(tc.asyncAssertSuccess(resp1 -> {
       tc.assertEquals(0, resp1.getErrorsSize());
       tc.assertEquals(0, resp1.getResultsSize());
-      writeClient.registerService(serviceOptions1, tc.asyncAssertSuccess(resp2 -> {
+      writeClient.registerService(serviceOptions1).onComplete(tc.asyncAssertSuccess(resp2 -> {
         getRegistrations(tc, SERVICE_NAME, registrations1 -> {
           checkService(tc, registrations1, serviceOptions1);
-          writeClient.transaction(deleteRequest, tc.asyncAssertSuccess(resp3 -> {
+          writeClient.transaction(deleteRequest).onComplete(tc.asyncAssertSuccess(resp3 -> {
             tc.assertEquals(0, resp1.getErrorsSize());
             tc.assertEquals(0, resp1.getResultsSize());
             getRegistrations(tc, SERVICE_NAME, registrations2 -> {
@@ -167,8 +178,8 @@ public class Transactions extends ConsulTestBase {
     ServiceOptions serviceOptions2 = createServiceOptions("id2", SERVICE_NAME, "10.10.10.10", 8081);
     Map<String, String> meta = new HashMap<>();
     meta.put("test1", "value2");
-    writeClient.registerService(serviceOptions1, tc.asyncAssertSuccess(resp1 -> {
-      writeClient.registerService(serviceOptions2, tc.asyncAssertSuccess(resp2 -> {
+    writeClient.registerService(serviceOptions1).onComplete(tc.asyncAssertSuccess(resp1 -> {
+      writeClient.registerService(serviceOptions2).onComplete(tc.asyncAssertSuccess(resp2 -> {
         getRegistrations(tc, SERVICE_NAME, registrations1 -> {
           long idx1 = getModifyIndex(tc, registrations1, serviceOptions1);
           long idx2 = getModifyIndex(tc, registrations1, serviceOptions2);
@@ -177,7 +188,7 @@ public class Transactions extends ConsulTestBase {
               serviceOptions1.setMeta(meta).setModifyIndex(idx1 - 1)))
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setType(TxnServiceVerb.CAS).setServiceOptions(
               serviceOptions2.setMeta(meta).setModifyIndex(idx2)));
-          writeClient.transaction(requestWithStaleIndex, tc.asyncAssertSuccess(resp3 -> {
+          writeClient.transaction(requestWithStaleIndex).onComplete(tc.asyncAssertSuccess(resp3 -> {
             tc.assertEquals(1, resp3.getErrorsSize());
             tc.assertEquals(0, resp3.getResultsSize());
             TxnRequest request = new TxnRequest()
@@ -185,14 +196,14 @@ public class Transactions extends ConsulTestBase {
                 serviceOptions1.setMeta(meta).setModifyIndex(idx1)))
               .addOperation(new TxnServiceOperation().setNode(getNodeName()).setType(TxnServiceVerb.CAS).setServiceOptions(
                 serviceOptions2.setMeta(meta).setModifyIndex(idx2)));
-            writeClient.transaction(request, tc.asyncAssertSuccess(resp4 -> {
+            writeClient.transaction(request).onComplete(tc.asyncAssertSuccess(resp4 -> {
               tc.assertEquals(0, resp4.getErrorsSize());
               tc.assertEquals(2, resp4.getResultsSize());
               getRegistrations(tc, SERVICE_NAME, registrations2 -> {
                 checkService(tc, registrations2, serviceOptions1);
                 checkService(tc, registrations2, serviceOptions2);
-                writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId(), tc.asyncAssertSuccess());
-                writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId(), tc.asyncAssertSuccess());
+                writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId()).onComplete(tc.asyncAssertSuccess());
+                writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId()).onComplete(tc.asyncAssertSuccess());
               });
             }));
           }));
@@ -206,8 +217,8 @@ public class Transactions extends ConsulTestBase {
     ServiceOptions serviceOptions1 = createServiceOptions("id1", SERVICE_NAME, "10.10.10.10", 8080);
     ServiceOptions serviceOptions2 = createServiceOptions("id2", SERVICE_NAME, "10.10.10.10", 8081);
     ServiceOptions serviceOptions3 = createServiceOptions("id3", SERVICE_NAME, "10.10.10.10", 8082);
-    writeClient.registerService(serviceOptions1, tc.asyncAssertSuccess(resp1 -> {
-      writeClient.registerService(serviceOptions2, tc.asyncAssertSuccess(resp2 -> {
+    writeClient.registerService(serviceOptions1).onComplete(tc.asyncAssertSuccess(resp1 -> {
+      writeClient.registerService(serviceOptions2).onComplete(tc.asyncAssertSuccess(resp2 -> {
         getRegistrations(tc, SERVICE_NAME, registrations1 -> {
           tc.assertEquals(2, registrations1.size());
           Map<String, String> meta = new HashMap<>();
@@ -217,15 +228,15 @@ public class Transactions extends ConsulTestBase {
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions1).setType(TxnServiceVerb.DELETE))
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions2).setType(TxnServiceVerb.SET))
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions3).setType(TxnServiceVerb.SET));
-          writeClient.transaction(multiOpRequest, tc.asyncAssertSuccess(resp3 -> {
+          writeClient.transaction(multiOpRequest).onComplete(tc.asyncAssertSuccess(resp3 -> {
             tc.assertEquals(0, resp3.getErrorsSize());
             tc.assertEquals(2, resp3.getResultsSize());
             getRegistrations(tc, SERVICE_NAME, registrations2 -> {
               tc.assertEquals(2, registrations2.size());
               checkService(tc, registrations2, serviceOptions2);
               checkService(tc, registrations2, serviceOptions3);
-              writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId(), tc.asyncAssertSuccess());
-              writeClient.deregisterCatalogService(getNodeName(), serviceOptions3.getId(), tc.asyncAssertSuccess());
+              writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId()).onComplete(tc.asyncAssertSuccess());
+              writeClient.deregisterCatalogService(getNodeName(), serviceOptions3.getId()).onComplete(tc.asyncAssertSuccess());
             });
           }));
         });
@@ -238,8 +249,8 @@ public class Transactions extends ConsulTestBase {
     ServiceOptions serviceOptions1 = createServiceOptions("id1", SERVICE_NAME, "10.10.12.10", 8080);
     ServiceOptions serviceOptions2 = createServiceOptions("id2", SERVICE_NAME, "10.10.12.10", 8081);
     ServiceOptions serviceOptions3 = createServiceOptions("id3", "", "10.10.12.10", 8082);
-    writeClient.registerService(serviceOptions1, tc.asyncAssertSuccess(resp1 -> {
-      writeClient.registerService(serviceOptions2, tc.asyncAssertSuccess(resp2 -> {
+    writeClient.registerService(serviceOptions1).onComplete(tc.asyncAssertSuccess(resp1 -> {
+      writeClient.registerService(serviceOptions2).onComplete(tc.asyncAssertSuccess(resp2 -> {
         getRegistrations(tc, SERVICE_NAME, registrations1 -> {
           checkService(tc, registrations1, serviceOptions1);
           checkService(tc, registrations1, serviceOptions2);
@@ -247,7 +258,7 @@ public class Transactions extends ConsulTestBase {
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions1).setType(TxnServiceVerb.DELETE))
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions2).setType(TxnServiceVerb.GET))
             .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions3).setType(TxnServiceVerb.SET));
-          writeClient.transaction(multiOpRequest, tc.asyncAssertSuccess(resp3 -> {
+          writeClient.transaction(multiOpRequest).onComplete(tc.asyncAssertSuccess(resp3 -> {
             tc.assertEquals(1, resp3.getErrorsSize());
             tc.assertEquals(2, resp3.getError(0).getOpIndex());
             tc.assertEquals(0, resp3.getResultsSize());
@@ -255,8 +266,8 @@ public class Transactions extends ConsulTestBase {
               tc.assertEquals(2, registrations2.size());
               checkService(tc, registrations2, serviceOptions1);
               checkService(tc, registrations2, serviceOptions2);
-              writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId(), tc.asyncAssertSuccess());
-              writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId(), tc.asyncAssertSuccess());
+              writeClient.deregisterCatalogService(getNodeName(), serviceOptions1.getId()).onComplete(tc.asyncAssertSuccess());
+              writeClient.deregisterCatalogService(getNodeName(), serviceOptions2.getId()).onComplete(tc.asyncAssertSuccess());
             });
           }));
         });
@@ -271,7 +282,7 @@ public class Transactions extends ConsulTestBase {
       .addOperation(new TxnKVOperation().setKey("foo/bar/t1").setValue("val1").setType(TxnKVVerb.SET))
       .addOperation(new TxnKVOperation().setKey("foo/bar/t2").setValue("val2").setType(TxnKVVerb.SET))
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions).setType(TxnServiceVerb.SET));
-    writeClient.transaction(request, tc.asyncAssertSuccess(response -> {
+    writeClient.transaction(request).onComplete(tc.asyncAssertSuccess(response -> {
       tc.assertEquals(0, response.getErrorsSize());
       tc.assertEquals(3, response.getResultsSize());
       List<String> keys = getKeys(response);
@@ -282,10 +293,10 @@ public class Transactions extends ConsulTestBase {
       getEntries(tc, "foo/bar/t", entries -> {
         tc.assertTrue(entries.contains("foo/bar/t1/val1"));
         tc.assertTrue(entries.contains("foo/bar/t2/val2"));
-        writeClient.deleteValues("foo/bar/t", tc.asyncAssertSuccess());
+        writeClient.deleteValues("foo/bar/t").onComplete(tc.asyncAssertSuccess());
         getRegistrations(tc, SERVICE_NAME, registrations2 -> {
           checkService(tc, registrations2, serviceOptions);;
-          writeClient.deregisterCatalogService(getNodeName(), serviceOptions.getId(), tc.asyncAssertSuccess());
+          writeClient.deregisterCatalogService(getNodeName(), serviceOptions.getId()).onComplete(tc.asyncAssertSuccess());
         });
       });
     }));
@@ -298,7 +309,7 @@ public class Transactions extends ConsulTestBase {
       .addOperation(new TxnKVOperation().setKey("foo/bar/t1").setValue("val1").setType(TxnKVVerb.SET))
       .addOperation(new TxnKVOperation().setKey("foo/bar/t2").setValue("val2").setType(TxnKVVerb.SET))
       .addOperation(new TxnServiceOperation().setNode(getNodeName()).setServiceOptions(serviceOptions).setType(TxnServiceVerb.GET));
-    writeClient.transaction(request, tc.asyncAssertSuccess(response -> {
+    writeClient.transaction(request).onComplete(tc.asyncAssertSuccess(response -> {
       tc.assertEquals(1, response.getErrorsSize());
       tc.assertEquals(2, response.getError(0).getOpIndex());
       tc.assertEquals(0, response.getResultsSize());
@@ -306,7 +317,7 @@ public class Transactions extends ConsulTestBase {
       tc.assertTrue(keys.isEmpty());
       List<Service> services = getServices(response);
       tc.assertTrue(services.isEmpty());
-      readClient.getValues("foo/bar/t", tc.asyncAssertSuccess(entries -> {
+      readClient.getValues("foo/bar/t").onComplete(tc.asyncAssertSuccess(entries -> {
         tc.assertTrue(entries.getList() == null);
       }));
     }));
@@ -409,7 +420,7 @@ public class Transactions extends ConsulTestBase {
   }
 
   private void getEntries(TestContext tc, String prefix, Handler<List<String>> resultHandler) {
-    readClient.getValues(prefix, tc.asyncAssertSuccess(list -> {
+    readClient.getValues(prefix).onComplete(tc.asyncAssertSuccess(list -> {
       resultHandler.handle(list.getList().stream()
         .map(kv -> kv.getKey() + "/" + kv.getValue()).collect(Collectors.toList()));
     }));
@@ -422,16 +433,16 @@ public class Transactions extends ConsulTestBase {
   }
 
   private void createKV(TestContext tc, String key, String value, Handler<Long> resultHandler) {
-    writeClient.putValue(key, value, tc.asyncAssertSuccess(b -> {
+    writeClient.putValue(key, value).onComplete(tc.asyncAssertSuccess(b -> {
       tc.assertTrue(b);
-      readClient.getValue(key, tc.asyncAssertSuccess(pair -> {
+      readClient.getValue(key).onComplete(tc.asyncAssertSuccess(pair -> {
         resultHandler.handle(pair.getModifyIndex());
       }));
     }));
   }
 
   private void getRegistrations(TestContext tc, String serviceName, Handler<List<Service>> resultHandler) {
-    readClient.catalogServiceNodes(serviceName, tc.asyncAssertSuccess(list -> {
+    readClient.catalogServiceNodes(serviceName).onComplete(tc.asyncAssertSuccess(list -> {
       resultHandler.handle(list.getList());
     }));
   }
@@ -480,8 +491,8 @@ public class Transactions extends ConsulTestBase {
   }
 
   private void registerServiceAndGet(TestContext tc, ServiceOptions serviceOptions, TxnRequest txnRequest, Handler<TxnResponse> resultsHandler) {
-    writeClient.registerService(serviceOptions, tc.asyncAssertSuccess(resp1 -> {
-      writeClient.transaction(txnRequest, tc.asyncAssertSuccess(resp2 -> {
+    writeClient.registerService(serviceOptions).onComplete(tc.asyncAssertSuccess(resp1 -> {
+      writeClient.transaction(txnRequest).onComplete(tc.asyncAssertSuccess(resp2 -> {
         resultsHandler.handle(resp2);
       }));
     }));

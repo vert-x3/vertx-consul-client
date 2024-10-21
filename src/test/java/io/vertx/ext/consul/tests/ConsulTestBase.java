@@ -13,10 +13,11 @@
  *
  * You may elect to redistribute this code under either of these licenses.
  */
-package io.vertx.ext.consul;
+package io.vertx.ext.consul.tests;
 
-import io.vertx.ext.consul.dc.ConsulDatacenter;
-import io.vertx.ext.consul.instance.ConsulInstance;
+import io.vertx.ext.consul.ConsulClient;
+import io.vertx.ext.consul.tests.dc.ConsulDatacenter;
+import io.vertx.ext.consul.tests.instance.ConsulInstance;
 import io.vertx.ext.consul.policy.AclPolicy;
 import io.vertx.ext.consul.token.PolicyLink;
 import io.vertx.test.core.VertxTestBase;
@@ -27,7 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.vertx.ext.consul.Utils.getAsync;
+import static io.vertx.ext.consul.tests.Utils.getAsync;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
 import static io.vertx.test.core.TestUtils.randomInt;
 
@@ -47,6 +48,7 @@ public class ConsulTestBase extends VertxTestBase {
   @BeforeClass
   public static void startConsul() throws Exception {
     consul = ConsulInstance.defaultConsulBuilder(dc).build();
+
   }
 
   @AfterClass
@@ -74,10 +76,10 @@ public class ConsulTestBase extends VertxTestBase {
     AclPolicy policy = new AclPolicy()
       .setName(name)
       .setRules(rules);
-    String id = getAsync(h -> masterClient.createAclPolicy(policy, h));
+    String id = getAsync(() -> masterClient.createAclPolicy(policy));
     io.vertx.ext.consul.token.AclToken request = new io.vertx.ext.consul.token.AclToken()
       .addPolicy(new PolicyLink().setId(id));
-    return Utils.<io.vertx.ext.consul.token.AclToken>getAsync(h -> masterClient.createAclToken(request, h)).getSecretId();
+    return getAsync(() -> masterClient.createAclToken(request)).getSecretId();
   }
 
   @Override
