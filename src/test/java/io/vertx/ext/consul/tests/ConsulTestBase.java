@@ -68,6 +68,10 @@ public class ConsulTestBase extends VertxTestBase {
     readClient = consul.createClient(vertx, consul.dc().readToken());
   }
 
+  public String getNodeName() {
+    return consul.getConfig("node_name");
+  }
+
   public String createAclToken(String name, String rules) {
     AclPolicy policy = new AclPolicy()
       .setName(name)

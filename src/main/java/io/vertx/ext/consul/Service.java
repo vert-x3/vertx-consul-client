@@ -34,7 +34,7 @@ import static io.vertx.ext.consul.impl.Utils.mapStringString;
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
  */
 @DataObject
-public class Service {
+public class Service implements TxnResult {
 
   private static final String NODE = "Node";
   private static final String ADDRESS = "Address";
@@ -44,6 +44,8 @@ public class Service {
   private static final String SERVICE_ADDRESS = "ServiceAddress";
   private static final String SERVICE_META = "ServiceMeta";
   private static final String SERVICE_PORT = "ServicePort";
+  private static final String CREATE_INDEX = "CreateIndex";
+  private static final String MODIFY_INDEX = "ModifyIndex";
 
   private String node;
   private String nodeAddress;
@@ -53,6 +55,8 @@ public class Service {
   private String address;
   private Map<String, String> meta;
   private int port;
+  private long createIndex;
+  private long modifyIndex;
 
   /**
    * Default constructor
@@ -74,6 +78,8 @@ public class Service {
     this.address = other.address;
     this.meta = other.meta;
     this.port = other.port;
+    this.createIndex = other.createIndex;
+    this.modifyIndex = other.modifyIndex;
   }
 
   /**
@@ -90,6 +96,8 @@ public class Service {
     this.address = service.getString(SERVICE_ADDRESS);
     this.meta = mapStringString(service.getJsonObject(SERVICE_META));
     this.port = service.getInteger(SERVICE_PORT, 0);
+    this.createIndex = service.getLong(CREATE_INDEX, 0l);
+    this.modifyIndex = service.getLong(MODIFY_INDEX, 0l);
   }
 
   /**
@@ -122,6 +130,12 @@ public class Service {
     }
     if (port != 0) {
       jsonObject.put(SERVICE_PORT, port);
+    }
+    if (createIndex != 0l) {
+      jsonObject.put(CREATE_INDEX, createIndex);
+    }
+    if (modifyIndex != 0l) {
+      jsonObject.put(MODIFY_INDEX, modifyIndex);
     }
     return jsonObject;
   }
@@ -285,6 +299,51 @@ public class Service {
     return this;
   }
 
+  /**
+   * Get the internal index value that represents when the entry was created.
+   *
+   * @return the internal index value that represents when the entry was created.
+   */
+  public long getCreateIndex() {
+    return createIndex;
+  }
+
+  /**
+   * Set the internal index value that represents when the entry was created.
+   *
+   * @param createIndex the internal index value that represents when the entry was created.
+   * @return reference to this, for fluency
+   */
+  public Service setCreateIndex(long createIndex) {
+    this.createIndex = createIndex;
+    return this;
+  }
+
+  /**
+   * Get the last index that modified this key.
+   *
+   * @return the last index that modified this key.
+   */
+  public long getModifyIndex() {
+    return modifyIndex;
+  }
+
+  /**
+   * Set the last index that modified this key.
+   *
+   * @param modifyIndex the last index that modified this key.
+   * @return reference to this, for fluency
+   */
+  public Service setModifyIndex(long modifyIndex) {
+    this.modifyIndex = modifyIndex;
+    return this;
+  }
+
+  @Override
+  public TxnOperationType getOperationType() {
+    return TxnOperationType.SERVICE;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -292,6 +351,8 @@ public class Service {
 
     Service service = (Service) o;
 
+    if (createIndex != service.createIndex) return false;
+    if (modifyIndex != service.modifyIndex) return false;
     if (port != service.port) return false;
     if (node != null ? !node.equals(service.node) : service.node != null) return false;
     if (nodeAddress != null ? !nodeAddress.equals(service.nodeAddress) : service.nodeAddress != null) return false;
@@ -312,6 +373,8 @@ public class Service {
     result = 31 * result + (address != null ? address.hashCode() : 0);
     result = 31 * result + (meta != null ? meta.hashCode() : 0);
     result = 31 * result + port;
+    result = 31 * result + (int) (createIndex ^ (createIndex >>> 32));
+    result = 31 * result + (int) (modifyIndex ^ (modifyIndex >>> 32));
     return result;
   }
 
