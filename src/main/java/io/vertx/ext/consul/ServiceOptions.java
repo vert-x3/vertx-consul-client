@@ -18,6 +18,7 @@ package io.vertx.ext.consul;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.json.annotations.JsonGen;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.consul.connect.ConnectOptions;
 
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class ServiceOptions {
   private List<CheckOptions> checkListOptions;
   private long createIndex;
   private long modifyIndex;
+  private ConnectOptions connectOptions;
 
   /**
    * Default constructor
@@ -65,6 +67,7 @@ public class ServiceOptions {
     this.checkListOptions = options.checkListOptions;
     this.createIndex = options.createIndex;
     this.modifyIndex = options.modifyIndex;
+    this.connectOptions = options.connectOptions;
   }
 
   /**
@@ -287,4 +290,23 @@ public class ServiceOptions {
     return this;
   }
 
+  /**
+   * Get consul-connect options of service
+   *
+   * @return consul-connect options
+   */
+  public ConnectOptions getConnectOptions() {
+    return connectOptions;
+  }
+
+  /**
+   * Set consul-connect options of service
+   *
+   * @param connectOptions consul-connect options
+   * @return reference to this, for fluency
+   */
+  public ServiceOptions setConnectOptions(ConnectOptions connectOptions) {
+    this.connectOptions = connectOptions;
+    return this;
+  }
 }

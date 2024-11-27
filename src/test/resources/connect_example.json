@@ -1,0 +1,41 @@
+{
+  "SidecarService": {
+    "Port": 33333,
+    "Proxy": {
+      "Upstreams": [{
+        "DestinationName": "dev-mesh-database-service",
+        "Datacenter": "dc-v5",
+        "LocalBindPort": 19102
+      }],
+      "Config": {
+        "envoy_local_cluster_json": "envoy_local_cluster_json1",
+        "envoy_public_listener_json": "envoy_local_cluster_json2",
+        "envoy_prometheus_bind_addr": "0.0.0.0:19500",
+        "envoy_extra_static_clusters_json": "envoy_local_cluster_json3"
+      },
+      "Expose": {
+        "Paths": [
+          {
+            "Path": "/metrics",
+            "Protocol": "http",
+            "LocalPathPort": 53000,
+            "ListenerPort": 19600
+          }
+        ]
+      }
+    },
+    "Checks": [
+      {
+        "Name": "Connect Sidecar dev-mesh-counting-service Listening",
+        "HTTP": "http://dev-mesh-counting-service:19000/healthcheck/ok",
+        "Method": "POST",
+        "Interval": "20s",
+        "Timeout": "5s"
+      },
+      {
+        "Name": "Connect Sidecar Aliasing dev-mesh-counting-service",
+        "AliasService": "dev-mesh-counting-service"
+      }
+    ]
+  }
+}

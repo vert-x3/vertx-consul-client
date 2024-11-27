@@ -9,6 +9,7 @@ module io.vertx.consul.client {
   requires io.vertx.web.client;
 
   exports io.vertx.ext.consul;
+  exports io.vertx.ext.consul.connect;
   exports io.vertx.ext.consul.policy;
   exports io.vertx.ext.consul.token;
 
