@@ -19,7 +19,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.connect.ConnectOptions;
+import io.vertx.ext.consul.connect.ProxyOptions;
+import io.vertx.ext.consul.connect.SidecarServiceOptions;
+import io.vertx.ext.consul.connect.UpstreamOptions;
 import io.vertx.ext.consul.tests.Utils;
+import io.vertx.ext.consul.tests.instance.SemVer;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
@@ -33,6 +38,7 @@ import java.util.stream.Collectors;
 import static io.vertx.ext.consul.tests.RandomObjects.randomServiceOptions;
 import static io.vertx.ext.consul.tests.Utils.*;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
+import static io.vertx.test.core.TestUtils.randomPortInt;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -52,6 +58,39 @@ public class Services extends ChecksBase {
       tc.assertEquals(s.getMeta().get(entry.getKey()), entry.getValue());
     }
     return serviceId;
+  }
+
+  @Test
+  public void connect(TestContext tc) {
+    if (consul.semVer().compareTo(new SemVer("1.8.0")) < 0) {
+      return;
+    }
+    Async async = tc.async();
+    String serviceName = randomAlphaString(10);
+    ConnectOptions connectOpts = new ConnectOptions()
+      .setSidecarService(new SidecarServiceOptions()
+        .setPort(randomPortInt())
+        .setProxy(new ProxyOptions()
+          .setUpstreams(Collections.singletonList(
+            new UpstreamOptions()
+              .setDestinationName("dest_name")
+              .setLocalBindPort(3333)
+          ))));
+    ServiceOptions opts = randomServiceOptions()
+      .setName(serviceName)
+      .setId(null)
+      .setConnectOptions(connectOpts);
+    writeClient.registerService(opts).onComplete(tc.asyncAssertSuccess(reg -> {
+      writeClient.localServices().onComplete(tc.asyncAssertSuccess(services -> {
+        tc.assertEquals(services.size(), 2); // service and sidecar
+        tc.assertEquals(services.stream().filter(s -> s.getName().startsWith(serviceName)).count(), 2L);
+        tc.assertEquals(services.stream().filter(s -> s.getName().endsWith("-sidecar-proxy")).count(), 1L);
+        writeClient.deregisterService(serviceName).onComplete(tc.asyncAssertSuccess(deregister -> {
+          async.countDown();
+        }));
+      }));
+    }));
+    async.await();
   }
 
   @Test
