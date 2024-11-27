@@ -11,6 +11,7 @@ import io.vertx.ext.consul.tests.dc.ConsulDatacenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.consul.ConsulContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
@@ -23,10 +24,12 @@ public class ConsulInstance extends ConsulContainer {
   private final ConsulDatacenter dc;
 
   private JsonObject configuration = new JsonObject();
+  private final SemVer semVer;
 
   private ConsulInstance(String image, String version, ConsulDatacenter dc) {
-    super(image + ":" + version);
+    super(DockerImageName.parse(image + ":" + version).asCompatibleSubstituteFor("consul"));
     this.dc = dc;
+    this.semVer = new SemVer(version);
   }
 
   public static ConsulInstance.Builder builder() {
@@ -39,6 +42,10 @@ public class ConsulInstance extends ConsulContainer {
       .keyFile("server-key.pem")
       .certFile("server-cert.pem")
       .caFile("server-cert-ca-chain.pem");
+  }
+
+  public SemVer semVer() {
+    return semVer;
   }
 
   @Override
@@ -115,8 +122,8 @@ public class ConsulInstance extends ConsulContainer {
 
   public static class Builder {
     private static final String CONSUL_LOCAL_CONFIG_ENV = "CONSUL_LOCAL_CONFIG";
-    private static final String DEFAULT_IMAGE = "consul";
-    private static final String DEFAULT_VERSION = "1.13.7";
+    private static final String DEFAULT_IMAGE = "hashicorp/consul";
+    private static final String DEFAULT_VERSION = "1.18.1";
     private static final int DNS_PORT = 8600;
     private static final int HTTP_PORT = 8500;
     private static final int HTTPS_PORT = 8501;
@@ -206,6 +213,9 @@ public class ConsulInstance extends ConsulContainer {
       cfg.put("bind_addr", "0.0.0.0");
 
       SemVer semVer = new SemVer(version);
+      if (semVer.compareTo(new SemVer("1.8.0")) >= 0) {
+        cfg.put("connect", new JsonObject().put("enabled", true));
+      }
 
       if (semVer.compareTo(new SemVer("1.4.0")) >= 0) {
         JsonObject master;
@@ -231,6 +241,10 @@ public class ConsulInstance extends ConsulContainer {
         ports.put("rpc", RPC_PORT);
       } else {
         ports.put("server", RPC_PORT);
+      }
+
+      if (semVer.compareTo(new SemVer("1.14.0")) >= 0) {
+        ports.put("grpc_tls", 8503);
       }
 
       if (semVer.compareTo(new SemVer("0.8.0")) >= 0) {
