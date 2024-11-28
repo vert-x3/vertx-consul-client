@@ -34,6 +34,38 @@ import static io.vertx.test.core.TestUtils.randomAlphaString;
 public class Checks extends ChecksBase {
 
   @Test
+  public void filter() {
+    String serviceName = "serviceName";
+    ServiceOptions service = new ServiceOptions()
+      .setCheckOptions(new CheckOptions().setTtl("1m").setStatus(CheckStatus.PASSING))
+      .setName(serviceName)
+      .setAddress("10.0.0.1")
+      .setPort(8080);
+    runAsync(() -> writeClient.registerService(service));
+    CheckOptions check = new CheckOptions()
+      .setId("checkId")
+      .setName("checkName")
+      .setNotes("checkNotes")
+      .setServiceId(serviceName)
+      .setStatus(CheckStatus.PASSING)
+      .setTtl("1m");
+    runAsync(() -> writeClient.registerCheck(check));
+
+    checkFilter(serviceName, null, 2);
+    checkFilter(serviceName, "CheckID==\"service:" + serviceName + "\"", 1);
+    checkFilter(serviceName, "CheckID==\"checkId\"", 1);
+    checkFilter(serviceName, "CheckID==\"kek\"", 0);
+
+    runAsync(() -> writeClient.deregisterService(serviceName));
+  }
+
+  private void checkFilter(String serviceName, String filter, int expectedSize) {
+    CheckQueryOptions opts = new CheckQueryOptions().setFilter(filter);
+    CheckList list1 = getAsync(() -> readClient.healthChecksWithOptions(serviceName, opts));
+    assertEquals(expectedSize, list1.getList().size());
+  }
+
+  @Test
   public void bindCheckToService() {
     String serviceName = "serviceName";
     ServiceOptions service = new ServiceOptions()
