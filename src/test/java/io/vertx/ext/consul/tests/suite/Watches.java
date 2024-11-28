@@ -15,12 +15,11 @@
  */
 package io.vertx.ext.consul.tests.suite;
 
-import io.vertx.core.Future;
 import io.vertx.ext.consul.*;
-import io.vertx.ext.consul.tests.impl.WatchKeyPrefixCnt;
-import io.vertx.ext.consul.tests.instance.ConsulInstance;
 import io.vertx.ext.consul.tests.ConsulTestBase;
 import io.vertx.ext.consul.tests.Utils;
+import io.vertx.ext.consul.tests.impl.WatchKeyPrefixCnt;
+import io.vertx.ext.consul.tests.instance.ConsulInstance;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -303,7 +302,7 @@ public class Watches extends ConsulTestBase {
     watch.setHandler(kv -> eventCnt.incrementAndGet());
     watch.start();
 
-    runAsync(h -> vertx.setTimer(1500, l -> h.handle(Future.succeededFuture())));
+    runAsync(() -> vertx.timer(1500));
 
     tc.assertEquals(1, eventCnt.get());
     tc.assertTrue(watch.cnt() < 5);

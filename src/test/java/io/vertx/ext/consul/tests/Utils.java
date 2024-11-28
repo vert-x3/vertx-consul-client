@@ -106,27 +106,6 @@ public class Utils {
     }
   }
 
-  public static void runAsync(Consumer<Handler<AsyncResult<Void>>> runner) {
-    CountDownLatch latch = new CountDownLatch(1);
-    Promise<Void> promise = Promise.promise();
-    runner.accept(h -> {
-      if (h.succeeded()) {
-        promise.complete();
-      } else {
-        promise.fail(h.cause());
-      }
-      latch.countDown();
-    });
-    try {
-      latch.await(10, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    if (promise.future().failed()) {
-      throw new RuntimeException(promise.future().cause());
-    }
-  }
-
   public static <T> T getAsync(Supplier<Future<T>> runner) {
     CountDownLatch latch = new CountDownLatch(1);
     Promise<T> promise = Promise.promise();

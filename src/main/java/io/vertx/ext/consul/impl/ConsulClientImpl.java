@@ -16,7 +16,10 @@
 package io.vertx.ext.consul.impl;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.vertx.core.*;
+import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -418,13 +421,32 @@ public class ConsulClientImpl implements ConsulClient {
     return healthChecksWithOptions(service, null);
   }
 
+  private Query fromCheckQueryOptions(CheckQueryOptions options) {
+    Query query = new Query();
+    if (options != null) {
+      if (options.getBlockingOptions() != null) {
+        query.put(options.getBlockingOptions());
+      }
+      if (options.getNear() != null) {
+        query.put("near", options.getNear());
+      }
+      if (options.getDc() != null && !options.getDc().isEmpty()) {
+        query.put("dc", options.getDc());
+      }
+      if (options.getFilter() != null && !options.getFilter().isEmpty()) {
+        query.put("filter", options.getFilter());
+      }
+    }
+    return query;
+  }
+
   @Override
   public Future<CheckList> healthChecksWithOptions(String service, CheckQueryOptions options) {
-    Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
-    return requestArray(HttpMethod.GET, "/v1/health/checks/" + urlEncode(service), query, null, (arr, headers) -> {
-      List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
-      return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
-    });
+    return requestArray(HttpMethod.GET, "/v1/health/checks/" + urlEncode(service), fromCheckQueryOptions(options), null,
+      (arr, headers) -> {
+        List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
+        return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+      });
   }
 
   @Override
@@ -434,11 +456,11 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<CheckList> healthStateWithOptions(HealthState healthState, CheckQueryOptions options) {
-    Query query = options == null ? null : Query.of("near", options.getNear()).put(options.getBlockingOptions());
-    return requestArray(HttpMethod.GET, "/v1/health/state/" + healthState.key, query, null, (arr, headers) -> {
-      List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
-      return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
-    });
+    return requestArray(HttpMethod.GET, "/v1/health/state/" + healthState.key, fromCheckQueryOptions(options), null,
+      (arr, headers) -> {
+        List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
+        return new CheckList().setList(list).setIndex(Long.parseLong(headers.get(INDEX_HEADER)));
+      });
   }
 
   @Override
@@ -467,14 +489,7 @@ public class ConsulClientImpl implements ConsulClient {
 
   @Override
   public Future<CheckList> healthNodesWithOptions(String node, CheckQueryOptions options) {
-    Query query = new Query().put("dc", options.getDc());
-    if (options.getBlockingOptions() != null) {
-      query.put(options.getBlockingOptions());
-    }
-    if (options.getDc() != null && !options.getDc().isEmpty()) {
-      query.put("dc", options.getDc());
-    }
-    return requestArray(HttpMethod.GET, "/v1/health/node/" + urlEncode(node), query,
+    return requestArray(HttpMethod.GET, "/v1/health/node/" + urlEncode(node), fromCheckQueryOptions(options),
       options.toJson().encode(),
       (arr, headers) -> {
         List<Check> list = arr.stream().map(obj -> CheckParser.parse((JsonObject) obj)).collect(Collectors.toList());
