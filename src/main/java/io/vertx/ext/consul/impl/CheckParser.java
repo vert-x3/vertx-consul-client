@@ -37,7 +37,6 @@ class CheckParser {
     return new Check()
       .setId(check.getString(ID_KEY))
       .setName(check.getString(NAME_KEY))
-      .setNodeName(check.getString(NODE_KEY))
       .setStatus(CheckStatus.of(check.getString(STATUS_KEY)))
       .setNotes(check.getString(NOTES_KEY))
       .setOutput(check.getString(OUTPUT_KEY))
