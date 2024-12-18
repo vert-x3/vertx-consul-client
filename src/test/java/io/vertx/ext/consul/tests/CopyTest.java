@@ -15,7 +15,9 @@
  */
 package io.vertx.ext.consul.tests;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.token.AclToken;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -34,16 +36,8 @@ public class CopyTest {
 
   @Test
   public void testAclToken() {
-    AclToken token = randomAclToken();
-    checkAclToken(token, new AclToken(token));
-    checkAclToken(token, new AclToken(token.toJson()));
-  }
-
-  private void checkAclToken(AclToken expected, AclToken actual) {
-    assertEquals(expected.getId(), actual.getId());
-    assertEquals(expected.getName(), actual.getName());
-    assertEquals(expected.getType(), actual.getType());
-    assertEquals(expected.getRules(), actual.getRules());
+    JsonObject token = randomAclToken();
+    assertEquals(token, new AclToken(token).toJson());
   }
 
   @Test
@@ -209,7 +203,6 @@ public class CopyTest {
     assertEquals(expected.hashCode(), actual.hashCode());
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getName(), actual.getName());
-    assertEquals(expected.getNodeName(), actual.getNodeName());
     assertEquals(expected.getNotes(), actual.getNotes());
     assertEquals(expected.getOutput(), actual.getOutput());
     assertEquals(expected.getServiceId(), actual.getServiceId());

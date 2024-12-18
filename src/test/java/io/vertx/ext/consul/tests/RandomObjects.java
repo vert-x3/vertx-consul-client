@@ -15,7 +15,12 @@
  */
 package io.vertx.ext.consul.tests;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
+import io.vertx.ext.consul.token.AclToken;
+import io.vertx.ext.consul.token.NodeTokenApplyingOptions;
+import io.vertx.ext.consul.token.PolicyLink;
+import io.vertx.ext.consul.token.ServiceTokenApplyingOptions;
 import io.vertx.test.core.TestUtils;
 
 import java.util.*;
@@ -28,12 +33,19 @@ import static io.vertx.test.core.TestUtils.*;
  */
 public class RandomObjects {
 
-  public static AclToken randomAclToken() {
+  public static JsonObject randomAclToken() {
     return new AclToken()
-      .setId(randomAlphaString(10))
-      .setName(randomAlphaString(10))
-      .setType(randomElement(AclTokenType.values()))
-      .setRules(randomAlphaString(10));
+      .local()
+      .setDescription(randomAlphaString(10))
+      .setPolicies(Collections.singletonList(
+        new PolicyLink().setId(randomAlphaString(10)).setName(randomAlphaString(10))))
+      .setServiceIdentities(Collections.singletonList(
+        new ServiceTokenApplyingOptions(new JsonObject().put("ServiceName", randomAlphaString(10)))))
+      .setNodeIdentities(Collections.singletonList(
+        new NodeTokenApplyingOptions(new JsonObject().put("NodeName", randomAlphaString(10)))))
+      .setNamespace(randomAlphaString(10))
+      .setExpirationTime(randomAlphaString(10))
+      .toJson(); // TODO
   }
 
   public static KeyValue randomKeyValue() {
@@ -62,7 +74,6 @@ public class RandomObjects {
     return new Check()
       .setId(randomAlphaString(10))
       .setName(randomAlphaString(10))
-      .setNodeName(randomAlphaString(10))
       .setNotes(randomAlphaString(100))
       .setOutput(randomAlphaString(100))
       .setServiceId(randomAlphaString(10))

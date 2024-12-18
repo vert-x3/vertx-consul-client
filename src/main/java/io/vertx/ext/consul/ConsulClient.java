@@ -21,6 +21,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.impl.ConsulClientImpl;
 import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.AclToken;
 import io.vertx.ext.consul.token.CloneAclTokenOptions;
 
 import java.util.List;
@@ -228,7 +229,7 @@ public interface ConsulClient {
   /**
    * This endpoint updates an existing ACL policy
    *
-   * @param id uuid of existing policy
+   * @param id     uuid of existing policy
    * @param policy options that will be applied to the existing policy
    * @return a future of AclPolicy
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/policies#update-a-policy">PUT /acl/policy/:id</a>
@@ -262,7 +263,7 @@ public interface ConsulClient {
    * {@link AclToken} secretId - using in {@link ConsulClientOptions#setAclToken(String)}.
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#create-a-token">/v1/acl/create</a> endpoint
    */
-  Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token);
+  Future<AclToken> createAclToken(AclToken token);
 
   /**
    * Update an existing Acl token
@@ -277,7 +278,7 @@ public interface ConsulClient {
   /**
    * Clones an existing ACL token
    *
-   * @param accessorId    uuid of the token
+   * @param accessorId           uuid of the token
    * @param cloneAclTokenOptions properties of cloned token
    * @return a future NewAclToken like in {@link #createAclToken(io.vertx.ext.consul.token.AclToken)}
    * @see <a href="https://developer.hashicorp.com/consul/api-docs/v1.11.x/acl/tokens#clone-a-token">/acl/token/:accessorId/clone</a> endpoint
@@ -303,75 +304,11 @@ public interface ConsulClient {
 
   /**
    * Deletes an ACL token
+   *
    * @param accessorId uuid of token
    * @return a future boolean value: true or false, indicating whether the deletion was successful.
    */
   Future<Boolean> deleteAclToken(String accessorId);
-
-  /**
-   * Legacy create new Acl token
-   *
-   * @param token properties of the token
-   * @return a future provided with ID of created token
-   * @see <a href="https://www.consul.io/api/acl.html#create-acl-token">/v1/acl/create</a> endpoint
-   * @deprecated Use {@link #createAclToken(io.vertx.ext.consul.token.AclToken)} instead
-   */
-  @Deprecated
-  Future<String> createAclToken(AclToken token);
-
-  /**
-   * Update Acl token
-   *
-   * @param token properties of the token to be updated
-   * @return a future provided with ID of updated
-   * @see <a href="https://www.consul.io/api/acl.html#update-acl-token">/v1/acl/update</a> endpoint
-   * @deprecated Use {@link #updateAclToken(String, io.vertx.ext.consul.token.AclToken)} instead
-   */
-  @Deprecated
-  Future<String> updateAclToken(AclToken token);
-
-  /**
-   * Clone Acl token
-   *
-   * @param id the ID of token to be cloned
-   * @return a future provided with ID of cloned token
-   * @see <a href="https://www.consul.io/api/acl.html#clone-acl-token">/v1/acl/clone/:uuid</a> endpoint
-   * @deprecated Use {@link #cloneAclToken(String, CloneAclTokenOptions)} instead
-   */
-  @Deprecated
-  Future<String> cloneAclToken(String id);
-
-  /**
-   * Get list of Acl token
-   *
-   * @return a future provided with list of tokens
-   * @see <a href="https://www.consul.io/api/acl.html#list-acls">/v1/acl/list</a> endpoint
-   * @deprecated Use {@link #getAclTokens()} instead
-   */
-  @Deprecated
-  Future<List<AclToken>> listAclTokens();
-
-  /**
-   * Get info of Acl token
-   *
-   * @param id the ID of token
-   * @return a future provided with token
-   * @see <a href="https://www.consul.io/api/acl.html#read-acl-token">/v1/acl/info/:uuid</a> endpoint
-   * @deprecated Use {@link #readAclToken(String)} instead
-   */
-  @Deprecated
-  Future<AclToken> infoAclToken(String id);
-
-  /**
-   * Destroy Acl token
-   *
-   * @param id the ID of token
-   * @return a future notified on complete
-   * @see <a href="https://www.consul.io/api/acl.html#delete-acl-token">/v1/acl/destroy/:uuid</a> endpoint
-   * @deprecated Use {@link #deleteAclToken(String)} instead
-   */
-  @Deprecated
-  Future<Void> destroyAclToken(String id);
 
   /**
    * Fires a new user event

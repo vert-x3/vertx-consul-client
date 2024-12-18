@@ -68,6 +68,7 @@ public class AclToken {
   }
 
   public AclToken(JsonObject json) {
+    this.description = json.getString(DESCRIPTION_KEY);
     this.accessorId = json.getString(ACCESSOR_ID_KEY);
     this.secretId = json.getString(SECRET_ID_KEY);
     this.policies = new ArrayList<>();

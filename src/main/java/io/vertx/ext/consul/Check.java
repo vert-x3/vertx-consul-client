@@ -36,8 +36,6 @@ public class Check {
   private String serviceId;
   private String serviceName;
   private String node;
-  @Deprecated
-  private String nodeName;
 
   /**
    * Default constructor
@@ -58,7 +56,6 @@ public class Check {
     this.output = other.output;
     this.serviceId = other.serviceId;
     this.serviceName = other.serviceName;
-    this.nodeName = other.nodeName;
     this.node = other.node;
   }
 
@@ -98,17 +95,6 @@ public class Check {
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * Get the name of node.
-   * Deprecated since consul 1.11, renamed to 'node'. Use {@link #getNode()} instead
-   *
-   * @return name of node
-   */
-  @Deprecated
-  public String getNodeName() {
-    return nodeName;
   }
 
   /**
@@ -244,19 +230,6 @@ public class Check {
 
   /**
    * Set the name of node
-   * Deprecated since consul 1.11, renamed to 'node'. Use {@link #setNode(String)} ()} instead
-   *
-   * @param nodeName the name of node
-   * @return reference to this, for fluency
-   */
-  @Deprecated
-  public Check setNodeName(String nodeName) {
-    this.nodeName = nodeName;
-    return this;
-  }
-
-  /**
-   * Set the name of node
    *
    * @param node the name of node
    * @return reference to this, for fluency
@@ -280,7 +253,6 @@ public class Check {
     if (output != null ? !output.equals(check.output) : check.output != null) return false;
     if (serviceId != null ? !serviceId.equals(check.serviceId) : check.serviceId != null) return false;
     if (serviceName != null ? !serviceName.equals(check.serviceName) : check.serviceName != null) return false;
-    if (nodeName != null ? !nodeName.equals(check.nodeName) : check.nodeName != null) return false;
     return node != null ? node.equals(check.node) : check.node == null;
   }
 
@@ -293,7 +265,6 @@ public class Check {
     result = 31 * result + (output != null ? output.hashCode() : 0);
     result = 31 * result + (serviceId != null ? serviceId.hashCode() : 0);
     result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
-    result = 31 * result + (nodeName != null ? nodeName.hashCode() : 0);
     result = 31 * result + (node != null ? node.hashCode() : 0);
     return result;
   }

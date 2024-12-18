@@ -26,6 +26,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.*;
 import io.vertx.ext.consul.policy.AclPolicy;
+import io.vertx.ext.consul.token.AclToken;
 import io.vertx.ext.consul.token.CloneAclTokenOptions;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
@@ -226,39 +227,39 @@ public class ConsulClientImpl implements ConsulClient {
     );
   }
 
-  public Future<io.vertx.ext.consul.token.AclToken> createAclToken(io.vertx.ext.consul.token.AclToken token) {
+  public Future<AclToken> createAclToken(AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token", null, token.toJson().encode(), (obj, headers) ->
-      new io.vertx.ext.consul.token.AclToken(obj)
+      new AclToken(obj)
     );
   }
 
   @Override
-  public Future<io.vertx.ext.consul.token.AclToken> updateAclToken(String accessorId, io.vertx.ext.consul.token.AclToken token) {
+  public Future<AclToken> updateAclToken(String accessorId, AclToken token) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId), null, token.toJson().encode(),
-      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
+      (obj, headers) -> new AclToken(obj)
     );
   }
 
   @Override
-  public Future<io.vertx.ext.consul.token.AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclTokenOptions) {
+  public Future<AclToken> cloneAclToken(String accessorId, CloneAclTokenOptions cloneAclTokenOptions) {
     return requestObject(HttpMethod.PUT, "/v1/acl/token/" + urlEncode(accessorId) + "/clone", null,
       cloneAclTokenOptions.toJson().encode(),
-      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
+      (obj, headers) -> new AclToken(obj)
     );
   }
 
   @Override
-  public Future<List<io.vertx.ext.consul.token.AclToken>> getAclTokens() {
+  public Future<List<AclToken>> getAclTokens() {
     return requestArray(HttpMethod.GET, "/v1/acl/tokens", null, null, (arr, headers) ->
       arr.stream()
-        .map(obj -> new io.vertx.ext.consul.token.AclToken((JsonObject) obj))
+        .map(obj -> new AclToken((JsonObject) obj))
         .collect(Collectors.toList()));
   }
 
   @Override
-  public Future<io.vertx.ext.consul.token.AclToken> readAclToken(String accessorId) {
+  public Future<AclToken> readAclToken(String accessorId) {
     return requestObject(HttpMethod.GET, "/v1/acl/token/" + urlEncode(accessorId), null, null,
-      (obj, headers) -> new io.vertx.ext.consul.token.AclToken(obj)
+      (obj, headers) -> new AclToken(obj)
     );
   }
 
@@ -267,45 +268,6 @@ public class ConsulClientImpl implements ConsulClient {
     return requestString(HttpMethod.DELETE, "/v1/acl/token/" + urlEncode(accessorId), null, null,
       (str, headers) -> Boolean.parseBoolean(str)
     );
-  }
-
-  @Override
-  public Future<String> createAclToken(AclToken token) {
-    return requestObject(HttpMethod.PUT, "/v1/acl/create", null, token.toJson().encode(), (obj, headers) ->
-      obj.getString("ID"));
-  }
-
-  @Override
-  public Future<String> updateAclToken(AclToken token) {
-    return requestObject(HttpMethod.PUT, "/v1/acl/update", null, token.toJson().encode(), (obj, headers) ->
-      obj.getString("ID"));
-  }
-
-  @Override
-  public Future<String> cloneAclToken(String id) {
-    return requestObject(HttpMethod.PUT, "/v1/acl/clone/" + urlEncode(id), null, null, (obj, headers) ->
-      obj.getString("ID"));
-  }
-
-  @Override
-  public Future<List<AclToken>> listAclTokens() {
-    return requestArray(HttpMethod.GET, "/v1/acl/list", null, null, (arr, headers) ->
-      arr.stream()
-        .map(obj -> new AclToken((JsonObject) obj))
-        .collect(Collectors.toList()));
-  }
-
-  @Override
-  public Future<AclToken> infoAclToken(String id) {
-    return requestArray(HttpMethod.GET, "/v1/acl/info/" + urlEncode(id), null, null, (arr, headers) -> {
-      JsonObject jsonObject = arr.getJsonObject(0);
-      return new AclToken(jsonObject);
-    });
-  }
-
-  @Override
-  public Future<Void> destroyAclToken(String id) {
-    return requestVoid(HttpMethod.PUT, "/v1/acl/destroy/" + urlEncode(id), null, null);
   }
 
   @Override
