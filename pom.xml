@@ -11,6 +11,8 @@
   <artifactId>vertx-consul-client</artifactId>
   <version>5.0.1-SNAPSHOT</version>
 
+  <name>Vert.x Consul Client</name>
+
   <scm>
     <connection>scm:git:git@github.com:vert-x3/vertx-consul-client.git</connection>
     <developerConnection>scm:git:git@github.com:vert-x3/vertx-consul-client.git</developerConnection>
