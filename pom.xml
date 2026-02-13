@@ -19,7 +19,7 @@
   </scm>
 
   <properties>
-    <testcontainersVersion>1.17.5</testcontainersVersion>
+    <testcontainersVersion>1.21.4</testcontainersVersion>
     <junit.version>4.13.1</junit.version>
 
     <grpc.version>1.50.2</grpc.version>
