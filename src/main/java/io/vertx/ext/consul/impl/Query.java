@@ -15,9 +15,7 @@
  */
 package io.vertx.ext.consul.impl;
 
-import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.consul.BlockingQueryOptions;
-import io.vertx.ext.web.client.HttpRequest;
 
 import java.util.HashMap;
 import java.util.Map;

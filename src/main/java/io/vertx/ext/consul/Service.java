@@ -20,10 +20,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.impl.Utils.listOf;
 import static io.vertx.ext.consul.impl.Utils.mapStringString;
