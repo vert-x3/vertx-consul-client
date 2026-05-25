@@ -18,7 +18,6 @@ package io.vertx.ext.consul.impl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.consul.KeyValue;
 
-import java.util.Base64;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
