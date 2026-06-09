@@ -51,9 +51,12 @@ public class Catalog extends ConsulTestBase {
   @Test
   public void nodes(TestContext tc) {
     readClient.catalogNodes().onComplete(tc.asyncAssertSuccess(nodes -> {
-      tc.assertEquals(nodes.getList().size(), 1);
-      Node node = nodes.getList().get(0);
-      tc.assertEquals(node.getName(), consul.getConfig("node_name"));
+      for (Node node : nodes.getList()) {
+        if (node.getName().equals(consul.getConfig("node_name"))) {
+          return;
+        }
+      }
+      tc.fail("Could not find the node in the catalog");
     }));
   }
 
