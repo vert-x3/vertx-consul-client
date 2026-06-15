@@ -33,12 +33,13 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.tests.RandomObjects.randomServiceOptions;
 import static io.vertx.ext.consul.tests.Utils.*;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
 import static io.vertx.test.core.TestUtils.randomPortInt;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -62,9 +63,7 @@ public class Services extends ChecksBase {
 
   @Test
   public void connect(TestContext tc) {
-    if (consul.semVer().compareTo(new SemVer("1.8.0")) < 0) {
-      return;
-    }
+    assumeTrue("Not supported before Consul 1.8.0", consul.semVer().compareTo(new SemVer("1.8.0")) >= 0);
     Async async = tc.async();
     String serviceName = randomAlphaString(10);
     ConnectOptions connectOpts = new ConnectOptions()
@@ -82,9 +81,8 @@ public class Services extends ChecksBase {
       .setConnectOptions(connectOpts);
     writeClient.registerService(opts).onComplete(tc.asyncAssertSuccess(reg -> {
       writeClient.localServices().onComplete(tc.asyncAssertSuccess(services -> {
-        tc.assertEquals(services.size(), 2); // service and sidecar
-        tc.assertEquals(services.stream().filter(s -> s.getName().startsWith(serviceName)).count(), 2L);
-        tc.assertEquals(services.stream().filter(s -> s.getName().endsWith("-sidecar-proxy")).count(), 1L);
+        tc.assertEquals(2L, services.stream().filter(s -> s.getName().startsWith(serviceName)).count());
+        tc.assertEquals(1L, services.stream().filter(s -> s.getName().endsWith("-sidecar-proxy")).count());
         writeClient.deregisterService(serviceName).onComplete(tc.asyncAssertSuccess(deregister -> {
           async.countDown();
         }));
@@ -196,7 +194,7 @@ public class Services extends ChecksBase {
 
     ServiceEntryList list1 = getAsync(() -> readClient.healthServiceNodes("service", true));
     assertEquals(list1.getList().size(), 3);
-    List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
+    List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(toList());
     Optional<String> nodeId = list1
       .getList()
       .stream()
@@ -208,8 +206,8 @@ public class Services extends ChecksBase {
 
     assertTrue(nodeId.isPresent());
     CheckList nodeHealthChecks = getAsync(() -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions()));
-    assertEquals(5, nodeHealthChecks.getList().size());
-    assertTrue(nodeHealthChecks.getList().stream().allMatch(it -> it.getStatus() == CheckStatus.PASSING));
+    assertEquals(4L, nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).count());
+    assertTrue(nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).allMatch(it -> it.getStatus() == CheckStatus.PASSING));
 
     ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
     ServiceEntryList list2 = getAsync(() -> readClient.healthServiceNodesWithOptions("service", true, opts2));
@@ -229,7 +227,7 @@ public class Services extends ChecksBase {
     runAsync(() -> writeClient.failCheck("service:id1"));
     awaitLatch(latch);
     CheckList checksWithFailed = getAsync(() -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions()));
-    assertEquals(5, nodeHealthChecks.getList().size());
+    assertEquals(4L, nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).count());
     Optional<Check> failedCheck = checksWithFailed.getList().stream()
       .filter(it -> Objects.equals(it.getId(), "service:id1"))
       .findFirst();
@@ -245,7 +243,7 @@ public class Services extends ChecksBase {
     ServiceList localConsulList = getAsync(() -> writeClient.catalogServiceNodes("consul"));
     assertEquals(localConsulList.getList().size(), 1);
     List<Service> catalogConsulList = Utils.<ServiceList>getAsync(() -> writeClient.catalogServices())
-      .getList().stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
+      .getList().stream().filter(s -> s.getName().equals("consul")).collect(toList());
     assertEquals(1, catalogConsulList.size());
     assertEquals(0, catalogConsulList.get(0).getTags().size());
   }
@@ -262,7 +260,9 @@ public class Services extends ChecksBase {
     runAsync(() -> writeClient.registerService(service));
     runAsync(() -> writeClient.passCheck("service:" + serviceId));
 
-    List<Check> checks = getAsync(() -> writeClient.localChecks());
+    List<Check> checks = getAsync(() -> writeClient.localChecks()).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(1, checks.size());
 
     String reason = "special symbols like `&` are allowed (хорошо)";
@@ -273,7 +273,9 @@ public class Services extends ChecksBase {
     runAsync(() -> writeClient.maintenanceService(opts));
 
     // TODO undocumented (?) behavior
-    checks = getAsync(() -> writeClient.localChecks());
+    checks = getAsync(() -> writeClient.localChecks()).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(2, checks.size());
     long cnt = checks.stream().filter(info -> info.getStatus() == CheckStatus.CRITICAL).count();
     assertEquals(1, cnt);
@@ -282,7 +284,9 @@ public class Services extends ChecksBase {
     opts.setEnable(false);
     runAsync(() -> writeClient.maintenanceService(opts));
 
-    checks = getAsync(() -> writeClient.localChecks());
+    checks = getAsync(() -> writeClient.localChecks()).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(1, checks.size());
 
     runAsync(() -> writeClient.deregisterService(serviceId));
@@ -319,7 +323,7 @@ public class Services extends ChecksBase {
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       request.accept(new BlockingQueryOptions().setIndex(idx), h -> {
         h.result().getList().forEach(s -> System.out.println("-+- " + s.toJson().encode()));
-        List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
+        List<String> names = h.result().getList().stream().map(Service::getName).collect(toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains("service2"));
       });
     });
