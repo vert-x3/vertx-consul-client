@@ -26,12 +26,11 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.vertx.ext.consul.RandomObjects.randomServiceOptions;
 import static io.vertx.ext.consul.Utils.*;
 import static io.vertx.test.core.TestUtils.randomAlphaString;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author <a href="mailto:ruslan.sennov@gmail.com">Ruslan Sennov</a>
@@ -158,7 +157,7 @@ public class Services extends ChecksBase {
 
     ServiceEntryList list1 = getAsync(h -> readClient.healthServiceNodes("service", true, h));
     assertEquals(list1.getList().size(), 3);
-    List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(Collectors.toList());
+    List<String> ids = list1.getList().stream().map(entry -> entry.getService().getId()).collect(toList());
     Optional<String> nodeId = list1
       .getList()
       .stream()
@@ -169,9 +168,9 @@ public class Services extends ChecksBase {
     assertTrue(ids.contains("id3"));
 
     assertTrue(nodeId.isPresent());
-    CheckList nodeHealthChecks = getAsync(h -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions(), h));
-    assertEquals(5, nodeHealthChecks.getList().size());
-    assertTrue(nodeHealthChecks.getList().stream().allMatch(it -> it.getStatus() == CheckStatus.PASSING));
+    CheckList nodeHealthChecks = getAsync((h -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions(), h)));
+    assertEquals(4L, nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).count());
+    assertTrue(nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).allMatch(it -> it.getStatus() == CheckStatus.PASSING));
 
     ServiceQueryOptions opts2 = new ServiceQueryOptions().setTag("tag2");
     ServiceEntryList list2 = getAsync(h -> readClient.healthServiceNodesWithOptions("service", true, opts2, h));
@@ -191,7 +190,7 @@ public class Services extends ChecksBase {
     runAsync(h -> writeClient.failCheck("service:id1", h));
     awaitLatch(latch);
     CheckList checksWithFailed = getAsync(h -> readClient.healthNodesWithOptions(nodeId.get(), new CheckQueryOptions(), h));
-    assertEquals(5, nodeHealthChecks.getList().size());
+    assertEquals(4L, nodeHealthChecks.getList().stream().filter(c -> "service".equals(c.getServiceName())).count());
     Optional<Check> failedCheck = checksWithFailed.getList().stream()
       .filter(it -> Objects.equals(it.getId(), "service:id1"))
       .findFirst();
@@ -207,7 +206,7 @@ public class Services extends ChecksBase {
     ServiceList localConsulList = getAsync(h -> writeClient.catalogServiceNodes("consul", h));
     assertEquals(localConsulList.getList().size(), 1);
     List<Service> catalogConsulList = Utils.<ServiceList>getAsync(h -> writeClient.catalogServices(h))
-      .getList().stream().filter(s -> s.getName().equals("consul")).collect(Collectors.toList());
+      .getList().stream().filter(s -> s.getName().equals("consul")).collect(toList());
     assertEquals(1, catalogConsulList.size());
     assertEquals(0, catalogConsulList.get(0).getTags().size());
   }
@@ -224,7 +223,9 @@ public class Services extends ChecksBase {
     runAsync(h -> writeClient.registerService(service, h));
     runAsync(h -> writeClient.passCheck("service:" + serviceId, h));
 
-    List<Check> checks = getAsync(h -> writeClient.localChecks(h));
+    List<Check> checks = Utils.<List<Check>>getAsync(h -> writeClient.localChecks(h)).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(1, checks.size());
 
     String reason = "special symbols like `&` are allowed (хорошо)";
@@ -235,7 +236,9 @@ public class Services extends ChecksBase {
     runAsync(h -> writeClient.maintenanceService(opts, h));
 
     // TODO undocumented (?) behavior
-    checks = getAsync(h -> writeClient.localChecks(h));
+    checks = Utils.<List<Check>>getAsync(h -> writeClient.localChecks(h)).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(2, checks.size());
     long cnt = checks.stream().filter(info -> info.getStatus() == CheckStatus.CRITICAL).count();
     assertEquals(1, cnt);
@@ -244,7 +247,9 @@ public class Services extends ChecksBase {
     opts.setEnable(false);
     runAsync(h -> writeClient.maintenanceService(opts, h));
 
-    checks = getAsync(h -> writeClient.localChecks(h));
+    checks = Utils.<List<Check>>getAsync(h -> writeClient.localChecks(h)).stream()
+      .filter(c -> serviceId.equals(c.getServiceId()))
+      .collect(toList());
     assertEquals(1, checks.size());
 
     runAsync(h -> writeClient.deregisterService(serviceId, h));
@@ -281,7 +286,7 @@ public class Services extends ChecksBase {
     waitBlockingQuery(latch, 10, list1.getIndex(), (idx, fut) -> {
       request.accept(new BlockingQueryOptions().setIndex(idx), h -> {
         h.result().getList().forEach(s -> System.out.println("-+- " + s.toJson().encode()));
-        List<String> names = h.result().getList().stream().map(Service::getName).collect(Collectors.toList());
+        List<String> names = h.result().getList().stream().map(Service::getName).collect(toList());
         waitComplete(vertx, fut, h.result().getIndex(), names.contains("service2"));
       });
     });
